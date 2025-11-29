@@ -248,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   Widget _buildPremiumHeader(String userName, bool isGuest) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -260,60 +260,46 @@ class _HomeScreenState extends State<HomeScreen>
               Row(
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
+                    width: 38,
+                    height: 38,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFFE8B931), Color(0xFFF4D03F)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFE8B931).withOpacity(0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                      borderRadius: BorderRadius.circular(11),
                     ),
                     child: const Center(
                       child: Text(
                         '॥',
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF1A0A2E),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
                         'Kundali',
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 18,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
-                          letterSpacing: -0.5,
                         ),
                       ),
-                      ShaderMask(
-                        shaderCallback:
-                            (bounds) => const LinearGradient(
-                              colors: [Color(0xFFE8B931), Color(0xFFF4D03F)],
-                            ).createShader(bounds),
-                        child: const Text(
-                          'Vedic Astrology',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                            letterSpacing: 1.5,
-                          ),
+                      Text(
+                        'Vedic Astrology',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFFE8B931).withOpacity(0.8),
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ],
@@ -329,7 +315,7 @@ class _HomeScreenState extends State<HomeScreen>
                     onTap: () {},
                     badge: true,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   _buildIconButton(
                     icon: CupertinoIcons.person_circle,
                     onTap: () => context.go('/profile'),
@@ -339,31 +325,28 @@ class _HomeScreenState extends State<HomeScreen>
             ],
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
           // Greeting Section
           Row(
             children: [
-              Text(_greetingEmoji, style: const TextStyle(fontSize: 28)),
-              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _greeting,
+                      '$_greeting $_greetingEmoji',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white.withOpacity(0.6),
-                        letterSpacing: 0.5,
+                        color: Colors.white.withOpacity(0.5),
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
                       userName,
                       style: const TextStyle(
-                        fontSize: 28,
+                        fontSize: 24,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                         letterSpacing: -0.5,
@@ -376,30 +359,29 @@ class _HomeScreenState extends State<HomeScreen>
               // Time Display
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
+                  horizontal: 14,
+                  vertical: 8,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withOpacity(0.08)),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white.withOpacity(0.06)),
                 ),
                 child: Column(
                   children: [
                     Text(
                       _currentTime,
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
-                        letterSpacing: -0.5,
                       ),
                     ),
                     Text(
                       DateFormat('EEE, MMM d').format(DateTime.now()),
                       style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.white.withOpacity(0.5),
+                        fontSize: 10,
+                        color: Colors.white.withOpacity(0.4),
                       ),
                     ),
                   ],
@@ -496,25 +478,25 @@ class _HomeScreenState extends State<HomeScreen>
         onTap();
       },
       child: Container(
-        width: 44,
-        height: 44,
+        width: 36,
+        height: 36,
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.white.withOpacity(0.06)),
         ),
         child: Stack(
           children: [
             Center(
-              child: Icon(icon, color: Colors.white.withOpacity(0.8), size: 22),
+              child: Icon(icon, color: Colors.white.withOpacity(0.6), size: 18),
             ),
             if (badge)
               Positioned(
-                top: 10,
-                right: 10,
+                top: 7,
+                right: 7,
                 child: Container(
-                  width: 8,
-                  height: 8,
+                  width: 6,
+                  height: 6,
                   decoration: const BoxDecoration(
                     color: Color(0xFFE8B931),
                     shape: BoxShape.circle,
@@ -528,74 +510,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildCosmicDivider() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.transparent, Colors.white.withOpacity(0.1)],
-                ),
-              ),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _buildStarIcon(size: 4),
-                const SizedBox(width: 8),
-                _buildStarIcon(size: 6),
-                const SizedBox(width: 8),
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8B931),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFE8B931).withOpacity(0.5),
-                        blurRadius: 8,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                _buildStarIcon(size: 6),
-                const SizedBox(width: 8),
-                _buildStarIcon(size: 4),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              height: 1,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.white.withOpacity(0.1), Colors.transparent],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStarIcon({required double size}) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.3),
-        shape: BoxShape.circle,
-      ),
-    );
+    return const SizedBox(height: 8);
   }
 
   Widget _buildCosmicEnergySection(
@@ -603,17 +518,15 @@ class _HomeScreenState extends State<HomeScreen>
     HoroscopeProvider horoscopeProvider,
   ) {
     final horoscope = horoscopeProvider.dailyHoroscopes[userSign];
+    final zodiacColor = _getZodiacColor(userSign);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle(
-            'Today\'s Cosmic Energy',
-            icon: CupertinoIcons.sparkles,
-          ),
-          const SizedBox(height: 16),
+          _buildSectionTitle('Daily Horoscope', icon: CupertinoIcons.sparkles),
+          const SizedBox(height: 14),
 
           GestureDetector(
             onTap: () {
@@ -621,64 +534,43 @@ class _HomeScreenState extends State<HomeScreen>
               context.go('/horoscope');
             },
             child: Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF1E1432).withOpacity(0.8),
-                    const Color(0xFF150E24).withOpacity(0.8),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withOpacity(0.08)),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF6B3FA0).withOpacity(0.1),
-                    blurRadius: 30,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
+                color: const Color(0xFF16101F),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withOpacity(0.06)),
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Header Row
                   Row(
                     children: [
-                      // Zodiac Symbol
+                      // Zodiac Icon
                       Container(
-                        width: 64,
-                        height: 64,
+                        width: 48,
+                        height: 48,
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [
-                              _getZodiacColor(userSign),
-                              _getZodiacColor(userSign).withOpacity(0.6),
-                            ],
+                            colors: [zodiacColor, zodiacColor.withOpacity(0.7)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: _getZodiacColor(userSign).withOpacity(0.3),
-                              blurRadius: 16,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
+                          borderRadius: BorderRadius.circular(14),
                         ),
                         child: Center(
                           child: Text(
                             _getZodiacSymbol(userSign),
                             style: const TextStyle(
-                              fontSize: 28,
+                              fontSize: 22,
                               color: Colors.white,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: 12),
 
+                      // Sign Info
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -686,95 +578,79 @@ class _HomeScreenState extends State<HomeScreen>
                             Text(
                               userSign,
                               style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
                                 color: Colors.white,
-                                letterSpacing: -0.5,
                               ),
                             ),
-                            const SizedBox(height: 4),
                             Text(
-                              'Daily Horoscope',
+                              'Today\'s Reading',
                               style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white.withOpacity(0.5),
+                                fontSize: 12,
+                                color: Colors.white.withOpacity(0.4),
                               ),
                             ),
                           ],
                         ),
                       ),
 
-                      // View Button
+                      // Arrow
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 8,
-                        ),
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.white.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Read',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withOpacity(0.9),
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              CupertinoIcons.arrow_right,
-                              size: 14,
-                              color: Colors.white.withOpacity(0.9),
-                            ),
-                          ],
+                        child: Icon(
+                          CupertinoIcons.chevron_right,
+                          size: 16,
+                          color: Colors.white.withOpacity(0.6),
                         ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 14),
 
-                  // Horoscope Preview
+                  // Horoscope Text
                   Text(
                     horoscope?.general ??
-                        'The celestial alignments today favor introspection and growth. Trust your intuition and remain open to unexpected opportunities.',
+                        'The stars align in your favor today. Trust your instincts and embrace new opportunities that come your way.',
                     style: TextStyle(
-                      fontSize: 14,
-                      height: 1.6,
-                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 13,
+                      height: 1.5,
+                      color: Colors.white.withOpacity(0.6),
                     ),
-                    maxLines: 3,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 14),
 
-                  // Cosmic Metrics Row
+                  // Divider
+                  Container(height: 1, color: Colors.white.withOpacity(0.06)),
+
+                  const SizedBox(height: 14),
+
+                  // Metrics Row - Simplified
                   Row(
                     children: [
-                      _buildCosmicMetric(
+                      _buildMinimalMetric(
                         label: 'Mood',
-                        value: horoscope?.mood ?? 'Inspired',
-                        icon: CupertinoIcons.heart_fill,
+                        value: horoscope?.mood ?? 'Positive',
                         color: const Color(0xFFFF6B9D),
                       ),
-                      const SizedBox(width: 12),
-                      _buildCosmicMetric(
-                        label: 'Lucky Color',
+                      _buildMetricDivider(),
+                      _buildMinimalMetric(
+                        label: 'Color',
                         value: horoscope?.luckyColor ?? 'Gold',
-                        icon: CupertinoIcons.circle_fill,
                         color: const Color(0xFFE8B931),
                       ),
-                      const SizedBox(width: 12),
-                      _buildCosmicMetric(
-                        label: 'Lucky Number',
+                      _buildMetricDivider(),
+                      _buildMinimalMetric(
+                        label: 'Number',
                         value: horoscope?.luckyNumber.toString() ?? '7',
-                        icon: CupertinoIcons.number,
                         color: const Color(0xFF4ECDC4),
                       ),
                     ],
@@ -788,89 +664,79 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildCosmicMetric({
+  Widget _buildMinimalMetric({
     required String label,
     required String value,
-    required IconData icon,
     required Color color,
   }) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2)),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 14, color: color),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 9,
-                      color: Colors.white.withOpacity(0.5),
-                      letterSpacing: 0.3,
-                    ),
-                  ),
-                  Text(
-                    value,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: color,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: color,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              color: Colors.white.withOpacity(0.4),
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildMetricDivider() {
+    return Container(
+      width: 1,
+      height: 28,
+      color: Colors.white.withOpacity(0.08),
     );
   }
 
   Widget _buildQuickActionsSection() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
+      padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('Explore', icon: CupertinoIcons.compass),
-          const SizedBox(height: 16),
+          _buildSectionTitle('Quick Actions', icon: CupertinoIcons.bolt_fill),
+          const SizedBox(height: 14),
 
           // Primary Actions Row
           Row(
             children: [
               Expanded(
                 child: _buildPrimaryActionCard(
-                  title: 'Generate\nKundali',
+                  title: 'Kundali',
                   subtitle: 'Birth Chart',
                   icon: '🔮',
-                  gradient: const [Color(0xFF6B3FA0), Color(0xFF9B59B6)],
+                  gradient: const [Color(0xFF6B3FA0), Color(0xFF8B5CF6)],
                   route: '/kundli',
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: _buildPrimaryActionCard(
-                  title: 'Match\nMaking',
+                  title: 'Matching',
                   subtitle: 'Compatibility',
-                  icon: '💑',
-                  gradient: const [Color(0xFFE74C8C), Color(0xFFFF6B9D)],
+                  icon: '💫',
+                  gradient: const [Color(0xFFD946EF), Color(0xFFF472B6)],
                   route: '/matchmaking',
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
           // Secondary Actions Grid
           Row(
@@ -878,12 +744,12 @@ class _HomeScreenState extends State<HomeScreen>
               Expanded(
                 child: _buildSecondaryActionCard(
                   title: 'Horoscope',
-                  icon: CupertinoIcons.star_circle_fill,
+                  icon: CupertinoIcons.sparkles,
                   color: const Color(0xFF4ECDC4),
                   route: '/horoscope',
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Expanded(
                 child: _buildSecondaryActionCard(
                   title: 'Panchang',
@@ -892,21 +758,21 @@ class _HomeScreenState extends State<HomeScreen>
                   route: '/panchang',
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Expanded(
                 child: _buildSecondaryActionCard(
                   title: 'AI Guru',
-                  icon: CupertinoIcons.sparkles,
+                  icon: CupertinoIcons.bubble_left_fill,
                   color: const Color(0xFFFF6B35),
                   route: '/chat',
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Expanded(
                 child: _buildSecondaryActionCard(
                   title: 'Learn',
                   icon: CupertinoIcons.book_fill,
-                  color: const Color(0xFF9B59B6),
+                  color: const Color(0xFF8B5CF6),
                   route: '/learn',
                 ),
               ),
@@ -930,61 +796,48 @@ class _HomeScreenState extends State<HomeScreen>
         context.go(route);
       },
       child: Container(
-        height: 140,
-        padding: const EdgeInsets.all(18),
+        height: 100,
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: gradient,
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: gradient[0].withOpacity(0.3),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(18),
         ),
-        child: Stack(
+        child: Row(
           children: [
-            // Background Pattern
-            Positioned(
-              right: -20,
-              bottom: -20,
-              child: Text(
-                icon,
-                style: TextStyle(
-                  fontSize: 80,
-                  color: Colors.white.withOpacity(0.2),
-                ),
+            Text(icon, style: const TextStyle(fontSize: 28)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Colors.white.withOpacity(0.7),
+                    ),
+                  ),
+                ],
               ),
             ),
-
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(icon, style: const TextStyle(fontSize: 32)),
-                const Spacer(),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.white.withOpacity(0.7),
-                  ),
-                ),
-              ],
+            Icon(
+              CupertinoIcons.chevron_right,
+              size: 16,
+              color: Colors.white.withOpacity(0.6),
             ),
           ],
         ),
@@ -1004,24 +857,24 @@ class _HomeScreenState extends State<HomeScreen>
         context.go(route);
       },
       child: Container(
-        height: 90,
-        padding: const EdgeInsets.all(12),
+        height: 72,
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: color.withOpacity(0.2)),
+          color: const Color(0xFF16101F),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.white.withOpacity(0.06)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 26),
-            const SizedBox(height: 8),
+            Icon(icon, color: color, size: 22),
+            const SizedBox(height: 6),
             Text(
               title,
               style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Colors.white.withOpacity(0.9),
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: Colors.white.withOpacity(0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -1036,15 +889,12 @@ class _HomeScreenState extends State<HomeScreen>
     final panchang = panchangProvider.currentPanchang;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle(
-            'Today\'s Panchang',
-            icon: CupertinoIcons.moon_stars_fill,
-          ),
-          const SizedBox(height: 16),
+          _buildSectionTitle('Panchang', icon: CupertinoIcons.moon_fill),
+          const SizedBox(height: 14),
 
           GestureDetector(
             onTap: () {
@@ -1052,37 +902,31 @@ class _HomeScreenState extends State<HomeScreen>
               context.go('/panchang');
             },
             child: Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF1A1425).withOpacity(0.9),
-                    const Color(0xFF0D0A14).withOpacity(0.9),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: const Color(0xFFE8B931).withOpacity(0.15),
-                ),
+                color: const Color(0xFF16101F),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withOpacity(0.06)),
               ),
               child: Column(
                 children: [
-                  // Hindu Date
+                  // Header Row
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        width: 40,
+                        height: 40,
                         decoration: BoxDecoration(
                           color: const Color(0xFFE8B931).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
-                          CupertinoIcons.calendar_today,
+                          CupertinoIcons.calendar,
                           color: Color(0xFFE8B931),
-                          size: 22,
+                          size: 20,
                         ),
                       ),
-                      const SizedBox(width: 14),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1090,7 +934,7 @@ class _HomeScreenState extends State<HomeScreen>
                             Text(
                               panchang?.vara ?? 'Friday',
                               style: const TextStyle(
-                                fontSize: 17,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
                               ),
@@ -1098,80 +942,76 @@ class _HomeScreenState extends State<HomeScreen>
                             Text(
                               panchang?.tithi ?? 'Panchami',
                               style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white.withOpacity(0.5),
+                                fontSize: 12,
+                                color: Colors.white.withOpacity(0.4),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      Icon(
-                        CupertinoIcons.chevron_right,
-                        color: Colors.white.withOpacity(0.3),
-                        size: 18,
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          CupertinoIcons.chevron_right,
+                          size: 16,
+                          color: Colors.white.withOpacity(0.6),
+                        ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 14),
 
-                  // Panchang Elements
+                  Container(height: 1, color: Colors.white.withOpacity(0.06)),
+
+                  const SizedBox(height: 14),
+
+                  // Panchang Info Grid
                   Row(
                     children: [
-                      _buildPanchangElement(
+                      _buildPanchangItem(
                         label: 'Nakshatra',
                         value: panchang?.nakshatra ?? 'Rohini',
-                        color: const Color(0xFF9B59B6),
                       ),
-                      const SizedBox(width: 12),
-                      _buildPanchangElement(
+                      _buildPanchangDivider(),
+                      _buildPanchangItem(
                         label: 'Yoga',
                         value: panchang?.yoga ?? 'Siddhi',
-                        color: const Color(0xFF4ECDC4),
                       ),
-                      const SizedBox(width: 12),
-                      _buildPanchangElement(
+                      _buildPanchangDivider(),
+                      _buildPanchangItem(
                         label: 'Karana',
                         value: panchang?.karana ?? 'Bava',
-                        color: const Color(0xFFE74C8C),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
 
-                  // Sunrise/Sunset
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.03),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildSunTimeItem(
+                  // Sunrise/Sunset Row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildSunTimeCompact(
                           icon: CupertinoIcons.sunrise_fill,
-                          label: 'Sunrise',
                           time: panchang?.sunrise ?? '6:45 AM',
                           color: const Color(0xFFFFB347),
                         ),
-                        Container(
-                          width: 1,
-                          height: 30,
-                          color: Colors.white.withOpacity(0.1),
-                        ),
-                        _buildSunTimeItem(
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _buildSunTimeCompact(
                           icon: CupertinoIcons.sunset_fill,
-                          label: 'Sunset',
                           time: panchang?.sunset ?? '5:32 PM',
                           color: const Color(0xFFFF6B9D),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -1182,191 +1022,139 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildPanchangElement({
-    required String label,
-    required String value,
-    required Color color,
-  }) {
+  Widget _buildPanchangItem({required String label, required String value}) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                color: Colors.white.withOpacity(0.5),
-                letterSpacing: 0.5,
-              ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
             ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: color,
-              ),
-              textAlign: TextAlign.center,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              color: Colors.white.withOpacity(0.4),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildSunTimeItem({
+  Widget _buildPanchangDivider() {
+    return Container(
+      width: 1,
+      height: 28,
+      color: Colors.white.withOpacity(0.08),
+    );
+  }
+
+  Widget _buildSunTimeCompact({
     required IconData icon,
-    required String label,
     required String time,
     required Color color,
   }) {
-    return Row(
-      children: [
-        Icon(icon, color: color, size: 20),
-        const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                color: Colors.white.withOpacity(0.5),
-              ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color, size: 16),
+          const SizedBox(width: 8),
+          Text(
+            time,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: color,
             ),
-            Text(
-              time,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildAIAstrologerBanner() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: GestureDetector(
         onTap: () {
           HapticFeedback.mediumImpact();
           context.go('/chat');
         },
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF2A1F4E), Color(0xFF1A1032)],
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFF6B3FA0).withOpacity(0.3),
+                const Color(0xFF4A2882).withOpacity(0.2),
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFF6B3FA0).withOpacity(0.3)),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF6B3FA0).withOpacity(0.15),
-                blurRadius: 30,
-                offset: const Offset(0, 10),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFF8B5CF6).withOpacity(0.2)),
           ),
           child: Row(
             children: [
-              // AI Avatar
+              // AI Icon
               Container(
-                width: 60,
-                height: 60,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     colors: [Color(0xFFE8B931), Color(0xFFF4D03F)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFE8B931).withOpacity(0.4),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Center(
-                  child: Text('🧙‍♂️', style: TextStyle(fontSize: 30)),
+                  child: Text('✨', style: TextStyle(fontSize: 22)),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
 
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        const Text(
-                          'AI Astrologer',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF4ECDC4).withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            'NEW',
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF4ECDC4),
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Ask any question about your destiny',
+                    const Text(
+                      'Ask AI Astrologer',
                       style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Get personalized guidance',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.white.withOpacity(0.5),
                       ),
                     ),
                   ],
                 ),
               ),
 
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Icon(
-                  CupertinoIcons.arrow_right,
-                  color: Colors.white,
-                  size: 20,
-                ),
+              Icon(
+                CupertinoIcons.chevron_right,
+                size: 18,
+                color: Colors.white.withOpacity(0.5),
               ),
             ],
           ),
@@ -1378,15 +1166,14 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildSectionTitle(String title, {required IconData icon}) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: const Color(0xFFE8B931)),
-        const SizedBox(width: 10),
+        Icon(icon, size: 16, color: const Color(0xFFE8B931)),
+        const SizedBox(width: 8),
         Text(
           title,
           style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
             color: Colors.white,
-            letterSpacing: -0.3,
           ),
         ),
       ],

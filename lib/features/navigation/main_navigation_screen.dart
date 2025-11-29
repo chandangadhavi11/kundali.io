@@ -63,13 +63,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+        return Scaffold(
       backgroundColor: const Color(0xFF0A0612),
       extendBody: true,
       body: widget.child,
       bottomNavigationBar: CosmicNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
       ),
     );
   }
