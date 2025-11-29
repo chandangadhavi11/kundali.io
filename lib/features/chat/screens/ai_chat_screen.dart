@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'dart:math' as math;
-import '../../../core/constants/app_colors.dart';
+import 'dart:ui';
 import '../../../core/providers/auth_provider.dart';
 import '../../../shared/widgets/auth_required_dialog.dart';
 
-// Responsive breakpoints
-class ChatBreakpoints {
-  static const double mobile = 600;
-  static const double tablet = 900;
-  static const double desktop = 1200;
-  static const double largeDesktop = 1800;
-}
-
-// Screen size categories
-enum ScreenSize { mobile, tablet, desktop, largeDesktop }
-
-// Chat layout modes
-enum ChatLayout {
-  single, // Mobile - single column
-  compact, // Tablet portrait - compact sidebar
-  expanded, // Tablet landscape - expanded sidebar
-  desktop, // Desktop - full sidebar and features
+// Premium Cosmic Colors
+class _CosmicColors {
+  static const background = Color(0xFF0A0612);
+  static const cardDark = Color(0xFF16101F);
+  static const cardLight = Color(0xFF1E1528);
+  static const golden = Color(0xFFE8B931);
+  static const goldenLight = Color(0xFFF5D563);
+  static const textPrimary = Color(0xFFFAFAFA);
+  static const textSecondary = Color(0xFF9CA3AF);
+  static const accent = Color(0xFF6C5CE7);
+  static const userBubble = Color(0xFF2D1F42);
+  static const aiBubble = Color(0xFF16101F);
 }
 
 class AiChatScreen extends StatefulWidget {
@@ -34,50 +28,22 @@ class AiChatScreen extends StatefulWidget {
 
 class _AiChatScreenState extends State<AiChatScreen>
     with TickerProviderStateMixin {
-  // Controllers
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
 
-  // Animation controllers
-  late AnimationController _sendButtonController;
-  late AnimationController _typingIndicatorController;
-  late AnimationController _messageAnimationController;
-  late AnimationController _sidebarController;
+  late AnimationController _entryController;
+  late AnimationController _typingController;
 
-  // Animations - these will be used in full implementation
-  // ignore: unused_field
-  late Animation<double> _sendButtonAnimation;
-  // ignore: unused_field
-  late Animation<double> _typingIndicatorAnimation;
-  // ignore: unused_field
-  late Animation<double> _messageAnimation;
-  // ignore: unused_field
-  late Animation<double> _sidebarAnimation;
-
-  // State
   bool _isTyping = false;
-  // ignore: unused_field
   bool _isAiTyping = false;
-  final bool _isSidebarExpanded = true;
-  bool _isKeyboardVisible = false;
-  ChatLayout _currentLayout = ChatLayout.single;
-  String? _selectedChatId;
 
-  // Data
   final List<ChatMessage> _messages = [];
-  List<ChatHistory> _chatHistory = [];
-  final List<String> _selectedContextChips = [];
 
-  // Quick actions and context
-  final List<String> _contextChips = [
-    'My Kundli',
-    'Today\'s Transit',
-    'Partner Match',
-    'Career',
-    'Health',
-    'Relationships',
-    'Finance',
+  final List<Map<String, dynamic>> _quickActions = [
+    {'label': 'My Kundli', 'icon': Icons.auto_awesome_rounded},
+    {'label': 'Today\'s Transit', 'icon': Icons.timeline_rounded},
+    {'label': 'Partner Match', 'icon': Icons.favorite_rounded},
   ];
 
   final List<String> _quickPrompts = [
@@ -85,9 +51,7 @@ class _AiChatScreenState extends State<AiChatScreen>
     'When will I get married?',
     'Career guidance needed',
     'Health concerns',
-    'Financial advice',
-    'Relationship compatibility',
-    'Lucky periods',
+    'Lucky periods ahead',
   ];
 
   @override
@@ -95,7 +59,36 @@ class _AiChatScreenState extends State<AiChatScreen>
     super.initState();
     _initializeAnimations();
     _initializeChat();
-    _setupKeyboardListener();
+  }
+
+  void _initializeAnimations() {
+    _entryController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    )..forward();
+
+    _typingController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    )..repeat();
+
+    _messageController.addListener(() {
+      final hasText = _messageController.text.isNotEmpty;
+      if (hasText != _isTyping) {
+        setState(() => _isTyping = hasText);
+      }
+    });
+  }
+
+  void _initializeChat() {
+    _messages.add(
+      ChatMessage(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        text: 'Hello! I\'m your AI Astrology Assistant. I can help you understand your birth chart, provide personalized predictions, and answer any astrological questions you may have. How can I assist you today?',
+        isUser: false,
+        timestamp: DateTime.now(),
+      ),
+    );
   }
 
   @override
@@ -103,192 +96,38 @@ class _AiChatScreenState extends State<AiChatScreen>
     _messageController.dispose();
     _scrollController.dispose();
     _focusNode.dispose();
-    _sendButtonController.dispose();
-    _typingIndicatorController.dispose();
-    _messageAnimationController.dispose();
-    _sidebarController.dispose();
+    _entryController.dispose();
+    _typingController.dispose();
     super.dispose();
-  }
-
-  void _initializeAnimations() {
-    // Send button animation
-    _sendButtonController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _sendButtonAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _sendButtonController, curve: Curves.elasticOut),
-    );
-
-    // Typing indicator animation
-    _typingIndicatorController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    )..repeat();
-    _typingIndicatorAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _typingIndicatorController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    // Message animation
-    _messageAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-    _messageAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _messageAnimationController,
-        curve: Curves.easeOutBack,
-      ),
-    );
-
-    // Sidebar animation
-    _sidebarController = AnimationController(
-      duration: const Duration(milliseconds: 350),
-      vsync: this,
-    );
-    _sidebarAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _sidebarController, curve: Curves.easeOutCubic),
-    );
-
-    // Message controller listener
-    _messageController.addListener(() {
-      if (_messageController.text.isNotEmpty && !_isTyping) {
-        _sendButtonController.forward();
-        setState(() => _isTyping = true);
-      } else if (_messageController.text.isEmpty && _isTyping) {
-        _sendButtonController.reverse();
-        setState(() => _isTyping = false);
-      }
-    });
-  }
-
-  void _initializeChat() {
-    // Add welcome message
-    _messages.add(
-      ChatMessage(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        text:
-            'Hello! I\'m your AI Astrology Assistant. I can help you understand your birth chart, provide personalized predictions, and answer any astrological questions you may have. How can I assist you today?',
-        isUser: false,
-        timestamp: DateTime.now(),
-        type: MessageType.text,
-      ),
-    );
-
-    // Load chat history
-    _loadChatHistory();
-
-    // Start animations
-    _messageAnimationController.forward();
-    _sidebarController.forward();
-  }
-
-  void _setupKeyboardListener() {
-    _focusNode.addListener(() {
-      setState(() {
-        _isKeyboardVisible = _focusNode.hasFocus;
-      });
-    });
-  }
-
-  void _loadChatHistory() {
-    // Simulate loading chat history
-    _chatHistory = [
-      ChatHistory(
-        id: '1',
-        title: 'Marriage Prediction',
-        lastMessage: 'Based on your chart...',
-        timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-        unreadCount: 0,
-      ),
-      ChatHistory(
-        id: '2',
-        title: 'Career Guidance',
-        lastMessage: 'The next 3 months...',
-        timestamp: DateTime.now().subtract(const Duration(days: 1)),
-        unreadCount: 2,
-      ),
-      ChatHistory(
-        id: '3',
-        title: 'Health Analysis',
-        lastMessage: 'Your health houses...',
-        timestamp: DateTime.now().subtract(const Duration(days: 3)),
-        unreadCount: 0,
-      ),
-    ];
-  }
-
-  ScreenSize _getScreenSize(double width) {
-    if (width < ChatBreakpoints.mobile) return ScreenSize.mobile;
-    if (width < ChatBreakpoints.tablet) return ScreenSize.tablet;
-    if (width < ChatBreakpoints.desktop) return ScreenSize.desktop;
-    return ScreenSize.largeDesktop;
-  }
-
-  ChatLayout _getChatLayout(double width, double height) {
-    final screenSize = _getScreenSize(width);
-    final isLandscape = width > height;
-
-    if (screenSize == ScreenSize.mobile) {
-      return ChatLayout.single;
-    } else if (screenSize == ScreenSize.tablet) {
-      return isLandscape ? ChatLayout.expanded : ChatLayout.compact;
-    } else {
-      return ChatLayout.desktop;
-    }
-  }
-
-  double _getMaxMessageWidth(double screenWidth, ScreenSize screenSize) {
-    // Maintain readable line lengths (45-75 characters)
-    // Assuming average character width of 8-10px
-    switch (screenSize) {
-      case ScreenSize.mobile:
-        return screenWidth * 0.85; // Max 85% of screen
-      case ScreenSize.tablet:
-        return math.min(screenWidth * 0.7, 600); // Max 600px
-      case ScreenSize.desktop:
-        return math.min(screenWidth * 0.5, 750); // Max 750px (75 chars)
-      case ScreenSize.largeDesktop:
-        return math.min(screenWidth * 0.4, 800); // Max 800px
-    }
   }
 
   void _sendMessage() async {
     if (_messageController.text.trim().isEmpty) return;
 
-    // Check if user is authenticated
     final authProvider = context.read<AuthProvider>();
     if (!authProvider.isAuthenticated) {
       await AuthRequiredDialog.show(
         context,
         feature: 'AI Astrologer',
-        description:
-            'Sign in to get personalized astrological guidance from our AI assistant.',
+        description: 'Sign in to get personalized astrological guidance.',
       );
       return;
     }
 
-    final message = ChatMessage(
+    final userMessage = ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       text: _messageController.text,
       isUser: true,
       timestamp: DateTime.now(),
-      contextChips: List.from(_selectedContextChips),
-      type: MessageType.text,
     );
 
     setState(() {
-      _messages.add(message);
-      _selectedContextChips.clear();
+      _messages.add(userMessage);
       _isAiTyping = true;
     });
 
     _messageController.clear();
     _scrollToBottom();
-    _messageAnimationController.forward(from: 0);
 
     // Simulate AI response
     Future.delayed(const Duration(seconds: 2), () {
@@ -297,17 +136,14 @@ class _AiChatScreenState extends State<AiChatScreen>
           _messages.add(
             ChatMessage(
               id: DateTime.now().millisecondsSinceEpoch.toString(),
-              text:
-                  'Based on your birth chart and current planetary positions, I can see interesting developments ahead. The conjunction of Jupiter with your natal Moon suggests a period of emotional growth and potential opportunities in your personal relationships...',
+              text: 'Based on your birth chart and current planetary positions, I can see interesting developments ahead. The conjunction of Jupiter with your natal Moon suggests a period of emotional growth and potential opportunities in your personal relationships. Would you like me to elaborate on any specific area?',
               isUser: false,
               timestamp: DateTime.now(),
-              type: MessageType.text,
             ),
           );
           _isAiTyping = false;
         });
         _scrollToBottom();
-        _messageAnimationController.forward(from: 0);
       }
     });
   }
@@ -326,395 +162,394 @@ class _AiChatScreenState extends State<AiChatScreen>
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final screenWidth = constraints.maxWidth;
-        final screenHeight = constraints.maxHeight;
-        final screenSize = _getScreenSize(screenWidth);
-        final chatLayout = _getChatLayout(screenWidth, screenHeight);
-
-        // Update layout state
-        if (_currentLayout != chatLayout) {
-          _currentLayout = chatLayout;
-        }
-
-        return Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          body: _buildResponsiveLayout(
-            context,
-            screenSize,
-            chatLayout,
-            screenWidth,
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildResponsiveLayout(
-    BuildContext context,
-    ScreenSize screenSize,
-    ChatLayout layout,
-    double screenWidth,
-  ) {
-    switch (layout) {
-      case ChatLayout.single:
-        return _buildMobileLayout(context, screenSize, screenWidth);
-      case ChatLayout.compact:
-        return _buildTabletCompactLayout(context, screenSize, screenWidth);
-      case ChatLayout.expanded:
-        return _buildTabletExpandedLayout(context, screenSize, screenWidth);
-      case ChatLayout.desktop:
-        return _buildDesktopLayout(context, screenSize, screenWidth);
-    }
-  }
-
-  // Mobile layout - single column
-  Widget _buildMobileLayout(
-    BuildContext context,
-    ScreenSize screenSize,
-    double screenWidth,
-  ) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    return SafeArea(
-      child: Column(
+    return Scaffold(
+      backgroundColor: _CosmicColors.background,
+      body: Stack(
         children: [
-          // Header
-          _buildMobileHeader(context, isDarkMode),
+          // Cosmic background
+          _buildCosmicBackground(),
 
-          // Messages area
-          Expanded(child: _buildMessagesArea(context, screenSize, screenWidth)),
+          // Main content
+          SafeArea(
+            child: Column(
+              children: [
+                // Premium Header
+                _buildPremiumHeader(),
 
-          // Context chips (when starting)
-          if (_messages.length <= 1 && !_isKeyboardVisible)
-            _buildContextChips(context, screenSize),
+                // Messages area
+                Expanded(child: _buildMessagesArea()),
 
-          // Quick prompts (when starting)
-          if (_messages.length <= 1 && !_isKeyboardVisible)
-            _buildQuickPrompts(context, screenSize),
+                // Quick actions (only when few messages)
+                if (_messages.length <= 1) _buildQuickActions(),
 
-          // Input area
-          _buildInputArea(context, screenSize, screenWidth),
+                // Quick prompts (only when few messages)
+                if (_messages.length <= 1) _buildQuickPrompts(),
+
+                // Input area
+                _buildInputArea(),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  // Tablet compact layout - with collapsible sidebar
-  Widget _buildTabletCompactLayout(
-    BuildContext context,
-    ScreenSize screenSize,
-    double screenWidth,
-  ) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    return Row(
-      children: [
-        // Collapsible sidebar
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          width: _isSidebarExpanded ? 280 : 72,
-          child: _buildSidebar(context, screenSize, compact: true),
+  Widget _buildCosmicBackground() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          center: Alignment.topCenter,
+          radius: 1.5,
+          colors: [
+            _CosmicColors.accent.withOpacity(0.06),
+            _CosmicColors.background,
+          ],
         ),
-
-        // Main chat area
-        Expanded(
-          child: Column(
-            children: [
-              // Header
-              _buildTabletHeader(context, isDarkMode),
-
-              // Messages
-              Expanded(
-                child: _buildMessagesArea(context, screenSize, screenWidth),
-              ),
-
-              // Input area
-              _buildInputArea(context, screenSize, screenWidth),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 
-  // Tablet expanded layout - with expanded sidebar
-  Widget _buildTabletExpandedLayout(
-    BuildContext context,
-    ScreenSize screenSize,
-    double screenWidth,
-  ) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    return Row(
-      children: [
-        // Sidebar
-        SizedBox(
-          width: 320,
-          child: _buildSidebar(context, screenSize, compact: false),
-        ),
-
-        // Main chat area
-        Expanded(
-          child: Column(
+  Widget _buildPremiumHeader() {
+    return FadeTransition(
+      opacity: _entryController,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, -0.3),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(
+          parent: _entryController,
+          curve: Curves.easeOut,
+        )),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(12, 8, 16, 12),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.white.withOpacity(0.05),
+                width: 1,
+              ),
+            ),
+          ),
+          child: Row(
             children: [
-              // Header with features
-              _buildExpandedHeader(context, isDarkMode),
-
-              // Messages
-              Expanded(
-                child: _buildMessagesArea(context, screenSize, screenWidth),
+              // Back button
+              _buildGlassButton(
+                icon: Icons.arrow_back_rounded,
+                onTap: () => Navigator.pop(context),
               ),
 
-              // Context bar
-              if (_messages.length <= 2) _buildContextBar(context, screenSize),
+              const SizedBox(width: 12),
 
-              // Input area
-              _buildInputArea(context, screenSize, screenWidth),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Desktop layout - full featured
-  Widget _buildDesktopLayout(
-    BuildContext context,
-    ScreenSize screenSize,
-    double screenWidth,
-  ) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    return Row(
-      children: [
-        // Sidebar with chat history
-        SizedBox(
-          width: 360,
-          child: _buildSidebar(context, screenSize, compact: false),
-        ),
-
-        // Main chat area
-        Expanded(
-          child: Column(
-            children: [
-              // Header with AI info
-              _buildDesktopHeader(context, isDarkMode),
-
-              // Messages with side features
-              Expanded(
-                child: Row(
-                  children: [
-                    // Messages area
-                    Expanded(
-                      child: _buildMessagesArea(
-                        context,
-                        screenSize,
-                        screenWidth,
-                      ),
+              // AI Avatar
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      _CosmicColors.golden,
+                      _CosmicColors.goldenLight,
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: _CosmicColors.golden.withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
+                  ],
+                ),
+                child: Icon(
+                  Icons.auto_awesome_rounded,
+                  color: _CosmicColors.background,
+                  size: 22,
+                ),
+              ),
 
-                    // Right panel with suggestions
-                    if (screenWidth > 1400)
-                      SizedBox(
-                        width: 280,
-                        child: _buildSuggestionsPanel(context, isDarkMode),
-                      ),
+              const SizedBox(width: 12),
+
+              // Title and status
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'AI Astrologer',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            color: _CosmicColors.textPrimary,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _CosmicColors.golden.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            'PRO',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              color: _CosmicColors.golden,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF00B894),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Online • Ready to assist',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _CosmicColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
 
-              // Input area with attachments
-              _buildInputArea(context, screenSize, screenWidth),
+              // More options
+              _buildGlassButton(
+                icon: Icons.more_vert_rounded,
+                onTap: () {},
+              ),
             ],
           ),
         ),
-      ],
-    );
-  }
-
-  // Stub methods - implement as needed
-  Widget _buildMobileHeader(BuildContext context, bool isDarkMode) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
-          ),
-          const Text('AI Chat'),
-        ],
       ),
     );
   }
 
-  Widget _buildTabletHeader(BuildContext context, bool isDarkMode) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: const Text('AI Chat - Tablet'),
-    );
-  }
-
-  Widget _buildExpandedHeader(BuildContext context, bool isDarkMode) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: const Text('AI Chat - Expanded'),
-    );
-  }
-
-  Widget _buildDesktopHeader(BuildContext context, bool isDarkMode) {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      child: const Text('AI Chat - Desktop'),
-    );
-  }
-
-  Widget _buildSidebar(
-    BuildContext context,
-    ScreenSize screenSize, {
-    bool compact = false,
+  Widget _buildGlassButton({
+    required IconData icon,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      color: Colors.grey[100],
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: const Text(
-              'Chat History',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _chatHistory.length,
-              itemBuilder: (context, index) {
-                final chat = _chatHistory[index];
-                final isSelected = _selectedChatId == chat.id;
-                return ListTile(
-                  selected: isSelected,
-                  title: Text(chat.title),
-                  subtitle: Text(chat.lastMessage),
-                  onTap: () {
-                    setState(() {
-                      _selectedChatId = chat.id;
-                    });
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMessagesArea(
-    BuildContext context,
-    ScreenSize screenSize,
-    double screenWidth,
-  ) {
-    final maxWidth = _getMaxMessageWidth(screenWidth, screenSize);
-    return ListView.builder(
-      controller: _scrollController,
-      itemCount: _messages.length,
-      itemBuilder: (context, index) {
-        final msg = _messages[index];
-        return Align(
-          alignment: msg.isUser ? Alignment.centerRight : Alignment.centerLeft,
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
-            constraints: BoxConstraints(maxWidth: maxWidth),
-            margin: const EdgeInsets.all(8),
-            padding: const EdgeInsets.all(12),
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: msg.isUser ? AppColors.primary : Colors.grey[200],
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(
-              msg.text,
-              style: TextStyle(
-                color: msg.isUser ? Colors.white : Colors.black87,
+              color: Colors.white.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 1,
               ),
             ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: _CosmicColors.textPrimary,
+            ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessagesArea() {
+    return ListView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      itemCount: _messages.length + (_isAiTyping ? 1 : 0),
+      itemBuilder: (context, index) {
+        if (index == _messages.length && _isAiTyping) {
+          return _buildTypingIndicator();
+        }
+
+        final message = _messages[index];
+        return TweenAnimationBuilder<double>(
+          duration: const Duration(milliseconds: 400),
+          tween: Tween(begin: 0.0, end: 1.0),
+          builder: (context, value, child) {
+            return Transform.translate(
+              offset: Offset(0, 20 * (1 - value)),
+              child: Opacity(opacity: value, child: child),
+            );
+          },
+          child: _buildMessageBubble(message),
         );
       },
     );
   }
 
-  Widget _buildContextChips(BuildContext context, ScreenSize screenSize) {
-    return SizedBox(
-      height: 44,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: _contextChips.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: Chip(label: Text(_contextChips[index])),
-          );
-        },
-      ),
-    );
-  }
+  Widget _buildMessageBubble(ChatMessage message) {
+    final isUser = message.isUser;
 
-  Widget _buildQuickPrompts(BuildContext context, ScreenSize screenSize) {
-    return SizedBox(
-      height: 40,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: _quickPrompts.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ActionChip(
-              label: Text(_quickPrompts[index]),
-              onPressed: () {
-                _messageController.text = _quickPrompts[index];
-              },
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildContextBar(BuildContext context, ScreenSize screenSize) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: Wrap(
-        spacing: 8,
-        children: _contextChips.map((chip) => Chip(label: Text(chip))).toList(),
-      ),
-    );
-  }
-
-  Widget _buildSuggestionsPanel(BuildContext context, bool isDarkMode) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Suggestions',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _quickPrompts.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  child: ListTile(
-                    title: Text(_quickPrompts[index]),
-                    onTap: () {
-                      _messageController.text = _quickPrompts[index];
-                    },
+          if (!isUser) ...[
+            // AI Avatar
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [_CosmicColors.golden, _CosmicColors.goldenLight],
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.auto_awesome_rounded,
+                color: _CosmicColors.background,
+                size: 16,
+              ),
+            ),
+            const SizedBox(width: 10),
+          ],
+
+          // Message bubble
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: isUser ? _CosmicColors.userBubble : _CosmicColors.aiBubble,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(18),
+                  topRight: const Radius.circular(18),
+                  bottomLeft: Radius.circular(isUser ? 18 : 4),
+                  bottomRight: Radius.circular(isUser ? 4 : 18),
+                ),
+                border: Border.all(
+                  color: isUser
+                      ? _CosmicColors.accent.withOpacity(0.2)
+                      : _CosmicColors.golden.withOpacity(0.1),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: (isUser ? _CosmicColors.accent : _CosmicColors.golden)
+                        .withOpacity(0.08),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    message.text,
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 1.5,
+                      color: _CosmicColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    _formatTime(message.timestamp),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: _CosmicColors.textSecondary.withOpacity(0.6),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          if (isUser) const SizedBox(width: 42),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTypingIndicator() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [_CosmicColors.golden, _CosmicColors.goldenLight],
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.auto_awesome_rounded,
+              color: _CosmicColors.background,
+              size: 16,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: _CosmicColors.aiBubble,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(18),
+                topRight: Radius.circular(18),
+                bottomLeft: Radius.circular(4),
+                bottomRight: Radius.circular(18),
+              ),
+              border: Border.all(
+                color: _CosmicColors.golden.withOpacity(0.1),
+                width: 1,
+              ),
+            ),
+            child: AnimatedBuilder(
+              animation: _typingController,
+              builder: (context, child) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(3, (index) {
+                    final delay = index * 0.2;
+                    final value = ((_typingController.value + delay) % 1.0);
+                    final opacity = 0.3 + 0.7 * (value < 0.5 ? value * 2 : 2 - value * 2);
+                    return Container(
+                      width: 8,
+                      height: 8,
+                      margin: EdgeInsets.only(right: index < 2 ? 4 : 0),
+                      decoration: BoxDecoration(
+                        color: _CosmicColors.golden.withOpacity(opacity),
+                        shape: BoxShape.circle,
+                      ),
+                    );
+                  }),
                 );
               },
             ),
@@ -724,51 +559,227 @@ class _AiChatScreenState extends State<AiChatScreen>
     );
   }
 
-  Widget _buildInputArea(
-    BuildContext context,
-    ScreenSize screenSize,
-    double screenWidth,
-  ) {
+  Widget _buildQuickActions() {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
       child: Row(
-        children: [
-          if (screenSize != ScreenSize.mobile || !_isKeyboardVisible)
-            IconButton(icon: const Icon(Icons.attach_file), onPressed: () {}),
-          Expanded(
-            child: TextField(
-              controller: _messageController,
-              focusNode: _focusNode,
-              decoration: InputDecoration(
-                hintText: 'Type your message...',
-                filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide.none,
+        children: _quickActions.map((action) {
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                _messageController.text = action['label'];
+              },
+              child: Container(
+                margin: EdgeInsets.only(
+                  right: action != _quickActions.last ? 10 : 0,
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.04),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: _CosmicColors.golden.withOpacity(0.15),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: _CosmicColors.golden.withOpacity(0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        action['icon'] as IconData,
+                        color: _CosmicColors.golden,
+                        size: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      action['label'] as String,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: _CosmicColors.textPrimary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
-              onSubmitted: (_) => _sendMessage(),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.send),
-            onPressed: _isTyping ? _sendMessage : null,
-            color: _isTyping ? AppColors.primary : Colors.grey,
-          ),
-        ],
+          );
+        }).toList(),
       ),
     );
+  }
+
+  Widget _buildQuickPrompts() {
+    return Container(
+      height: 44,
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: _quickPrompts.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              _messageController.text = _quickPrompts[index];
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.1),
+                  width: 1,
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                _quickPrompts[index],
+                style: TextStyle(
+                  fontSize: 13,
+                  color: _CosmicColors.textSecondary,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildInputArea() {
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.03),
+            border: Border(
+              top: BorderSide(
+                color: Colors.white.withOpacity(0.08),
+                width: 1,
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              // Attachment button
+              GestureDetector(
+                onTap: () => HapticFeedback.lightImpact(),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.06),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.attach_file_rounded,
+                    color: _CosmicColors.textSecondary,
+                    size: 20,
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 10),
+
+              // Input field
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.06),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: _isTyping
+                          ? _CosmicColors.golden.withOpacity(0.3)
+                          : Colors.white.withOpacity(0.08),
+                      width: 1,
+                    ),
+                  ),
+                  child: TextField(
+                    controller: _messageController,
+                    focusNode: _focusNode,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: _CosmicColors.textPrimary,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Type your message...',
+                      hintStyle: TextStyle(
+                        fontSize: 15,
+                        color: _CosmicColors.textSecondary.withOpacity(0.5),
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    onSubmitted: (_) => _sendMessage(),
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 10),
+
+              // Send button
+              GestureDetector(
+                onTap: _isTyping ? _sendMessage : null,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    gradient: _isTyping
+                        ? LinearGradient(
+                            colors: [
+                              _CosmicColors.golden,
+                              _CosmicColors.goldenLight,
+                            ],
+                          )
+                        : null,
+                    color: _isTyping ? null : Colors.white.withOpacity(0.06),
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: _isTyping
+                        ? [
+                            BoxShadow(
+                              color: _CosmicColors.golden.withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Icon(
+                    Icons.send_rounded,
+                    color: _isTyping
+                        ? _CosmicColors.background
+                        : _CosmicColors.textSecondary.withOpacity(0.5),
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatTime(DateTime time) {
+    final hour = time.hour > 12 ? time.hour - 12 : time.hour;
+    final period = time.hour >= 12 ? 'PM' : 'AM';
+    return '${hour == 0 ? 12 : hour}:${time.minute.toString().padLeft(2, '0')} $period';
   }
 }
 
@@ -778,35 +789,11 @@ class ChatMessage {
   final String text;
   final bool isUser;
   final DateTime timestamp;
-  final List<String> contextChips;
-  final MessageType type;
 
   ChatMessage({
     required this.id,
     required this.text,
     required this.isUser,
     required this.timestamp,
-    this.contextChips = const [],
-    this.type = MessageType.text,
-  });
-}
-
-// Message type enum
-enum MessageType { text, image, file, voice, location, chart }
-
-// Chat history model
-class ChatHistory {
-  final String id;
-  final String title;
-  final String lastMessage;
-  final DateTime timestamp;
-  final int unreadCount;
-
-  ChatHistory({
-    required this.id,
-    required this.title,
-    required this.lastMessage,
-    required this.timestamp,
-    this.unreadCount = 0,
   });
 }

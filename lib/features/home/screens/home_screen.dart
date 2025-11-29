@@ -3,8 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
-import 'dart:async';
 import 'dart:math' as math;
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/horoscope_provider.dart';
@@ -22,12 +20,6 @@ class _HomeScreenState extends State<HomeScreen>
   // Animation controller for stagger effect
   late AnimationController _staggerController;
 
-  // Time and greeting
-  Timer? _timeUpdateTimer;
-  String _currentTime = '';
-  String _greeting = '';
-  String _greetingEmoji = '';
-
   // Scroll controller
   final ScrollController _scrollController = ScrollController();
 
@@ -35,8 +27,6 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     _initializeAnimations();
-    _updateTimeAndGreeting();
-    _startTimeUpdates();
     _loadData();
   }
 
@@ -46,35 +36,6 @@ class _HomeScreenState extends State<HomeScreen>
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     )..forward();
-  }
-
-  void _updateTimeAndGreeting() {
-    final now = DateTime.now();
-    final hour = now.hour;
-
-    setState(() {
-      _currentTime = DateFormat('h:mm').format(now);
-
-      if (hour >= 5 && hour < 12) {
-        _greeting = 'Good Morning';
-        _greetingEmoji = '☀️';
-      } else if (hour >= 12 && hour < 17) {
-        _greeting = 'Good Afternoon';
-        _greetingEmoji = '🌤️';
-      } else if (hour >= 17 && hour < 21) {
-        _greeting = 'Good Evening';
-        _greetingEmoji = '🌅';
-      } else {
-        _greeting = 'Good Night';
-        _greetingEmoji = '🌙';
-      }
-    });
-  }
-
-  void _startTimeUpdates() {
-    _timeUpdateTimer = Timer.periodic(const Duration(seconds: 30), (_) {
-      _updateTimeAndGreeting();
-    });
   }
 
   Future<void> _loadData() async {
@@ -90,7 +51,6 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void dispose() {
     _staggerController.dispose();
-    _timeUpdateTimer?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
@@ -101,7 +61,6 @@ class _HomeScreenState extends State<HomeScreen>
     final horoscopeProvider = context.watch<HoroscopeProvider>();
     final user = authProvider.currentUser;
     final isGuest = user == null;
-    final userName = isGuest ? 'Seeker' : user.name.split(' ').first;
     final userSign = isGuest ? 'Aries' : user.zodiacSign;
 
     return Scaffold(
@@ -123,9 +82,7 @@ class _HomeScreenState extends State<HomeScreen>
                 physics: const BouncingScrollPhysics(),
                 slivers: [
                   // Premium Header
-                  SliverToBoxAdapter(
-                    child: _buildPremiumHeader(userName, isGuest),
-                  ),
+                  SliverToBoxAdapter(child: _buildPremiumHeader()),
 
                   // Cosmic Divider
                   SliverToBoxAdapter(child: _buildCosmicDivider()),
@@ -246,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildPremiumHeader(String userName, bool isGuest) {
+  Widget _buildPremiumHeader() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       child: Column(
@@ -324,144 +281,6 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ],
           ),
-
-          const SizedBox(height: 24),
-
-          // Greeting Section
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '$_greeting $_greetingEmoji',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white.withOpacity(0.5),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      userName,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Time Display
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.white.withOpacity(0.06)),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      _currentTime,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      DateFormat('EEE, MMM d').format(DateTime.now()),
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.white.withOpacity(0.4),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          // Guest Sign-in Prompt
-          if (isGuest) ...[
-            const SizedBox(height: 20),
-            GestureDetector(
-              onTap: () {
-                HapticFeedback.lightImpact();
-                context.go('/login');
-              },
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFFE8B931).withOpacity(0.15),
-                      const Color(0xFFF4D03F).withOpacity(0.05),
-                    ],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: const Color(0xFFE8B931).withOpacity(0.3),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE8B931).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        CupertinoIcons.sparkles,
-                        color: Color(0xFFE8B931),
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Unlock Your Full Horoscope',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                          Text(
-                            'Sign in for personalized cosmic insights',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white.withOpacity(0.6),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      CupertinoIcons.arrow_right_circle_fill,
-                      color: Color(0xFFE8B931),
-                      size: 24,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
         ],
       ),
     );
@@ -525,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('Daily Horoscope', icon: CupertinoIcons.sparkles),
+          // _buildSectionTitle('Daily Horoscope', icon: CupertinoIcons.sparkles),
           const SizedBox(height: 14),
 
           GestureDetector(

@@ -1,5 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:ui';
+
+// Premium Cosmic Colors
+class _CosmicColors {
+  static const background = Color(0xFF0A0612);
+  static const cardDark = Color(0xFF16101F);
+  static const golden = Color(0xFFE8B931);
+  static const goldenLight = Color(0xFFF5D563);
+  static const textPrimary = Color(0xFFFAFAFA);
+  static const textSecondary = Color(0xFF9CA3AF);
+  static const accent = Color(0xFF6C5CE7);
+}
 
 class FestivalsIndexView extends StatefulWidget {
   const FestivalsIndexView({super.key});
@@ -11,7 +23,6 @@ class FestivalsIndexView extends StatefulWidget {
 class _FestivalsIndexViewState extends State<FestivalsIndexView>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  late List<Animation<double>> _itemAnimations;
 
   final TextEditingController _searchController = TextEditingController();
   String _selectedRegion = 'All Regions';
@@ -22,7 +33,7 @@ class _FestivalsIndexViewState extends State<FestivalsIndexView>
       'name': 'Diwali',
       'date': 'Nov 12, 2024',
       'type': 'Major Festival',
-      'color': const Color(0xFFFDAB3D),
+      'color': const Color(0xFFE8B931),
       'icon': Icons.celebration_rounded,
     },
     {
@@ -58,27 +69,10 @@ class _FestivalsIndexViewState extends State<FestivalsIndexView>
   @override
   void initState() {
     super.initState();
-
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
-    );
-
-    _itemAnimations = List.generate(
-      10,
-      (index) => Tween<double>(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(
-          parent: _animationController,
-          curve: Interval(
-            index * 0.05,
-            0.5 + index * 0.05,
-            curve: Curves.easeOutCubic,
-          ),
-        ),
-      ),
-    );
-
-    _animationController.forward();
+    )..forward();
   }
 
   @override
@@ -90,33 +84,25 @@ class _FestivalsIndexViewState extends State<FestivalsIndexView>
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Column(
       children: [
-        // Search Bar
-        _buildSearchBar(isDarkMode),
-
-        // Region Filter
-        _buildRegionFilter(isDarkMode),
-
-        // Festivals List
+        _buildSearchBar(),
+        _buildRegionFilter(),
+        const SizedBox(height: 8),
         Expanded(
           child: ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: _festivals.length,
             itemBuilder: (context, index) {
-              return AnimatedBuilder(
-                animation: _itemAnimations[index % 10],
-                builder: (context, child) {
+              return TweenAnimationBuilder<double>(
+                duration: Duration(milliseconds: 300 + index * 100),
+                tween: Tween(begin: 0.0, end: 1.0),
+                builder: (context, value, child) {
                   return Transform.translate(
-                    offset: Offset(
-                      0,
-                      20 * (1 - _itemAnimations[index % 10].value),
-                    ),
+                    offset: Offset(0, 20 * (1 - value)),
                     child: Opacity(
-                      opacity: _itemAnimations[index % 10].value,
-                      child: _buildFestivalCard(_festivals[index], isDarkMode),
+                      opacity: value,
+                      child: _buildFestivalCard(_festivals[index]),
                     ),
                   );
                 },
@@ -128,122 +114,134 @@ class _FestivalsIndexViewState extends State<FestivalsIndexView>
     );
   }
 
-  Widget _buildSearchBar(bool isDarkMode) {
+  Widget _buildSearchBar() {
     return Container(
       margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color:
-            isDarkMode ? Colors.grey[850]?.withOpacity(0.5) : Colors.grey[100],
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color:
-              isDarkMode
-                  ? Colors.grey[800]!.withOpacity(0.5)
-                  : Colors.grey[200]!,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.search_rounded,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-            size: 20,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-              style: TextStyle(
-                fontSize: 14,
-                color: isDarkMode ? Colors.white : Colors.grey[900],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.08),
+                width: 1,
               ),
-              decoration: InputDecoration(
-                hintText: 'Search festivals...',
-                hintStyle: TextStyle(
-                  fontSize: 14,
-                  color: isDarkMode ? Colors.grey[500] : Colors.grey[500],
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.search_rounded,
+                  color: _CosmicColors.textSecondary,
+                  size: 20,
                 ),
-                border: InputBorder.none,
-              ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() => _searchQuery = value);
+                    },
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: _CosmicColors.textPrimary,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: 'Search festivals...',
+                      hintStyle: TextStyle(
+                        fontSize: 14,
+                        color: _CosmicColors.textSecondary.withOpacity(0.6),
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                  ),
+                ),
+                if (_searchQuery.isNotEmpty)
+                  GestureDetector(
+                    onTap: () {
+                      _searchController.clear();
+                      setState(() => _searchQuery = '');
+                    },
+                    child: Icon(
+                      Icons.clear_rounded,
+                      color: _CosmicColors.textSecondary,
+                      size: 18,
+                    ),
+                  ),
+              ],
             ),
           ),
-          if (_searchQuery.isNotEmpty)
-            IconButton(
-              onPressed: () {
-                _searchController.clear();
-                setState(() {
-                  _searchQuery = '';
-                });
-              },
-              icon: Icon(
-                Icons.clear_rounded,
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                size: 18,
-              ),
-            ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildRegionFilter(bool isDarkMode) {
-    final regions = [
-      'All Regions',
-      'North India',
-      'South India',
-      'East India',
-      'West India',
-    ];
+  Widget _buildRegionFilter() {
+    final regions = ['All Regions', 'North India', 'South India', 'East India', 'West India'];
 
     return SizedBox(
-      height: 36,
-      child: ListView.builder(
+      height: 34,
+      child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
         itemCount: regions.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final region = regions[index];
           final isSelected = _selectedRegion == region;
 
-          return Padding(
-            padding: EdgeInsets.only(right: index < regions.length - 1 ? 8 : 0),
-            child: FilterChip(
-              label: Text(region),
-              selected: isSelected,
-              onSelected: (selected) {
-                setState(() {
-                  _selectedRegion = region;
-                });
-              },
-              backgroundColor:
-                  isDarkMode
-                      ? Colors.grey[800]?.withOpacity(0.5)
-                      : Colors.grey[100],
-              selectedColor: const Color(0xFFFDAB3D).withOpacity(0.2),
-              checkmarkColor: const Color(0xFFFDAB3D),
-              labelStyle: TextStyle(
-                fontSize: 12,
-                color:
-                    isSelected
-                        ? const Color(0xFFFDAB3D)
-                        : (isDarkMode ? Colors.grey[400] : Colors.grey[600]),
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(
-                  color:
-                      isSelected
-                          ? const Color(0xFFFDAB3D).withOpacity(0.3)
-                          : Colors.transparent,
+          return GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              setState(() => _selectedRegion = region);
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                gradient: isSelected
+                    ? LinearGradient(
+                        colors: [
+                          _CosmicColors.golden.withOpacity(0.2),
+                          _CosmicColors.golden.withOpacity(0.1),
+                        ],
+                      )
+                    : null,
+                color: !isSelected ? Colors.white.withOpacity(0.05) : null,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isSelected
+                      ? _CosmicColors.golden.withOpacity(0.5)
+                      : Colors.white.withOpacity(0.1),
+                  width: 1,
                 ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isSelected) ...[
+                    Icon(
+                      Icons.check_rounded,
+                      size: 12,
+                      color: _CosmicColors.golden,
+                    ),
+                    const SizedBox(width: 4),
+                  ],
+                  Text(
+                    region,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                      color: isSelected
+                          ? _CosmicColors.golden
+                          : _CosmicColors.textSecondary,
+                    ),
+                  ),
+                ],
               ),
             ),
           );
@@ -252,7 +250,9 @@ class _FestivalsIndexViewState extends State<FestivalsIndexView>
     );
   }
 
-  Widget _buildFestivalCard(Map<String, dynamic> festival, bool isDarkMode) {
+  Widget _buildFestivalCard(Map<String, dynamic> festival) {
+    final color = festival['color'] as Color;
+
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -260,43 +260,38 @@ class _FestivalsIndexViewState extends State<FestivalsIndexView>
       },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.grey[900]?.withOpacity(0.7) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: Colors.white.withOpacity(0.03),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: (festival['color'] as Color).withOpacity(0.2),
+            color: color.withOpacity(0.15),
             width: 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: (festival['color'] as Color).withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
         child: Row(
           children: [
             Container(
-              width: 48,
-              height: 48,
+              width: 46,
+              height: 46,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                   colors: [
-                    (festival['color'] as Color).withOpacity(0.2),
-                    (festival['color'] as Color).withOpacity(0.1),
+                    color.withOpacity(0.2),
+                    color.withOpacity(0.1),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 festival['icon'] as IconData,
-                color: festival['color'] as Color,
-                size: 24,
+                color: color,
+                size: 22,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -304,9 +299,9 @@ class _FestivalsIndexViewState extends State<FestivalsIndexView>
                   Text(
                     festival['name'] as String,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: isDarkMode ? Colors.white : Colors.grey[900],
+                      color: _CosmicColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -314,33 +309,32 @@ class _FestivalsIndexViewState extends State<FestivalsIndexView>
                     children: [
                       Icon(
                         Icons.calendar_today_rounded,
-                        size: 12,
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        size: 11,
+                        color: _CosmicColors.textSecondary,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         festival['date'] as String,
                         style: TextStyle(
                           fontSize: 12,
-                          color:
-                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                          color: _CosmicColors.textSecondary,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: (festival['color'] as Color).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10),
+                          color: color.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           festival['type'] as String,
                           style: TextStyle(
                             fontSize: 10,
-                            color: festival['color'] as Color,
+                            color: color,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -352,8 +346,8 @@ class _FestivalsIndexViewState extends State<FestivalsIndexView>
             ),
             Icon(
               Icons.arrow_forward_ios_rounded,
-              size: 16,
-              color: isDarkMode ? Colors.grey[600] : Colors.grey[400],
+              size: 14,
+              color: _CosmicColors.textSecondary.withOpacity(0.5),
             ),
           ],
         ),
@@ -365,5 +359,3 @@ class _FestivalsIndexViewState extends State<FestivalsIndexView>
     // Show festival detail bottom sheet
   }
 }
-
-

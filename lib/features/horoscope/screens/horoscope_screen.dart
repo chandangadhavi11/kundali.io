@@ -1,37 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'dart:ui' as ui;
-import 'dart:math' as math;
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/horoscope_provider.dart';
-import '../../../core/constants/app_colors.dart';
-
-// Responsive breakpoints
-class HoroscopeBreakpoints {
-  static const double mobile = 600;
-  static const double tablet = 900;
-  static const double desktop = 1200;
-  static const double largeDesktop = 1800;
-}
-
-// Screen size categories
-enum ScreenSize { mobile, tablet, desktop, largeDesktop }
-
-// Layout modes
-enum HoroscopeLayout {
-  compact, // Mobile - single column
-  expanded, // Tablet - two columns
-  desktop, // Desktop - multi-panel
-  ultraWide, // Large desktop - maximum content
-}
-
-// Category display modes
-enum CategoryDisplay {
-  horizontal, // Mobile - horizontal scroll
-  grid, // Tablet+ - grid layout
-  cards, // Desktop - large cards
-}
 
 class HoroscopeScreen extends StatefulWidget {
   const HoroscopeScreen({super.key});
@@ -42,223 +15,68 @@ class HoroscopeScreen extends StatefulWidget {
 
 class _HoroscopeScreenState extends State<HoroscopeScreen>
     with TickerProviderStateMixin {
-  // Controllers
-  late TabController _mainTabController;
-  late AnimationController _headerController;
-  late AnimationController _contentController;
-  late AnimationController _glassController;
-  late AnimationController _cardElevationController;
-  late AnimationController _planetaryController;
-  late AnimationController _luckyElementsController;
-  late ScrollController _categoryScrollController;
+  late TabController _tabController;
+  late AnimationController _rotationController;
+  late AnimationController _pulseController;
+  late AnimationController _fadeController;
 
-  // Animations
-  late Animation<double> _headerAnimation;
-  // ignore: unused_field
-  late Animation<double> _contentFadeAnimation;
-  late Animation<double> _glassAnimation;
-  // ignore: unused_field
-  late Animation<double> _cardElevationAnimation;
-  late Animation<double> _planetaryRotation;
-  late Animation<double> _luckyElementsAnimation;
-
-  // State
-  int _currentTab = 0;
-  bool _isKundliMode = true;
   String _selectedCategory = 'general';
   String _userSign = 'Aries';
-  HoroscopeLayout _currentLayout = HoroscopeLayout.compact;
-  bool _isFirstLoad = true;
 
-  // Categories
-  final List<HoroscopeCategory> _categories = [
-    HoroscopeCategory(
+  final List<_Category> _categories = [
+    _Category(
       'general',
-      'General',
-      Icons.stars_rounded,
-      const Color(0xFF6C5CE7),
+      'Overview',
+      CupertinoIcons.sparkles,
+      const Color(0xFF8B5CF6),
     ),
-    HoroscopeCategory(
+    _Category(
       'love',
       'Love',
-      Icons.favorite_rounded,
-      const Color(0xFFFF6B94),
+      CupertinoIcons.heart_fill,
+      const Color(0xFFEC4899),
     ),
-    HoroscopeCategory(
+    _Category(
       'career',
       'Career',
-      Icons.work_rounded,
-      const Color(0xFF3498DB),
+      CupertinoIcons.briefcase_fill,
+      const Color(0xFF3B82F6),
     ),
-    HoroscopeCategory(
+    _Category(
       'health',
-      'Health',
-      Icons.health_and_safety_rounded,
-      const Color(0xFF4ECDC4),
+      'Wellness',
+      CupertinoIcons.leaf_arrow_circlepath,
+      const Color(0xFF10B981),
     ),
-    HoroscopeCategory(
+    _Category(
       'finance',
-      'Finance',
-      Icons.account_balance_wallet_rounded,
-      const Color(0xFFFFA502),
+      'Wealth',
+      CupertinoIcons.chart_bar_alt_fill,
+      const Color(0xFFE8B931),
     ),
-    HoroscopeCategory(
-      'family',
-      'Family',
-      Icons.family_restroom_rounded,
-      const Color(0xFF95E1D3),
-    ),
-  ];
-
-  // Lucky elements
-  final Map<String, LuckyElements> _luckyElements = {
-    'Aries': LuckyElements(
-      color: const Color(0xFFFF6B6B),
-      number: 9,
-      gemstone: 'Ruby',
-      day: 'Tuesday',
-      direction: 'East',
-    ),
-    'Taurus': LuckyElements(
-      color: const Color(0xFF4ECDC4),
-      number: 6,
-      gemstone: 'Emerald',
-      day: 'Friday',
-      direction: 'South',
-    ),
-    // Add more signs...
-  };
-
-  // Planetary positions
-  final List<PlanetaryPosition> _planetaryPositions = [
-    PlanetaryPosition('Sun', 0, const Color(0xFFFFA502), 24),
-    PlanetaryPosition('Moon', 45, const Color(0xFF95E1D3), 20),
-    PlanetaryPosition('Mercury', 90, const Color(0xFF3498DB), 16),
-    PlanetaryPosition('Venus', 135, const Color(0xFFFF6B94), 18),
-    PlanetaryPosition('Mars', 180, const Color(0xFFFF6B6B), 20),
-    PlanetaryPosition('Jupiter', 225, const Color(0xFFB983FF), 28),
-    PlanetaryPosition('Saturn', 270, const Color(0xFF6C5B7B), 26),
   ];
 
   @override
   void initState() {
     super.initState();
-    _categoryScrollController = ScrollController();
-    _mainTabController = TabController(length: 4, vsync: this);
-    // Initialize controllers with default durations, will update in didChangeDependencies
-    _initControllersWithDefaults();
-  }
+    _tabController = TabController(length: 3, vsync: this);
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Now safe to access MediaQuery and context
-    _updateAnimationControllers();
-
-    // Only load data once
-    if (_isFirstLoad) {
-      _isFirstLoad = false;
-      _loadData();
-    }
-  }
-
-  void _initControllersWithDefaults() {
-    // Initialize with default durations (will be updated in didChangeDependencies)
-    _headerController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-
-    _contentController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-
-    _glassController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-
-    _cardElevationController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-
-    _planetaryController = AnimationController(
-      duration: const Duration(seconds: 20),
+    _rotationController = AnimationController(
+      duration: const Duration(seconds: 60),
       vsync: this,
     )..repeat();
 
-    _luckyElementsController = AnimationController(
-      duration: const Duration(milliseconds: 500),
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
       vsync: this,
-    );
+    )..repeat(reverse: true);
 
-    // Initialize animations
-    _headerAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _headerController, curve: Curves.easeOutCubic),
-    );
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    )..forward();
 
-    _contentFadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _contentController, curve: Curves.easeInOut),
-    );
-
-    _glassAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _glassController, curve: Curves.easeInOut),
-    );
-
-    _cardElevationAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _cardElevationController,
-        curve: Curves.easeOutBack,
-      ),
-    );
-
-    _planetaryRotation = Tween<double>(begin: 0.0, end: 2 * math.pi).animate(
-      CurvedAnimation(parent: _planetaryController, curve: Curves.linear),
-    );
-
-    _luckyElementsAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _luckyElementsController,
-        curve: Curves.elasticOut,
-      ),
-    );
-
-    // Start animations
-    _headerController.forward();
-    _contentController.forward();
-    _glassController.forward();
-    _cardElevationController.forward();
-    _luckyElementsController.forward();
-
-    // Tab listener
-    _mainTabController.addListener(() {
-      if (_mainTabController.index != _currentTab) {
-        setState(() {
-          _currentTab = _mainTabController.index;
-        });
-        _contentController.forward(from: 0);
-        _glassController.forward(from: 0);
-      }
-    });
-  }
-
-  void _updateAnimationControllers() {
-    // Update animation durations based on screen size
-    final animationSpeed = _getAdaptiveAnimationSpeed();
-
-    _headerController.duration = Duration(milliseconds: animationSpeed.header);
-    _contentController.duration = Duration(
-      milliseconds: animationSpeed.content,
-    );
-    _glassController.duration = Duration(milliseconds: animationSpeed.glass);
-    _cardElevationController.duration = Duration(
-      milliseconds: animationSpeed.card,
-    );
-    _luckyElementsController.duration = Duration(
-      milliseconds: animationSpeed.elements,
-    );
+    _loadData();
   }
 
   Future<void> _loadData() async {
@@ -267,779 +85,525 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
 
     final authProvider = context.read<AuthProvider>();
     final user = authProvider.currentUser;
-    if (user?.zodiacSign != null) {
-      setState(() {
-        _userSign = user!.zodiacSign;
-      });
+    if (user?.zodiacSign != null && mounted) {
+      setState(() => _userSign = user!.zodiacSign);
     }
-  }
-
-  // Get screen size category
-  ScreenSize _getScreenSize(double width) {
-    if (width < HoroscopeBreakpoints.mobile) return ScreenSize.mobile;
-    if (width < HoroscopeBreakpoints.tablet) return ScreenSize.tablet;
-    if (width < HoroscopeBreakpoints.desktop) return ScreenSize.desktop;
-    return ScreenSize.largeDesktop;
-  }
-
-  // Get layout mode
-  HoroscopeLayout _getLayout(double width) {
-    final screenSize = _getScreenSize(width);
-    switch (screenSize) {
-      case ScreenSize.mobile:
-        return HoroscopeLayout.compact;
-      case ScreenSize.tablet:
-        return HoroscopeLayout.expanded;
-      case ScreenSize.desktop:
-        return HoroscopeLayout.desktop;
-      case ScreenSize.largeDesktop:
-        return HoroscopeLayout.ultraWide;
-    }
-  }
-
-  // Get category display mode
-  CategoryDisplay _getCategoryDisplay(ScreenSize screenSize) {
-    switch (screenSize) {
-      case ScreenSize.mobile:
-        return CategoryDisplay.horizontal;
-      case ScreenSize.tablet:
-        return CategoryDisplay.grid;
-      case ScreenSize.desktop:
-      case ScreenSize.largeDesktop:
-        return CategoryDisplay.cards;
-    }
-  }
-
-  // Get adaptive animation speeds
-  AnimationSpeed _getAdaptiveAnimationSpeed() {
-    final width = MediaQuery.of(context).size.width;
-    final screenSize = _getScreenSize(width);
-
-    switch (screenSize) {
-      case ScreenSize.mobile:
-        return AnimationSpeed(
-          header: 600,
-          content: 400,
-          glass: 300,
-          card: 200,
-          elements: 500,
-        );
-      case ScreenSize.tablet:
-        return AnimationSpeed(
-          header: 700,
-          content: 500,
-          glass: 400,
-          card: 300,
-          elements: 600,
-        );
-      case ScreenSize.desktop:
-      case ScreenSize.largeDesktop:
-        return AnimationSpeed(
-          header: 800,
-          content: 600,
-          glass: 500,
-          card: 400,
-          elements: 700,
-        );
-    }
-  }
-
-  // Get responsive elevation
-  double _getResponsiveElevation(
-    ScreenSize screenSize, {
-    bool isHovered = false,
-  }) {
-    final baseElevation = switch (screenSize) {
-      ScreenSize.mobile => 2.0,
-      ScreenSize.tablet => 4.0,
-      ScreenSize.desktop => 6.0,
-      ScreenSize.largeDesktop => 8.0,
-    };
-
-    return isHovered ? baseElevation * 1.5 : baseElevation;
-  }
-
-  // Get responsive shadow
-  List<BoxShadow> _getResponsiveShadow(
-    ScreenSize screenSize,
-    Color color, {
-    bool isHovered = false,
-  }) {
-    final elevation = _getResponsiveElevation(screenSize, isHovered: isHovered);
-
-    return [
-      BoxShadow(
-        color: color.withOpacity(0.1 * (elevation / 8)),
-        blurRadius: elevation * 2,
-        offset: Offset(0, elevation),
-      ),
-      if (screenSize != ScreenSize.mobile)
-        BoxShadow(
-          color: color.withOpacity(0.05),
-          blurRadius: elevation * 4,
-          offset: Offset(0, elevation * 2),
-        ),
-    ];
   }
 
   @override
   void dispose() {
-    _mainTabController.dispose();
-    _headerController.dispose();
-    _contentController.dispose();
-    _glassController.dispose();
-    _cardElevationController.dispose();
-    _planetaryController.dispose();
-    _luckyElementsController.dispose();
-    _categoryScrollController.dispose();
+    _tabController.dispose();
+    _rotationController.dispose();
+    _pulseController.dispose();
+    _fadeController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final screenWidth = constraints.maxWidth;
-        final screenHeight = constraints.maxHeight;
-        final screenSize = _getScreenSize(screenWidth);
-        final layout = _getLayout(screenWidth);
-        final categoryDisplay = _getCategoryDisplay(screenSize);
-
-        // Update layout state
-        if (_currentLayout != layout) {
-          _currentLayout = layout;
-        }
-
-        return Scaffold(
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          body: Stack(
-            children: [
-              // Animated background
-              if (screenSize != ScreenSize.mobile)
-                _buildAnimatedBackground(screenSize),
-
-              // Main content
-              _buildResponsiveLayout(
-                context,
-                screenSize,
-                layout,
-                categoryDisplay,
-                screenWidth,
-                screenHeight,
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  // Build animated background
-  Widget _buildAnimatedBackground(ScreenSize screenSize) {
-    return AnimatedBuilder(
-      animation: _planetaryRotation,
-      builder: (context, child) {
-        return CustomPaint(
-          painter: CosmicBackgroundPainter(
-            rotation: _planetaryRotation.value,
-            opacity: 0.05,
-          ),
-          child: Container(),
-        );
-      },
-    );
-  }
-
-  // Build responsive layout
-  Widget _buildResponsiveLayout(
-    BuildContext context,
-    ScreenSize screenSize,
-    HoroscopeLayout layout,
-    CategoryDisplay categoryDisplay,
-    double screenWidth,
-    double screenHeight,
-  ) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    switch (layout) {
-      case HoroscopeLayout.compact:
-        return _buildMobileLayout(
-          context,
-          screenSize,
-          categoryDisplay,
-          isDarkMode,
-        );
-      case HoroscopeLayout.expanded:
-        return _buildTabletLayout(
-          context,
-          screenSize,
-          categoryDisplay,
-          isDarkMode,
-          screenWidth,
-        );
-      case HoroscopeLayout.desktop:
-        return _buildDesktopLayout(
-          context,
-          screenSize,
-          categoryDisplay,
-          isDarkMode,
-          screenWidth,
-        );
-      case HoroscopeLayout.ultraWide:
-        return _buildUltraWideLayout(
-          context,
-          screenSize,
-          categoryDisplay,
-          isDarkMode,
-          screenWidth,
-        );
-    }
-  }
-
-  // Mobile layout
-  Widget _buildMobileLayout(
-    BuildContext context,
-    ScreenSize screenSize,
-    CategoryDisplay categoryDisplay,
-    bool isDarkMode,
-  ) {
-    return SafeArea(
-      child: Column(
+    return Scaffold(
+      backgroundColor: const Color(0xFF0A0612),
+      body: Stack(
         children: [
-          // Header
-          _buildResponsiveHeader(context, screenSize, isDarkMode),
-
-          // Tab bar
-          _buildResponsiveTabBar(context, screenSize, isDarkMode),
-
-          // Content
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  // Categories (horizontal scroll)
-                  _buildCategorySection(
-                    context,
-                    screenSize,
-                    categoryDisplay,
-                    isDarkMode,
-                  ),
-
-                  // Main prediction card
-                  _buildMainPredictionCard(context, screenSize, isDarkMode),
-
-                  // Lucky elements
-                  _buildLuckyElementsSection(context, screenSize, isDarkMode),
-
-                  // Planetary positions
-                  _buildPlanetaryPositions(context, screenSize, isDarkMode),
-
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Tablet layout
-  Widget _buildTabletLayout(
-    BuildContext context,
-    ScreenSize screenSize,
-    CategoryDisplay categoryDisplay,
-    bool isDarkMode,
-    double screenWidth,
-  ) {
-    return SafeArea(
-      child: Column(
-        children: [
-          // Header
-          _buildResponsiveHeader(context, screenSize, isDarkMode),
-
-          // Tab bar
-          _buildResponsiveTabBar(context, screenSize, isDarkMode),
-
-          // Content
-          Expanded(
-            child: Row(
-              children: [
-                // Left panel
-                SizedBox(
-                  width: screenWidth * 0.4,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        _buildPlanetaryPositions(
-                          context,
-                          screenSize,
-                          isDarkMode,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildLuckyElementsSection(
-                          context,
-                          screenSize,
-                          isDarkMode,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Right panel
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        _buildCategorySection(
-                          context,
-                          screenSize,
-                          categoryDisplay,
-                          isDarkMode,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildMainPredictionCard(
-                          context,
-                          screenSize,
-                          isDarkMode,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Desktop layout
-  Widget _buildDesktopLayout(
-    BuildContext context,
-    ScreenSize screenSize,
-    CategoryDisplay categoryDisplay,
-    bool isDarkMode,
-    double screenWidth,
-  ) {
-    return SafeArea(
-      child: Row(
-        children: [
-          // Sidebar
-          Container(
-            width: 320,
-            decoration: BoxDecoration(
-              color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
-              border: Border(
-                right: BorderSide(
-                  color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
-                ),
-              ),
-            ),
-            child: Column(
-              children: [
-                _buildResponsiveHeader(context, screenSize, isDarkMode),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      children: [
-                        _buildPlanetaryPositions(
-                          context,
-                          screenSize,
-                          isDarkMode,
-                        ),
-                        const SizedBox(height: 20),
-                        _buildLuckyElementsSection(
-                          context,
-                          screenSize,
-                          isDarkMode,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // Animated cosmic background
+          _buildAnimatedBackground(),
 
           // Main content
-          Expanded(
+          SafeArea(
             child: Column(
               children: [
-                // Tab bar
-                _buildResponsiveTabBar(context, screenSize, isDarkMode),
-
-                // Content area
+                _buildHeader(),
+                _buildTabBar(),
                 Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      children: [
-                        _buildCategorySection(
-                          context,
-                          screenSize,
-                          categoryDisplay,
-                          isDarkMode,
-                        ),
-                        const SizedBox(height: 24),
-                        _buildMainPredictionCard(
-                          context,
-                          screenSize,
-                          isDarkMode,
-                        ),
-                        const SizedBox(height: 24),
-                        _buildAdditionalInsights(
-                          context,
-                          screenSize,
-                          isDarkMode,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Ultra-wide layout
-  Widget _buildUltraWideLayout(
-    BuildContext context,
-    ScreenSize screenSize,
-    CategoryDisplay categoryDisplay,
-    bool isDarkMode,
-    double screenWidth,
-  ) {
-    return SafeArea(
-      child: Row(
-        children: [
-          // Left sidebar
-          Container(
-            width: 360,
-            decoration: BoxDecoration(
-              color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
-              border: Border(
-                right: BorderSide(
-                  color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
-                ),
-              ),
-            ),
-            child: Column(
-              children: [
-                _buildResponsiveHeader(context, screenSize, isDarkMode),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      children: [
-                        _buildPlanetaryPositions(
-                          context,
-                          screenSize,
-                          isDarkMode,
-                        ),
-                        const SizedBox(height: 24),
-                        _buildLuckyElementsSection(
-                          context,
-                          screenSize,
-                          isDarkMode,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Main content
-          Expanded(
-            child: Column(
-              children: [
-                _buildResponsiveTabBar(context, screenSize, isDarkMode),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(32),
-                    child: Column(
-                      children: [
-                        _buildCategorySection(
-                          context,
-                          screenSize,
-                          categoryDisplay,
-                          isDarkMode,
-                        ),
-                        const SizedBox(height: 32),
-                        _buildMainPredictionCard(
-                          context,
-                          screenSize,
-                          isDarkMode,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Right sidebar
-          Container(
-            width: 320,
-            decoration: BoxDecoration(
-              color: isDarkMode ? Colors.grey[900] : Colors.grey[50],
-              border: Border(
-                left: BorderSide(
-                  color: isDarkMode ? Colors.grey[800]! : Colors.grey[200]!,
-                ),
-              ),
-            ),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: _buildAdditionalInsights(context, screenSize, isDarkMode),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Build responsive header
-  Widget _buildResponsiveHeader(
-    BuildContext context,
-    ScreenSize screenSize,
-    bool isDarkMode,
-  ) {
-    final isCompact = screenSize == ScreenSize.mobile;
-
-    return AnimatedBuilder(
-      animation: _headerAnimation,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, -20 * (1 - _headerAnimation.value)),
-          child: Opacity(
-            opacity: _headerAnimation.value,
-            child: Container(
-              padding: EdgeInsets.all(isCompact ? 16 : 24),
-              child: Row(
-                children: [
-                  if (!isCompact)
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back),
-                    ),
-
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Horoscope',
-                          style: TextStyle(
-                            fontSize: isCompact ? 24 : 32,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'Your cosmic guidance',
-                          style: TextStyle(
-                            fontSize: isCompact ? 13 : 15,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  _buildModeSwitcher(isDarkMode, isCompact),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // Build mode switcher
-  Widget _buildModeSwitcher(bool isDarkMode, bool isCompact) {
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.lightImpact();
-        setState(() {
-          _isKundliMode = !_isKundliMode;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        padding: EdgeInsets.symmetric(
-          horizontal: isCompact ? 12 : 16,
-          vertical: isCompact ? 8 : 10,
-        ),
-        decoration: BoxDecoration(
-          gradient:
-              _isKundliMode
-                  ? LinearGradient(
-                    colors: [
-                      AppColors.primary,
-                      AppColors.primary.withOpacity(0.8),
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildTodayTab(),
+                      _buildWeeklyTab(),
+                      _buildAllSignsTab(),
                     ],
-                  )
-                  : null,
-          color:
-              !_isKundliMode
-                  ? (isDarkMode ? Colors.grey[800] : Colors.grey[200])
-                  : null,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              _isKundliMode
-                  ? Icons.auto_awesome_rounded
-                  : Icons.wb_sunny_rounded,
-              size: isCompact ? 16 : 20,
-              color:
-                  _isKundliMode
-                      ? Colors.white
-                      : (isDarkMode ? Colors.white : Colors.grey[700]),
+                  ),
+                ),
+              ],
             ),
-            if (!isCompact) ...[
-              const SizedBox(width: 8),
-              Text(
-                _isKundliMode ? 'Kundli' : 'Sun Sign',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color:
-                      _isKundliMode
-                          ? Colors.white
-                          : (isDarkMode ? Colors.white : Colors.grey[700]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnimatedBackground() {
+    return Stack(
+      children: [
+        // Base gradient
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF1A0A2E), Color(0xFF0A0612), Color(0xFF0D0618)],
+            ),
+          ),
+        ),
+
+        // Rotating constellation ring
+        Positioned(
+          top: -150,
+          right: -150,
+          child: AnimatedBuilder(
+            animation: _rotationController,
+            builder: (context, child) {
+              return Transform.rotate(
+                angle: _rotationController.value * 2 * math.pi,
+                child: child,
+              );
+            },
+            child: Container(
+              width: 400,
+              height: 400,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xFF8B5CF6).withOpacity(0.1),
+                  width: 1,
                 ),
               ),
-            ],
+              child: Stack(
+                children: List.generate(12, (index) {
+                  final angle = (index * 30) * math.pi / 180;
+                  return Positioned(
+                    left: 200 + 180 * math.cos(angle) - 4,
+                    top: 200 + 180 * math.sin(angle) - 4,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8B931).withOpacity(0.3),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+        ),
+
+        // Pulsing glow
+        AnimatedBuilder(
+          animation: _pulseController,
+          builder: (context, child) {
+            return Positioned(
+              top: 100,
+              left: -100,
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      const Color(
+                        0xFF6B3FA0,
+                      ).withOpacity(0.15 + _pulseController.value * 0.05),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+
+        // Stars
+        ...List.generate(30, (index) {
+          final random = math.Random(index);
+          return Positioned(
+            left: random.nextDouble() * MediaQuery.of(context).size.width,
+            top: random.nextDouble() * MediaQuery.of(context).size.height,
+            child: AnimatedBuilder(
+              animation: _pulseController,
+              builder: (context, _) {
+                final twinkle =
+                    (math.sin(_pulseController.value * math.pi + index) + 1) /
+                    2;
+                return Container(
+                  width: 2 + random.nextDouble() * 2,
+                  height: 2 + random.nextDouble() * 2,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2 + twinkle * 0.3),
+                    shape: BoxShape.circle,
+                  ),
+                );
+              },
+            ),
+          );
+        }),
+      ],
+    );
+  }
+
+  Widget _buildHeader() {
+    final zodiacColor = _getZodiacColor(_userSign);
+
+    return FadeTransition(
+      opacity: _fadeController,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _getGreeting(),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFFE8B931).withOpacity(0.8),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    'Your Cosmic Guide',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Zodiac selector with glow
+            GestureDetector(
+              onTap: () => _showSignSelector(),
+              child: Container(
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    colors: [
+                      zodiacColor.withOpacity(0.5),
+                      zodiacColor.withOpacity(0.2),
+                    ],
+                  ),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF16101F),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _getZodiacSymbol(_userSign),
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(width: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _userSign,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            _getZodiacDates(_userSign),
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: Colors.white.withOpacity(0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        CupertinoIcons.chevron_down,
+                        size: 12,
+                        color: Colors.white.withOpacity(0.5),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  // Build responsive tab bar
-  Widget _buildResponsiveTabBar(
-    BuildContext context,
-    ScreenSize screenSize,
-    bool isDarkMode,
-  ) {
-    final isCompact = screenSize == ScreenSize.mobile;
-    final tabs = ['Today', 'Forecast', 'All Signs', 'Reports'];
-    final icons = [
-      Icons.today_rounded,
-      Icons.calendar_view_week_rounded,
-      Icons.grid_view_rounded,
-      Icons.description_rounded,
-    ];
-
+  Widget _buildTabBar() {
     return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: isCompact ? 16 : 24,
-        vertical: 8,
-      ),
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+      padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color:
-            isDarkMode ? Colors.grey[900]?.withOpacity(0.5) : Colors.grey[100],
-        borderRadius: BorderRadius.circular(16),
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
       ),
       child: TabBar(
-        controller: _mainTabController,
+        controller: _tabController,
         indicator: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.primary, AppColors.primary.withOpacity(0.8)],
+          gradient: const LinearGradient(
+            colors: [Color(0xFFE8B931), Color(0xFFF4D03F)],
           ),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(11),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFE8B931).withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         indicatorSize: TabBarIndicatorSize.tab,
-        indicatorPadding: const EdgeInsets.all(4),
-        labelColor: Colors.white,
-        unselectedLabelColor: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-        tabs: List.generate(
-          tabs.length,
-          (index) => Tab(
-            height: isCompact ? 40 : 48,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icons[index], size: isCompact ? 16 : 20),
-                if (!isCompact || screenSize == ScreenSize.tablet) ...[
-                  const SizedBox(width: 4),
-                  Text(
-                    tabs[index],
-                    style: TextStyle(fontSize: isCompact ? 12 : 14),
-                  ),
-                ],
-              ],
-            ),
-          ),
+        dividerColor: Colors.transparent,
+        labelColor: const Color(0xFF0A0612),
+        unselectedLabelColor: Colors.white.withOpacity(0.6),
+        labelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        tabs: const [
+          Tab(text: 'Today', height: 38),
+          Tab(text: 'This Week', height: 38),
+          Tab(text: 'All Signs', height: 38),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTodayTab() {
+    final horoscopeProvider = context.watch<HoroscopeProvider>();
+    final horoscope = horoscopeProvider.dailyHoroscopes[_userSign];
+
+    return RefreshIndicator(
+      onRefresh: _loadData,
+      color: const Color(0xFFE8B931),
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
+        child: Column(
+          children: [
+            // Cosmic Score Card
+            _buildCosmicScoreCard(horoscope),
+            const SizedBox(height: 16),
+
+            // Category Pills
+            _buildCategories(),
+            const SizedBox(height: 16),
+
+            // Main Reading Card
+            _buildReadingCard(horoscope),
+            const SizedBox(height: 16),
+
+            // Lucky Elements Row
+            _buildLuckyElementsRow(horoscope),
+            const SizedBox(height: 16),
+
+            // Planetary Influence
+            _buildPlanetaryInfluence(),
+            const SizedBox(height: 16),
+
+            // Compatibility Glimpse
+            _buildCompatibilityGlimpse(),
+          ],
         ),
       ),
     );
   }
 
-  // Build category section
-  Widget _buildCategorySection(
-    BuildContext context,
-    ScreenSize screenSize,
-    CategoryDisplay display,
-    bool isDarkMode,
-  ) {
-    switch (display) {
-      case CategoryDisplay.horizontal:
-        return _buildHorizontalCategories(context, screenSize, isDarkMode);
-      case CategoryDisplay.grid:
-        return _buildGridCategories(context, screenSize, isDarkMode);
-      case CategoryDisplay.cards:
-        return _buildCardCategories(context, screenSize, isDarkMode);
-    }
+  Widget _buildCosmicScoreCard(dynamic horoscope) {
+    final zodiacColor = _getZodiacColor(_userSign);
+    final score = (horoscope?.rating ?? 4) * 20;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [zodiacColor.withOpacity(0.2), const Color(0xFF16101F)],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: zodiacColor.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: zodiacColor.withOpacity(0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Animated Score Circle
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              // Outer glow
+              AnimatedBuilder(
+                animation: _pulseController,
+                builder: (context, child) {
+                  return Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: zodiacColor.withOpacity(
+                            0.3 + _pulseController.value * 0.1,
+                          ),
+                          blurRadius: 20,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              // Progress ring
+              SizedBox(
+                width: 80,
+                height: 80,
+                child: CircularProgressIndicator(
+                  value: score / 100,
+                  strokeWidth: 6,
+                  backgroundColor: Colors.white.withOpacity(0.1),
+                  valueColor: AlwaysStoppedAnimation(zodiacColor),
+                ),
+              ),
+              // Center content
+              Column(
+                children: [
+                  Text(
+                    '$score',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    'score',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.white.withOpacity(0.6),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(width: 20),
+
+          // Sign info and mood
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      _getZodiacSymbol(_userSign),
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _userSign,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          _getZodiacElement(_userSign),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: zodiacColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Mood chip
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        CupertinoIcons.sun_max_fill,
+                        size: 14,
+                        color: const Color(0xFFE8B931),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        horoscope?.mood ?? 'Optimistic',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFE8B931),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  // Build horizontal scrolling categories (mobile)
-  Widget _buildHorizontalCategories(
-    BuildContext context,
-    ScreenSize screenSize,
-    bool isDarkMode,
-  ) {
-    return Container(
-      height: 120,
-      margin: const EdgeInsets.symmetric(vertical: 16),
-      child: ListView.builder(
-        controller: _categoryScrollController,
+  Widget _buildCategories() {
+    return SizedBox(
+      height: 36,
+      child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: _categories.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final category = _categories[index];
           final isSelected = category.id == _selectedCategory;
 
           return GestureDetector(
             onTap: () {
-              setState(() {
-                _selectedCategory = category.id;
-              });
               HapticFeedback.lightImpact();
+              setState(() => _selectedCategory = category.id);
             },
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: 100,
-              margin: const EdgeInsets.only(right: 12),
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 14),
               decoration: BoxDecoration(
                 gradient:
                     isSelected
@@ -1050,26 +614,36 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
                           ],
                         )
                         : null,
-                color:
-                    !isSelected
-                        ? (isDarkMode ? Colors.grey[900] : Colors.white)
-                        : null,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: _getResponsiveShadow(
-                  screenSize,
-                  category.color,
-                  isHovered: isSelected,
+                color: isSelected ? null : Colors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color:
+                      isSelected
+                          ? Colors.transparent
+                          : Colors.white.withOpacity(0.1),
                 ),
+                boxShadow:
+                    isSelected
+                        ? [
+                          BoxShadow(
+                            color: category.color.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                        : null,
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Row(
                 children: [
                   Icon(
                     category.icon,
-                    size: 32,
-                    color: isSelected ? Colors.white : category.color,
+                    size: 14,
+                    color:
+                        isSelected
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.6),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(width: 6),
                   Text(
                     category.title,
                     style: TextStyle(
@@ -1078,7 +652,7 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
                       color:
                           isSelected
                               ? Colors.white
-                              : (isDarkMode ? Colors.white : Colors.grey[800]),
+                              : Colors.white.withOpacity(0.6),
                     ),
                   ),
                 ],
@@ -1090,532 +664,266 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
     );
   }
 
-  // Build grid categories (tablet)
-  Widget _buildGridCategories(
-    BuildContext context,
-    ScreenSize screenSize,
-    bool isDarkMode,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          childAspectRatio: 1.2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-        ),
-        itemCount: _categories.length,
-        itemBuilder: (context, index) {
-          final category = _categories[index];
-          final isSelected = category.id == _selectedCategory;
+  Widget _buildReadingCard(dynamic horoscope) {
+    final category = _categories.firstWhere((c) => c.id == _selectedCategory);
 
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedCategory = category.id;
-              });
-              HapticFeedback.lightImpact();
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              decoration: BoxDecoration(
-                gradient:
-                    isSelected
-                        ? LinearGradient(
-                          colors: [
-                            category.color,
-                            category.color.withOpacity(0.7),
-                          ],
-                        )
-                        : null,
-                color:
-                    !isSelected
-                        ? (isDarkMode ? Colors.grey[900] : Colors.white)
-                        : null,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: _getResponsiveShadow(
-                  screenSize,
-                  category.color,
-                  isHovered: isSelected,
-                ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    category.icon,
-                    size: 36,
-                    color: isSelected ? Colors.white : category.color,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    category.title,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color:
-                          isSelected
-                              ? Colors.white
-                              : (isDarkMode ? Colors.white : Colors.grey[800]),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16101F),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
       ),
-    );
-  }
-
-  // Build card categories (desktop)
-  Widget _buildCardCategories(
-    BuildContext context,
-    ScreenSize screenSize,
-    bool isDarkMode,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Wrap(
-        spacing: 20,
-        runSpacing: 20,
-        children:
-            _categories.map((category) {
-              final isSelected = category.id == _selectedCategory;
-
-              return MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedCategory = category.id;
-                    });
-                    HapticFeedback.lightImpact();
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    width: 160,
-                    height: 140,
-                    decoration: BoxDecoration(
-                      gradient:
-                          isSelected
-                              ? LinearGradient(
-                                colors: [
-                                  category.color,
-                                  category.color.withOpacity(0.7),
-                                ],
-                              )
-                              : null,
-                      color:
-                          !isSelected
-                              ? (isDarkMode ? Colors.grey[900] : Colors.white)
-                              : null,
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: _getResponsiveShadow(
-                        screenSize,
-                        category.color,
-                        isHovered: isSelected,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          category.icon,
-                          size: 48,
-                          color: isSelected ? Colors.white : category.color,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          category.title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color:
-                                isSelected
-                                    ? Colors.white
-                                    : (isDarkMode
-                                        ? Colors.white
-                                        : Colors.grey[800]),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-      ),
-    );
-  }
-
-  // Build main prediction card with glass morphism
-  Widget _buildMainPredictionCard(
-    BuildContext context,
-    ScreenSize screenSize,
-    bool isDarkMode,
-  ) {
-    final isCompact = screenSize == ScreenSize.mobile;
-
-    return AnimatedBuilder(
-      animation: _glassAnimation,
-      builder: (context, child) {
-        return Container(
-          margin: EdgeInsets.all(isCompact ? 16 : 24),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ui.ImageFilter.blur(
-                sigmaX: 10 * _glassAnimation.value,
-                sigmaY: 10 * _glassAnimation.value,
-              ),
-              child: Container(
-                padding: EdgeInsets.all(isCompact ? 20 : 32),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      (isDarkMode ? Colors.white : Colors.black).withOpacity(
-                        0.1,
-                      ),
-                      (isDarkMode ? Colors.white : Colors.black).withOpacity(
-                        0.05,
-                      ),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: (isDarkMode ? Colors.white : Colors.black)
-                        .withOpacity(0.1),
-                  ),
-                  boxShadow: _getResponsiveShadow(
-                    screenSize,
-                    AppColors.primary,
-                  ),
+                  color: category.color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                child: Icon(category.icon, size: 18, color: category.color),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: isCompact ? 48 : 60,
-                          height: isCompact ? 48 : 60,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                _getZodiacColor(_userSign),
-                                _getZodiacColor(_userSign).withOpacity(0.7),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Icon(
-                            _getZodiacIcon(_userSign),
-                            color: Colors.white,
-                            size: isCompact ? 28 : 36,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _userSign,
-                                style: TextStyle(
-                                  fontSize: isCompact ? 20 : 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                'Today\'s Horoscope',
-                                style: TextStyle(
-                                  fontSize: isCompact ? 14 : 16,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
                     Text(
-                      'The stars align in your favor today. Your natural charisma '
-                      'and leadership qualities will help you overcome any challenges. '
-                      'This is an excellent time to pursue new opportunities and make '
-                      'important decisions that will shape your future.',
+                      '${category.title} Reading',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Updated today at ${_getCurrentTime()}',
                       style: TextStyle(
-                        fontSize: isCompact ? 14 : 16,
-                        height: 1.6,
-                        color: isDarkMode ? Colors.grey[300] : Colors.grey[700],
+                        fontSize: 10,
+                        color: Colors.white.withOpacity(0.4),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // Build planetary positions
-  Widget _buildPlanetaryPositions(
-    BuildContext context,
-    ScreenSize screenSize,
-    bool isDarkMode,
-  ) {
-    final isCompact = screenSize == ScreenSize.mobile;
-    final size = isCompact ? 200.0 : 280.0;
-
-    return AnimatedBuilder(
-      animation: _planetaryRotation,
-      builder: (context, child) {
-        return Container(
-          margin: EdgeInsets.all(isCompact ? 16 : 20),
-          padding: EdgeInsets.all(isCompact ? 16 : 24),
-          decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[900] : Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: _getResponsiveShadow(screenSize, AppColors.primary),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Planetary Positions',
-                style: TextStyle(
-                  fontSize: isCompact ? 16 : 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Center(
-                child: SizedBox(
-                  width: size,
-                  height: size,
-                  child: CustomPaint(
-                    painter: PlanetaryPositionsPainter(
-                      planets: _planetaryPositions,
-                      rotation: _planetaryRotation.value,
-                      isDarkMode: isDarkMode,
-                    ),
+              // Share button
+              GestureDetector(
+                onTap: () => HapticFeedback.lightImpact(),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    CupertinoIcons.share,
+                    size: 16,
+                    color: Colors.white.withOpacity(0.6),
                   ),
                 ),
               ),
             ],
           ),
-        );
-      },
-    );
-  }
 
-  // Build lucky elements section
-  Widget _buildLuckyElementsSection(
-    BuildContext context,
-    ScreenSize screenSize,
-    bool isDarkMode,
-  ) {
-    final isCompact = screenSize == ScreenSize.mobile;
-    final luckyElements = _luckyElements[_userSign] ?? _luckyElements['Aries']!;
+          const SizedBox(height: 16),
 
-    return AnimatedBuilder(
-      animation: _luckyElementsAnimation,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: 0.8 + (0.2 * _luckyElementsAnimation.value),
-          child: Container(
-            margin: EdgeInsets.all(isCompact ? 16 : 20),
-            padding: EdgeInsets.all(isCompact ? 16 : 24),
+          // Reading text with quote styling
+          Container(
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.grey[900] : Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: _getResponsiveShadow(screenSize, luckyElements.color),
+              color: Colors.white.withOpacity(0.03),
+              borderRadius: BorderRadius.circular(14),
+              border: Border(left: BorderSide(color: category.color, width: 3)),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Lucky Elements',
-                  style: TextStyle(
-                    fontSize: isCompact ? 16 : 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Wrap(
-                  spacing: isCompact ? 12 : 16,
-                  runSpacing: isCompact ? 12 : 16,
-                  children: [
-                    _buildLuckyElement('Color', luckyElements.color, isCompact),
-                    _buildLuckyElement(
-                      'Number',
-                      luckyElements.number,
-                      isCompact,
-                    ),
-                    _buildLuckyElement(
-                      'Gemstone',
-                      luckyElements.gemstone,
-                      isCompact,
-                    ),
-                    _buildLuckyElement('Day', luckyElements.day, isCompact),
-                    _buildLuckyElement(
-                      'Direction',
-                      luckyElements.direction,
-                      isCompact,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  // Build lucky element item
-  Widget _buildLuckyElement(String title, dynamic value, bool isCompact) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: isCompact ? 12 : 16,
-        vertical: isCompact ? 8 : 12,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: isCompact ? 11 : 12,
-              color: Colors.grey[600],
-            ),
-          ),
-          const SizedBox(height: 4),
-          if (value is Color)
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: value,
-                borderRadius: BorderRadius.circular(6),
-              ),
-            )
-          else
-            Text(
-              value.toString(),
+            child: Text(
+              _getHoroscopeText(horoscope),
               style: TextStyle(
-                fontSize: isCompact ? 14 : 16,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary,
+                fontSize: 14,
+                height: 1.6,
+                color: Colors.white.withOpacity(0.8),
               ),
             ),
+          ),
+
+          const SizedBox(height: 14),
+
+          // Rating stars
+          Row(
+            children: [
+              Text(
+                'Today\'s Energy',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.white.withOpacity(0.5),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ...List.generate(5, (index) {
+                final rating = horoscope?.rating ?? 4;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 2),
+                  child: Icon(
+                    index < rating
+                        ? CupertinoIcons.star_fill
+                        : CupertinoIcons.star,
+                    size: 14,
+                    color:
+                        index < rating
+                            ? const Color(0xFFE8B931)
+                            : Colors.white.withOpacity(0.2),
+                  ),
+                );
+              }),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  // Build additional insights (desktop only)
-  Widget _buildAdditionalInsights(
-    BuildContext context,
-    ScreenSize screenSize,
-    bool isDarkMode,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildLuckyElementsRow(dynamic horoscope) {
+    return Row(
       children: [
-        Text(
-          'Additional Insights',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Expanded(
+          child: _buildLuckyCard(
+            icon: CupertinoIcons.circle_fill,
+            label: 'Color',
+            value: horoscope?.luckyColor ?? 'Gold',
+            color: _getLuckyColor(horoscope?.luckyColor ?? 'Gold'),
+          ),
         ),
-        const SizedBox(height: 20),
-        _buildInsightCard(
-          'Compatibility',
-          'Libra, Sagittarius',
-          Icons.favorite,
-          Colors.pink,
-          isDarkMode,
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildLuckyCard(
+            icon: CupertinoIcons.number,
+            label: 'Number',
+            value: horoscope?.luckyNumber?.toString() ?? '7',
+            color: const Color(0xFF3B82F6),
+          ),
         ),
-        const SizedBox(height: 12),
-        _buildInsightCard(
-          'Element',
-          'Fire',
-          Icons.local_fire_department,
-          Colors.orange,
-          isDarkMode,
-        ),
-        const SizedBox(height: 12),
-        _buildInsightCard(
-          'Quality',
-          'Cardinal',
-          Icons.diamond,
-          Colors.blue,
-          isDarkMode,
-        ),
-        const SizedBox(height: 12),
-        _buildInsightCard(
-          'Ruling Planet',
-          'Mars',
-          Icons.language,
-          Colors.red,
-          isDarkMode,
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildLuckyCard(
+            icon: CupertinoIcons.clock,
+            label: 'Peak Hour',
+            value: '2 PM',
+            color: const Color(0xFF10B981),
+          ),
         ),
       ],
     );
   }
 
-  // Build insight card
-  Widget _buildInsightCard(
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-    bool isDarkMode,
-  ) {
+  Widget _buildLuckyCard({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16101F),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 14, color: color),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(fontSize: 9, color: Colors.white.withOpacity(0.4)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlanetaryInfluence() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[850] : Colors.grey[100],
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF6B3FA0).withOpacity(0.15),
+            const Color(0xFF16101F),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFF8B5CF6).withOpacity(0.2)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+          Row(
+            children: [
+              const Text('🪐', style: TextStyle(fontSize: 18)),
+              const SizedBox(width: 8),
+              const Text(
+                'Planetary Influence',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
                 ),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF8B5CF6).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'Active',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF8B5CF6),
                   ),
                 ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              _buildPlanetChip('Mercury', '↗', const Color(0xFF3B82F6)),
+              const SizedBox(width: 8),
+              _buildPlanetChip('Venus', '→', const Color(0xFFEC4899)),
+              const SizedBox(width: 8),
+              _buildPlanetChip('Mars', '↗', const Color(0xFFEF4444)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Mercury in direct motion enhances communication today.',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.white.withOpacity(0.6),
             ),
           ),
         ],
@@ -1623,192 +931,757 @@ class _HoroscopeScreenState extends State<HoroscopeScreen>
     );
   }
 
-  // Get zodiac color
-  Color _getZodiacColor(String sign) {
-    final colors = {
-      'Aries': const Color(0xFFFF6B6B),
-      'Taurus': const Color(0xFF4ECDC4),
-      'Gemini': const Color(0xFFFFD93D),
-      'Cancer': const Color(0xFF95E1D3),
-      'Leo': const Color(0xFFFFA502),
-      'Virgo': const Color(0xFFA8E6CF),
-      'Libra': const Color(0xFFFF8B94),
-      'Scorpio': const Color(0xFF8B5CF6),
-      'Sagittarius': const Color(0xFFB983FF),
-      'Capricorn': const Color(0xFF6C5B7B),
-      'Aquarius': const Color(0xFF3498DB),
-      'Pisces': const Color(0xFF74B9FF),
-    };
-    return colors[sign] ?? AppColors.primary;
+  Widget _buildPlanetChip(String planet, String direction, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            planet,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Text(direction, style: TextStyle(color: color, fontSize: 12)),
+        ],
+      ),
+    );
   }
 
-  // Get zodiac icon
-  IconData _getZodiacIcon(String sign) {
-    switch (sign.toLowerCase()) {
-      case 'aries':
-        return Icons.whatshot_rounded;
-      case 'taurus':
-        return Icons.terrain_rounded;
-      case 'gemini':
-        return Icons.people_rounded;
-      case 'cancer':
-        return Icons.home_rounded;
-      case 'leo':
-        return Icons.sunny;
-      case 'virgo':
-        return Icons.eco_rounded;
-      case 'libra':
-        return Icons.balance_rounded;
-      case 'scorpio':
-        return Icons.water_drop_rounded;
-      case 'sagittarius':
-        return Icons.explore_rounded;
-      case 'capricorn':
-        return Icons.landscape_rounded;
-      case 'aquarius':
-        return Icons.air_rounded;
-      case 'pisces':
-        return Icons.waves_rounded;
-      default:
-        return Icons.stars_rounded;
+  Widget _buildCompatibilityGlimpse() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF16101F),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('💫', style: TextStyle(fontSize: 16)),
+              const SizedBox(width: 8),
+              const Text(
+                'Best Match Today',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _buildCompatSign(_getCompatibleSign(_userSign), true),
+              const SizedBox(width: 8),
+              _buildCompatSign(_getSecondCompatibleSign(_userSign), false),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompatSign(String sign, bool primary) {
+    final color = _getZodiacColor(sign);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color:
+            primary ? color.withOpacity(0.15) : Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12),
+        border: primary ? Border.all(color: color.withOpacity(0.3)) : null,
+      ),
+      child: Row(
+        children: [
+          Text(_getZodiacSymbol(sign), style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                sign,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: primary ? color : Colors.white.withOpacity(0.8),
+                ),
+              ),
+              Text(
+                primary ? '95% match' : '88% match',
+                style: TextStyle(
+                  fontSize: 9,
+                  color: Colors.white.withOpacity(0.4),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeeklyTab() {
+    return RefreshIndicator(
+      onRefresh: _loadData,
+      color: const Color(0xFFE8B931),
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
+        child: Column(
+          children: [
+            _buildWeekOverview(),
+            const SizedBox(height: 16),
+            ...[
+              'Mon',
+              'Tue',
+              'Wed',
+              'Thu',
+              'Fri',
+              'Sat',
+              'Sun',
+            ].asMap().entries.map(
+              (entry) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _buildDayCard(entry.value, entry.key),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWeekOverview() {
+    final zodiacColor = _getZodiacColor(_userSign);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [zodiacColor.withOpacity(0.2), const Color(0xFF16101F)],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: zodiacColor.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                _getZodiacSymbol(_userSign),
+                style: const TextStyle(fontSize: 32),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$_userSign\'s Week',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'A transformative week ahead',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white.withOpacity(0.6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              _buildWeekStat('Best Day', 'Saturday', const Color(0xFF10B981)),
+              const SizedBox(width: 12),
+              _buildWeekStat('Focus', 'Career', const Color(0xFF3B82F6)),
+              const SizedBox(width: 12),
+              _buildWeekStat('Avoid', 'Tuesday', const Color(0xFFEF4444)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeekStat(String label, String value, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 9,
+                color: Colors.white.withOpacity(0.4),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDayCard(String day, int index) {
+    final isToday = day == 'Sat';
+    final dayNames = {
+      'Mon': 'Monday',
+      'Tue': 'Tuesday',
+      'Wed': 'Wednesday',
+      'Thu': 'Thursday',
+      'Fri': 'Friday',
+      'Sat': 'Saturday',
+      'Sun': 'Sunday',
+    };
+    final ratings = [4, 3, 5, 4, 3, 5, 4];
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color:
+            isToday
+                ? const Color(0xFFE8B931).withOpacity(0.1)
+                : const Color(0xFF16101F),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color:
+              isToday
+                  ? const Color(0xFFE8B931).withOpacity(0.4)
+                  : Colors.white.withOpacity(0.06),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              gradient:
+                  isToday
+                      ? const LinearGradient(
+                        colors: [Color(0xFFE8B931), Color(0xFFF4D03F)],
+                      )
+                      : null,
+              color: isToday ? null : Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: Text(
+                day,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color:
+                      isToday
+                          ? const Color(0xFF0A0612)
+                          : Colors.white.withOpacity(0.7),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isToday ? 'Today' : dayNames[day] ?? day,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isToday ? const Color(0xFFE8B931) : Colors.white,
+                  ),
+                ),
+                Text(
+                  _getDayForecast(index),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.white.withOpacity(0.5),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          _buildDayRating(ratings[index]),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDayRating(int rating) {
+    Color color;
+    String label;
+    if (rating >= 5) {
+      color = const Color(0xFF10B981);
+      label = 'Great';
+    } else if (rating >= 4) {
+      color = const Color(0xFF3B82F6);
+      label = 'Good';
+    } else {
+      color = const Color(0xFFE8B931);
+      label = 'Okay';
     }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  String _getDayForecast(int index) {
+    const forecasts = [
+      'Focus on growth',
+      'Financial planning',
+      'New opportunities',
+      'Connect with others',
+      'Complete tasks',
+      'Rest & reflect',
+      'Spiritual focus',
+    ];
+    return forecasts[index];
+  }
+
+  Widget _buildAllSignsTab() {
+    final signs = [
+      'Aries',
+      'Taurus',
+      'Gemini',
+      'Cancer',
+      'Leo',
+      'Virgo',
+      'Libra',
+      'Scorpio',
+      'Sagittarius',
+      'Capricorn',
+      'Aquarius',
+      'Pisces',
+    ];
+
+    return GridView.builder(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
+      physics: const BouncingScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 0.95,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: signs.length,
+      itemBuilder: (context, index) {
+        final sign = signs[index];
+        final isSelected = sign == _userSign;
+        final color = _getZodiacColor(sign);
+
+        return GestureDetector(
+          onTap: () {
+            HapticFeedback.lightImpact();
+            setState(() => _userSign = sign);
+            _tabController.animateTo(0);
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              gradient:
+                  isSelected
+                      ? LinearGradient(
+                        colors: [
+                          color.withOpacity(0.3),
+                          color.withOpacity(0.1),
+                        ],
+                      )
+                      : null,
+              color: isSelected ? null : const Color(0xFF16101F),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color:
+                    isSelected
+                        ? color.withOpacity(0.5)
+                        : Colors.white.withOpacity(0.06),
+                width: isSelected ? 2 : 1,
+              ),
+              boxShadow:
+                  isSelected
+                      ? [
+                        BoxShadow(
+                          color: color.withOpacity(0.2),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                      : null,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _getZodiacSymbol(sign),
+                  style: const TextStyle(fontSize: 28),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  sign,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: isSelected ? color : Colors.white.withOpacity(0.8),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _getZodiacElement(sign),
+                  style: TextStyle(
+                    fontSize: 9,
+                    color:
+                        isSelected
+                            ? color.withOpacity(0.7)
+                            : Colors.white.withOpacity(0.4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSignSelector() {
+    HapticFeedback.lightImpact();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => _buildSignSelector(),
+    );
+  }
+
+  Widget _buildSignSelector() {
+    final signs = [
+      'Aries',
+      'Taurus',
+      'Gemini',
+      'Cancer',
+      'Leo',
+      'Virgo',
+      'Libra',
+      'Scorpio',
+      'Sagittarius',
+      'Capricorn',
+      'Aquarius',
+      'Pisces',
+    ];
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xFF16101F),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            '✨ Select Your Sign',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children:
+                  signs.map((sign) {
+                    final isSelected = sign == _userSign;
+                    final color = _getZodiacColor(sign);
+
+                    return GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        setState(() => _userSign = sign);
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        width: 100,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          gradient:
+                              isSelected
+                                  ? LinearGradient(
+                                    colors: [
+                                      color.withOpacity(0.3),
+                                      color.withOpacity(0.15),
+                                    ],
+                                  )
+                                  : null,
+                          color:
+                              isSelected
+                                  ? null
+                                  : Colors.white.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color:
+                                isSelected
+                                    ? color.withOpacity(0.5)
+                                    : Colors.transparent,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              _getZodiacSymbol(sign),
+                              style: const TextStyle(fontSize: 22),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              sign,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight:
+                                    isSelected
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                color:
+                                    isSelected
+                                        ? color
+                                        : Colors.white.withOpacity(0.8),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+            ),
+          ),
+          const SizedBox(height: 30),
+        ],
+      ),
+    );
+  }
+
+  // Helper methods
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return '☀️ Good Morning';
+    if (hour < 17) return '🌤️ Good Afternoon';
+    return '🌙 Good Evening';
+  }
+
+  String _getCurrentTime() {
+    final now = DateTime.now();
+    final hour = now.hour > 12 ? now.hour - 12 : now.hour;
+    final period = now.hour >= 12 ? 'PM' : 'AM';
+    return '$hour:${now.minute.toString().padLeft(2, '0')} $period';
+  }
+
+  String _getHoroscopeText(dynamic horoscope) {
+    switch (_selectedCategory) {
+      case 'love':
+        return horoscope?.love ??
+            'Venus graces your love sector, bringing warmth and romantic possibilities. Open your heart to meaningful connections today.';
+      case 'career':
+        return horoscope?.career ??
+            'Professional energies are aligned in your favor. Bold moves and innovative thinking will open new doors of opportunity.';
+      case 'health':
+        return horoscope?.health ??
+            'Your vital energy flows strong today. Channel it into activities that nurture both body and spirit for optimal wellness.';
+      case 'finance':
+        return horoscope?.finance ??
+            'Abundance consciousness is heightened. Trust your financial instincts and watch for unexpected opportunities.';
+      default:
+        return horoscope?.general ??
+            'The cosmos aligns to illuminate your path today. Your intuition is sharp—trust the guidance from within.';
+    }
+  }
+
+  String _getZodiacDates(String sign) {
+    const dates = {
+      'Aries': 'Mar 21 - Apr 19',
+      'Taurus': 'Apr 20 - May 20',
+      'Gemini': 'May 21 - Jun 20',
+      'Cancer': 'Jun 21 - Jul 22',
+      'Leo': 'Jul 23 - Aug 22',
+      'Virgo': 'Aug 23 - Sep 22',
+      'Libra': 'Sep 23 - Oct 22',
+      'Scorpio': 'Oct 23 - Nov 21',
+      'Sagittarius': 'Nov 22 - Dec 21',
+      'Capricorn': 'Dec 22 - Jan 19',
+      'Aquarius': 'Jan 20 - Feb 18',
+      'Pisces': 'Feb 19 - Mar 20',
+    };
+    return dates[sign] ?? '';
+  }
+
+  String _getZodiacElement(String sign) {
+    const elements = {
+      'Aries': '🔥 Fire',
+      'Taurus': '🌍 Earth',
+      'Gemini': '💨 Air',
+      'Cancer': '💧 Water',
+      'Leo': '🔥 Fire',
+      'Virgo': '🌍 Earth',
+      'Libra': '💨 Air',
+      'Scorpio': '💧 Water',
+      'Sagittarius': '🔥 Fire',
+      'Capricorn': '🌍 Earth',
+      'Aquarius': '💨 Air',
+      'Pisces': '💧 Water',
+    };
+    return elements[sign] ?? '';
+  }
+
+  String _getCompatibleSign(String sign) {
+    const compat = {
+      'Aries': 'Leo',
+      'Taurus': 'Virgo',
+      'Gemini': 'Libra',
+      'Cancer': 'Scorpio',
+      'Leo': 'Sagittarius',
+      'Virgo': 'Capricorn',
+      'Libra': 'Aquarius',
+      'Scorpio': 'Pisces',
+      'Sagittarius': 'Aries',
+      'Capricorn': 'Taurus',
+      'Aquarius': 'Gemini',
+      'Pisces': 'Cancer',
+    };
+    return compat[sign] ?? 'Leo';
+  }
+
+  String _getSecondCompatibleSign(String sign) {
+    const compat = {
+      'Aries': 'Sagittarius',
+      'Taurus': 'Capricorn',
+      'Gemini': 'Aquarius',
+      'Cancer': 'Pisces',
+      'Leo': 'Aries',
+      'Virgo': 'Taurus',
+      'Libra': 'Gemini',
+      'Scorpio': 'Cancer',
+      'Sagittarius': 'Leo',
+      'Capricorn': 'Virgo',
+      'Aquarius': 'Libra',
+      'Pisces': 'Scorpio',
+    };
+    return compat[sign] ?? 'Aries';
+  }
+
+  Color _getLuckyColor(String colorName) {
+    const colors = {
+      'Red': Color(0xFFEF4444),
+      'Blue': Color(0xFF3B82F6),
+      'Green': Color(0xFF10B981),
+      'Yellow': Color(0xFFE8B931),
+      'Purple': Color(0xFF8B5CF6),
+      'Pink': Color(0xFFEC4899),
+      'Orange': Color(0xFFF97316),
+      'Gold': Color(0xFFE8B931),
+      'White': Color(0xFFE2E8F0),
+    };
+    return colors[colorName] ?? const Color(0xFFE8B931);
+  }
+
+  Color _getZodiacColor(String sign) {
+    const colors = {
+      'Aries': Color(0xFFEF4444),
+      'Taurus': Color(0xFF10B981),
+      'Gemini': Color(0xFFE8B931),
+      'Cancer': Color(0xFF06B6D4),
+      'Leo': Color(0xFFF97316),
+      'Virgo': Color(0xFF84CC16),
+      'Libra': Color(0xFFEC4899),
+      'Scorpio': Color(0xFF8B5CF6),
+      'Sagittarius': Color(0xFFA855F7),
+      'Capricorn': Color(0xFF6366F1),
+      'Aquarius': Color(0xFF3B82F6),
+      'Pisces': Color(0xFF14B8A6),
+    };
+    return colors[sign] ?? const Color(0xFFE8B931);
+  }
+
+  String _getZodiacSymbol(String sign) {
+    const symbols = {
+      'Aries': '♈',
+      'Taurus': '♉',
+      'Gemini': '♊',
+      'Cancer': '♋',
+      'Leo': '♌',
+      'Virgo': '♍',
+      'Libra': '♎',
+      'Scorpio': '♏',
+      'Sagittarius': '♐',
+      'Capricorn': '♑',
+      'Aquarius': '♒',
+      'Pisces': '♓',
+    };
+    return symbols[sign] ?? '✦';
   }
 }
 
-// Models
-class HoroscopeCategory {
+class _Category {
   final String id;
   final String title;
   final IconData icon;
   final Color color;
 
-  HoroscopeCategory(this.id, this.title, this.icon, this.color);
-}
-
-class LuckyElements {
-  final Color color;
-  final int number;
-  final String gemstone;
-  final String day;
-  final String direction;
-
-  LuckyElements({
-    required this.color,
-    required this.number,
-    required this.gemstone,
-    required this.day,
-    required this.direction,
-  });
-}
-
-class PlanetaryPosition {
-  final String name;
-  final double angle;
-  final Color color;
-  final double size;
-
-  PlanetaryPosition(this.name, this.angle, this.color, this.size);
-}
-
-class AnimationSpeed {
-  final int header;
-  final int content;
-  final int glass;
-  final int card;
-  final int elements;
-
-  AnimationSpeed({
-    required this.header,
-    required this.content,
-    required this.glass,
-    required this.card,
-    required this.elements,
-  });
-}
-
-// Custom painters
-class CosmicBackgroundPainter extends CustomPainter {
-  final double rotation;
-  final double opacity;
-
-  CosmicBackgroundPainter({required this.rotation, required this.opacity});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..style = PaintingStyle.fill
-          ..strokeWidth = 2;
-
-    // Draw rotating cosmic elements
-    for (int i = 0; i < 5; i++) {
-      final angle = (i * 72 * math.pi / 180) + rotation;
-      final x = size.width / 2 + math.cos(angle) * size.width * 0.3;
-      final y = size.height / 2 + math.sin(angle) * size.height * 0.3;
-
-      paint.color = AppColors.primary.withOpacity(opacity);
-      canvas.drawCircle(Offset(x, y), 50, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(CosmicBackgroundPainter oldDelegate) {
-    return oldDelegate.rotation != rotation;
-  }
-}
-
-class PlanetaryPositionsPainter extends CustomPainter {
-  final List<PlanetaryPosition> planets;
-  final double rotation;
-  final bool isDarkMode;
-
-  PlanetaryPositionsPainter({
-    required this.planets,
-    required this.rotation,
-    required this.isDarkMode,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-
-    // Draw orbit circles
-    final orbitPaint =
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1
-          ..color = (isDarkMode ? Colors.white : Colors.black).withOpacity(0.1);
-
-    for (double i = 0.3; i <= 0.9; i += 0.2) {
-      canvas.drawCircle(center, radius * i, orbitPaint);
-    }
-
-    // Draw planets
-    for (final planet in planets) {
-      final angle = (planet.angle * math.pi / 180) + rotation;
-      final x = center.dx + math.cos(angle) * radius * 0.7;
-      final y = center.dy + math.sin(angle) * radius * 0.7;
-
-      final planetPaint =
-          Paint()
-            ..style = PaintingStyle.fill
-            ..color = planet.color;
-
-      canvas.drawCircle(Offset(x, y), planet.size / 2, planetPaint);
-    }
-
-    // Draw sun at center
-    final sunPaint =
-        Paint()
-          ..style = PaintingStyle.fill
-          ..color = const Color(0xFFFFA502);
-
-    canvas.drawCircle(center, 20, sunPaint);
-  }
-
-  @override
-  bool shouldRepaint(PlanetaryPositionsPainter oldDelegate) {
-    return oldDelegate.rotation != rotation;
-  }
+  _Category(this.id, this.title, this.icon, this.color);
 }

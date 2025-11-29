@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
+
+// Premium Cosmic Colors
+class _CosmicColors {
+  static const background = Color(0xFF0A0612);
+  static const cardDark = Color(0xFF16101F);
+  static const golden = Color(0xFFE8B931);
+  static const goldenLight = Color(0xFFF5D563);
+  static const textPrimary = Color(0xFFFAFAFA);
+  static const textSecondary = Color(0xFF9CA3AF);
+  static const accent = Color(0xFF6C5CE7);
+}
 
 class ProfileHeader extends StatelessWidget {
   final dynamic user;
-  final Animation<double> floatingAnimation;
+  final Animation<double>? floatingAnimation;
 
   const ProfileHeader({
     super.key,
     required this.user,
-    required this.floatingAnimation,
+    this.floatingAnimation,
   });
 
   @override
@@ -20,124 +32,43 @@ class ProfileHeader extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors:
-              isPremium
-                  ? [
-                    const Color(0xFFFDAB3D).withOpacity(0.9),
-                    const Color(0xFFFF8E53).withOpacity(0.9),
-                  ]
-                  : [
-                    const Color(0xFF6C5CE7).withOpacity(0.9),
-                    const Color(0xFF8B7EFF).withOpacity(0.9),
-                  ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            _CosmicColors.accent.withOpacity(0.15),
+            _CosmicColors.background,
+          ],
         ),
       ),
       child: Stack(
         children: [
-          // Background Pattern
+          // Cosmic pattern
           Positioned.fill(
             child: CustomPaint(
-              painter: PatternPainter(color: Colors.white.withOpacity(0.05)),
+              painter: _CosmicPatternPainter(),
             ),
           ),
 
           // Content
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 40),
-
-                  // Avatar with animation
-                  AnimatedBuilder(
-                    animation: floatingAnimation,
-                    builder: (context, child) {
-                      return Transform.translate(
-                        offset: Offset(0, floatingAnimation.value),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Glow effect
-                            Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.white.withOpacity(0.3),
-                                    blurRadius: 20,
-                                    spreadRadius: 5,
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            // Avatar
-                            Container(
-                              width: 90,
-                              height: 90,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.5),
-                                  width: 3,
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  name[0].toUpperCase(),
-                                  style: TextStyle(
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.bold,
-                                    color:
-                                        isPremium
-                                            ? const Color(0xFFFDAB3D)
-                                            : const Color(0xFF6C5CE7),
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            // Premium badge
-                            if (isPremium)
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.workspace_premium_rounded,
-                                    color: Color(0xFFFDAB3D),
-                                    size: 20,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                  // Avatar
+                  _buildAvatar(name, isPremium),
 
                   const SizedBox(height: 16),
 
                   // Name
                   Text(
                     name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: -0.5,
+                      fontWeight: FontWeight.w600,
+                      color: _CosmicColors.textPrimary,
+                      letterSpacing: -0.3,
                     ),
                   ),
 
@@ -148,7 +79,7 @@ class ProfileHeader extends StatelessWidget {
                     email,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.9),
+                      color: _CosmicColors.textSecondary,
                     ),
                   ),
 
@@ -158,70 +89,16 @@ class ProfileHeader extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Wallet Balance
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.account_balance_wallet_rounded,
-                              size: 16,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              walletBalance,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
+                      _buildStatPill(
+                        Icons.account_balance_wallet_rounded,
+                        walletBalance,
+                        _CosmicColors.golden,
                       ),
-
                       const SizedBox(width: 12),
-
-                      // Premium Status
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isPremium
-                                  ? Icons.verified_rounded
-                                  : Icons.lock_rounded,
-                              size: 16,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              isPremium ? 'Premium' : 'Free Plan',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
+                      _buildStatPill(
+                        isPremium ? Icons.verified_rounded : Icons.lock_rounded,
+                        isPremium ? 'Premium' : 'Free Plan',
+                        isPremium ? _CosmicColors.golden : _CosmicColors.accent,
                       ),
                     ],
                   ),
@@ -233,26 +110,143 @@ class ProfileHeader extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildAvatar(String name, bool isPremium) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Outer glow ring
+        Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                _CosmicColors.golden.withOpacity(0.3),
+                _CosmicColors.accent.withOpacity(0.3),
+              ],
+            ),
+          ),
+        ),
+
+        // Avatar circle
+        Container(
+          width: 88,
+          height: 88,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                _CosmicColors.cardDark,
+                _CosmicColors.background,
+              ],
+            ),
+            border: Border.all(
+              color: _CosmicColors.golden.withOpacity(0.3),
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: _CosmicColors.golden.withOpacity(0.15),
+                blurRadius: 20,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              name[0].toUpperCase(),
+              style: TextStyle(
+                fontSize: 34,
+                fontWeight: FontWeight.w600,
+                color: _CosmicColors.golden,
+              ),
+            ),
+          ),
+        ),
+
+        // Premium badge
+        if (isPremium)
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [_CosmicColors.golden, _CosmicColors.goldenLight],
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: _CosmicColors.golden.withOpacity(0.4),
+                    blurRadius: 8,
+                  ),
+                ],
+              ),
+              child: Icon(
+                Icons.workspace_premium_rounded,
+                color: _CosmicColors.background,
+                size: 16,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildStatPill(IconData icon, String text, Color color) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: color.withOpacity(0.25),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 14, color: color),
+              const SizedBox(width: 6),
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class PatternPainter extends CustomPainter {
-  final Color color;
-
-  PatternPainter({required this.color});
-
+class _CosmicPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = color
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1;
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.03)
+      ..style = PaintingStyle.fill;
 
-    const spacing = 30.0;
-
+    const spacing = 40.0;
     for (double x = 0; x < size.width; x += spacing) {
       for (double y = 0; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), 2, paint);
+        canvas.drawCircle(Offset(x, y), 1, paint);
       }
     }
   }

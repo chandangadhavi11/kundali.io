@@ -1,5 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:ui';
+
+// Premium Cosmic Colors
+class _CosmicColors {
+  static const background = Color(0xFF0A0612);
+  static const cardDark = Color(0xFF16101F);
+  static const golden = Color(0xFFE8B931);
+  static const goldenLight = Color(0xFFF5D563);
+  static const textPrimary = Color(0xFFFAFAFA);
+  static const textSecondary = Color(0xFF9CA3AF);
+  static const accent = Color(0xFF6C5CE7);
+  static const success = Color(0xFF00B894);
+  static const danger = Color(0xFFFF6B6B);
+}
 
 class RemindersView extends StatefulWidget {
   const RemindersView({super.key});
@@ -11,7 +25,6 @@ class RemindersView extends StatefulWidget {
 class _RemindersViewState extends State<RemindersView>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
 
   final List<Map<String, dynamic>> _reminders = [
     {
@@ -55,17 +68,10 @@ class _RemindersViewState extends State<RemindersView>
   @override
   void initState() {
     super.initState();
-
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 600),
       vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-
-    _animationController.forward();
+    )..forward();
   }
 
   @override
@@ -76,22 +82,29 @@ class _RemindersViewState extends State<RemindersView>
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return FadeTransition(
-      opacity: _fadeAnimation,
+      opacity: _animationController,
       child: Column(
         children: [
-          // Add Reminder Button
-          _buildAddReminderButton(isDarkMode),
-
-          // Reminders List
+          _buildAddReminderButton(),
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: _reminders.length,
               itemBuilder: (context, index) {
-                return _buildReminderCard(_reminders[index], isDarkMode);
+                return TweenAnimationBuilder<double>(
+                  duration: Duration(milliseconds: 300 + index * 100),
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  builder: (context, value, child) {
+                    return Transform.translate(
+                      offset: Offset(0, 20 * (1 - value)),
+                      child: Opacity(
+                        opacity: value,
+                        child: _buildReminderCard(_reminders[index]),
+                      ),
+                    );
+                  },
+                );
               },
             ),
           ),
@@ -100,7 +113,7 @@ class _RemindersViewState extends State<RemindersView>
     );
   }
 
-  Widget _buildAddReminderButton(bool isDarkMode) {
+  Widget _buildAddReminderButton() {
     return Container(
       margin: const EdgeInsets.all(16),
       child: GestureDetector(
@@ -109,16 +122,16 @@ class _RemindersViewState extends State<RemindersView>
           _showAddReminderSheet();
         },
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFFFDAB3D), Color(0xFFFF8E53)],
+            gradient: LinearGradient(
+              colors: [_CosmicColors.golden, _CosmicColors.goldenLight],
             ),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFFDAB3D).withOpacity(0.3),
-                blurRadius: 12,
+                color: _CosmicColors.golden.withOpacity(0.3),
+                blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
             ],
@@ -127,25 +140,25 @@ class _RemindersViewState extends State<RemindersView>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 30,
+                height: 30,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.add_rounded,
-                  color: Colors.white,
-                  size: 20,
+                  color: _CosmicColors.background,
+                  size: 18,
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Add New Reminder',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: _CosmicColors.background,
                 ),
               ),
             ],
@@ -155,164 +168,145 @@ class _RemindersViewState extends State<RemindersView>
     );
   }
 
-  Widget _buildReminderCard(Map<String, dynamic> reminder, bool isDarkMode) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[900]?.withOpacity(0.7) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: (reminder['color'] as Color).withOpacity(0.2),
-          width: 1,
+  Widget _buildReminderCard(Map<String, dynamic> reminder) {
+    final color = reminder['color'] as Color;
+    final isEnabled = reminder['enabled'] as bool;
+
+    return Dismissible(
+      key: Key(reminder['title'] as String),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: _CosmicColors.danger.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(14),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: (reminder['color'] as Color).withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        child: Icon(Icons.delete_rounded, color: _CosmicColors.danger, size: 22),
       ),
-      child: Dismissible(
-        key: Key(reminder['title'] as String),
-        direction: DismissDirection.endToStart,
-        background: Container(
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.only(right: 20),
-          decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: const Icon(Icons.delete_rounded, color: Colors.red, size: 24),
-        ),
-        onDismissed: (direction) {
-          setState(() {
-            _reminders.remove(reminder);
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${reminder['title']} deleted'),
-              action: SnackBarAction(
-                label: 'Undo',
-                onPressed: () {
-                  setState(() {
-                    _reminders.add(reminder);
-                  });
-                },
-              ),
+      onDismissed: (direction) {
+        setState(() => _reminders.remove(reminder));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${reminder['title']} deleted'),
+            backgroundColor: _CosmicColors.cardDark,
+            action: SnackBarAction(
+              label: 'Undo',
+              textColor: _CosmicColors.golden,
+              onPressed: () {
+                setState(() => _reminders.add(reminder));
+              },
             ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      (reminder['color'] as Color).withOpacity(0.2),
-                      (reminder['color'] as Color).withOpacity(0.1),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  reminder['icon'] as IconData,
-                  color: reminder['color'] as Color,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      reminder['title'] as String,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: isDarkMode ? Colors.white : Colors.grey[900],
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_today_rounded,
-                          size: 12,
-                          color:
-                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          reminder['date'] as String,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color:
-                                isDarkMode
-                                    ? Colors.grey[400]
-                                    : Colors.grey[600],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Icon(
-                          Icons.access_time_rounded,
-                          size: 12,
-                          color:
-                              isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          reminder['time'] as String,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color:
-                                isDarkMode
-                                    ? Colors.grey[400]
-                                    : Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getTypeColor(
-                          reminder['type'] as String,
-                        ).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        _getTypeLabel(reminder['type'] as String),
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: _getTypeColor(reminder['type'] as String),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(isEnabled ? 0.04 : 0.02),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: color.withOpacity(isEnabled ? 0.2 : 0.1),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    color.withOpacity(0.2),
+                    color.withOpacity(0.1),
                   ],
                 ),
+                borderRadius: BorderRadius.circular(12),
               ),
-              Switch(
-                value: reminder['enabled'] as bool,
-                onChanged: (value) {
-                  setState(() {
-                    reminder['enabled'] = value;
-                  });
-                },
-                activeColor: reminder['color'] as Color,
+              child: Icon(
+                reminder['icon'] as IconData,
+                color: color.withOpacity(isEnabled ? 1.0 : 0.5),
+                size: 22,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    reminder['title'] as String,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: _CosmicColors.textPrimary.withOpacity(isEnabled ? 1.0 : 0.5),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today_rounded,
+                        size: 11,
+                        color: _CosmicColors.textSecondary.withOpacity(isEnabled ? 1.0 : 0.5),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        reminder['date'] as String,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: _CosmicColors.textSecondary.withOpacity(isEnabled ? 1.0 : 0.5),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Icon(
+                        Icons.access_time_rounded,
+                        size: 11,
+                        color: _CosmicColors.textSecondary.withOpacity(isEnabled ? 1.0 : 0.5),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        reminder['time'] as String,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: _CosmicColors.textSecondary.withOpacity(isEnabled ? 1.0 : 0.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: _getTypeColor(reminder['type'] as String).withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _getTypeLabel(reminder['type'] as String),
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: _getTypeColor(reminder['type'] as String),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Switch(
+              value: isEnabled,
+              onChanged: (value) {
+                setState(() => reminder['enabled'] = value);
+              },
+              activeColor: color,
+              activeTrackColor: color.withOpacity(0.3),
+              inactiveThumbColor: _CosmicColors.textSecondary,
+              inactiveTrackColor: Colors.white.withOpacity(0.1),
+            ),
+          ],
         ),
       ),
     );
@@ -321,13 +315,13 @@ class _RemindersViewState extends State<RemindersView>
   Color _getTypeColor(String type) {
     switch (type) {
       case 'tithi':
-        return const Color(0xFF6C5CE7);
+        return _CosmicColors.accent;
       case 'nakshatra':
-        return const Color(0xFFFDAB3D);
+        return _CosmicColors.golden;
       case 'gregorian':
-        return const Color(0xFF00B894);
+        return _CosmicColors.success;
       default:
-        return Colors.grey;
+        return _CosmicColors.textSecondary;
     }
   }
 
@@ -349,12 +343,14 @@ class _RemindersViewState extends State<RemindersView>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _AddReminderSheet(),
+      builder: (context) => const _AddReminderSheet(),
     );
   }
 }
 
 class _AddReminderSheet extends StatefulWidget {
+  const _AddReminderSheet();
+
   @override
   State<_AddReminderSheet> createState() => _AddReminderSheetState();
 }
@@ -364,13 +360,12 @@ class _AddReminderSheetState extends State<_AddReminderSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final size = MediaQuery.of(context).size;
 
     return Container(
       height: size.height * 0.7,
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.grey[900] : Colors.white,
+        color: _CosmicColors.background,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -381,7 +376,7 @@ class _AddReminderSheetState extends State<_AddReminderSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+              color: Colors.white.withOpacity(0.2),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -395,16 +390,25 @@ class _AddReminderSheetState extends State<_AddReminderSheet> {
                   'Add Reminder',
                   style: TextStyle(
                     fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: isDarkMode ? Colors.white : Colors.grey[900],
+                    fontWeight: FontWeight.w600,
+                    color: _CosmicColors.textPrimary,
                   ),
                 ),
                 const Spacer(),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(
-                    Icons.close_rounded,
-                    color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.close_rounded,
+                      color: _CosmicColors.textSecondary,
+                      size: 18,
+                    ),
                   ),
                 ),
               ],
@@ -414,87 +418,28 @@ class _AddReminderSheetState extends State<_AddReminderSheet> {
           // Content
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Type selector
-                  Text(
-                    'Reminder Type',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: isDarkMode ? Colors.white : Colors.grey[900],
-                    ),
-                  ),
+                  _buildSectionTitle('Reminder Type'),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      _buildTypeChip('Hindu Tithi', 'tithi', isDarkMode),
+                      _buildTypeChip('Hindu Tithi', 'tithi'),
                       const SizedBox(width: 8),
-                      _buildTypeChip('Nakshatra', 'nakshatra', isDarkMode),
+                      _buildTypeChip('Nakshatra', 'nakshatra'),
                       const SizedBox(width: 8),
-                      _buildTypeChip('Gregorian', 'gregorian', isDarkMode),
+                      _buildTypeChip('Gregorian', 'gregorian'),
                     ],
                   ),
-
                   const SizedBox(height: 24),
-
-                  // Form fields based on type
-                  if (_selectedType == 'tithi') ...[
-                    _buildDropdownField('Select Tithi', [
-                      'Ekadashi',
-                      'Purnima',
-                      'Amavasya',
-                    ], isDarkMode),
-                  ] else if (_selectedType == 'nakshatra') ...[
-                    _buildDropdownField('Select Nakshatra', [
-                      'Ashwini',
-                      'Bharani',
-                      'Krittika',
-                    ], isDarkMode),
-                  ] else ...[
-                    _buildDateField('Select Date', isDarkMode),
-                  ],
-
-                  const SizedBox(height: 20),
-                  _buildTextField('Reminder Title', isDarkMode),
-
-                  const SizedBox(height: 20),
-                  _buildTimeField('Reminder Time', isDarkMode),
-
-                  const SizedBox(height: 20),
-                  _buildRepeatOptions(isDarkMode),
-
+                  _buildInputField('Reminder Title', Icons.edit_rounded),
+                  const SizedBox(height: 16),
+                  _buildInputField('Select Time', Icons.access_time_rounded),
                   const SizedBox(height: 32),
-
-                  // Save button
-                  GestureDetector(
-                    onTap: () {
-                      HapticFeedback.mediumImpact();
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFFDAB3D), Color(0xFFFF8E53)],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Save Reminder',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  _buildSaveButton(),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -504,25 +449,40 @@ class _AddReminderSheetState extends State<_AddReminderSheet> {
     );
   }
 
-  Widget _buildTypeChip(String label, String value, bool isDarkMode) {
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: _CosmicColors.textPrimary,
+      ),
+    );
+  }
+
+  Widget _buildTypeChip(String label, String value) {
     final isSelected = _selectedType == value;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedType = value;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      onTap: () => setState(() => _selectedType = value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? const Color(0xFFFDAB3D).withOpacity(0.2)
-                  : (isDarkMode ? Colors.grey[800] : Colors.grey[100]),
-          borderRadius: BorderRadius.circular(20),
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [
+                    _CosmicColors.golden.withOpacity(0.2),
+                    _CosmicColors.golden.withOpacity(0.1),
+                  ],
+                )
+              : null,
+          color: !isSelected ? Colors.white.withOpacity(0.05) : null,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? const Color(0xFFFDAB3D) : Colors.transparent,
+            color: isSelected
+                ? _CosmicColors.golden.withOpacity(0.5)
+                : Colors.white.withOpacity(0.1),
             width: 1,
           ),
         ),
@@ -530,231 +490,76 @@ class _AddReminderSheetState extends State<_AddReminderSheet> {
           label,
           style: TextStyle(
             fontSize: 12,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            color:
-                isSelected
-                    ? const Color(0xFFFDAB3D)
-                    : (isDarkMode ? Colors.white : Colors.grey[700]),
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+            color: isSelected
+                ? _CosmicColors.golden
+                : _CosmicColors.textSecondary,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildDropdownField(
-    String label,
-    List<String> items,
-    bool isDarkMode,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: isDarkMode ? Colors.white : Colors.grey[900],
-          ),
+  Widget _buildInputField(String hint, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.08),
+          width: 1,
         ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[850] : Colors.grey[50],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
-              width: 1,
-            ),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: items[0],
-              items:
-                  items.map((item) {
-                    return DropdownMenuItem(value: item, child: Text(item));
-                  }).toList(),
-              onChanged: (value) {},
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDateField(String label, bool isDarkMode) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: isDarkMode ? Colors.white : Colors.grey[900],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[850] : Colors.grey[50],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
-              width: 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.calendar_today_rounded,
-                size: 20,
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'Select Date',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTextField(String label, bool isDarkMode) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: isDarkMode ? Colors.white : Colors.grey[900],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[850] : Colors.grey[50],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
-              width: 1,
-            ),
-          ),
-          child: TextField(
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: _CosmicColors.textSecondary),
+          const SizedBox(width: 12),
+          Text(
+            hint,
             style: TextStyle(
               fontSize: 14,
-              color: isDarkMode ? Colors.white : Colors.grey[900],
-            ),
-            decoration: InputDecoration(
-              hintText: 'Enter title',
-              hintStyle: TextStyle(
-                fontSize: 14,
-                color: isDarkMode ? Colors.grey[500] : Colors.grey[500],
-              ),
-              border: InputBorder.none,
+              color: _CosmicColors.textSecondary,
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildTimeField(String label, bool isDarkMode) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: isDarkMode ? Colors.white : Colors.grey[900],
+  Widget _buildSaveButton() {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        Navigator.pop(context);
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [_CosmicColors.golden, _CosmicColors.goldenLight],
           ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDarkMode ? Colors.grey[850] : Colors.grey[50],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isDarkMode ? Colors.grey[700]! : Colors.grey[300]!,
-              width: 1,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: _CosmicColors.golden.withOpacity(0.3),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.access_time_rounded,
-                size: 20,
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-              ),
-              const SizedBox(width: 12),
-              Text(
-                '08:00 AM',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDarkMode ? Colors.white : Colors.grey[900],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRepeatOptions(bool isDarkMode) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Repeat',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: isDarkMode ? Colors.white : Colors.grey[900],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          children: [
-            _buildRepeatChip('Once', isDarkMode),
-            _buildRepeatChip('Daily', isDarkMode),
-            _buildRepeatChip('Weekly', isDarkMode),
-            _buildRepeatChip('Monthly', isDarkMode),
-            _buildRepeatChip('Yearly', isDarkMode),
           ],
         ),
-      ],
-    );
-  }
-
-  Widget _buildRepeatChip(String label, bool isDarkMode) {
-    return Chip(
-      label: Text(
-        label,
-        style: TextStyle(
-          fontSize: 12,
-          color: isDarkMode ? Colors.white : Colors.grey[700],
+        child: Center(
+          child: Text(
+            'Save Reminder',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: _CosmicColors.background,
+            ),
+          ),
         ),
       ),
-      backgroundColor: isDarkMode ? Colors.grey[800] : Colors.grey[100],
     );
   }
 }
-
-
