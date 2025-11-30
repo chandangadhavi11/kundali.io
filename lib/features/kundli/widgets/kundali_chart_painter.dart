@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../../../core/services/kundali_calculation_service.dart';
 
-/// Custom painter for North Indian style chart
+/// Custom painter for North Indian style chart (Diamond style)
+/// 
+/// Structure:
+/// - Outer square
+/// - Inner diamond connecting midpoints of the square
+/// - Diagonals from corner to corner
+/// - 12 houses arranged clockwise starting from top center (House 1)
 class NorthIndianChartPainter extends CustomPainter {
   final List<House> houses;
   final Map<String, PlanetPosition> planets;
@@ -20,117 +26,168 @@ class NorthIndianChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = isDarkMode ? Colors.white24 : Colors.black26
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.5;
+    final chartSize = math.min(size.width, size.height);
+    final padding = chartSize * 0.05;
+    final effectiveSize = chartSize - (padding * 2);
+    
+    // Define the four corners of the outer square
+    final left = (size.width - effectiveSize) / 2;
+    final top = (size.height - effectiveSize) / 2;
+    final right = left + effectiveSize;
+    final bottom = top + effectiveSize;
+    final centerX = (left + right) / 2;
+    final centerY = (top + bottom) / 2;
+    
+    // Midpoints of each edge
+    final midTop = Offset(centerX, top);
+    final midRight = Offset(right, centerY);
+    final midBottom = Offset(centerX, bottom);
+    final midLeft = Offset(left, centerY);
+    
+    // Corner points
+    final topLeft = Offset(left, top);
+    final topRight = Offset(right, top);
+    final bottomRight = Offset(right, bottom);
+    final bottomLeft = Offset(left, bottom);
 
-    final fillPaint =
-        Paint()
-          ..color = isDarkMode ? const Color(0xFF2A2A3E) : Colors.white
-          ..style = PaintingStyle.fill;
+    // Paints
+    final strokePaint = Paint()
+      ..color = isDarkMode ? Colors.white.withOpacity(0.3) : Colors.black.withOpacity(0.3)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
 
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width, size.height) / 2 - 20;
+    final fillPaint = Paint()
+      ..color = isDarkMode ? const Color(0xFF1A1625) : Colors.white
+      ..style = PaintingStyle.fill;
 
+    // Draw background
+    final outerRect = Rect.fromLTRB(left, top, right, bottom);
+    canvas.drawRect(outerRect, fillPaint);
+    
     // Draw outer square
-    final rect = Rect.fromCenter(
-      center: center,
-      width: radius * 2,
-      height: radius * 2,
-    );
-    canvas.drawRect(rect, fillPaint);
-    canvas.drawRect(rect, paint);
+    canvas.drawRect(outerRect, strokePaint);
+    
+    // Draw diagonals (corner to corner)
+    canvas.drawLine(topLeft, bottomRight, strokePaint);
+    canvas.drawLine(topRight, bottomLeft, strokePaint);
+    
+    // Draw inner diamond (connecting midpoints)
+    final diamondPath = Path()
+      ..moveTo(midTop.dx, midTop.dy)
+      ..lineTo(midRight.dx, midRight.dy)
+      ..lineTo(midBottom.dx, midBottom.dy)
+      ..lineTo(midLeft.dx, midLeft.dy)
+      ..close();
+    canvas.drawPath(diamondPath, strokePaint);
 
-    // Draw diagonal lines for North Indian chart
-    canvas.drawLine(rect.topLeft, rect.bottomRight, paint);
-    canvas.drawLine(rect.topRight, rect.bottomLeft, paint);
+    // Calculate house centers for all 12 houses (clockwise from top center)
+    // The chart creates 12 compartments with the above lines
+    
+    final houseSize = effectiveSize / 4;
+    
+    // House positions: center point for each compartment
+    // House 1: Top center triangle (between midTop, diagonal intersection with top edge)
+    // House 2: Top right corner triangle
+    // House 3: Right upper triangle
+    // House 4: Right center triangle
+    // House 5: Right lower triangle  
+    // House 6: Bottom right corner triangle
+    // House 7: Bottom center triangle
+    // House 8: Bottom left corner triangle
+    // House 9: Left lower triangle
+    // House 10: Left center triangle
+    // House 11: Left upper triangle
+    // House 12: Top left corner triangle
 
-    // Draw inner rhombus
-    final innerSize = radius * 0.5;
-    final innerPath =
-        Path()
-          ..moveTo(center.dx, center.dy - innerSize)
-          ..lineTo(center.dx + innerSize, center.dy)
-          ..lineTo(center.dx, center.dy + innerSize)
-          ..lineTo(center.dx - innerSize, center.dy)
-          ..close();
-    canvas.drawPath(innerPath, paint);
-
-    // House positions for North Indian chart
-    final housePositions = [
-      // House 1 (top triangle)
-      Offset(center.dx, rect.top + radius * 0.25),
-      // House 2 (top-right)
-      Offset(rect.right - radius * 0.25, rect.top + radius * 0.25),
-      // House 3 (right-top)
-      Offset(rect.right - radius * 0.25, center.dy - radius * 0.25),
-      // House 4 (right triangle)
-      Offset(rect.right - radius * 0.25, center.dy),
-      // House 5 (right-bottom)
-      Offset(rect.right - radius * 0.25, center.dy + radius * 0.25),
-      // House 6 (bottom-right)
-      Offset(rect.right - radius * 0.25, rect.bottom - radius * 0.25),
-      // House 7 (bottom triangle)
-      Offset(center.dx, rect.bottom - radius * 0.25),
-      // House 8 (bottom-left)
-      Offset(rect.left + radius * 0.25, rect.bottom - radius * 0.25),
-      // House 9 (left-bottom)
-      Offset(rect.left + radius * 0.25, center.dy + radius * 0.25),
-      // House 10 (left triangle)
-      Offset(rect.left + radius * 0.25, center.dy),
-      // House 11 (left-top)
-      Offset(rect.left + radius * 0.25, center.dy - radius * 0.25),
-      // House 12 (top-left)
-      Offset(rect.left + radius * 0.25, rect.top + radius * 0.25),
+    final housePositions = <Offset>[
+      // House 1 - Top center (main ascendant house)
+      Offset(centerX, top + houseSize * 0.7),
+      // House 2 - Top right corner
+      Offset(right - houseSize * 0.6, top + houseSize * 0.6),
+      // House 3 - Right upper
+      Offset(right - houseSize * 0.7, centerY - houseSize * 0.55),
+      // House 4 - Right center
+      Offset(right - houseSize * 0.7, centerY),
+      // House 5 - Right lower
+      Offset(right - houseSize * 0.7, centerY + houseSize * 0.55),
+      // House 6 - Bottom right corner
+      Offset(right - houseSize * 0.6, bottom - houseSize * 0.6),
+      // House 7 - Bottom center
+      Offset(centerX, bottom - houseSize * 0.7),
+      // House 8 - Bottom left corner
+      Offset(left + houseSize * 0.6, bottom - houseSize * 0.6),
+      // House 9 - Left lower
+      Offset(left + houseSize * 0.7, centerY + houseSize * 0.55),
+      // House 10 - Left center
+      Offset(left + houseSize * 0.7, centerY),
+      // House 11 - Left upper
+      Offset(left + houseSize * 0.7, centerY - houseSize * 0.55),
+      // House 12 - Top left corner
+      Offset(left + houseSize * 0.6, top + houseSize * 0.6),
     ];
 
-    // Draw house numbers and planets
     final textPainter = TextPainter(textDirection: TextDirection.ltr);
-
-    for (int i = 0; i < 12; i++) {
+    
+    // Draw house content
+    for (int i = 0; i < 12 && i < houses.length; i++) {
       final house = houses[i];
-      final position = housePositions[i];
-
-      // Draw house number
+      final pos = housePositions[i];
+      final isAscendant = house.sign == ascendantSign;
+      
+      // Determine vertical layout based on house type
+      // Corner houses (2, 6, 8, 12) - smaller triangles
+      // Center houses (1, 4, 7, 10) - main diamond triangles
+      // Side houses (3, 5, 9, 11) - side triangles
+      
+      final isCornerHouse = [1, 5, 7, 11].contains(i); // 0-indexed: 2,6,8,12
+      
+      // Calculate font sizes based on chart size
+      final houseNumSize = chartSize * 0.028;
+      final signSize = chartSize * 0.038;
+      final planetSize = chartSize * 0.032;
+      
+      // Vertical offset adjustments
+      double numOffsetY = -signSize * 1.2;
+      double planetOffsetY = signSize * 0.8;
+      
+      if (isCornerHouse) {
+        numOffsetY = -signSize * 0.9;
+        planetOffsetY = signSize * 0.6;
+      }
+      
+      // Draw house number (small, subtle)
       textPainter.text = TextSpan(
         text: '${i + 1}',
-        style: textStyle?.copyWith(
-          fontSize: 10,
-          fontWeight: FontWeight.bold,
-          color: isDarkMode ? Colors.white70 : Colors.black54,
+        style: TextStyle(
+          fontSize: houseNumSize,
+          fontWeight: FontWeight.w600,
+          color: isDarkMode 
+            ? Colors.white.withOpacity(0.4) 
+            : Colors.black.withOpacity(0.4),
         ),
       );
       textPainter.layout();
       textPainter.paint(
         canvas,
-        Offset(
-          position.dx - textPainter.width / 2,
-          position.dy - textPainter.height - 5,
-        ),
+        Offset(pos.dx - textPainter.width / 2, pos.dy + numOffsetY - textPainter.height),
       );
 
-      // Draw sign
+      // Draw zodiac sign abbreviation
       textPainter.text = TextSpan(
         text: _getSignAbbreviation(house.sign),
-        style: textStyle?.copyWith(
-          fontSize: 12,
-          color:
-              house.sign == ascendantSign
-                  ? Colors.orange
-                  : (isDarkMode ? Colors.white : Colors.black87),
-          fontWeight:
-              house.sign == ascendantSign ? FontWeight.bold : FontWeight.normal,
+        style: TextStyle(
+          fontSize: signSize,
+          fontWeight: isAscendant ? FontWeight.bold : FontWeight.w500,
+          color: isAscendant 
+            ? const Color(0xFFD4AF37) // Gold for ascendant
+            : (isDarkMode ? Colors.white.withOpacity(0.85) : Colors.black87),
         ),
       );
       textPainter.layout();
       textPainter.paint(
         canvas,
-        Offset(
-          position.dx - textPainter.width / 2,
-          position.dy - textPainter.height / 2,
-        ),
+        Offset(pos.dx - textPainter.width / 2, pos.dy - textPainter.height / 2),
       );
 
       // Draw planets in house
@@ -138,41 +195,38 @@ class NorthIndianChartPainter extends CustomPainter {
         final planetsText = house.planets.map(_getPlanetSymbol).join(' ');
         textPainter.text = TextSpan(
           text: planetsText,
-          style: textStyle?.copyWith(
-            fontSize: 11,
-            color: Colors.blue,
+          style: TextStyle(
+            fontSize: planetSize,
             fontWeight: FontWeight.w500,
+            color: const Color(0xFF5B8DEF), // Blue for planets
           ),
         );
         textPainter.layout();
         textPainter.paint(
           canvas,
-          Offset(position.dx - textPainter.width / 2, position.dy + 5),
+          Offset(pos.dx - textPainter.width / 2, pos.dy + planetOffsetY),
         );
       }
     }
 
-    // Draw "Asc" indicator
+    // Draw "Asc" indicator in center
     textPainter.text = TextSpan(
       text: 'Asc',
-      style: textStyle?.copyWith(
-        fontSize: 14,
-        color: Colors.orange,
+      style: TextStyle(
+        fontSize: chartSize * 0.045,
         fontWeight: FontWeight.bold,
+        color: const Color(0xFFD4AF37),
       ),
     );
     textPainter.layout();
     textPainter.paint(
       canvas,
-      Offset(
-        center.dx - textPainter.width / 2,
-        center.dy - textPainter.height / 2,
-      ),
+      Offset(centerX - textPainter.width / 2, centerY - textPainter.height / 2),
     );
   }
 
   String _getSignAbbreviation(String sign) {
-    final abbreviations = {
+    const abbreviations = {
       'Aries': 'Ari',
       'Taurus': 'Tau',
       'Gemini': 'Gem',
@@ -190,7 +244,7 @@ class NorthIndianChartPainter extends CustomPainter {
   }
 
   String _getPlanetSymbol(String planet) {
-    final symbols = {
+    const symbols = {
       'Sun': '☉',
       'Moon': '☽',
       'Mars': '♂',
@@ -198,14 +252,19 @@ class NorthIndianChartPainter extends CustomPainter {
       'Jupiter': '♃',
       'Venus': '♀',
       'Saturn': '♄',
-      'Rahu': 'Ra',
-      'Ketu': 'Ke',
+      'Rahu': 'ॐ',
+      'Ketu': '☋',
     };
     return symbols[planet] ?? planet.substring(0, 2);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+  bool shouldRepaint(covariant NorthIndianChartPainter oldDelegate) {
+    return houses != oldDelegate.houses ||
+           planets != oldDelegate.planets ||
+           ascendantSign != oldDelegate.ascendantSign ||
+           isDarkMode != oldDelegate.isDarkMode;
+  }
 }
 
 /// Custom painter for South Indian style chart

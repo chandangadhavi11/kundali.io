@@ -432,6 +432,209 @@ class KundaliCalculationService {
 
     return navamsaChart;
   }
+
+  /// Calculate Chandra (Moon) chart - houses based on Moon sign
+  static List<House> calculateChandraChart(
+    Map<String, PlanetPosition> planetPositions,
+  ) {
+    final moonPosition = planetPositions['Moon']!;
+    final moonSignIndex = zodiacSigns.indexOf(moonPosition.sign);
+    final moonLongitude = moonSignIndex * 30.0;
+    
+    List<House> houses = [];
+    for (int i = 0; i < 12; i++) {
+      double houseCusp = (moonLongitude + (i * 30)) % 360;
+      houses.add(House(
+        number: i + 1,
+        sign: _getZodiacSign(houseCusp),
+        cuspDegree: houseCusp,
+        planets: [],
+      ));
+    }
+    
+    // Assign planets to houses based on Moon
+    for (var planet in planetPositions.values) {
+      double relativePosition = (planet.longitude - moonLongitude) % 360;
+      if (relativePosition < 0) relativePosition += 360;
+      int houseNumber = (relativePosition / 30).floor() + 1;
+      if (houseNumber > 12) houseNumber = 1;
+      houses[houseNumber - 1].planets.add(planet.planet);
+    }
+    
+    return houses;
+  }
+
+  /// Calculate Surya (Sun) chart - houses based on Sun sign
+  static List<House> calculateSuryaChart(
+    Map<String, PlanetPosition> planetPositions,
+  ) {
+    final sunPosition = planetPositions['Sun']!;
+    final sunSignIndex = zodiacSigns.indexOf(sunPosition.sign);
+    final sunLongitude = sunSignIndex * 30.0;
+    
+    List<House> houses = [];
+    for (int i = 0; i < 12; i++) {
+      double houseCusp = (sunLongitude + (i * 30)) % 360;
+      houses.add(House(
+        number: i + 1,
+        sign: _getZodiacSign(houseCusp),
+        cuspDegree: houseCusp,
+        planets: [],
+      ));
+    }
+    
+    // Assign planets to houses based on Sun
+    for (var planet in planetPositions.values) {
+      double relativePosition = (planet.longitude - sunLongitude) % 360;
+      if (relativePosition < 0) relativePosition += 360;
+      int houseNumber = (relativePosition / 30).floor() + 1;
+      if (houseNumber > 12) houseNumber = 1;
+      houses[houseNumber - 1].planets.add(planet.planet);
+    }
+    
+    return houses;
+  }
+
+  /// Calculate Dasamsa (D10) chart - Career
+  static Map<String, PlanetPosition> calculateDasamsaChart(
+    Map<String, PlanetPosition> birthChart,
+  ) {
+    Map<String, PlanetPosition> dasamsaChart = {};
+
+    for (var entry in birthChart.entries) {
+      String planet = entry.key;
+      PlanetPosition position = entry.value;
+
+      // D10: Each sign is divided into 10 parts of 3° each
+      double dasamsaDegree = position.longitude * 10;
+      dasamsaDegree = dasamsaDegree % 360;
+
+      dasamsaChart[planet] = PlanetPosition(
+        planet: planet,
+        longitude: dasamsaDegree,
+        sign: _getZodiacSign(dasamsaDegree),
+        signDegree: dasamsaDegree % 30,
+        nakshatra: _getNakshatra(dasamsaDegree),
+        house: 1,
+      );
+    }
+
+    return dasamsaChart;
+  }
+
+  /// Calculate Saptamsa (D7) chart - Children
+  static Map<String, PlanetPosition> calculateSaptamsaChart(
+    Map<String, PlanetPosition> birthChart,
+  ) {
+    Map<String, PlanetPosition> saptamsaChart = {};
+
+    for (var entry in birthChart.entries) {
+      String planet = entry.key;
+      PlanetPosition position = entry.value;
+
+      // D7: Each sign is divided into 7 parts
+      double saptamsaDegree = position.longitude * 7;
+      saptamsaDegree = saptamsaDegree % 360;
+
+      saptamsaChart[planet] = PlanetPosition(
+        planet: planet,
+        longitude: saptamsaDegree,
+        sign: _getZodiacSign(saptamsaDegree),
+        signDegree: saptamsaDegree % 30,
+        nakshatra: _getNakshatra(saptamsaDegree),
+        house: 1,
+      );
+    }
+
+    return saptamsaChart;
+  }
+
+  /// Calculate Dwadasamsa (D12) chart - Parents
+  static Map<String, PlanetPosition> calculateDwadasamsaChart(
+    Map<String, PlanetPosition> birthChart,
+  ) {
+    Map<String, PlanetPosition> dwadasamsaChart = {};
+
+    for (var entry in birthChart.entries) {
+      String planet = entry.key;
+      PlanetPosition position = entry.value;
+
+      // D12: Each sign is divided into 12 parts of 2°30' each
+      double dwadasamsaDegree = position.longitude * 12;
+      dwadasamsaDegree = dwadasamsaDegree % 360;
+
+      dwadasamsaChart[planet] = PlanetPosition(
+        planet: planet,
+        longitude: dwadasamsaDegree,
+        sign: _getZodiacSign(dwadasamsaDegree),
+        signDegree: dwadasamsaDegree % 30,
+        nakshatra: _getNakshatra(dwadasamsaDegree),
+        house: 1,
+      );
+    }
+
+    return dwadasamsaChart;
+  }
+
+  /// Calculate Trimshamsa (D30) chart - Misfortunes
+  static Map<String, PlanetPosition> calculateTrimshamsaChart(
+    Map<String, PlanetPosition> birthChart,
+  ) {
+    Map<String, PlanetPosition> trimshamsaChart = {};
+
+    for (var entry in birthChart.entries) {
+      String planet = entry.key;
+      PlanetPosition position = entry.value;
+
+      // D30: Each sign is divided into 30 parts of 1° each
+      double trimshamsaDegree = position.longitude * 30;
+      trimshamsaDegree = trimshamsaDegree % 360;
+
+      trimshamsaChart[planet] = PlanetPosition(
+        planet: planet,
+        longitude: trimshamsaDegree,
+        sign: _getZodiacSign(trimshamsaDegree),
+        signDegree: trimshamsaDegree % 30,
+        nakshatra: _getNakshatra(trimshamsaDegree),
+        house: 1,
+      );
+    }
+
+    return trimshamsaChart;
+  }
+
+  /// Get houses for a divisional chart
+  static List<House> getHousesForDivisionalChart(
+    Map<String, PlanetPosition> divisionalPositions,
+    double ascendantLongitude,
+    int division,
+  ) {
+    // Calculate divisional ascendant
+    double divisionalAscendant = (ascendantLongitude * division) % 360;
+    
+    List<House> houses = [];
+    for (int i = 0; i < 12; i++) {
+      double houseCusp = (divisionalAscendant + (i * 30)) % 360;
+      houses.add(House(
+        number: i + 1,
+        sign: _getZodiacSign(houseCusp),
+        cuspDegree: houseCusp,
+        planets: [],
+      ));
+    }
+    
+    // Assign planets to houses
+    for (var planet in divisionalPositions.values) {
+      double relativePosition = (planet.longitude - divisionalAscendant) % 360;
+      if (relativePosition < 0) relativePosition += 360;
+      int houseNumber = (relativePosition / 30).floor() + 1;
+      if (houseNumber > 12) houseNumber = 1;
+      planet.house = houseNumber;
+      houses[houseNumber - 1].planets.add(planet.planet);
+    }
+    
+    return houses;
+  }
 }
 
 /// Model classes for Kundali data

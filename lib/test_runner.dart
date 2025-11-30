@@ -11,7 +11,7 @@ import 'core/providers/kundli_provider.dart';
 import 'core/providers/app_provider.dart';
 
 // Import screens to test
-import 'features/home/screens/home/home_screen.dart';
+import 'features/home/screens/home_screen.dart';
 import 'features/horoscope/screens/horoscope/horoscope_screen.dart';
 import 'features/panchang/screens/panchang/panchang_screen.dart';
 import 'features/chat/screens/ai_chat/ai_chat_screen.dart';

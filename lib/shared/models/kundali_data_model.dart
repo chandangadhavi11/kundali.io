@@ -339,3 +339,82 @@ extension ChartStyleExtension on ChartStyle {
     }
   }
 }
+
+/// Kundali chart types (Divisional charts)
+enum KundaliType {
+  lagna,      // D1 - Main birth chart (Ascendant based)
+  chandra,    // Moon chart - houses from Moon sign
+  surya,      // Sun chart - houses from Sun sign
+  navamsa,    // D9 - Marriage, dharma, spiritual life
+  dasamsa,    // D10 - Career, profession
+  saptamsa,   // D7 - Children, progeny
+  dwadasamsa, // D12 - Parents
+  trimshamsa, // D30 - Misfortunes, evils
+}
+
+/// Extension for Kundali type display
+extension KundaliTypeExtension on KundaliType {
+  String get displayName {
+    switch (this) {
+      case KundaliType.lagna:
+        return 'Lagna';
+      case KundaliType.chandra:
+        return 'Chandra';
+      case KundaliType.surya:
+        return 'Surya';
+      case KundaliType.navamsa:
+        return 'Navamsa';
+      case KundaliType.dasamsa:
+        return 'Dasamsa';
+      case KundaliType.saptamsa:
+        return 'Saptamsa';
+      case KundaliType.dwadasamsa:
+        return 'Dwadasamsa';
+      case KundaliType.trimshamsa:
+        return 'Trimshamsa';
+    }
+  }
+
+  String get shortName {
+    switch (this) {
+      case KundaliType.lagna:
+        return 'D1';
+      case KundaliType.chandra:
+        return 'Moon';
+      case KundaliType.surya:
+        return 'Sun';
+      case KundaliType.navamsa:
+        return 'D9';
+      case KundaliType.dasamsa:
+        return 'D10';
+      case KundaliType.saptamsa:
+        return 'D7';
+      case KundaliType.dwadasamsa:
+        return 'D12';
+      case KundaliType.trimshamsa:
+        return 'D30';
+    }
+  }
+
+  String get description {
+    switch (this) {
+      case KundaliType.lagna:
+        return 'Overall life, self';
+      case KundaliType.chandra:
+        return 'Mind, emotions';
+      case KundaliType.surya:
+        return 'Soul, career, father';
+      case KundaliType.navamsa:
+        return 'Marriage, dharma';
+      case KundaliType.dasamsa:
+        return 'Career, profession';
+      case KundaliType.saptamsa:
+        return 'Children, progeny';
+      case KundaliType.dwadasamsa:
+        return 'Parents';
+      case KundaliType.trimshamsa:
+        return 'Misfortunes';
+    }
+  }
+
+}
