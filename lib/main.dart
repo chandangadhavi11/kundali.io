@@ -14,6 +14,7 @@ import 'core/providers/horoscope_provider.dart';
 import 'core/providers/chat_provider.dart';
 import 'core/providers/language_provider.dart';
 import 'core/providers/theme_provider.dart';
+import 'core/providers/compatibility_provider.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
@@ -43,6 +44,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => PanchangProvider()),
         ChangeNotifierProvider(create: (_) => HoroscopeProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => CompatibilityProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider(prefs)),
         ChangeNotifierProvider(create: (_) => ThemeProvider(prefs)),
       ],
