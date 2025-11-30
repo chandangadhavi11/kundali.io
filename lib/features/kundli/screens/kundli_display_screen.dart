@@ -8,7 +8,6 @@ import '../../../shared/models/kundali_data_model.dart';
 import '../../../core/providers/kundli_provider.dart';
 import '../../../core/services/kundali_calculation_service.dart';
 import '../widgets/kundali_chart_painter.dart';
-import '../widgets/chart_style_selector.dart';
 import '../widgets/interactive_kundli_chart.dart';
 import '../widgets/interactive_south_indian_chart.dart';
 
@@ -60,7 +59,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
     super.initState();
     _effectiveKundaliData = widget.kundaliData;
     _currentChartStyle = _kundaliData?.chartStyle ?? ChartStyle.northIndian;
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 8, vsync: this);
     _tabController.addListener(_handleTabChange);
     _initializeAnimations();
   }
@@ -180,6 +179,9 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                           _buildPlanetsTab(),
                           _buildHousesTab(),
                           _buildDashaTab(),
+                          _buildStrengthTab(),
+                          _buildTransitTab(),
+                          _buildPanchangTab(),
                           _buildYogasTab(),
                         ],
                       ),
@@ -402,6 +404,9 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       {'icon': Icons.public_rounded, 'label': 'Planets'},
       {'icon': Icons.home_work_outlined, 'label': 'Houses'},
       {'icon': Icons.timeline_rounded, 'label': 'Dasha'},
+      {'icon': Icons.analytics_rounded, 'label': 'Strength'},
+      {'icon': Icons.sync_rounded, 'label': 'Transit'},
+      {'icon': Icons.calendar_today_rounded, 'label': 'Panchang'},
       {'icon': Icons.auto_awesome_rounded, 'label': 'Yogas'},
     ];
 
@@ -486,12 +491,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Chart Type Selector (horizontal scroll)
-          _buildChartTypeHeader(),
-          const SizedBox(height: 12),
           _buildChartCard(),
-          const SizedBox(height: 14),
-          _buildChartStyleSelector(),
           const SizedBox(height: 20),
           _buildQuickStats(),
           const SizedBox(height: 20),
@@ -505,6 +505,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
     if (_kundaliData == null) return;
 
     switch (_currentChartType) {
+      // Primary Charts
       case KundaliType.lagna:
         _currentHouses = _kundaliData!.houses;
         _currentPlanetPositions = _kundaliData!.planetPositions;
@@ -523,6 +524,67 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
         );
         _currentPlanetPositions = _kundaliData!.planetPositions;
         _currentAscendantSign = _kundaliData!.sunSign;
+        break;
+      case KundaliType.bhavaChalit:
+        _currentHouses = KundaliCalculationService.calculateBhavaChaliChart(
+          _kundaliData!.planetPositions,
+          _kundaliData!.ascendant.longitude,
+        );
+        _currentPlanetPositions = _kundaliData!.planetPositions;
+        _currentAscendantSign = _kundaliData!.ascendant.sign;
+        break;
+
+      // Divisional Charts
+      case KundaliType.hora:
+        final horaPositions = KundaliCalculationService.calculateHoraChart(
+          _kundaliData!.planetPositions,
+        );
+        _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
+          horaPositions,
+          _kundaliData!.ascendant.longitude,
+          2,
+        );
+        _currentPlanetPositions = horaPositions;
+        _currentAscendantSign = _currentHouses!.first.sign;
+        break;
+      case KundaliType.drekkana:
+        final drekkanaPositions =
+            KundaliCalculationService.calculateDrekkanaChart(
+              _kundaliData!.planetPositions,
+            );
+        _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
+          drekkanaPositions,
+          _kundaliData!.ascendant.longitude,
+          3,
+        );
+        _currentPlanetPositions = drekkanaPositions;
+        _currentAscendantSign = _currentHouses!.first.sign;
+        break;
+      case KundaliType.chaturthamsa:
+        final chaturthamsaPositions =
+            KundaliCalculationService.calculateChaturthamsaChart(
+              _kundaliData!.planetPositions,
+            );
+        _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
+          chaturthamsaPositions,
+          _kundaliData!.ascendant.longitude,
+          4,
+        );
+        _currentPlanetPositions = chaturthamsaPositions;
+        _currentAscendantSign = _currentHouses!.first.sign;
+        break;
+      case KundaliType.saptamsa:
+        final saptamsaPositions =
+            KundaliCalculationService.calculateSaptamsaChart(
+              _kundaliData!.planetPositions,
+            );
+        _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
+          saptamsaPositions,
+          _kundaliData!.ascendant.longitude,
+          7,
+        );
+        _currentPlanetPositions = saptamsaPositions;
+        _currentAscendantSign = _currentHouses!.first.sign;
         break;
       case KundaliType.navamsa:
         final navamsaPositions =
@@ -551,19 +613,6 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
         _currentPlanetPositions = dasamsaPositions;
         _currentAscendantSign = _currentHouses!.first.sign;
         break;
-      case KundaliType.saptamsa:
-        final saptamsaPositions =
-            KundaliCalculationService.calculateSaptamsaChart(
-              _kundaliData!.planetPositions,
-            );
-        _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
-          saptamsaPositions,
-          _kundaliData!.ascendant.longitude,
-          7,
-        );
-        _currentPlanetPositions = saptamsaPositions;
-        _currentAscendantSign = _currentHouses!.first.sign;
-        break;
       case KundaliType.dwadasamsa:
         final dwadasamsaPositions =
             KundaliCalculationService.calculateDwadasamsaChart(
@@ -575,6 +624,57 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
           12,
         );
         _currentPlanetPositions = dwadasamsaPositions;
+        _currentAscendantSign = _currentHouses!.first.sign;
+        break;
+      case KundaliType.shodasamsa:
+        final shodasamsaPositions =
+            KundaliCalculationService.calculateShodasamsaChart(
+              _kundaliData!.planetPositions,
+            );
+        _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
+          shodasamsaPositions,
+          _kundaliData!.ascendant.longitude,
+          16,
+        );
+        _currentPlanetPositions = shodasamsaPositions;
+        _currentAscendantSign = _currentHouses!.first.sign;
+        break;
+      case KundaliType.vimsamsa:
+        final vimsamsaPositions =
+            KundaliCalculationService.calculateVimsamsaChart(
+              _kundaliData!.planetPositions,
+            );
+        _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
+          vimsamsaPositions,
+          _kundaliData!.ascendant.longitude,
+          20,
+        );
+        _currentPlanetPositions = vimsamsaPositions;
+        _currentAscendantSign = _currentHouses!.first.sign;
+        break;
+      case KundaliType.chaturvimsamsa:
+        final chaturvimsamsaPositions =
+            KundaliCalculationService.calculateChaturvimsamsaChart(
+              _kundaliData!.planetPositions,
+            );
+        _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
+          chaturvimsamsaPositions,
+          _kundaliData!.ascendant.longitude,
+          24,
+        );
+        _currentPlanetPositions = chaturvimsamsaPositions;
+        _currentAscendantSign = _currentHouses!.first.sign;
+        break;
+      case KundaliType.bhamsa:
+        final bhamsaPositions = KundaliCalculationService.calculateBhamsaChart(
+          _kundaliData!.planetPositions,
+        );
+        _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
+          bhamsaPositions,
+          _kundaliData!.ascendant.longitude,
+          27,
+        );
+        _currentPlanetPositions = bhamsaPositions;
         _currentAscendantSign = _currentHouses!.first.sign;
         break;
       case KundaliType.trimshamsa:
@@ -590,268 +690,307 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
         _currentPlanetPositions = trimshamsaPositions;
         _currentAscendantSign = _currentHouses!.first.sign;
         break;
+      case KundaliType.khavedamsa:
+        final khavedamsaPositions =
+            KundaliCalculationService.calculateKhavedamsaChart(
+              _kundaliData!.planetPositions,
+            );
+        _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
+          khavedamsaPositions,
+          _kundaliData!.ascendant.longitude,
+          40,
+        );
+        _currentPlanetPositions = khavedamsaPositions;
+        _currentAscendantSign = _currentHouses!.first.sign;
+        break;
+      case KundaliType.akshavedamsa:
+        final akshavedamsaPositions =
+            KundaliCalculationService.calculateAkshavedamsaChart(
+              _kundaliData!.planetPositions,
+            );
+        _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
+          akshavedamsaPositions,
+          _kundaliData!.ascendant.longitude,
+          45,
+        );
+        _currentPlanetPositions = akshavedamsaPositions;
+        _currentAscendantSign = _currentHouses!.first.sign;
+        break;
+      case KundaliType.shashtiamsa:
+        final shashtiamsaPositions =
+            KundaliCalculationService.calculateShashtiamsaChart(
+              _kundaliData!.planetPositions,
+            );
+        _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
+          shashtiamsaPositions,
+          _kundaliData!.ascendant.longitude,
+          60,
+        );
+        _currentPlanetPositions = shashtiamsaPositions;
+        _currentAscendantSign = _currentHouses!.first.sign;
+        break;
+
+      // Special Charts - use Lagna as base
+      case KundaliType.sudarshan:
+      case KundaliType.ashtakavarga:
+        _currentHouses = _kundaliData!.houses;
+        _currentPlanetPositions = _kundaliData!.planetPositions;
+        _currentAscendantSign = _kundaliData!.ascendant.sign;
+        break;
     }
-  }
-
-  Widget _buildChartTypeHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.auto_awesome_mosaic_rounded,
-                    size: 14,
-                    color: _textMuted,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Chart Type',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: _textMuted,
-                    ),
-                  ),
-                ],
-              ),
-              // Current type badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: _accentPrimary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: _accentPrimary.withOpacity(0.2),
-                    width: 0.5,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      _currentChartType.shortName,
-                      style: GoogleFonts.dmMono(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        color: _accentPrimary,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      _currentChartType.displayName,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: _accentPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        // Horizontal scrolling chart type cards
-        SizedBox(
-          height: 72,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            itemCount: KundaliType.values.length,
-            itemBuilder: (context, index) {
-              final type = KundaliType.values[index];
-              final isSelected = _currentChartType == type;
-
-              return _buildChartTypeCard(type, isSelected, index);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildChartTypeCard(KundaliType type, bool isSelected, int index) {
-    final key = 'chart_type_${type.name}';
-    final accentColor = _getChartTypeColor(type);
-
-    return GestureDetector(
-      onTapDown: (_) => _setPressed(key, true),
-      onTapUp: (_) => _setPressed(key, false),
-      onTapCancel: () => _setPressed(key, false),
-      onTap: () {
-        HapticFeedback.selectionClick();
-        setState(() => _currentChartType = type);
-      },
-      child: AnimatedScale(
-        scale: _isPressed(key) ? 0.95 : 1.0,
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeOutCubic,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          width: 76,
-          margin: EdgeInsets.only(
-            right: index < KundaliType.values.length - 1 ? 10 : 0,
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-          decoration: BoxDecoration(
-            gradient:
-                isSelected
-                    ? LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        accentColor.withOpacity(0.2),
-                        accentColor.withOpacity(0.08),
-                      ],
-                    )
-                    : null,
-            color: isSelected ? null : _surfaceColor.withOpacity(0.4),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color:
-                  isSelected
-                      ? accentColor.withOpacity(0.4)
-                      : _borderColor.withOpacity(0.3),
-              width: isSelected ? 1 : 0.5,
-            ),
-            boxShadow:
-                isSelected
-                    ? [
-                      BoxShadow(
-                        color: accentColor.withOpacity(0.12),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ]
-                    : null,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Icon with badge
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 220),
-                    padding: const EdgeInsets.all(7),
-                    decoration: BoxDecoration(
-                      color:
-                          isSelected
-                              ? accentColor.withOpacity(0.2)
-                              : _borderColor.withOpacity(0.25),
-                      borderRadius: BorderRadius.circular(9),
-                    ),
-                    child: Icon(
-                      _getChartTypeIcon(type),
-                      size: 16,
-                      color: isSelected ? accentColor : _textMuted,
-                    ),
-                  ),
-                  // Short name badge
-                  Positioned(
-                    top: -4,
-                    right: -6,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 1,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            isSelected
-                                ? accentColor
-                                : _borderColor.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        type.shortName,
-                        style: GoogleFonts.dmMono(
-                          fontSize: 6,
-                          fontWeight: FontWeight.w700,
-                          color: isSelected ? _bgPrimary : _textMuted,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              // Name
-              Text(
-                type.displayName,
-                style: GoogleFonts.dmSans(
-                  fontSize: 9,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected ? _textPrimary : _textMuted,
-                  letterSpacing: 0.1,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 
   IconData _getChartTypeIcon(KundaliType type) {
     switch (type) {
+      // Primary Charts
       case KundaliType.lagna:
         return Icons.north_east_rounded;
       case KundaliType.chandra:
         return Icons.nightlight_round;
       case KundaliType.surya:
         return Icons.wb_sunny_rounded;
+      case KundaliType.bhavaChalit:
+        return Icons.swap_horiz_rounded;
+      // Divisional Charts
+      case KundaliType.hora:
+        return Icons.attach_money_rounded;
+      case KundaliType.drekkana:
+        return Icons.people_outline_rounded;
+      case KundaliType.chaturthamsa:
+        return Icons.home_rounded;
+      case KundaliType.saptamsa:
+        return Icons.child_care_rounded;
       case KundaliType.navamsa:
         return Icons.favorite_rounded;
       case KundaliType.dasamsa:
         return Icons.work_rounded;
-      case KundaliType.saptamsa:
-        return Icons.child_care_rounded;
       case KundaliType.dwadasamsa:
-        return Icons.people_rounded;
+        return Icons.family_restroom_rounded;
+      case KundaliType.shodasamsa:
+        return Icons.directions_car_rounded;
+      case KundaliType.vimsamsa:
+        return Icons.self_improvement_rounded;
+      case KundaliType.chaturvimsamsa:
+        return Icons.school_rounded;
+      case KundaliType.bhamsa:
+        return Icons.stars_rounded;
       case KundaliType.trimshamsa:
         return Icons.warning_amber_rounded;
+      case KundaliType.khavedamsa:
+        return Icons.auto_awesome_rounded;
+      case KundaliType.akshavedamsa:
+        return Icons.insights_rounded;
+      case KundaliType.shashtiamsa:
+        return Icons.history_rounded;
+      // Special Charts
+      case KundaliType.sudarshan:
+        return Icons.blur_circular_rounded;
+      case KundaliType.ashtakavarga:
+        return Icons.grid_on_rounded;
     }
   }
 
   Color _getChartTypeColor(KundaliType type) {
     switch (type) {
+      // Primary Charts
       case KundaliType.lagna:
         return _accentSecondary;
       case KundaliType.chandra:
         return const Color(0xFF6EE7B7);
       case KundaliType.surya:
         return _accentPrimary;
+      case KundaliType.bhavaChalit:
+        return const Color(0xFF818CF8);
+      // Divisional Charts - color coded by category
+      case KundaliType.hora:
+        return const Color(0xFFFCD34D);
+      case KundaliType.drekkana:
+        return const Color(0xFF93C5FD);
+      case KundaliType.chaturthamsa:
+        return const Color(0xFFFCA5A5);
+      case KundaliType.saptamsa:
+        return const Color(0xFFFBBF24);
       case KundaliType.navamsa:
         return const Color(0xFFF472B6);
       case KundaliType.dasamsa:
         return const Color(0xFF60A5FA);
-      case KundaliType.saptamsa:
-        return const Color(0xFFFBBF24);
       case KundaliType.dwadasamsa:
         return const Color(0xFF34D399);
+      case KundaliType.shodasamsa:
+        return const Color(0xFF67E8F9);
+      case KundaliType.vimsamsa:
+        return const Color(0xFFC4B5FD);
+      case KundaliType.chaturvimsamsa:
+        return const Color(0xFF86EFAC);
+      case KundaliType.bhamsa:
+        return const Color(0xFFFDE68A);
       case KundaliType.trimshamsa:
         return const Color(0xFFF87171);
+      case KundaliType.khavedamsa:
+        return const Color(0xFF7DD3FC);
+      case KundaliType.akshavedamsa:
+        return const Color(0xFFFDA4AF);
+      case KundaliType.shashtiamsa:
+        return const Color(0xFFD8B4FE);
+      // Special Charts
+      case KundaliType.sudarshan:
+        return const Color(0xFF22D3EE);
+      case KundaliType.ashtakavarga:
+        return const Color(0xFF4ADE80);
     }
   }
 
-  Widget _buildChartStyleSelector() {
-    return ChartStyleSelector(
-      currentStyle: _currentChartStyle,
-      onStyleChanged: (style) {
-        setState(() => _currentChartStyle = style);
-      },
+  // User-friendly simple names for the horizontal selector
+  String _getChartTypeLabel(KundaliType type) {
+    switch (type) {
+      case KundaliType.lagna:
+        return 'Lagna';
+      case KundaliType.chandra:
+        return 'Moon';
+      case KundaliType.surya:
+        return 'Sun';
+      case KundaliType.bhavaChalit:
+        return 'Bhava';
+      case KundaliType.hora:
+        return 'Hora';
+      case KundaliType.drekkana:
+        return 'Drekkana';
+      case KundaliType.chaturthamsa:
+        return 'Chaturthamsa';
+      case KundaliType.saptamsa:
+        return 'Saptamsa';
+      case KundaliType.navamsa:
+        return 'Navamsa';
+      case KundaliType.dasamsa:
+        return 'Dasamsa';
+      case KundaliType.dwadasamsa:
+        return 'Dwadasamsa';
+      case KundaliType.shodasamsa:
+        return 'Shodasamsa';
+      case KundaliType.vimsamsa:
+        return 'Vimsamsa';
+      case KundaliType.chaturvimsamsa:
+        return 'Chaturvimsamsa';
+      case KundaliType.bhamsa:
+        return 'Bhamsa';
+      case KundaliType.trimshamsa:
+        return 'Trimshamsa';
+      case KundaliType.khavedamsa:
+        return 'Khavedamsa';
+      case KundaliType.akshavedamsa:
+        return 'Akshavedamsa';
+      case KundaliType.shashtiamsa:
+        return 'Shashtiamsa';
+      case KundaliType.sudarshan:
+        return 'Sudarshan';
+      case KundaliType.ashtakavarga:
+        return 'Ashtakavarga';
+    }
+  }
+
+  Widget _buildCompactChartStyleSelector() {
+    final isNorth = _currentChartStyle == ChartStyle.northIndian;
+
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: _surfaceColor.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _borderColor.withOpacity(0.3), width: 0.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // North Indian
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              setState(() => _currentChartStyle = ChartStyle.northIndian);
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color:
+                    isNorth
+                        ? _accentPrimary.withOpacity(0.15)
+                        : Colors.transparent,
+                borderRadius: BorderRadius.circular(7),
+                border: Border.all(
+                  color:
+                      isNorth
+                          ? _accentPrimary.withOpacity(0.3)
+                          : Colors.transparent,
+                  width: 0.5,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.diamond_outlined,
+                    size: 12,
+                    color: isNorth ? _accentPrimary : _textMuted,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    'North',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 10,
+                      fontWeight: isNorth ? FontWeight.w600 : FontWeight.w400,
+                      color: isNorth ? _accentPrimary : _textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // South Indian
+          GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              setState(() => _currentChartStyle = ChartStyle.southIndian);
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color:
+                    !isNorth
+                        ? _accentPrimary.withOpacity(0.15)
+                        : Colors.transparent,
+                borderRadius: BorderRadius.circular(7),
+                border: Border.all(
+                  color:
+                      !isNorth
+                          ? _accentPrimary.withOpacity(0.3)
+                          : Colors.transparent,
+                  width: 0.5,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.grid_4x4_rounded,
+                    size: 12,
+                    color: !isNorth ? _accentPrimary : _textMuted,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    'South',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 10,
+                      fontWeight: !isNorth ? FontWeight.w600 : FontWeight.w400,
+                      color: !isNorth ? _accentPrimary : _textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -870,71 +1009,20 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       ),
       child: Column(
         children: [
-          // Header with chart type info and fullscreen button
+          // Compact header with style selector and fullscreen button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Chart type info
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _getChartTypeColor(
-                        _currentChartType,
-                      ).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _getChartTypeIcon(_currentChartType),
-                          size: 10,
-                          color: _getChartTypeColor(_currentChartType),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          _currentChartType.displayName,
-                          style: GoogleFonts.dmSans(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                            color: _getChartTypeColor(_currentChartType),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.touch_app_rounded,
-                    size: 11,
-                    color: _textMuted.withOpacity(0.4),
-                  ),
-                  const SizedBox(width: 3),
-                  Text(
-                    'Tap house',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 9,
-                      color: _textMuted.withOpacity(0.4),
-                    ),
-                  ),
-                ],
-              ),
-              // Fullscreen button
+              // Chart Style Selector (North/South) - compact
+              _buildCompactChartStyleSelector(),
+              // Fullscreen button - icon only
               GestureDetector(
                 onTap: () {
                   HapticFeedback.lightImpact();
                   _openFullscreenChart();
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
-                  ),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: _accentPrimary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
@@ -943,24 +1031,10 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                       width: 0.5,
                     ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.fullscreen_rounded,
-                        size: 14,
-                        color: _accentPrimary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Fullscreen',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                          color: _accentPrimary,
-                        ),
-                      ),
-                    ],
+                  child: Icon(
+                    Icons.fullscreen_rounded,
+                    size: 16,
+                    color: _accentPrimary,
                   ),
                 ),
               ),
@@ -1004,8 +1078,186 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                       ),
             ),
           ),
+          const SizedBox(height: 16),
+          // Chart Type Selector (Lagna, Chandra, Navamsa, etc.)
+          _buildInlineChartTypeSelector(),
         ],
       ),
+    );
+  }
+
+  Widget _buildInlineChartTypeSelector() {
+    final accentColor = _getChartTypeColor(_currentChartType);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Current selection header with details
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                accentColor.withOpacity(0.12),
+                accentColor.withOpacity(0.04),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: accentColor.withOpacity(0.2), width: 0.5),
+          ),
+          child: Row(
+            children: [
+              // Icon container
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: accentColor.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  _getChartTypeIcon(_currentChartType),
+                  size: 20,
+                  color: accentColor,
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Chart info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _currentChartType.displayName,
+                      style: GoogleFonts.dmSans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: _textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      _currentChartType.subtitle,
+                      style: GoogleFonts.dmSans(
+                        fontSize: 11,
+                        color: _textMuted,
+                        height: 1.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Short name badge
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: accentColor.withOpacity(0.18),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  _currentChartType.shortName,
+                  style: GoogleFonts.dmMono(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: accentColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 14),
+        // Section label
+        Row(
+          children: [
+            Icon(
+              Icons.auto_awesome_mosaic_rounded,
+              size: 13,
+              color: _textMuted,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              'Select Chart Type',
+              style: GoogleFonts.dmSans(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: _textMuted,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        // Horizontally scrollable chart types - same as fullscreen
+        SizedBox(
+          height: 36,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemCount: KundaliType.values.length,
+            itemBuilder: (context, index) {
+              final type = KundaliType.values[index];
+              final isSelected = _currentChartType == type;
+              final typeColor = _getChartTypeColor(type);
+
+              return GestureDetector(
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  setState(() => _currentChartType = type);
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: EdgeInsets.only(
+                    right: index < KundaliType.values.length - 1 ? 8 : 0,
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color:
+                        isSelected
+                            ? typeColor.withOpacity(0.15)
+                            : _surfaceColor.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color:
+                          isSelected
+                              ? typeColor.withOpacity(0.4)
+                              : _borderColor.withOpacity(0.3),
+                      width: isSelected ? 1 : 0.5,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _getChartTypeIcon(type),
+                        size: 14,
+                        color: isSelected ? typeColor : _textMuted,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _getChartTypeLabel(type),
+                        style: GoogleFonts.dmSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: isSelected ? typeColor : _textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -1632,6 +1884,1108 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
     );
   }
 
+  // ============ STRENGTH TAB (Shadbala, Vimshopaka, Ashtakavarga) ============
+
+  Widget _buildStrengthTab() {
+    final shadbala = KundaliCalculationService.calculateShadbala(
+      _kundaliData!.planetPositions,
+      _kundaliData!.ascendant.longitude,
+      _kundaliData!.birthDateTime,
+    );
+    final vimshopaka = KundaliCalculationService.calculateVimshopakaBala(
+      _kundaliData!.planetPositions,
+    );
+    final ashtakavarga = KundaliCalculationService.calculateAshtakavarga(
+      _kundaliData!.planetPositions,
+    );
+    final sav = KundaliCalculationService.calculateSarvashtakavarga(
+      ashtakavarga,
+    );
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Shadbala Section
+          _buildSectionHeader(
+            'Shadbala',
+            'Six-fold planetary strength',
+            Icons.fitness_center_rounded,
+            const Color(0xFFA78BFA),
+          ),
+          const SizedBox(height: 10),
+          ...shadbala.entries.map((entry) => _buildShadbalaCard(entry.value)),
+
+          const SizedBox(height: 24),
+
+          // Vimshopaka Bala Section
+          _buildSectionHeader(
+            'Vimshopaka Bala',
+            'Divisional chart strength',
+            Icons.layers_rounded,
+            const Color(0xFF60A5FA),
+          ),
+          const SizedBox(height: 10),
+          ...vimshopaka.entries.map(
+            (entry) => _buildVimshopakCard(entry.value),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Ashtakavarga Section
+          _buildSectionHeader(
+            'Ashtakavarga',
+            'Point-based strength analysis',
+            Icons.grid_on_rounded,
+            const Color(0xFF4ADE80),
+          ),
+          const SizedBox(height: 10),
+          _buildAshtakavargaGrid(ashtakavarga, sav),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(
+    String title,
+    String subtitle,
+    IconData icon,
+    Color color,
+  ) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, size: 16, color: color),
+        ),
+        const SizedBox(width: 10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.dmSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: _textPrimary,
+              ),
+            ),
+            Text(
+              subtitle,
+              style: GoogleFonts.dmSans(fontSize: 10, color: _textMuted),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShadbalaCard(ShadbalaData data) {
+    final percentage = data.percentageOfRequired.clamp(0.0, 150.0);
+    final color =
+        data.isStrong ? const Color(0xFF4ADE80) : const Color(0xFFFBBF24);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _surfaceColor.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _borderColor.withOpacity(0.4), width: 0.5),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: _getPlanetColor(data.planet).withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: Text(
+                    _getPlanetSymbol(data.planet),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: _getPlanetColor(data.planet),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          data.planet,
+                          style: GoogleFonts.dmSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: _textPrimary,
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: color.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            data.isStrong ? 'Strong' : 'Weak',
+                            style: GoogleFonts.dmSans(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w600,
+                              color: color,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    // Progress bar
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: percentage / 150,
+                        backgroundColor: _borderColor.withOpacity(0.3),
+                        valueColor: AlwaysStoppedAnimation<Color>(color),
+                        minHeight: 4,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${data.totalBala.toStringAsFixed(1)} / ${data.requiredBala.toStringAsFixed(0)} (${percentage.toStringAsFixed(0)}%)',
+                      style: GoogleFonts.dmMono(fontSize: 9, color: _textMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // Bala breakdown
+          Row(
+            children: [
+              _buildBalaChip('Sthana', data.sthanaBala),
+              _buildBalaChip('Dig', data.digBala),
+              _buildBalaChip('Kala', data.kalaBala),
+              _buildBalaChip('Chesta', data.chestaBala),
+              _buildBalaChip('Naisarg', data.naisargikaBala),
+              _buildBalaChip('Drik', data.drikBala),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBalaChip(String label, double value) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 2),
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(
+          color: _borderColor.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Column(
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.dmSans(fontSize: 7, color: _textMuted),
+            ),
+            Text(
+              value.toStringAsFixed(0),
+              style: GoogleFonts.dmMono(
+                fontSize: 8,
+                fontWeight: FontWeight.w600,
+                color: _textPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVimshopakCard(VimshopakaBalaData data) {
+    final color =
+        data.strength == 'Strong'
+            ? const Color(0xFF4ADE80)
+            : data.strength == 'Medium'
+            ? const Color(0xFFFBBF24)
+            : const Color(0xFFF87171);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _surfaceColor.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _borderColor.withOpacity(0.4), width: 0.5),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: _getPlanetColor(data.planet).withOpacity(0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: Text(
+                _getPlanetSymbol(data.planet),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: _getPlanetColor(data.planet),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      data.planet,
+                      style: GoogleFonts.dmSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: _textPrimary,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        data.strength,
+                        style: GoogleFonts.dmSans(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                          color: color,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${data.totalPoints.toStringAsFixed(1)} / ${data.maxPoints.toStringAsFixed(0)} points (${data.percentage.toStringAsFixed(0)}%)',
+                  style: GoogleFonts.dmMono(fontSize: 9, color: _textMuted),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAshtakavargaGrid(
+    Map<String, List<int>> ashtakavarga,
+    List<int> sav,
+  ) {
+    final signs = [
+      'Ari',
+      'Tau',
+      'Gem',
+      'Can',
+      'Leo',
+      'Vir',
+      'Lib',
+      'Sco',
+      'Sag',
+      'Cap',
+      'Aqu',
+      'Pis',
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _surfaceColor.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _borderColor.withOpacity(0.4), width: 0.5),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header row with signs
+            Row(
+              children: [
+                Container(
+                  width: 50,
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    'Planet',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w600,
+                      color: _textMuted,
+                    ),
+                  ),
+                ),
+                ...signs.map(
+                  (sign) => Container(
+                    width: 32,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    alignment: Alignment.center,
+                    child: Text(
+                      sign,
+                      style: GoogleFonts.dmMono(
+                        fontSize: 7,
+                        fontWeight: FontWeight.w600,
+                        color: _accentPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 36,
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Total',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 8,
+                      fontWeight: FontWeight.w600,
+                      color: _textMuted,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 8, color: _borderColor),
+            // Planet rows
+            ...ashtakavarga.entries.map((entry) {
+              final total = entry.value.reduce((a, b) => a + b);
+              return Row(
+                children: [
+                  Container(
+                    width: 50,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Text(
+                      entry.key.substring(0, 3),
+                      style: GoogleFonts.dmSans(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w500,
+                        color: _getPlanetColor(entry.key),
+                      ),
+                    ),
+                  ),
+                  ...entry.value.map(
+                    (points) => Container(
+                      width: 32,
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color:
+                            points >= 4
+                                ? const Color(0xFF4ADE80).withOpacity(0.15)
+                                : points <= 2
+                                ? const Color(0xFFF87171).withOpacity(0.15)
+                                : Colors.transparent,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '$points',
+                        style: GoogleFonts.dmMono(
+                          fontSize: 9,
+                          color: _textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 36,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    alignment: Alignment.center,
+                    child: Text(
+                      '$total',
+                      style: GoogleFonts.dmMono(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                        color: _accentSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }),
+            const Divider(height: 8, color: _borderColor),
+            // SAV row
+            Row(
+              children: [
+                Container(
+                  width: 50,
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Text(
+                    'SAV',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: _accentPrimary,
+                    ),
+                  ),
+                ),
+                ...sav.map(
+                  (points) => Container(
+                    width: 32,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color:
+                          points >= 28
+                              ? const Color(0xFF4ADE80).withOpacity(0.2)
+                              : points <= 22
+                              ? const Color(0xFFF87171).withOpacity(0.2)
+                              : _accentPrimary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      '$points',
+                      style: GoogleFonts.dmMono(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                        color: _textPrimary,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 36,
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '${sav.reduce((a, b) => a + b)}',
+                    style: GoogleFonts.dmMono(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w700,
+                      color: _accentPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============ TRANSIT TAB ============
+
+  Widget _buildTransitTab() {
+    // For demo, we'll use current positions (in real app, would get from ephemeris)
+    // Here we simulate current transits
+    final currentPositions = _getSimulatedCurrentPositions();
+    final transits = KundaliCalculationService.calculateTransits(
+      _kundaliData!.planetPositions,
+      currentPositions,
+      _kundaliData!.moonSign,
+    );
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader(
+            'Current Transits (Gochar)',
+            'Planetary movements from Moon',
+            Icons.sync_rounded,
+            const Color(0xFF22D3EE),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Effects calculated from your Moon sign: ${_kundaliData!.moonSign}',
+            style: GoogleFonts.dmSans(fontSize: 10, color: _textMuted),
+          ),
+          const SizedBox(height: 14),
+          ...transits.entries.map((entry) => _buildTransitCard(entry.value)),
+        ],
+      ),
+    );
+  }
+
+  Map<String, PlanetPosition> _getSimulatedCurrentPositions() {
+    // Simulate current planetary positions (in real app, calculate from current date)
+    final now = DateTime.now();
+    final dayOfYear = now.difference(DateTime(now.year)).inDays;
+
+    Map<String, PlanetPosition> positions = {};
+    final planetSpeeds = {
+      'Sun': 1.0,
+      'Moon': 13.0,
+      'Mars': 0.5,
+      'Mercury': 1.2,
+      'Jupiter': 0.08,
+      'Venus': 1.0,
+      'Saturn': 0.03,
+      'Rahu': -0.05,
+      'Ketu': -0.05,
+    };
+
+    for (var planet in planetSpeeds.keys) {
+      double longitude =
+          (dayOfYear * planetSpeeds[planet]! * 0.5 + planet.hashCode) % 360;
+      int signIndex = (longitude / 30).floor();
+      positions[planet] = PlanetPosition(
+        planet: planet,
+        longitude: longitude,
+        sign: KundaliCalculationService.zodiacSigns[signIndex],
+        signDegree: longitude % 30,
+        nakshatra:
+            KundaliCalculationService.nakshatras[(longitude / 13.333).floor() %
+                27],
+        house: 1,
+      );
+    }
+    return positions;
+  }
+
+  Widget _buildTransitCard(TransitData transit) {
+    final color =
+        transit.isFavorable ? const Color(0xFF4ADE80) : const Color(0xFFF87171);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _surfaceColor.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color:
+              transit.isFavorable
+                  ? color.withOpacity(0.3)
+                  : _borderColor.withOpacity(0.4),
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: _getPlanetColor(transit.planet).withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: Text(
+                    _getPlanetSymbol(transit.planet),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: _getPlanetColor(transit.planet),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          transit.planet,
+                          style: GoogleFonts.dmSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: _textPrimary,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              transit.isFavorable
+                                  ? Icons.thumb_up_rounded
+                                  : Icons.thumb_down_rounded,
+                              size: 12,
+                              color: color,
+                            ),
+                            const SizedBox(width: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: color.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                transit.isFavorable
+                                    ? 'Favorable'
+                                    : 'Challenging',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w600,
+                                  color: color,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        _buildTransitChip(
+                          '${transit.currentSign} ${transit.currentDegree.toStringAsFixed(1)}°',
+                          _textSecondary,
+                        ),
+                        const SizedBox(width: 6),
+                        _buildTransitChip(
+                          'House ${transit.transitHouse}',
+                          _accentSecondary,
+                        ),
+                        if (transit.aspectToNatal != 'None') ...[
+                          const SizedBox(width: 6),
+                          _buildTransitChip(
+                            transit.aspectToNatal,
+                            _accentPrimary,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (transit.effects.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _borderColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.lightbulb_outline_rounded,
+                    size: 12,
+                    color: _textMuted,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      transit.effects,
+                      style: GoogleFonts.dmSans(
+                        fontSize: 10,
+                        color: _textSecondary,
+                        height: 1.3,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTransitChip(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: GoogleFonts.dmMono(
+          fontSize: 9,
+          fontWeight: FontWeight.w500,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  // ============ PANCHANG TAB ============
+
+  Widget _buildPanchangTab() {
+    final sunPos = _kundaliData!.planetPositions['Sun'];
+    final moonPos = _kundaliData!.planetPositions['Moon'];
+
+    final panchang = KundaliCalculationService.calculatePanchang(
+      _kundaliData!.birthDateTime,
+      sunPos?.longitude ?? 0,
+      moonPos?.longitude ?? 0,
+    );
+
+    final varshphal = KundaliCalculationService.calculateVarshphal(
+      _kundaliData!.birthDateTime,
+      sunPos?.longitude ?? 0,
+      DateTime.now().year,
+    );
+
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Birth Panchang
+          _buildSectionHeader(
+            'Birth Panchang',
+            'Lunar calendar details at birth',
+            Icons.calendar_today_rounded,
+            const Color(0xFFF472B6),
+          ),
+          const SizedBox(height: 12),
+          _buildPanchangCard(panchang),
+
+          const SizedBox(height: 24),
+
+          // Varshphal
+          _buildSectionHeader(
+            'Varshphal ${varshphal.year}',
+            'Annual horoscope (Solar Return)',
+            Icons.cake_rounded,
+            const Color(0xFFFBBF24),
+          ),
+          const SizedBox(height: 12),
+          _buildVarshphalCard(varshphal),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPanchangCard(PanchangData panchang) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFF472B6).withOpacity(0.1),
+            const Color(0xFFA78BFA).withOpacity(0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFF472B6).withOpacity(0.2),
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        children: [
+          // Main Panchang elements
+          Row(
+            children: [
+              Expanded(
+                child: _buildPanchangElement(
+                  'Tithi',
+                  '${panchang.paksha} ${panchang.tithi}',
+                  Icons.brightness_2_rounded,
+                  const Color(0xFF6EE7B7),
+                ),
+              ),
+              Expanded(
+                child: _buildPanchangElement(
+                  'Nakshatra',
+                  '${panchang.nakshatra} (Pada ${panchang.nakshatraPada})',
+                  Icons.star_rounded,
+                  const Color(0xFFFBBF24),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildPanchangElement(
+                  'Yoga',
+                  panchang.yoga,
+                  Icons.link_rounded,
+                  const Color(0xFF60A5FA),
+                ),
+              ),
+              Expanded(
+                child: _buildPanchangElement(
+                  'Karana',
+                  panchang.karana,
+                  Icons.auto_awesome_rounded,
+                  const Color(0xFFA78BFA),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildPanchangElement(
+                  'Vara',
+                  panchang.vara,
+                  Icons.calendar_view_day_rounded,
+                  const Color(0xFF22D3EE),
+                ),
+              ),
+              Expanded(
+                child: _buildPanchangElement(
+                  'Ruling Deity',
+                  panchang.varaDeity,
+                  Icons.person_rounded,
+                  _accentPrimary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPanchangElement(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: _surfaceColor.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _borderColor.withOpacity(0.3), width: 0.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 12, color: color),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: GoogleFonts.dmSans(fontSize: 9, color: _textMuted),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: GoogleFonts.dmSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: _textPrimary,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVarshphalCard(VarshphalData varshphal) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFFBBF24).withOpacity(0.12),
+            const Color(0xFFF97316).withOpacity(0.05),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFFBBF24).withOpacity(0.2),
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _textPrimary.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      '${varshphal.age}',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: _accentPrimary,
+                      ),
+                    ),
+                    Text(
+                      'years',
+                      style: GoogleFonts.dmSans(fontSize: 9, color: _textMuted),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Solar Return ${varshphal.year}',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: _textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Date: ${DateFormat('d MMM yyyy').format(varshphal.solarReturnDate)}',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 11,
+                        color: _textMuted,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _surfaceColor.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.place_rounded,
+                            size: 12,
+                            color: _accentSecondary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Muntha Sign',
+                            style: GoogleFonts.dmSans(
+                              fontSize: 9,
+                              color: _textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        varshphal.munthaSign,
+                        style: GoogleFonts.dmSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: _textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _surfaceColor.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.person_rounded,
+                            size: 12,
+                            color: _accentPrimary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Year Lord',
+                            style: GoogleFonts.dmSans(
+                              fontSize: 9,
+                              color: _textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        varshphal.yearLord,
+                        style: GoogleFonts.dmSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: _textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildYogasTab() {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -2231,6 +3585,26 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
 
   // Get chart data based on current chart type
   void _updateChartData() {
+    final division = _currentType.division;
+
+    // Handle divisional charts with division number
+    if (division != null && division > 1) {
+      final divisionalPositions =
+          KundaliCalculationService.calculateDivisionalChart(
+            widget.kundaliData.planetPositions,
+            division,
+          );
+      _houses = KundaliCalculationService.getHousesForDivisionalChart(
+        divisionalPositions,
+        widget.kundaliData.ascendant.longitude,
+        division,
+      );
+      _planets = divisionalPositions;
+      _ascendantSign = _houses!.first.sign;
+      return;
+    }
+
+    // Handle primary and special charts
     switch (_currentType) {
       case KundaliType.lagna:
         _houses = widget.kundaliData.houses;
@@ -2251,114 +3625,124 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
         _planets = widget.kundaliData.planetPositions;
         _ascendantSign = widget.kundaliData.sunSign;
         break;
-      case KundaliType.navamsa:
-        final navamsaPositions =
-            widget.kundaliData.navamsaChart ??
-            KundaliCalculationService.calculateNavamsaChart(
-              widget.kundaliData.planetPositions,
-            );
-        _houses = KundaliCalculationService.getHousesForDivisionalChart(
-          navamsaPositions,
+      case KundaliType.bhavaChalit:
+        _houses = KundaliCalculationService.calculateBhavaChaliChart(
+          widget.kundaliData.planetPositions,
           widget.kundaliData.ascendant.longitude,
-          9,
         );
-        _planets = navamsaPositions;
-        _ascendantSign = _houses!.first.sign;
+        _planets = widget.kundaliData.planetPositions;
+        _ascendantSign = widget.kundaliData.ascendant.sign;
         break;
-      case KundaliType.dasamsa:
-        final dasamsaPositions =
-            KundaliCalculationService.calculateDasamsaChart(
-              widget.kundaliData.planetPositions,
-            );
-        _houses = KundaliCalculationService.getHousesForDivisionalChart(
-          dasamsaPositions,
-          widget.kundaliData.ascendant.longitude,
-          10,
-        );
-        _planets = dasamsaPositions;
-        _ascendantSign = _houses!.first.sign;
+      case KundaliType.sudarshan:
+      case KundaliType.ashtakavarga:
+        _houses = widget.kundaliData.houses;
+        _planets = widget.kundaliData.planetPositions;
+        _ascendantSign = widget.kundaliData.ascendant.sign;
         break;
-      case KundaliType.saptamsa:
-        final saptamsaPositions =
-            KundaliCalculationService.calculateSaptamsaChart(
-              widget.kundaliData.planetPositions,
-            );
-        _houses = KundaliCalculationService.getHousesForDivisionalChart(
-          saptamsaPositions,
-          widget.kundaliData.ascendant.longitude,
-          7,
-        );
-        _planets = saptamsaPositions;
-        _ascendantSign = _houses!.first.sign;
-        break;
-      case KundaliType.dwadasamsa:
-        final dwadasamsaPositions =
-            KundaliCalculationService.calculateDwadasamsaChart(
-              widget.kundaliData.planetPositions,
-            );
-        _houses = KundaliCalculationService.getHousesForDivisionalChart(
-          dwadasamsaPositions,
-          widget.kundaliData.ascendant.longitude,
-          12,
-        );
-        _planets = dwadasamsaPositions;
-        _ascendantSign = _houses!.first.sign;
-        break;
-      case KundaliType.trimshamsa:
-        final trimshamsaPositions =
-            KundaliCalculationService.calculateTrimshamsaChart(
-              widget.kundaliData.planetPositions,
-            );
-        _houses = KundaliCalculationService.getHousesForDivisionalChart(
-          trimshamsaPositions,
-          widget.kundaliData.ascendant.longitude,
-          30,
-        );
-        _planets = trimshamsaPositions;
-        _ascendantSign = _houses!.first.sign;
-        break;
+      default:
+        _houses = widget.kundaliData.houses;
+        _planets = widget.kundaliData.planetPositions;
+        _ascendantSign = widget.kundaliData.ascendant.sign;
     }
   }
 
   IconData _getTypeIcon(KundaliType type) {
     switch (type) {
+      // Primary Charts
       case KundaliType.lagna:
         return Icons.north_east_rounded;
       case KundaliType.chandra:
         return Icons.nightlight_round;
       case KundaliType.surya:
         return Icons.wb_sunny_rounded;
+      case KundaliType.bhavaChalit:
+        return Icons.swap_horiz_rounded;
+      // Divisional Charts
+      case KundaliType.hora:
+        return Icons.attach_money_rounded;
+      case KundaliType.drekkana:
+        return Icons.people_outline_rounded;
+      case KundaliType.chaturthamsa:
+        return Icons.home_rounded;
+      case KundaliType.saptamsa:
+        return Icons.child_care_rounded;
       case KundaliType.navamsa:
         return Icons.favorite_rounded;
       case KundaliType.dasamsa:
         return Icons.work_rounded;
-      case KundaliType.saptamsa:
-        return Icons.child_care_rounded;
       case KundaliType.dwadasamsa:
-        return Icons.people_rounded;
+        return Icons.family_restroom_rounded;
+      case KundaliType.shodasamsa:
+        return Icons.directions_car_rounded;
+      case KundaliType.vimsamsa:
+        return Icons.self_improvement_rounded;
+      case KundaliType.chaturvimsamsa:
+        return Icons.school_rounded;
+      case KundaliType.bhamsa:
+        return Icons.stars_rounded;
       case KundaliType.trimshamsa:
         return Icons.warning_amber_rounded;
+      case KundaliType.khavedamsa:
+        return Icons.auto_awesome_rounded;
+      case KundaliType.akshavedamsa:
+        return Icons.insights_rounded;
+      case KundaliType.shashtiamsa:
+        return Icons.history_rounded;
+      // Special Charts
+      case KundaliType.sudarshan:
+        return Icons.blur_circular_rounded;
+      case KundaliType.ashtakavarga:
+        return Icons.grid_on_rounded;
     }
   }
 
   Color _getTypeColor(KundaliType type) {
     switch (type) {
+      // Primary Charts
       case KundaliType.lagna:
         return _accentSecondary;
       case KundaliType.chandra:
         return const Color(0xFF6EE7B7);
       case KundaliType.surya:
         return _accentPrimary;
+      case KundaliType.bhavaChalit:
+        return const Color(0xFF818CF8);
+      // Divisional Charts
+      case KundaliType.hora:
+        return const Color(0xFFFCD34D);
+      case KundaliType.drekkana:
+        return const Color(0xFF93C5FD);
+      case KundaliType.chaturthamsa:
+        return const Color(0xFFFCA5A5);
+      case KundaliType.saptamsa:
+        return const Color(0xFFFBBF24);
       case KundaliType.navamsa:
         return const Color(0xFFF472B6);
       case KundaliType.dasamsa:
         return const Color(0xFF60A5FA);
-      case KundaliType.saptamsa:
-        return const Color(0xFFFBBF24);
       case KundaliType.dwadasamsa:
         return const Color(0xFF34D399);
+      case KundaliType.shodasamsa:
+        return const Color(0xFF67E8F9);
+      case KundaliType.vimsamsa:
+        return const Color(0xFFC4B5FD);
+      case KundaliType.chaturvimsamsa:
+        return const Color(0xFF86EFAC);
+      case KundaliType.bhamsa:
+        return const Color(0xFFFDE68A);
       case KundaliType.trimshamsa:
         return const Color(0xFFF87171);
+      case KundaliType.khavedamsa:
+        return const Color(0xFF7DD3FC);
+      case KundaliType.akshavedamsa:
+        return const Color(0xFFFDA4AF);
+      case KundaliType.shashtiamsa:
+        return const Color(0xFFD8B4FE);
+      // Special Charts
+      case KundaliType.sudarshan:
+        return const Color(0xFF22D3EE);
+      case KundaliType.ashtakavarga:
+        return const Color(0xFF4ADE80);
     }
   }
 
@@ -2528,9 +3912,9 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    type.shortName,
-                    style: GoogleFonts.dmMono(
-                      fontSize: 10,
+                    _getTypeLabel(type),
+                    style: GoogleFonts.dmSans(
+                      fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: isSelected ? accentColor : _textMuted,
                     ),
@@ -2552,6 +3936,54 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
         return 'South Indian';
       case ChartStyle.western:
         return 'Western';
+    }
+  }
+
+  // User-friendly simple names for the horizontal selector
+  String _getTypeLabel(KundaliType type) {
+    switch (type) {
+      case KundaliType.lagna:
+        return 'Lagna';
+      case KundaliType.chandra:
+        return 'Moon';
+      case KundaliType.surya:
+        return 'Sun';
+      case KundaliType.bhavaChalit:
+        return 'Bhava';
+      case KundaliType.hora:
+        return 'Hora';
+      case KundaliType.drekkana:
+        return 'Drekkana';
+      case KundaliType.chaturthamsa:
+        return 'Chaturthamsa';
+      case KundaliType.saptamsa:
+        return 'Saptamsa';
+      case KundaliType.navamsa:
+        return 'Navamsa';
+      case KundaliType.dasamsa:
+        return 'Dasamsa';
+      case KundaliType.dwadasamsa:
+        return 'Dwadasamsa';
+      case KundaliType.shodasamsa:
+        return 'Shodasamsa';
+      case KundaliType.vimsamsa:
+        return 'Vimsamsa';
+      case KundaliType.chaturvimsamsa:
+        return 'Chaturvimsamsa';
+      case KundaliType.bhamsa:
+        return 'Bhamsa';
+      case KundaliType.trimshamsa:
+        return 'Trimshamsa';
+      case KundaliType.khavedamsa:
+        return 'Khavedamsa';
+      case KundaliType.akshavedamsa:
+        return 'Akshavedamsa';
+      case KundaliType.shashtiamsa:
+        return 'Shashtiamsa';
+      case KundaliType.sudarshan:
+        return 'Sudarshan';
+      case KundaliType.ashtakavarga:
+        return 'Ashtakavarga';
     }
   }
 
@@ -2746,23 +4178,7 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
   }
 
   Widget _buildStyleSelector() {
-    final styles = [
-      {
-        'style': ChartStyle.northIndian,
-        'icon': Icons.diamond_outlined,
-        'label': 'North Indian',
-      },
-      {
-        'style': ChartStyle.southIndian,
-        'icon': Icons.grid_4x4_rounded,
-        'label': 'South Indian',
-      },
-      {
-        'style': ChartStyle.western,
-        'icon': Icons.circle_outlined,
-        'label': 'Western',
-      },
-    ];
+    final isNorth = _currentStyle == ChartStyle.northIndian;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -2770,62 +4186,102 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
         padding: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: _surfaceColor.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: _borderColor.withOpacity(0.3), width: 0.5),
         ),
         child: Row(
-          children:
-              styles.map((item) {
-                final style = item['style'] as ChartStyle;
-                final isSelected = _currentStyle == style;
-
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () => _changeStyle(style),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOutCubic,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color:
-                            isSelected
-                                ? _accentPrimary.withOpacity(0.15)
-                                : Colors.transparent,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color:
-                              isSelected
-                                  ? _accentPrimary.withOpacity(0.3)
-                                  : Colors.transparent,
-                          width: 0.5,
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            item['icon'] as IconData,
-                            size: 16,
-                            color: isSelected ? _accentPrimary : _textMuted,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            item['label'] as String,
-                            style: GoogleFonts.dmSans(
-                              fontSize: 11,
-                              fontWeight:
-                                  isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                              color: isSelected ? _accentPrimary : _textMuted,
-                            ),
-                          ),
-                        ],
-                      ),
+          children: [
+            // North Indian
+            Expanded(
+              child: GestureDetector(
+                onTap: () => _changeStyle(ChartStyle.northIndian),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutCubic,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color:
+                        isNorth
+                            ? _accentPrimary.withOpacity(0.15)
+                            : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color:
+                          isNorth
+                              ? _accentPrimary.withOpacity(0.3)
+                              : Colors.transparent,
+                      width: 0.5,
                     ),
                   ),
-                );
-              }).toList(),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.diamond_outlined,
+                        size: 14,
+                        color: isNorth ? _accentPrimary : _textMuted,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'North Indian',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 11,
+                          fontWeight:
+                              isNorth ? FontWeight.w600 : FontWeight.w400,
+                          color: isNorth ? _accentPrimary : _textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // South Indian
+            Expanded(
+              child: GestureDetector(
+                onTap: () => _changeStyle(ChartStyle.southIndian),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutCubic,
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color:
+                        !isNorth
+                            ? _accentPrimary.withOpacity(0.15)
+                            : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color:
+                          !isNorth
+                              ? _accentPrimary.withOpacity(0.3)
+                              : Colors.transparent,
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.grid_4x4_rounded,
+                        size: 14,
+                        color: !isNorth ? _accentPrimary : _textMuted,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'South Indian',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 11,
+                          fontWeight:
+                              !isNorth ? FontWeight.w600 : FontWeight.w400,
+                          color: !isNorth ? _accentPrimary : _textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -342,14 +342,30 @@ extension ChartStyleExtension on ChartStyle {
 
 /// Kundali chart types (Divisional charts)
 enum KundaliType {
-  lagna,      // D1 - Main birth chart (Ascendant based)
-  chandra,    // Moon chart - houses from Moon sign
-  surya,      // Sun chart - houses from Sun sign
-  navamsa,    // D9 - Marriage, dharma, spiritual life
-  dasamsa,    // D10 - Career, profession
-  saptamsa,   // D7 - Children, progeny
+  // Primary Charts
+  lagna, // D1 - Main birth chart (Ascendant based)
+  chandra, // Moon chart - houses from Moon sign
+  surya, // Sun chart - houses from Sun sign
+  bhavaChalit, // Bhava Chalit - cusp-based houses
+  // Shodasavarga (16 Divisional Charts)
+  hora, // D2 - Wealth
+  drekkana, // D3 - Siblings, courage
+  chaturthamsa, // D4 - Property, fortune
+  saptamsa, // D7 - Children, progeny
+  navamsa, // D9 - Marriage, dharma, spiritual life
+  dasamsa, // D10 - Career, profession
   dwadasamsa, // D12 - Parents
+  shodasamsa, // D16 - Vehicles, comforts
+  vimsamsa, // D20 - Spiritual progress
+  chaturvimsamsa, // D24 - Education, learning
+  bhamsa, // D27 - Strength, weakness (Nakshatramsa)
   trimshamsa, // D30 - Misfortunes, evils
+  khavedamsa, // D40 - Auspicious effects
+  akshavedamsa, // D45 - General indications
+  shashtiamsa, // D60 - Past life karma
+  // Special Charts
+  sudarshan, // Sudarshan Chakra - Triple chart view
+  ashtakavarga, // Ashtakavarga - Point-based strength
 }
 
 /// Extension for Kundali type display
@@ -357,42 +373,143 @@ extension KundaliTypeExtension on KundaliType {
   String get displayName {
     switch (this) {
       case KundaliType.lagna:
-        return 'Lagna';
+        return 'Lagna Kundali';
+      case KundaliType.chandra:
+        return 'Moon Chart';
+      case KundaliType.surya:
+        return 'Sun Chart';
+      case KundaliType.bhavaChalit:
+        return 'Chalit Kundali';
+      case KundaliType.hora:
+        return 'Hora Chart';
+      case KundaliType.drekkana:
+        return 'Drekkana Chart';
+      case KundaliType.chaturthamsa:
+        return 'Chaturthamsha';
+      case KundaliType.saptamsa:
+        return 'Saptamsha';
+      case KundaliType.navamsa:
+        return 'Navamsha Kundali';
+      case KundaliType.dasamsa:
+        return 'Dasamsha Chart';
+      case KundaliType.dwadasamsa:
+        return 'Dwadashamsha';
+      case KundaliType.shodasamsa:
+        return 'Shodashamsha';
+      case KundaliType.vimsamsa:
+        return 'Vimshamsha';
+      case KundaliType.chaturvimsamsa:
+        return 'Chaturvimshamsha';
+      case KundaliType.bhamsa:
+        return 'Bhamsha Chart';
+      case KundaliType.trimshamsa:
+        return 'Trimshamsha';
+      case KundaliType.khavedamsa:
+        return 'Khavedamsha';
+      case KundaliType.akshavedamsa:
+        return 'Akshavedamsha';
+      case KundaliType.shashtiamsa:
+        return 'Shashtiamsha';
+      case KundaliType.sudarshan:
+        return 'Sudarshan Chakra';
+      case KundaliType.ashtakavarga:
+        return 'Ashtakavarga';
+    }
+  }
+
+  /// Get short name with D-chart notation
+  String get shortName {
+    switch (this) {
+      case KundaliType.lagna:
+        return 'Rasi/D1';
       case KundaliType.chandra:
         return 'Chandra';
       case KundaliType.surya:
         return 'Surya';
-      case KundaliType.navamsa:
-        return 'Navamsa';
-      case KundaliType.dasamsa:
-        return 'Dasamsa';
+      case KundaliType.bhavaChalit:
+        return 'Bhava';
+      case KundaliType.hora:
+        return 'D2';
+      case KundaliType.drekkana:
+        return 'D3';
+      case KundaliType.chaturthamsa:
+        return 'D4';
       case KundaliType.saptamsa:
-        return 'Saptamsa';
-      case KundaliType.dwadasamsa:
-        return 'Dwadasamsa';
-      case KundaliType.trimshamsa:
-        return 'Trimshamsa';
-    }
-  }
-
-  String get shortName {
-    switch (this) {
-      case KundaliType.lagna:
-        return 'D1';
-      case KundaliType.chandra:
-        return 'Moon';
-      case KundaliType.surya:
-        return 'Sun';
+        return 'D7';
       case KundaliType.navamsa:
         return 'D9';
       case KundaliType.dasamsa:
         return 'D10';
-      case KundaliType.saptamsa:
-        return 'D7';
       case KundaliType.dwadasamsa:
         return 'D12';
+      case KundaliType.shodasamsa:
+        return 'D16';
+      case KundaliType.vimsamsa:
+        return 'D20';
+      case KundaliType.chaturvimsamsa:
+        return 'D24';
+      case KundaliType.bhamsa:
+        return 'D27';
       case KundaliType.trimshamsa:
         return 'D30';
+      case KundaliType.khavedamsa:
+        return 'D40';
+      case KundaliType.akshavedamsa:
+        return 'D45';
+      case KundaliType.shashtiamsa:
+        return 'D60';
+      case KundaliType.sudarshan:
+        return 'Chakra';
+      case KundaliType.ashtakavarga:
+        return 'AV';
+    }
+  }
+
+  /// Get subtitle/alternate name for display
+  String get subtitle {
+    switch (this) {
+      case KundaliType.lagna:
+        return 'Rasi Chart / D1 Chart';
+      case KundaliType.chandra:
+        return 'Chandra Kundali';
+      case KundaliType.surya:
+        return 'Surya Kundali';
+      case KundaliType.bhavaChalit:
+        return 'Bhava Chalit Chart';
+      case KundaliType.hora:
+        return 'Wealth Chart';
+      case KundaliType.drekkana:
+        return 'Siblings & Courage';
+      case KundaliType.chaturthamsa:
+        return 'Property & Fortune';
+      case KundaliType.saptamsa:
+        return 'Children & Progeny';
+      case KundaliType.navamsa:
+        return 'D9 - Marriage & Dharma';
+      case KundaliType.dasamsa:
+        return 'Career & Profession';
+      case KundaliType.dwadasamsa:
+        return 'Parents';
+      case KundaliType.shodasamsa:
+        return 'Vehicles & Comforts';
+      case KundaliType.vimsamsa:
+        return 'Spiritual Progress';
+      case KundaliType.chaturvimsamsa:
+        return 'Education & Learning';
+      case KundaliType.bhamsa:
+        return 'Nakshatramsa';
+      case KundaliType.trimshamsa:
+        return 'Misfortunes';
+      case KundaliType.khavedamsa:
+        return 'Auspicious Effects';
+      case KundaliType.akshavedamsa:
+        return 'General Indications';
+      case KundaliType.shashtiamsa:
+        return 'Past Life Karma';
+      case KundaliType.sudarshan:
+        return 'Triple Chart View';
+      case KundaliType.ashtakavarga:
+        return 'Point-based Strength';
     }
   }
 
@@ -404,17 +521,96 @@ extension KundaliTypeExtension on KundaliType {
         return 'Mind, emotions';
       case KundaliType.surya:
         return 'Soul, career, father';
+      case KundaliType.bhavaChalit:
+        return 'Cusp-based houses';
+      case KundaliType.hora:
+        return 'Wealth, finances';
+      case KundaliType.drekkana:
+        return 'Siblings, courage';
+      case KundaliType.chaturthamsa:
+        return 'Property, fortune';
+      case KundaliType.saptamsa:
+        return 'Children, progeny';
       case KundaliType.navamsa:
         return 'Marriage, dharma';
       case KundaliType.dasamsa:
         return 'Career, profession';
-      case KundaliType.saptamsa:
-        return 'Children, progeny';
       case KundaliType.dwadasamsa:
         return 'Parents';
+      case KundaliType.shodasamsa:
+        return 'Vehicles, comforts';
+      case KundaliType.vimsamsa:
+        return 'Spiritual progress';
+      case KundaliType.chaturvimsamsa:
+        return 'Education, learning';
+      case KundaliType.bhamsa:
+        return 'Strength, weakness';
       case KundaliType.trimshamsa:
         return 'Misfortunes';
+      case KundaliType.khavedamsa:
+        return 'Auspicious effects';
+      case KundaliType.akshavedamsa:
+        return 'General indications';
+      case KundaliType.shashtiamsa:
+        return 'Past life karma';
+      case KundaliType.sudarshan:
+        return 'Triple chart view';
+      case KundaliType.ashtakavarga:
+        return 'Strength analysis';
     }
   }
 
+  /// Get the category of the chart type
+  String get category {
+    switch (this) {
+      case KundaliType.lagna:
+      case KundaliType.chandra:
+      case KundaliType.surya:
+      case KundaliType.bhavaChalit:
+        return 'Primary';
+      case KundaliType.sudarshan:
+      case KundaliType.ashtakavarga:
+        return 'Special';
+      default:
+        return 'Divisional';
+    }
+  }
+
+  /// Get division number for divisional charts
+  int? get division {
+    switch (this) {
+      case KundaliType.hora:
+        return 2;
+      case KundaliType.drekkana:
+        return 3;
+      case KundaliType.chaturthamsa:
+        return 4;
+      case KundaliType.saptamsa:
+        return 7;
+      case KundaliType.navamsa:
+        return 9;
+      case KundaliType.dasamsa:
+        return 10;
+      case KundaliType.dwadasamsa:
+        return 12;
+      case KundaliType.shodasamsa:
+        return 16;
+      case KundaliType.vimsamsa:
+        return 20;
+      case KundaliType.chaturvimsamsa:
+        return 24;
+      case KundaliType.bhamsa:
+        return 27;
+      case KundaliType.trimshamsa:
+        return 30;
+      case KundaliType.khavedamsa:
+        return 40;
+      case KundaliType.akshavedamsa:
+        return 45;
+      case KundaliType.shashtiamsa:
+        return 60;
+      default:
+        return null;
+    }
+  }
 }
