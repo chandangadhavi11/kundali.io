@@ -32,6 +32,17 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
+  // Tab scroll controller for centering selected tab
+  final ScrollController _tabScrollController = ScrollController();
+  final List<GlobalKey> _tabKeys = List.generate(9, (_) => GlobalKey());
+
+  // Chart type scroll controller for centering selected chart type
+  final ScrollController _chartTypeScrollController = ScrollController();
+  final List<GlobalKey> _chartTypeKeys = List.generate(
+    KundaliType.values.length,
+    (_) => GlobalKey(),
+  );
+
   KundaliData? _effectiveKundaliData;
   KundaliData? get _kundaliData => _effectiveKundaliData ?? widget.kundaliData;
 
@@ -39,6 +50,10 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
   List<House>? _currentHouses;
   Map<String, PlanetPosition>? _currentPlanetPositions;
   String? _currentAscendantSign;
+
+  // Custom date/time for chart viewing
+  DateTime? _customDateTime;
+  KundaliData? _recalculatedKundaliData;
 
   // Tap states for microinteractions
   final Map<String, bool> _pressedStates = {};
@@ -54,19 +69,25 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
   static const _textSecondary = Color(0xFF9B95A8);
   static const _textMuted = Color(0xFF6B6478);
 
+  // Number of tabs - keep this consistent
+  static const int _tabCount = 9;
+
   @override
   void initState() {
     super.initState();
     _effectiveKundaliData = widget.kundaliData;
     _currentChartStyle = _kundaliData?.chartStyle ?? ChartStyle.northIndian;
-    _tabController = TabController(length: 8, vsync: this);
+    _tabController = TabController(length: _tabCount, vsync: this);
     _tabController.addListener(_handleTabChange);
     _initializeAnimations();
   }
 
   void _handleTabChange() {
+    if (!mounted) return;
     if (_tabController.indexIsChanging) return;
     setState(() {});
+    // Also scroll to center the tab when changed via swipe
+    _scrollToTab(_tabController.index);
   }
 
   void _initializeAnimations() {
@@ -112,13 +133,110 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
   }
 
   @override
+  void didUpdateWidget(covariant KundliDisplayScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Ensure tab controller index is valid after widget update
+    if (_tabController.index >= _tabCount) {
+      _tabController.index = 0;
+    }
+  }
+
+  @override
   void dispose() {
     _tabController.removeListener(_handleTabChange);
     _tabController.dispose();
+    _tabScrollController.dispose();
+    _chartTypeScrollController.dispose();
     _fadeController.dispose();
     _slideController.dispose();
     _pulseController.dispose();
     super.dispose();
+  }
+
+  // Scroll to center the selected tab with smooth animation
+  void _scrollToTab(int index) {
+    if (!_tabScrollController.hasClients) return;
+    if (index < 0 || index >= _tabKeys.length) return;
+
+    // Get the key for the selected tab
+    final key = _tabKeys[index];
+    final tabContext = key.currentContext;
+    if (tabContext == null) return;
+
+    // Get the RenderBox of the tab
+    final RenderBox? tabBox = tabContext.findRenderObject() as RenderBox?;
+    if (tabBox == null) return;
+
+    // Get screen width for centering calculation
+    final screenWidth = MediaQuery.of(context).size.width;
+    final tabWidth = tabBox.size.width;
+
+    // Get the tab's global position
+    final tabGlobalPosition = tabBox.localToGlobal(Offset.zero);
+
+    // Calculate current scroll offset
+    final currentScroll = _tabScrollController.offset;
+
+    // The tab's position in the scrollable content
+    final tabScrollPosition =
+        tabGlobalPosition.dx - 16 + currentScroll; // 16 is padding
+
+    // Calculate offset to center the tab (accounting for screen width)
+    final targetOffset = tabScrollPosition - (screenWidth / 2) + (tabWidth / 2);
+
+    // Clamp the target offset within valid bounds
+    final maxScroll = _tabScrollController.position.maxScrollExtent;
+    final clampedOffset = targetOffset.clamp(0.0, maxScroll);
+
+    // Animate to the target position with a nice easing curve
+    _tabScrollController.animateTo(
+      clampedOffset,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutQuart,
+    );
+  }
+
+  // Scroll to center the selected chart type with smooth animation
+  void _scrollToChartType(int index) {
+    if (!_chartTypeScrollController.hasClients) return;
+    if (index < 0 || index >= _chartTypeKeys.length) return;
+
+    // Get the key for the selected chart type
+    final key = _chartTypeKeys[index];
+    final itemContext = key.currentContext;
+    if (itemContext == null) return;
+
+    // Get the RenderBox of the chart type item
+    final RenderBox? itemBox = itemContext.findRenderObject() as RenderBox?;
+    if (itemBox == null) return;
+
+    // Get screen width for centering calculation
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemWidth = itemBox.size.width;
+
+    // Get the item's global position
+    final itemGlobalPosition = itemBox.localToGlobal(Offset.zero);
+
+    // Calculate current scroll offset
+    final currentScroll = _chartTypeScrollController.offset;
+
+    // The item's position in the scrollable content
+    final itemScrollPosition = itemGlobalPosition.dx + currentScroll;
+
+    // Calculate offset to center the item (accounting for screen width)
+    final targetOffset =
+        itemScrollPosition - (screenWidth / 2) + (itemWidth / 2);
+
+    // Clamp the target offset within valid bounds
+    final maxScroll = _chartTypeScrollController.position.maxScrollExtent;
+    final clampedOffset = targetOffset.clamp(0.0, maxScroll);
+
+    // Animate to the target position with a nice easing curve
+    _chartTypeScrollController.animateTo(
+      clampedOffset,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutQuart,
+    );
   }
 
   void _setPressed(String key, bool value) {
@@ -176,6 +294,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                         physics: const BouncingScrollPhysics(),
                         children: [
                           _buildChartTab(),
+                          _buildDetailsTab(),
                           _buildPlanetsTab(),
                           _buildHousesTab(),
                           _buildDashaTab(),
@@ -401,6 +520,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
   Widget _buildTabBar() {
     final tabs = [
       {'icon': Icons.grid_view_rounded, 'label': 'Chart'},
+      {'icon': Icons.person_outline_rounded, 'label': 'Details'},
       {'icon': Icons.public_rounded, 'label': 'Planets'},
       {'icon': Icons.home_work_outlined, 'label': 'Houses'},
       {'icon': Icons.timeline_rounded, 'label': 'Dasha'},
@@ -413,19 +533,30 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
     return SizedBox(
       height: 38,
       child: ListView.builder(
+        controller: _tabScrollController,
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: tabs.length,
         itemBuilder: (context, index) {
           final tab = tabs[index];
-          final isSelected = _tabController.index == index;
+          // Safe index check to prevent assertion errors
+          final currentIndex = _tabController.index.clamp(0, _tabCount - 1);
+          final isSelected = currentIndex == index;
 
           return GestureDetector(
+            key: _tabKeys[index],
             onTap: () {
-              HapticFeedback.selectionClick();
-              _tabController.animateTo(index);
-              setState(() {});
+              if (index >= 0 && index < _tabCount) {
+                HapticFeedback.selectionClick();
+                _tabController.animateTo(index);
+                setState(() {});
+                // Scroll to center the selected tab after a short delay
+                // to allow the UI to update first
+                Future.delayed(const Duration(milliseconds: 50), () {
+                  _scrollToTab(index);
+                });
+              }
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
@@ -492,56 +623,1883 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildChartCard(),
-          const SizedBox(height: 20),
-          _buildQuickStats(),
-          const SizedBox(height: 20),
-          _buildBasicInfo(),
+          const SizedBox(height: 12),
+          _buildDateTimeNavigator(),
         ],
       ),
     );
   }
 
+  Widget _buildDateTimeNavigator() {
+    final displayDateTime = _customDateTime ?? _kundaliData!.birthDateTime;
+    final isCustom = _customDateTime != null;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: _surfaceColor.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color:
+              isCustom
+                  ? _accentPrimary.withOpacity(0.25)
+                  : _borderColor.withOpacity(0.3),
+          width: 0.5,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Previous day button
+          GestureDetector(
+            onTap: () => _adjustDateTime(days: -1),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: _borderColor.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(
+                Icons.chevron_left_rounded,
+                size: 16,
+                color: _textMuted,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Date/Time display - tappable
+          Expanded(
+            child: GestureDetector(
+              onTap: () => _showDateTimePicker(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.calendar_today_rounded,
+                      size: 12,
+                      color: isCustom ? _accentPrimary : _textMuted,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      DateFormat('d MMM yyyy').format(displayDateTime),
+                      style: GoogleFonts.dmSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isCustom ? _accentPrimary : _textPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 1,
+                      height: 12,
+                      color: _borderColor.withOpacity(0.5),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.schedule_rounded,
+                      size: 12,
+                      color: isCustom ? _accentPrimary : _textMuted,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      DateFormat('h:mm a').format(displayDateTime),
+                      style: GoogleFonts.dmSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: isCustom ? _accentPrimary : _textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          // Next day button
+          GestureDetector(
+            onTap: () => _adjustDateTime(days: 1),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: _borderColor.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Icon(
+                Icons.chevron_right_rounded,
+                size: 16,
+                color: _textMuted,
+              ),
+            ),
+          ),
+          // Reset button (only when custom)
+          if (isCustom) ...[
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                setState(() {
+                  _customDateTime = null;
+                  _recalculatedKundaliData = null;
+                  _updateChartDataForMainScreen();
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: _accentPrimary.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(
+                  Icons.restore_rounded,
+                  size: 16,
+                  color: _accentPrimary,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  void _showDateTimePicker(BuildContext context) {
+    final displayDateTime = _customDateTime ?? _kundaliData!.birthDateTime;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder:
+          (context) => Container(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+            decoration: const BoxDecoration(
+              color: _bgSecondary,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: _borderColor,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'View Chart For',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: _textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildPickerOption(
+                          icon: Icons.calendar_today_rounded,
+                          label: 'Date',
+                          value: DateFormat(
+                            'd MMM yyyy',
+                          ).format(displayDateTime),
+                          color: _accentSecondary,
+                          onTap: () {
+                            Navigator.pop(context);
+                            _selectDate(context);
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildPickerOption(
+                          icon: Icons.schedule_rounded,
+                          label: 'Time',
+                          value: DateFormat('h:mm a').format(displayDateTime),
+                          color: const Color(0xFF6EE7B7),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _selectTime(context);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      Navigator.pop(context);
+                      setState(() {
+                        _customDateTime = DateTime.now();
+                        _recalculateKundaliData();
+                        _updateChartDataForMainScreen();
+                      });
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF6EE7B7).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: const Color(0xFF6EE7B7).withOpacity(0.2),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.access_time_filled_rounded,
+                            size: 16,
+                            color: const Color(0xFF6EE7B7),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'View Current Time Chart',
+                            style: GoogleFonts.dmSans(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF6EE7B7),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+    );
+  }
+
+  Widget _buildPickerOption({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: _surfaceColor.withOpacity(0.6),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: _borderColor.withOpacity(0.4), width: 0.5),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 20, color: color),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: GoogleFonts.dmSans(fontSize: 10, color: _textMuted),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              value,
+              style: GoogleFonts.dmSans(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: _textPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailsTab() {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildQuickStats(),
+          const SizedBox(height: 16),
+          _buildBasicInfo(),
+          const SizedBox(height: 16),
+          _buildAscendantDetails(),
+          const SizedBox(height: 16),
+          _buildNakshatraDetails(),
+          const SizedBox(height: 16),
+          _buildPanchangDetails(),
+          const SizedBox(height: 16),
+          _buildCurrentDashaDetails(),
+          const SizedBox(height: 16),
+          _buildCompatibilityDetails(),
+          const SizedBox(height: 16),
+          _buildLuckyFactors(),
+          const SizedBox(height: 16),
+          _buildPlanetaryStatus(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAscendantDetails() {
+    final ascendant = _kundaliData!.ascendant;
+    final lagnaLord = _getLagnaLord(ascendant.sign);
+    final ascNakshatra = _getNakshatraFromLongitude(ascendant.longitude);
+    final nakshatraLord = _getNakshatraLord(ascNakshatra);
+
+    return _buildDetailCard(
+      title: 'Lagna (Ascendant)',
+      icon: Icons.north_east_rounded,
+      color: _accentSecondary,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildDetailItem(
+                  'Lagna Sign',
+                  ascendant.sign,
+                  Icons.blur_circular_rounded,
+                  _accentSecondary,
+                ),
+              ),
+              Expanded(
+                child: _buildDetailItem(
+                  'Degree',
+                  '${(ascendant.longitude % 30).toStringAsFixed(2)}°',
+                  Icons.straighten_rounded,
+                  const Color(0xFF60A5FA),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDetailItem(
+                  'Nakshatra',
+                  ascNakshatra,
+                  Icons.star_rounded,
+                  const Color(0xFFFBBF24),
+                ),
+              ),
+              Expanded(
+                child: _buildDetailItem(
+                  'Lagna Lord',
+                  lagnaLord,
+                  Icons.person_rounded,
+                  const Color(0xFF6EE7B7),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDetailItem(
+                  'Nakshatra Lord',
+                  nakshatraLord,
+                  Icons.auto_awesome_rounded,
+                  const Color(0xFFF472B6),
+                ),
+              ),
+              Expanded(
+                child: _buildDetailItem(
+                  'Element',
+                  _getSignElement(ascendant.sign),
+                  _getElementIcon(ascendant.sign),
+                  _getElementColor(ascendant.sign),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNakshatraDetails() {
+    final moonPos = _kundaliData!.planetPositions['Moon']!;
+    final nakshatra = _kundaliData!.birthNakshatra;
+    final pada = _kundaliData!.birthNakshatraPada;
+    final nakshatraLord = _getNakshatraLord(nakshatra);
+    final deity = _getNakshatraDeity(nakshatra);
+    final gana = _getNakshatraGana(nakshatra);
+    final symbol = _getNakshatraSymbol(nakshatra);
+
+    return _buildDetailCard(
+      title: 'Nakshatra Details',
+      icon: Icons.stars_rounded,
+      color: const Color(0xFFF472B6),
+      child: Column(
+        children: [
+          // Main nakshatra display
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFFF472B6).withOpacity(0.12),
+                  const Color(0xFFA78BFA).withOpacity(0.06),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color(0xFFF472B6).withOpacity(0.2),
+                width: 0.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF472B6).withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(symbol, style: const TextStyle(fontSize: 24)),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        nakshatra,
+                        style: GoogleFonts.dmSans(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: _textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Pada $pada • ${moonPos.signDegree.toStringAsFixed(2)}° in ${moonPos.sign}',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 11,
+                          color: _textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _getGanaColor(gana).withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    gana,
+                    style: GoogleFonts.dmSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: _getGanaColor(gana),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDetailItem(
+                  'Lord',
+                  nakshatraLord,
+                  Icons.person_outline_rounded,
+                  const Color(0xFFA78BFA),
+                ),
+              ),
+              Expanded(
+                child: _buildDetailItem(
+                  'Deity',
+                  deity,
+                  Icons.temple_hindu_rounded,
+                  const Color(0xFFFBBF24),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDetailItem(
+                  'Gana',
+                  gana,
+                  Icons.group_rounded,
+                  _getGanaColor(gana),
+                ),
+              ),
+              Expanded(
+                child: _buildDetailItem(
+                  'Yoni',
+                  _getNakshatraYoni(nakshatra),
+                  Icons.pets_rounded,
+                  const Color(0xFF67E8F9),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPanchangDetails() {
+    final sunPos = _kundaliData!.planetPositions['Sun'];
+    final moonPos = _kundaliData!.planetPositions['Moon'];
+
+    final panchang = KundaliCalculationService.calculatePanchang(
+      _kundaliData!.birthDateTime,
+      sunPos?.longitude ?? 0,
+      moonPos?.longitude ?? 0,
+    );
+
+    return _buildDetailCard(
+      title: 'Panchang at Birth',
+      icon: Icons.calendar_month_rounded,
+      color: const Color(0xFF6EE7B7),
+      child: Column(
+        children: [
+          // Tithi and Paksha highlight
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF6EE7B7).withOpacity(0.12),
+                  const Color(0xFF22D3EE).withOpacity(0.06),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: const Color(0xFF6EE7B7).withOpacity(0.2),
+                width: 0.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  panchang.paksha == 'Shukla'
+                      ? Icons.brightness_2_rounded
+                      : Icons.brightness_3_rounded,
+                  size: 28,
+                  color:
+                      panchang.paksha == 'Shukla'
+                          ? const Color(0xFFFBBF24)
+                          : const Color(0xFF9CA3AF),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${panchang.paksha} Paksha',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: _textMuted,
+                        ),
+                      ),
+                      Text(
+                        panchang.tithi,
+                        style: GoogleFonts.dmSans(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: _textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6EE7B7).withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    panchang.vara,
+                    style: GoogleFonts.dmSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF6EE7B7),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDetailItem(
+                  'Yoga',
+                  panchang.yoga,
+                  Icons.link_rounded,
+                  const Color(0xFF60A5FA),
+                ),
+              ),
+              Expanded(
+                child: _buildDetailItem(
+                  'Karana',
+                  panchang.karana,
+                  Icons.hourglass_bottom_rounded,
+                  const Color(0xFFA78BFA),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDetailItem(
+                  'Vara Deity',
+                  panchang.varaDeity,
+                  Icons.temple_hindu_rounded,
+                  _accentPrimary,
+                ),
+              ),
+              Expanded(
+                child: _buildDetailItem(
+                  'Nakshatra',
+                  panchang.nakshatra,
+                  Icons.star_rounded,
+                  const Color(0xFFF472B6),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCurrentDashaDetails() {
+    final dasha = _kundaliData!.dashaInfo;
+    final currentPlanetColor = _getPlanetColor(dasha.currentMahadasha);
+
+    return _buildDetailCard(
+      title: 'Current Dasha Period',
+      icon: Icons.timeline_rounded,
+      color: const Color(0xFF60A5FA),
+      child: Column(
+        children: [
+          // Main Dasha display
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  currentPlanetColor.withOpacity(0.15),
+                  currentPlanetColor.withOpacity(0.05),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: currentPlanetColor.withOpacity(0.25),
+                width: 0.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: currentPlanetColor.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      _getPlanetSymbol(dasha.currentMahadasha),
+                      style: TextStyle(fontSize: 22, color: currentPlanetColor),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Mahadasha',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: _textMuted,
+                        ),
+                      ),
+                      Text(
+                        '${dasha.currentMahadasha} Dasha',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: _textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.hourglass_bottom_rounded,
+                            size: 10,
+                            color: _textMuted,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${dasha.remainingYears.toStringAsFixed(1)} years remaining',
+                            style: GoogleFonts.dmSans(
+                              fontSize: 10,
+                              color: _textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Dasha sequence preview
+          Text(
+            'Upcoming Periods',
+            style: GoogleFonts.dmSans(
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              color: _textMuted,
+            ),
+          ),
+          const SizedBox(height: 8),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children:
+                  dasha.sequence.take(5).map((period) {
+                    final isCurrent = period.planet == dasha.currentMahadasha;
+                    final color = _getPlanetColor(period.planet);
+                    return Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color:
+                            isCurrent
+                                ? color.withOpacity(0.15)
+                                : _surfaceColor.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color:
+                              isCurrent
+                                  ? color.withOpacity(0.3)
+                                  : _borderColor.withOpacity(0.3),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            _getPlanetSymbol(period.planet),
+                            style: TextStyle(fontSize: 16, color: color),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            period.planet.substring(0, 3),
+                            style: GoogleFonts.dmSans(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w600,
+                              color: isCurrent ? color : _textMuted,
+                            ),
+                          ),
+                          Text(
+                            '${period.years}y',
+                            style: GoogleFonts.dmMono(
+                              fontSize: 8,
+                              color: _textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompatibilityDetails() {
+    final nakshatra = _kundaliData!.birthNakshatra;
+    final gana = _getNakshatraGana(nakshatra);
+    final varna = _getVarna(_kundaliData!.moonSign);
+    final nadi = _getNadi(nakshatra);
+    final yoni = _getNakshatraYoni(nakshatra);
+
+    return _buildDetailCard(
+      title: 'Compatibility Factors (Guna)',
+      icon: Icons.favorite_rounded,
+      color: const Color(0xFFF472B6),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildGunaItem(
+                  'Varna',
+                  varna,
+                  '1/1',
+                  const Color(0xFFFBBF24),
+                ),
+              ),
+              Expanded(
+                child: _buildGunaItem(
+                  'Vashya',
+                  _getVashya(_kundaliData!.moonSign),
+                  '2/2',
+                  const Color(0xFF60A5FA),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildGunaItem(
+                  'Tara',
+                  _getTara(nakshatra),
+                  '3/3',
+                  const Color(0xFF6EE7B7),
+                ),
+              ),
+              Expanded(
+                child: _buildGunaItem(
+                  'Yoni',
+                  yoni,
+                  '4/4',
+                  const Color(0xFFA78BFA),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildGunaItem(
+                  'Graha Maitri',
+                  _getGrahaMaitri(_kundaliData!.moonSign),
+                  '5/5',
+                  const Color(0xFF67E8F9),
+                ),
+              ),
+              Expanded(
+                child: _buildGunaItem('Gana', gana, '6/6', _getGanaColor(gana)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildGunaItem(
+                  'Bhakoot',
+                  _getBhakoot(_kundaliData!.moonSign),
+                  '7/7',
+                  const Color(0xFFFCA5A5),
+                ),
+              ),
+              Expanded(
+                child: _buildGunaItem(
+                  'Nadi',
+                  nadi,
+                  '8/8',
+                  const Color(0xFFD8B4FE),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGunaItem(String name, String value, String points, Color color) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 3),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withOpacity(0.15), width: 0.5),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: GoogleFonts.dmSans(fontSize: 9, color: _textMuted),
+                ),
+                Text(
+                  value,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: _textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Text(
+              points,
+              style: GoogleFonts.dmMono(
+                fontSize: 8,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLuckyFactors() {
+    final moonSign = _kundaliData!.moonSign;
+
+    return _buildDetailCard(
+      title: 'Lucky Factors',
+      icon: Icons.auto_awesome_rounded,
+      color: _accentPrimary,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildLuckyItem(
+                  'Lucky Numbers',
+                  _getLuckyNumbers(moonSign),
+                  Icons.tag_rounded,
+                  _accentPrimary,
+                ),
+              ),
+              Expanded(
+                child: _buildLuckyItem(
+                  'Lucky Day',
+                  _getLuckyDay(moonSign),
+                  Icons.calendar_today_rounded,
+                  const Color(0xFF6EE7B7),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _buildLuckyItem(
+                  'Lucky Colors',
+                  _getLuckyColors(moonSign),
+                  Icons.palette_rounded,
+                  const Color(0xFFF472B6),
+                ),
+              ),
+              Expanded(
+                child: _buildLuckyItem(
+                  'Lucky Metal',
+                  _getLuckyMetal(moonSign),
+                  Icons.hardware_rounded,
+                  const Color(0xFF9CA3AF),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          // Gemstone recommendation
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  _accentPrimary.withOpacity(0.12),
+                  const Color(0xFFA78BFA).withOpacity(0.06),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _accentPrimary.withOpacity(0.2),
+                width: 0.5,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _accentPrimary.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.diamond_rounded,
+                    size: 20,
+                    color: _accentPrimary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Primary Gemstone',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 10,
+                          color: _textMuted,
+                        ),
+                      ),
+                      Text(
+                        _getLuckyGemstone(moonSign),
+                        style: GoogleFonts.dmSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: _textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  _getGemstoneEmoji(moonSign),
+                  style: const TextStyle(fontSize: 20),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLuckyItem(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 3),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: _surfaceColor.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _borderColor.withOpacity(0.3), width: 0.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 12, color: color),
+              const SizedBox(width: 5),
+              Text(
+                label,
+                style: GoogleFonts.dmSans(fontSize: 9, color: _textMuted),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: GoogleFonts.dmSans(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: _textPrimary,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlanetaryStatus() {
+    final planets = _kundaliData!.planetPositions;
+
+    // Find special planetary states
+    final retrograde = <String>[];
+    final exalted = <String>[];
+    final debilitated = <String>[];
+    final combust = <String>[];
+
+    final exaltationSigns = {
+      'Sun': 'Aries',
+      'Moon': 'Taurus',
+      'Mars': 'Capricorn',
+      'Mercury': 'Virgo',
+      'Jupiter': 'Cancer',
+      'Venus': 'Pisces',
+      'Saturn': 'Libra',
+      'Rahu': 'Taurus',
+      'Ketu': 'Scorpio',
+    };
+    final debilitationSigns = {
+      'Sun': 'Libra',
+      'Moon': 'Scorpio',
+      'Mars': 'Cancer',
+      'Mercury': 'Pisces',
+      'Jupiter': 'Capricorn',
+      'Venus': 'Virgo',
+      'Saturn': 'Aries',
+      'Rahu': 'Scorpio',
+      'Ketu': 'Taurus',
+    };
+
+    planets.forEach((name, planet) {
+      if (exaltationSigns[name] == planet.sign) exalted.add(name);
+      if (debilitationSigns[name] == planet.sign) debilitated.add(name);
+      // Simulate retrograde and combust (would need actual calculation)
+      if (name == 'Saturn' || name == 'Jupiter') retrograde.add(name);
+    });
+
+    return _buildDetailCard(
+      title: 'Planetary Status',
+      icon: Icons.public_rounded,
+      color: const Color(0xFF22D3EE),
+      child: Column(
+        children: [
+          _buildStatusRow(
+            'Exalted',
+            exalted.isEmpty ? ['None'] : exalted,
+            const Color(0xFF4ADE80),
+            Icons.arrow_upward_rounded,
+          ),
+          const SizedBox(height: 8),
+          _buildStatusRow(
+            'Debilitated',
+            debilitated.isEmpty ? ['None'] : debilitated,
+            const Color(0xFFF87171),
+            Icons.arrow_downward_rounded,
+          ),
+          const SizedBox(height: 8),
+          _buildStatusRow(
+            'Retrograde',
+            retrograde.isEmpty ? ['None'] : retrograde,
+            const Color(0xFFFBBF24),
+            Icons.replay_rounded,
+          ),
+          if (combust.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            _buildStatusRow(
+              'Combust',
+              combust,
+              const Color(0xFFFF6B6B),
+              Icons.local_fire_department_rounded,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusRow(
+    String label,
+    List<String> planets,
+    Color color,
+    IconData icon,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withOpacity(0.15), width: 0.5),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 14, color: color),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            label,
+            style: GoogleFonts.dmSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: _textMuted,
+            ),
+          ),
+          const Spacer(),
+          Wrap(
+            spacing: 6,
+            children:
+                planets.map((p) {
+                  final planetColor =
+                      p == 'None' ? _textMuted : _getPlanetColor(p);
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: planetColor.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      p == 'None' ? p : p.substring(0, math.min(3, p.length)),
+                      style: GoogleFonts.dmSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: planetColor,
+                      ),
+                    ),
+                  );
+                }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailCard({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required Widget child,
+  }) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, childWidget) {
+        return Transform.translate(
+          offset: Offset(0, 15 * (1 - value)),
+          child: Opacity(opacity: value, child: childWidget),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: _surfaceColor.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: _borderColor.withOpacity(0.4), width: 0.5),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, size: 14, color: color),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: _textPrimary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailItem(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 3),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: _surfaceColor.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _borderColor.withOpacity(0.3), width: 0.5),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.dmSans(fontSize: 9, color: _textMuted),
+                ),
+                Text(
+                  value,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: _textPrimary,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper methods for astrological data
+  String _getLagnaLord(String sign) {
+    const lords = {
+      'Aries': 'Mars',
+      'Taurus': 'Venus',
+      'Gemini': 'Mercury',
+      'Cancer': 'Moon',
+      'Leo': 'Sun',
+      'Virgo': 'Mercury',
+      'Libra': 'Venus',
+      'Scorpio': 'Mars',
+      'Sagittarius': 'Jupiter',
+      'Capricorn': 'Saturn',
+      'Aquarius': 'Saturn',
+      'Pisces': 'Jupiter',
+    };
+    return lords[sign] ?? 'Unknown';
+  }
+
+  String _getNakshatraFromLongitude(double longitude) {
+    final index = (longitude / 13.333333).floor() % 27;
+    return KundaliCalculationService.nakshatras[index];
+  }
+
+  String _getNakshatraLord(String nakshatra) {
+    const lords = {
+      'Ashwini': 'Ketu',
+      'Bharani': 'Venus',
+      'Krittika': 'Sun',
+      'Rohini': 'Moon',
+      'Mrigashira': 'Mars',
+      'Ardra': 'Rahu',
+      'Punarvasu': 'Jupiter',
+      'Pushya': 'Saturn',
+      'Ashlesha': 'Mercury',
+      'Magha': 'Ketu',
+      'Purva Phalguni': 'Venus',
+      'Uttara Phalguni': 'Sun',
+      'Hasta': 'Moon',
+      'Chitra': 'Mars',
+      'Swati': 'Rahu',
+      'Vishakha': 'Jupiter',
+      'Anuradha': 'Saturn',
+      'Jyeshtha': 'Mercury',
+      'Mula': 'Ketu',
+      'Purva Ashadha': 'Venus',
+      'Uttara Ashadha': 'Sun',
+      'Shravana': 'Moon',
+      'Dhanishta': 'Mars',
+      'Shatabhisha': 'Rahu',
+      'Purva Bhadrapada': 'Jupiter',
+      'Uttara Bhadrapada': 'Saturn',
+      'Revati': 'Mercury',
+    };
+    return lords[nakshatra] ?? 'Unknown';
+  }
+
+  String _getNakshatraDeity(String nakshatra) {
+    const deities = {
+      'Ashwini': 'Ashwini Kumaras',
+      'Bharani': 'Yama',
+      'Krittika': 'Agni',
+      'Rohini': 'Brahma',
+      'Mrigashira': 'Soma',
+      'Ardra': 'Rudra',
+      'Punarvasu': 'Aditi',
+      'Pushya': 'Brihaspati',
+      'Ashlesha': 'Nagas',
+      'Magha': 'Pitris',
+      'Purva Phalguni': 'Bhaga',
+      'Uttara Phalguni': 'Aryaman',
+      'Hasta': 'Savitar',
+      'Chitra': 'Vishwakarma',
+      'Swati': 'Vayu',
+      'Vishakha': 'Indra-Agni',
+      'Anuradha': 'Mitra',
+      'Jyeshtha': 'Indra',
+      'Mula': 'Nirriti',
+      'Purva Ashadha': 'Apas',
+      'Uttara Ashadha': 'Vishvadevas',
+      'Shravana': 'Vishnu',
+      'Dhanishta': 'Vasus',
+      'Shatabhisha': 'Varuna',
+      'Purva Bhadrapada': 'Aja Ekapada',
+      'Uttara Bhadrapada': 'Ahir Budhnya',
+      'Revati': 'Pushan',
+    };
+    return deities[nakshatra] ?? 'Unknown';
+  }
+
+  String _getNakshatraGana(String nakshatra) {
+    const ganas = {
+      'Ashwini': 'Deva',
+      'Bharani': 'Manushya',
+      'Krittika': 'Rakshasa',
+      'Rohini': 'Manushya',
+      'Mrigashira': 'Deva',
+      'Ardra': 'Manushya',
+      'Punarvasu': 'Deva',
+      'Pushya': 'Deva',
+      'Ashlesha': 'Rakshasa',
+      'Magha': 'Rakshasa',
+      'Purva Phalguni': 'Manushya',
+      'Uttara Phalguni': 'Manushya',
+      'Hasta': 'Deva',
+      'Chitra': 'Rakshasa',
+      'Swati': 'Deva',
+      'Vishakha': 'Rakshasa',
+      'Anuradha': 'Deva',
+      'Jyeshtha': 'Rakshasa',
+      'Mula': 'Rakshasa',
+      'Purva Ashadha': 'Manushya',
+      'Uttara Ashadha': 'Manushya',
+      'Shravana': 'Deva',
+      'Dhanishta': 'Rakshasa',
+      'Shatabhisha': 'Rakshasa',
+      'Purva Bhadrapada': 'Manushya',
+      'Uttara Bhadrapada': 'Manushya',
+      'Revati': 'Deva',
+    };
+    return ganas[nakshatra] ?? 'Manushya';
+  }
+
+  String _getNakshatraSymbol(String nakshatra) {
+    const symbols = {
+      'Ashwini': '🐴',
+      'Bharani': '🔺',
+      'Krittika': '🔥',
+      'Rohini': '🛞',
+      'Mrigashira': '🦌',
+      'Ardra': '💎',
+      'Punarvasu': '🏹',
+      'Pushya': '🌸',
+      'Ashlesha': '🐍',
+      'Magha': '👑',
+      'Purva Phalguni': '🛏️',
+      'Uttara Phalguni': '🛏️',
+      'Hasta': '✋',
+      'Chitra': '💠',
+      'Swati': '🌱',
+      'Vishakha': '🎯',
+      'Anuradha': '🪷',
+      'Jyeshtha': '☂️',
+      'Mula': '🦁',
+      'Purva Ashadha': '🐘',
+      'Uttara Ashadha': '🐘',
+      'Shravana': '👂',
+      'Dhanishta': '🎵',
+      'Shatabhisha': '⭕',
+      'Purva Bhadrapada': '⚔️',
+      'Uttara Bhadrapada': '🐍',
+      'Revati': '🐟',
+    };
+    return symbols[nakshatra] ?? '⭐';
+  }
+
+  String _getNakshatraYoni(String nakshatra) {
+    const yonis = {
+      'Ashwini': 'Horse',
+      'Bharani': 'Elephant',
+      'Krittika': 'Goat',
+      'Rohini': 'Serpent',
+      'Mrigashira': 'Serpent',
+      'Ardra': 'Dog',
+      'Punarvasu': 'Cat',
+      'Pushya': 'Goat',
+      'Ashlesha': 'Cat',
+      'Magha': 'Rat',
+      'Purva Phalguni': 'Rat',
+      'Uttara Phalguni': 'Cow',
+      'Hasta': 'Buffalo',
+      'Chitra': 'Tiger',
+      'Swati': 'Buffalo',
+      'Vishakha': 'Tiger',
+      'Anuradha': 'Deer',
+      'Jyeshtha': 'Deer',
+      'Mula': 'Dog',
+      'Purva Ashadha': 'Monkey',
+      'Uttara Ashadha': 'Mongoose',
+      'Shravana': 'Monkey',
+      'Dhanishta': 'Lion',
+      'Shatabhisha': 'Horse',
+      'Purva Bhadrapada': 'Lion',
+      'Uttara Bhadrapada': 'Cow',
+      'Revati': 'Elephant',
+    };
+    return yonis[nakshatra] ?? 'Unknown';
+  }
+
+  Color _getGanaColor(String gana) {
+    switch (gana) {
+      case 'Deva':
+        return const Color(0xFF6EE7B7);
+      case 'Manushya':
+        return const Color(0xFF60A5FA);
+      case 'Rakshasa':
+        return const Color(0xFFF87171);
+      default:
+        return _textMuted;
+    }
+  }
+
+  String _getSignElement(String sign) {
+    const elements = {
+      'Aries': 'Fire',
+      'Taurus': 'Earth',
+      'Gemini': 'Air',
+      'Cancer': 'Water',
+      'Leo': 'Fire',
+      'Virgo': 'Earth',
+      'Libra': 'Air',
+      'Scorpio': 'Water',
+      'Sagittarius': 'Fire',
+      'Capricorn': 'Earth',
+      'Aquarius': 'Air',
+      'Pisces': 'Water',
+    };
+    return elements[sign] ?? 'Unknown';
+  }
+
+  IconData _getElementIcon(String sign) {
+    final element = _getSignElement(sign);
+    switch (element) {
+      case 'Fire':
+        return Icons.local_fire_department_rounded;
+      case 'Earth':
+        return Icons.landscape_rounded;
+      case 'Air':
+        return Icons.air_rounded;
+      case 'Water':
+        return Icons.water_drop_rounded;
+      default:
+        return Icons.circle;
+    }
+  }
+
+  Color _getElementColor(String sign) {
+    final element = _getSignElement(sign);
+    switch (element) {
+      case 'Fire':
+        return const Color(0xFFF87171);
+      case 'Earth':
+        return const Color(0xFF6EE7B7);
+      case 'Air':
+        return const Color(0xFF60A5FA);
+      case 'Water':
+        return const Color(0xFF67E8F9);
+      default:
+        return _textMuted;
+    }
+  }
+
+  String _getVarna(String moonSign) {
+    const varnas = {
+      'Aries': 'Kshatriya',
+      'Leo': 'Kshatriya',
+      'Sagittarius': 'Kshatriya',
+      'Taurus': 'Vaishya',
+      'Virgo': 'Vaishya',
+      'Capricorn': 'Vaishya',
+      'Gemini': 'Shudra',
+      'Libra': 'Shudra',
+      'Aquarius': 'Shudra',
+      'Cancer': 'Brahmin',
+      'Scorpio': 'Brahmin',
+      'Pisces': 'Brahmin',
+    };
+    return varnas[moonSign] ?? 'Unknown';
+  }
+
+  String _getVashya(String moonSign) {
+    const vashyas = {
+      'Aries': 'Chatushpad',
+      'Taurus': 'Chatushpad',
+      'Leo': 'Chatushpad',
+      'Sagittarius': 'Chatushpad',
+      'Capricorn': 'Chatushpad',
+      'Gemini': 'Nara',
+      'Virgo': 'Nara',
+      'Libra': 'Nara',
+      'Aquarius': 'Nara',
+      'Cancer': 'Jalachara',
+      'Pisces': 'Jalachara',
+      'Scorpio': 'Keeta',
+    };
+    return vashyas[moonSign] ?? 'Unknown';
+  }
+
+  String _getTara(String nakshatra) {
+    // Simplified - would need actual calculation based on birth nakshatra
+    return 'Janma';
+  }
+
+  String _getGrahaMaitri(String moonSign) {
+    return _getLagnaLord(moonSign);
+  }
+
+  String _getBhakoot(String moonSign) {
+    return moonSign;
+  }
+
+  String _getNadi(String nakshatra) {
+    const nadis = {
+      'Ashwini': 'Aadi',
+      'Bharani': 'Madhya',
+      'Krittika': 'Antya',
+      'Rohini': 'Aadi',
+      'Mrigashira': 'Madhya',
+      'Ardra': 'Antya',
+      'Punarvasu': 'Aadi',
+      'Pushya': 'Madhya',
+      'Ashlesha': 'Antya',
+      'Magha': 'Aadi',
+      'Purva Phalguni': 'Madhya',
+      'Uttara Phalguni': 'Antya',
+      'Hasta': 'Aadi',
+      'Chitra': 'Madhya',
+      'Swati': 'Antya',
+      'Vishakha': 'Aadi',
+      'Anuradha': 'Madhya',
+      'Jyeshtha': 'Antya',
+      'Mula': 'Aadi',
+      'Purva Ashadha': 'Madhya',
+      'Uttara Ashadha': 'Antya',
+      'Shravana': 'Aadi',
+      'Dhanishta': 'Madhya',
+      'Shatabhisha': 'Antya',
+      'Purva Bhadrapada': 'Aadi',
+      'Uttara Bhadrapada': 'Madhya',
+      'Revati': 'Antya',
+    };
+    return nadis[nakshatra] ?? 'Unknown';
+  }
+
+  String _getLuckyNumbers(String moonSign) {
+    const numbers = {
+      'Aries': '1, 8, 9',
+      'Taurus': '2, 6, 7',
+      'Gemini': '3, 5, 6',
+      'Cancer': '2, 4, 7',
+      'Leo': '1, 4, 5',
+      'Virgo': '3, 5, 6',
+      'Libra': '2, 6, 7',
+      'Scorpio': '3, 9, 4',
+      'Sagittarius': '3, 5, 8',
+      'Capricorn': '4, 8, 6',
+      'Aquarius': '4, 7, 8',
+      'Pisces': '3, 7, 9',
+    };
+    return numbers[moonSign] ?? '1, 7, 9';
+  }
+
+  String _getLuckyDay(String moonSign) {
+    const days = {
+      'Aries': 'Tuesday',
+      'Taurus': 'Friday',
+      'Gemini': 'Wednesday',
+      'Cancer': 'Monday',
+      'Leo': 'Sunday',
+      'Virgo': 'Wednesday',
+      'Libra': 'Friday',
+      'Scorpio': 'Tuesday',
+      'Sagittarius': 'Thursday',
+      'Capricorn': 'Saturday',
+      'Aquarius': 'Saturday',
+      'Pisces': 'Thursday',
+    };
+    return days[moonSign] ?? 'Sunday';
+  }
+
+  String _getLuckyColors(String moonSign) {
+    const colors = {
+      'Aries': 'Red, Orange',
+      'Taurus': 'Green, Pink',
+      'Gemini': 'Yellow, Green',
+      'Cancer': 'White, Silver',
+      'Leo': 'Gold, Orange',
+      'Virgo': 'Green, Brown',
+      'Libra': 'Blue, Pink',
+      'Scorpio': 'Red, Maroon',
+      'Sagittarius': 'Yellow, Purple',
+      'Capricorn': 'Black, Brown',
+      'Aquarius': 'Blue, Electric',
+      'Pisces': 'Sea Green, Lavender',
+    };
+    return colors[moonSign] ?? 'White';
+  }
+
+  String _getLuckyMetal(String moonSign) {
+    const metals = {
+      'Aries': 'Iron',
+      'Taurus': 'Copper',
+      'Gemini': 'Brass',
+      'Cancer': 'Silver',
+      'Leo': 'Gold',
+      'Virgo': 'Bronze',
+      'Libra': 'Copper',
+      'Scorpio': 'Iron',
+      'Sagittarius': 'Tin',
+      'Capricorn': 'Lead',
+      'Aquarius': 'Lead',
+      'Pisces': 'Tin',
+    };
+    return metals[moonSign] ?? 'Gold';
+  }
+
+  String _getLuckyGemstone(String moonSign) {
+    const gems = {
+      'Aries': 'Red Coral',
+      'Taurus': 'Diamond',
+      'Gemini': 'Emerald',
+      'Cancer': 'Pearl',
+      'Leo': 'Ruby',
+      'Virgo': 'Emerald',
+      'Libra': 'Diamond',
+      'Scorpio': 'Red Coral',
+      'Sagittarius': 'Yellow Sapphire',
+      'Capricorn': 'Blue Sapphire',
+      'Aquarius': 'Blue Sapphire',
+      'Pisces': 'Yellow Sapphire',
+    };
+    return gems[moonSign] ?? 'Pearl';
+  }
+
+  String _getGemstoneEmoji(String moonSign) {
+    const gems = {
+      'Aries': '🔴',
+      'Taurus': '💎',
+      'Gemini': '💚',
+      'Cancer': '🤍',
+      'Leo': '❤️',
+      'Virgo': '💚',
+      'Libra': '💎',
+      'Scorpio': '🔴',
+      'Sagittarius': '💛',
+      'Capricorn': '💙',
+      'Aquarius': '💙',
+      'Pisces': '💛',
+    };
+    return gems[moonSign] ?? '💎';
+  }
+
   void _updateChartDataForMainScreen() {
     if (_kundaliData == null) return;
+
+    // Use recalculated data if available (when custom date/time is set)
+    final data = _recalculatedKundaliData ?? _kundaliData!;
 
     switch (_currentChartType) {
       // Primary Charts
       case KundaliType.lagna:
-        _currentHouses = _kundaliData!.houses;
-        _currentPlanetPositions = _kundaliData!.planetPositions;
-        _currentAscendantSign = _kundaliData!.ascendant.sign;
+        _currentHouses = data.houses;
+        _currentPlanetPositions = data.planetPositions;
+        _currentAscendantSign = data.ascendant.sign;
         break;
       case KundaliType.chandra:
         _currentHouses = KundaliCalculationService.calculateChandraChart(
-          _kundaliData!.planetPositions,
+          data.planetPositions,
         );
-        _currentPlanetPositions = _kundaliData!.planetPositions;
-        _currentAscendantSign = _kundaliData!.moonSign;
+        _currentPlanetPositions = data.planetPositions;
+        _currentAscendantSign = data.moonSign;
         break;
       case KundaliType.surya:
         _currentHouses = KundaliCalculationService.calculateSuryaChart(
-          _kundaliData!.planetPositions,
+          data.planetPositions,
         );
-        _currentPlanetPositions = _kundaliData!.planetPositions;
-        _currentAscendantSign = _kundaliData!.sunSign;
+        _currentPlanetPositions = data.planetPositions;
+        _currentAscendantSign = data.sunSign;
         break;
       case KundaliType.bhavaChalit:
         _currentHouses = KundaliCalculationService.calculateBhavaChaliChart(
-          _kundaliData!.planetPositions,
-          _kundaliData!.ascendant.longitude,
+          data.planetPositions,
+          data.ascendant.longitude,
         );
-        _currentPlanetPositions = _kundaliData!.planetPositions;
-        _currentAscendantSign = _kundaliData!.ascendant.sign;
+        _currentPlanetPositions = data.planetPositions;
+        _currentAscendantSign = data.ascendant.sign;
         break;
 
       // Divisional Charts
       case KundaliType.hora:
         final horaPositions = KundaliCalculationService.calculateHoraChart(
-          _kundaliData!.planetPositions,
+          data.planetPositions,
         );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           horaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           2,
         );
         _currentPlanetPositions = horaPositions;
@@ -550,11 +2508,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       case KundaliType.drekkana:
         final drekkanaPositions =
             KundaliCalculationService.calculateDrekkanaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           drekkanaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           3,
         );
         _currentPlanetPositions = drekkanaPositions;
@@ -563,11 +2521,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       case KundaliType.chaturthamsa:
         final chaturthamsaPositions =
             KundaliCalculationService.calculateChaturthamsaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           chaturthamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           4,
         );
         _currentPlanetPositions = chaturthamsaPositions;
@@ -576,11 +2534,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       case KundaliType.saptamsa:
         final saptamsaPositions =
             KundaliCalculationService.calculateSaptamsaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           saptamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           7,
         );
         _currentPlanetPositions = saptamsaPositions;
@@ -588,13 +2546,13 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
         break;
       case KundaliType.navamsa:
         final navamsaPositions =
-            _kundaliData!.navamsaChart ??
+            data.navamsaChart ??
             KundaliCalculationService.calculateNavamsaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           navamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           9,
         );
         _currentPlanetPositions = navamsaPositions;
@@ -603,11 +2561,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       case KundaliType.dasamsa:
         final dasamsaPositions =
             KundaliCalculationService.calculateDasamsaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           dasamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           10,
         );
         _currentPlanetPositions = dasamsaPositions;
@@ -616,11 +2574,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       case KundaliType.dwadasamsa:
         final dwadasamsaPositions =
             KundaliCalculationService.calculateDwadasamsaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           dwadasamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           12,
         );
         _currentPlanetPositions = dwadasamsaPositions;
@@ -629,11 +2587,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       case KundaliType.shodasamsa:
         final shodasamsaPositions =
             KundaliCalculationService.calculateShodasamsaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           shodasamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           16,
         );
         _currentPlanetPositions = shodasamsaPositions;
@@ -642,11 +2600,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       case KundaliType.vimsamsa:
         final vimsamsaPositions =
             KundaliCalculationService.calculateVimsamsaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           vimsamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           20,
         );
         _currentPlanetPositions = vimsamsaPositions;
@@ -655,11 +2613,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       case KundaliType.chaturvimsamsa:
         final chaturvimsamsaPositions =
             KundaliCalculationService.calculateChaturvimsamsaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           chaturvimsamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           24,
         );
         _currentPlanetPositions = chaturvimsamsaPositions;
@@ -667,11 +2625,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
         break;
       case KundaliType.bhamsa:
         final bhamsaPositions = KundaliCalculationService.calculateBhamsaChart(
-          _kundaliData!.planetPositions,
+          data.planetPositions,
         );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           bhamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           27,
         );
         _currentPlanetPositions = bhamsaPositions;
@@ -680,11 +2638,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       case KundaliType.trimshamsa:
         final trimshamsaPositions =
             KundaliCalculationService.calculateTrimshamsaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           trimshamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           30,
         );
         _currentPlanetPositions = trimshamsaPositions;
@@ -693,11 +2651,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       case KundaliType.khavedamsa:
         final khavedamsaPositions =
             KundaliCalculationService.calculateKhavedamsaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           khavedamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           40,
         );
         _currentPlanetPositions = khavedamsaPositions;
@@ -706,11 +2664,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       case KundaliType.akshavedamsa:
         final akshavedamsaPositions =
             KundaliCalculationService.calculateAkshavedamsaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           akshavedamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           45,
         );
         _currentPlanetPositions = akshavedamsaPositions;
@@ -719,11 +2677,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       case KundaliType.shashtiamsa:
         final shashtiamsaPositions =
             KundaliCalculationService.calculateShashtiamsaChart(
-              _kundaliData!.planetPositions,
+              data.planetPositions,
             );
         _currentHouses = KundaliCalculationService.getHousesForDivisionalChart(
           shashtiamsaPositions,
-          _kundaliData!.ascendant.longitude,
+          data.ascendant.longitude,
           60,
         );
         _currentPlanetPositions = shashtiamsaPositions;
@@ -733,9 +2691,9 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       // Special Charts - use Lagna as base
       case KundaliType.sudarshan:
       case KundaliType.ashtakavarga:
-        _currentHouses = _kundaliData!.houses;
-        _currentPlanetPositions = _kundaliData!.planetPositions;
-        _currentAscendantSign = _kundaliData!.ascendant.sign;
+        _currentHouses = data.houses;
+        _currentPlanetPositions = data.planetPositions;
+        _currentAscendantSign = data.ascendant.sign;
         break;
     }
   }
@@ -1086,6 +3044,92 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
     );
   }
 
+  void _adjustDateTime({int days = 0, int hours = 0}) {
+    final current = _customDateTime ?? _kundaliData!.birthDateTime;
+    setState(() {
+      _customDateTime = current.add(Duration(days: days, hours: hours));
+      _recalculateKundaliData();
+      _updateChartDataForMainScreen();
+    });
+  }
+
+  void _recalculateKundaliData() {
+    if (_customDateTime == null) {
+      _recalculatedKundaliData = null;
+      return;
+    }
+
+    // Recalculate Kundali with custom date/time
+    _recalculatedKundaliData = KundaliData.fromBirthDetails(
+      id: 'temp_${_customDateTime!.millisecondsSinceEpoch}',
+      name: _kundaliData!.name,
+      birthDateTime: _customDateTime!,
+      birthPlace: _kundaliData!.birthPlace,
+      latitude: _kundaliData!.latitude,
+      longitude: _kundaliData!.longitude,
+      timezone: _kundaliData!.timezone,
+      gender: _kundaliData!.gender,
+      chartStyle: _kundaliData!.chartStyle,
+    );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final displayDateTime = _customDateTime ?? _kundaliData!.birthDateTime;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder:
+          (context) => _CustomDatePicker(
+            initialDate: displayDateTime,
+            onDateSelected: (picked) {
+              HapticFeedback.selectionClick();
+              setState(() {
+                _customDateTime = DateTime(
+                  picked.year,
+                  picked.month,
+                  picked.day,
+                  displayDateTime.hour,
+                  displayDateTime.minute,
+                  displayDateTime.second,
+                );
+                _recalculateKundaliData();
+                _updateChartDataForMainScreen();
+              });
+            },
+          ),
+    );
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final displayDateTime = _customDateTime ?? _kundaliData!.birthDateTime;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder:
+          (context) => _CustomTimePicker(
+            initialTime: displayDateTime,
+            onTimeSelected: (picked) {
+              HapticFeedback.selectionClick();
+              setState(() {
+                _customDateTime = DateTime(
+                  displayDateTime.year,
+                  displayDateTime.month,
+                  displayDateTime.day,
+                  picked.hour,
+                  picked.minute,
+                );
+                _recalculateKundaliData();
+                _updateChartDataForMainScreen();
+              });
+            },
+          ),
+    );
+  }
+
   Widget _buildInlineChartTypeSelector() {
     final accentColor = _getChartTypeColor(_currentChartType);
 
@@ -1200,6 +3244,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
         SizedBox(
           height: 36,
           child: ListView.builder(
+            controller: _chartTypeScrollController,
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             itemCount: KundaliType.values.length,
@@ -1209,9 +3254,14 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
               final typeColor = _getChartTypeColor(type);
 
               return GestureDetector(
+                key: _chartTypeKeys[index],
                 onTap: () {
                   HapticFeedback.selectionClick();
                   setState(() => _currentChartType = type);
+                  // Scroll to center the selected chart type
+                  Future.delayed(const Duration(milliseconds: 50), () {
+                    _scrollToChartType(index);
+                  });
                 },
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
@@ -3457,6 +5507,13 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
   double _currentZoom = 1.0;
   TapDownDetails? _doubleTapDetails;
 
+  // Chart type scroll controller for centering
+  final ScrollController _chartTypeScrollController = ScrollController();
+  final List<GlobalKey> _chartTypeKeys = List.generate(
+    KundaliType.values.length,
+    (_) => GlobalKey(),
+  );
+
   // Cached chart data
   List<House>? _houses;
   Map<String, PlanetPosition>? _planets;
@@ -3504,8 +5561,38 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
   void dispose() {
     _transformController.removeListener(_onZoomChanged);
     _transformController.dispose();
+    _chartTypeScrollController.dispose();
     _animController.dispose();
     super.dispose();
+  }
+
+  // Scroll to center the selected chart type with smooth animation
+  void _scrollToChartType(int index) {
+    if (!_chartTypeScrollController.hasClients) return;
+    if (index < 0 || index >= _chartTypeKeys.length) return;
+
+    final key = _chartTypeKeys[index];
+    final itemContext = key.currentContext;
+    if (itemContext == null) return;
+
+    final RenderBox? itemBox = itemContext.findRenderObject() as RenderBox?;
+    if (itemBox == null) return;
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemWidth = itemBox.size.width;
+    final itemGlobalPosition = itemBox.localToGlobal(Offset.zero);
+    final currentScroll = _chartTypeScrollController.offset;
+    final itemScrollPosition = itemGlobalPosition.dx + currentScroll;
+    final targetOffset =
+        itemScrollPosition - (screenWidth / 2) + (itemWidth / 2);
+    final maxScroll = _chartTypeScrollController.position.maxScrollExtent;
+    final clampedOffset = targetOffset.clamp(0.0, maxScroll);
+
+    _chartTypeScrollController.animateTo(
+      clampedOffset,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutQuart,
+    );
   }
 
   void _handleDoubleTapDown(TapDownDetails details) {
@@ -3872,6 +5959,7 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
     return SizedBox(
       height: 36,
       child: ListView.builder(
+        controller: _chartTypeScrollController,
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         itemCount: KundaliType.values.length,
@@ -3881,7 +5969,14 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
           final accentColor = _getTypeColor(type);
 
           return GestureDetector(
-            onTap: () => _changeType(type),
+            key: _chartTypeKeys[index],
+            onTap: () {
+              _changeType(type);
+              // Scroll to center the selected chart type
+              Future.delayed(const Duration(milliseconds: 50), () {
+                _scrollToChartType(index);
+              });
+            },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               margin: EdgeInsets.only(
@@ -4283,6 +6378,1153 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// Custom Date Picker Widget
+class _CustomDatePicker extends StatefulWidget {
+  final DateTime initialDate;
+  final Function(DateTime) onDateSelected;
+
+  const _CustomDatePicker({
+    required this.initialDate,
+    required this.onDateSelected,
+  });
+
+  @override
+  State<_CustomDatePicker> createState() => _CustomDatePickerState();
+}
+
+class _CustomDatePickerState extends State<_CustomDatePicker> {
+  late int _selectedDay;
+  late int _selectedMonth;
+  late int _selectedYear;
+  late FixedExtentScrollController _dayController;
+  late FixedExtentScrollController _monthController;
+  late FixedExtentScrollController _yearController;
+
+  static const _bgPrimary = Color(0xFF0D0B14);
+  static const _bgSecondary = Color(0xFF131020);
+  static const _surfaceColor = Color(0xFF1A1625);
+  static const _borderColor = Color(0xFF2A2438);
+  static const _accentPrimary = Color(0xFFD4AF37);
+  static const _accentSecondary = Color(0xFFA78BFA);
+  static const _textPrimary = Color(0xFFF8F7FC);
+  static const _textMuted = Color(0xFF6B6478);
+
+  final List<String> _months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDay = widget.initialDate.day;
+    _selectedMonth = widget.initialDate.month;
+    _selectedYear = widget.initialDate.year;
+    _dayController = FixedExtentScrollController(initialItem: _selectedDay - 1);
+    _monthController = FixedExtentScrollController(
+      initialItem: _selectedMonth - 1,
+    );
+    _yearController = FixedExtentScrollController(
+      initialItem: _selectedYear - 1900,
+    );
+  }
+
+  @override
+  void dispose() {
+    _dayController.dispose();
+    _monthController.dispose();
+    _yearController.dispose();
+    super.dispose();
+  }
+
+  int _getDaysInMonth(int month, int year) {
+    return DateTime(year, month + 1, 0).day;
+  }
+
+  void _goToToday() {
+    final now = DateTime.now();
+    setState(() {
+      _selectedDay = now.day;
+      _selectedMonth = now.month;
+      _selectedYear = now.year;
+    });
+    _dayController.animateToItem(
+      _selectedDay - 1,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+    _monthController.animateToItem(
+      _selectedMonth - 1,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+    _yearController.animateToItem(
+      _selectedYear - 1900,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+    HapticFeedback.mediumImpact();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final daysInMonth = _getDaysInMonth(_selectedMonth, _selectedYear);
+    final selectedDate = DateTime(_selectedYear, _selectedMonth, _selectedDay);
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.52,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [_bgSecondary, _bgPrimary],
+        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: _borderColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Header with prominent date display
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                // Selected date prominent display
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        _accentPrimary.withOpacity(0.12),
+                        _accentSecondary.withOpacity(0.08),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: _accentPrimary.withOpacity(0.2),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        DateFormat('EEEE').format(selectedDate),
+                        style: GoogleFonts.dmSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: _accentSecondary,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        DateFormat('d MMMM yyyy').format(selectedDate),
+                        style: GoogleFonts.dmSans(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: _textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                // Quick actions row
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _goToToday,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6EE7B7).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: const Color(0xFF6EE7B7).withOpacity(0.2),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.today_rounded,
+                                size: 14,
+                                color: const Color(0xFF6EE7B7),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Today',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF6EE7B7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _borderColor.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: _textMuted,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () {
+                        HapticFeedback.mediumImpact();
+                        Navigator.pop(context);
+                        widget.onDateSelected(selectedDate);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              _accentPrimary,
+                              _accentPrimary.withOpacity(0.8),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _accentPrimary.withOpacity(0.25),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          'Confirm',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Picker labels
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Center(
+                    child: Text(
+                      'DAY',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: _textMuted,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Center(
+                    child: Text(
+                      'MONTH',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: _textMuted,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Center(
+                    child: Text(
+                      'YEAR',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: _textMuted,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 6),
+          // Date Pickers
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: _surfaceColor.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: _borderColor.withOpacity(0.3)),
+              ),
+              child: Stack(
+                children: [
+                  // Selection highlight
+                  Center(
+                    child: Container(
+                      height: 48,
+                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            _accentPrimary.withOpacity(0.12),
+                            _accentPrimary.withOpacity(0.06),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _accentPrimary.withOpacity(0.25),
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Gradient overlays for fade effect
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 50,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            _surfaceColor.withOpacity(0.9),
+                            _surfaceColor.withOpacity(0.0),
+                          ],
+                        ),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: 50,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            _surfaceColor.withOpacity(0.9),
+                            _surfaceColor.withOpacity(0.0),
+                          ],
+                        ),
+                        borderRadius: const BorderRadius.vertical(
+                          bottom: Radius.circular(16),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      // Day picker
+                      Expanded(
+                        flex: 2,
+                        child: ListWheelScrollView.useDelegate(
+                          controller: _dayController,
+                          itemExtent: 48,
+                          diameterRatio: 1.2,
+                          perspective: 0.002,
+                          physics: const FixedExtentScrollPhysics(),
+                          onSelectedItemChanged: (index) {
+                            HapticFeedback.selectionClick();
+                            setState(() => _selectedDay = index + 1);
+                          },
+                          childDelegate: ListWheelChildBuilderDelegate(
+                            childCount: daysInMonth,
+                            builder: (context, index) {
+                              final isSelected = index + 1 == _selectedDay;
+                              return Center(
+                                child: AnimatedDefaultTextStyle(
+                                  duration: const Duration(milliseconds: 150),
+                                  style: GoogleFonts.dmMono(
+                                    fontSize: isSelected ? 22 : 16,
+                                    fontWeight:
+                                        isSelected
+                                            ? FontWeight.w700
+                                            : FontWeight.w400,
+                                    color:
+                                        isSelected
+                                            ? _accentPrimary
+                                            : _textMuted.withOpacity(0.6),
+                                  ),
+                                  child: Text('${index + 1}'.padLeft(2, '0')),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      // Month picker
+                      Expanded(
+                        flex: 3,
+                        child: ListWheelScrollView.useDelegate(
+                          controller: _monthController,
+                          itemExtent: 48,
+                          diameterRatio: 1.2,
+                          perspective: 0.002,
+                          physics: const FixedExtentScrollPhysics(),
+                          onSelectedItemChanged: (index) {
+                            HapticFeedback.selectionClick();
+                            setState(() {
+                              _selectedMonth = index + 1;
+                              final maxDays = _getDaysInMonth(
+                                _selectedMonth,
+                                _selectedYear,
+                              );
+                              if (_selectedDay > maxDays) {
+                                _selectedDay = maxDays;
+                                _dayController.jumpToItem(_selectedDay - 1);
+                              }
+                            });
+                          },
+                          childDelegate: ListWheelChildBuilderDelegate(
+                            childCount: 12,
+                            builder: (context, index) {
+                              final isSelected = index + 1 == _selectedMonth;
+                              return Center(
+                                child: AnimatedDefaultTextStyle(
+                                  duration: const Duration(milliseconds: 150),
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: isSelected ? 18 : 14,
+                                    fontWeight:
+                                        isSelected
+                                            ? FontWeight.w700
+                                            : FontWeight.w400,
+                                    color:
+                                        isSelected
+                                            ? _accentPrimary
+                                            : _textMuted.withOpacity(0.6),
+                                  ),
+                                  child: Text(_months[index]),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      // Year picker
+                      Expanded(
+                        flex: 3,
+                        child: ListWheelScrollView.useDelegate(
+                          controller: _yearController,
+                          itemExtent: 48,
+                          diameterRatio: 1.2,
+                          perspective: 0.002,
+                          physics: const FixedExtentScrollPhysics(),
+                          onSelectedItemChanged: (index) {
+                            HapticFeedback.selectionClick();
+                            setState(() {
+                              _selectedYear = 1900 + index;
+                              final maxDays = _getDaysInMonth(
+                                _selectedMonth,
+                                _selectedYear,
+                              );
+                              if (_selectedDay > maxDays) {
+                                _selectedDay = maxDays;
+                                _dayController.jumpToItem(_selectedDay - 1);
+                              }
+                            });
+                          },
+                          childDelegate: ListWheelChildBuilderDelegate(
+                            childCount: 201,
+                            builder: (context, index) {
+                              final year = 1900 + index;
+                              final isSelected = year == _selectedYear;
+                              return Center(
+                                child: AnimatedDefaultTextStyle(
+                                  duration: const Duration(milliseconds: 150),
+                                  style: GoogleFonts.dmMono(
+                                    fontSize: isSelected ? 20 : 15,
+                                    fontWeight:
+                                        isSelected
+                                            ? FontWeight.w700
+                                            : FontWeight.w400,
+                                    color:
+                                        isSelected
+                                            ? _accentPrimary
+                                            : _textMuted.withOpacity(0.6),
+                                  ),
+                                  child: Text('$year'),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
+
+// Custom Time Picker Widget
+class _CustomTimePicker extends StatefulWidget {
+  final DateTime initialTime;
+  final Function(DateTime) onTimeSelected;
+
+  const _CustomTimePicker({
+    required this.initialTime,
+    required this.onTimeSelected,
+  });
+
+  @override
+  State<_CustomTimePicker> createState() => _CustomTimePickerState();
+}
+
+class _CustomTimePickerState extends State<_CustomTimePicker> {
+  late int _selectedHour;
+  late int _selectedMinute;
+  late bool _isAM;
+  late FixedExtentScrollController _hourController;
+  late FixedExtentScrollController _minuteController;
+
+  static const _bgPrimary = Color(0xFF0D0B14);
+  static const _bgSecondary = Color(0xFF131020);
+  static const _surfaceColor = Color(0xFF1A1625);
+  static const _borderColor = Color(0xFF2A2438);
+  static const _accentPrimary = Color(0xFFD4AF37);
+  static const _accentSecondary = Color(0xFFA78BFA);
+  static const _textPrimary = Color(0xFFF8F7FC);
+  static const _textMuted = Color(0xFF6B6478);
+
+  @override
+  void initState() {
+    super.initState();
+    final hour24 = widget.initialTime.hour;
+    _isAM = hour24 < 12;
+    _selectedHour = hour24 == 0 ? 12 : (hour24 > 12 ? hour24 - 12 : hour24);
+    _selectedMinute = widget.initialTime.minute;
+    _hourController = FixedExtentScrollController(
+      initialItem: _selectedHour - 1,
+    );
+    _minuteController = FixedExtentScrollController(
+      initialItem: _selectedMinute,
+    );
+  }
+
+  @override
+  void dispose() {
+    _hourController.dispose();
+    _minuteController.dispose();
+    super.dispose();
+  }
+
+  int _get24Hour() {
+    if (_isAM) {
+      return _selectedHour == 12 ? 0 : _selectedHour;
+    } else {
+      return _selectedHour == 12 ? 12 : _selectedHour + 12;
+    }
+  }
+
+  void _setCurrentTime() {
+    final now = DateTime.now();
+    final hour24 = now.hour;
+    setState(() {
+      _isAM = hour24 < 12;
+      _selectedHour = hour24 == 0 ? 12 : (hour24 > 12 ? hour24 - 12 : hour24);
+      _selectedMinute = now.minute;
+    });
+    _hourController.animateToItem(
+      _selectedHour - 1,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+    _minuteController.animateToItem(
+      _selectedMinute,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
+    );
+    HapticFeedback.mediumImpact();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final timeString =
+        '${_selectedHour.toString().padLeft(2, '0')}:${_selectedMinute.toString().padLeft(2, '0')} ${_isAM ? 'AM' : 'PM'}';
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.48,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [_bgSecondary, _bgPrimary],
+        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        children: [
+          const SizedBox(height: 12),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: _borderColor,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Header with prominent time display
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                // Selected time prominent display
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        _accentPrimary.withOpacity(0.12),
+                        _accentSecondary.withOpacity(0.08),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: _accentPrimary.withOpacity(0.2),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.schedule_rounded,
+                        size: 20,
+                        color: _accentSecondary,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        timeString,
+                        style: GoogleFonts.dmMono(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
+                          color: _textPrimary,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                // Quick actions row
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _setCurrentTime,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6EE7B7).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: const Color(0xFF6EE7B7).withOpacity(0.2),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.access_time_filled_rounded,
+                                size: 14,
+                                color: const Color(0xFF6EE7B7),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Now',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF6EE7B7),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _borderColor.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: _textMuted,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () {
+                        HapticFeedback.mediumImpact();
+                        Navigator.pop(context);
+                        widget.onTimeSelected(
+                          DateTime(
+                            widget.initialTime.year,
+                            widget.initialTime.month,
+                            widget.initialTime.day,
+                            _get24Hour(),
+                            _selectedMinute,
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              _accentPrimary,
+                              _accentPrimary.withOpacity(0.8),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _accentPrimary.withOpacity(0.25),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          'Confirm',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Time Picker
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  // Hour & Minute Pickers
+                  Expanded(
+                    flex: 4,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _surfaceColor.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: _borderColor.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          // Selection highlight
+                          Center(
+                            child: Container(
+                              height: 54,
+                              margin: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    _accentPrimary.withOpacity(0.12),
+                                    _accentPrimary.withOpacity(0.06),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _accentPrimary.withOpacity(0.25),
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Gradient fades
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: 40,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    _surfaceColor.withOpacity(0.9),
+                                    _surfaceColor.withOpacity(0.0),
+                                  ],
+                                ),
+                                borderRadius: const BorderRadius.vertical(
+                                  top: Radius.circular(16),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            height: 40,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                  colors: [
+                                    _surfaceColor.withOpacity(0.9),
+                                    _surfaceColor.withOpacity(0.0),
+                                  ],
+                                ),
+                                borderRadius: const BorderRadius.vertical(
+                                  bottom: Radius.circular(16),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              // Hour picker
+                              Expanded(
+                                child: ListWheelScrollView.useDelegate(
+                                  controller: _hourController,
+                                  itemExtent: 54,
+                                  diameterRatio: 1.2,
+                                  perspective: 0.002,
+                                  physics: const FixedExtentScrollPhysics(),
+                                  onSelectedItemChanged: (index) {
+                                    HapticFeedback.selectionClick();
+                                    setState(() => _selectedHour = index + 1);
+                                  },
+                                  childDelegate: ListWheelChildBuilderDelegate(
+                                    childCount: 12,
+                                    builder: (context, index) {
+                                      final hour = index + 1;
+                                      final isSelected = hour == _selectedHour;
+                                      return Center(
+                                        child: AnimatedDefaultTextStyle(
+                                          duration: const Duration(
+                                            milliseconds: 150,
+                                          ),
+                                          style: GoogleFonts.dmMono(
+                                            fontSize: isSelected ? 32 : 22,
+                                            fontWeight:
+                                                isSelected
+                                                    ? FontWeight.w700
+                                                    : FontWeight.w400,
+                                            color:
+                                                isSelected
+                                                    ? _accentPrimary
+                                                    : _textMuted.withOpacity(
+                                                      0.5,
+                                                    ),
+                                          ),
+                                          child: Text(
+                                            hour.toString().padLeft(2, '0'),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                              // Colon separator
+                              Text(
+                                ':',
+                                style: GoogleFonts.dmMono(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w700,
+                                  color: _accentPrimary,
+                                ),
+                              ),
+                              // Minute picker
+                              Expanded(
+                                child: ListWheelScrollView.useDelegate(
+                                  controller: _minuteController,
+                                  itemExtent: 54,
+                                  diameterRatio: 1.2,
+                                  perspective: 0.002,
+                                  physics: const FixedExtentScrollPhysics(),
+                                  onSelectedItemChanged: (index) {
+                                    HapticFeedback.selectionClick();
+                                    setState(() => _selectedMinute = index);
+                                  },
+                                  childDelegate: ListWheelChildBuilderDelegate(
+                                    childCount: 60,
+                                    builder: (context, index) {
+                                      final isSelected =
+                                          index == _selectedMinute;
+                                      return Center(
+                                        child: AnimatedDefaultTextStyle(
+                                          duration: const Duration(
+                                            milliseconds: 150,
+                                          ),
+                                          style: GoogleFonts.dmMono(
+                                            fontSize: isSelected ? 32 : 22,
+                                            fontWeight:
+                                                isSelected
+                                                    ? FontWeight.w700
+                                                    : FontWeight.w400,
+                                            color:
+                                                isSelected
+                                                    ? _accentPrimary
+                                                    : _textMuted.withOpacity(
+                                                      0.5,
+                                                    ),
+                                          ),
+                                          child: Text(
+                                            index.toString().padLeft(2, '0'),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  // AM/PM Selector
+                  Container(
+                    width: 72,
+                    decoration: BoxDecoration(
+                      color: _surfaceColor.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: _borderColor.withOpacity(0.3)),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            setState(() => _isAM = true);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 56,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            decoration: BoxDecoration(
+                              gradient:
+                                  _isAM
+                                      ? LinearGradient(
+                                        colors: [
+                                          _accentPrimary.withOpacity(0.2),
+                                          _accentPrimary.withOpacity(0.1),
+                                        ],
+                                      )
+                                      : null,
+                              color: _isAM ? null : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color:
+                                    _isAM
+                                        ? _accentPrimary.withOpacity(0.4)
+                                        : Colors.transparent,
+                                width: 1,
+                              ),
+                              boxShadow:
+                                  _isAM
+                                      ? [
+                                        BoxShadow(
+                                          color: _accentPrimary.withOpacity(
+                                            0.15,
+                                          ),
+                                          blurRadius: 8,
+                                        ),
+                                      ]
+                                      : null,
+                            ),
+                            child: Center(
+                              child: Text(
+                                'AM',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 15,
+                                  fontWeight:
+                                      _isAM ? FontWeight.w700 : FontWeight.w500,
+                                  color:
+                                      _isAM
+                                          ? _accentPrimary
+                                          : _textMuted.withOpacity(0.6),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        GestureDetector(
+                          onTap: () {
+                            HapticFeedback.selectionClick();
+                            setState(() => _isAM = false);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: 56,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            decoration: BoxDecoration(
+                              gradient:
+                                  !_isAM
+                                      ? LinearGradient(
+                                        colors: [
+                                          _accentPrimary.withOpacity(0.2),
+                                          _accentPrimary.withOpacity(0.1),
+                                        ],
+                                      )
+                                      : null,
+                              color: !_isAM ? null : Colors.transparent,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color:
+                                    !_isAM
+                                        ? _accentPrimary.withOpacity(0.4)
+                                        : Colors.transparent,
+                                width: 1,
+                              ),
+                              boxShadow:
+                                  !_isAM
+                                      ? [
+                                        BoxShadow(
+                                          color: _accentPrimary.withOpacity(
+                                            0.15,
+                                          ),
+                                          blurRadius: 8,
+                                        ),
+                                      ]
+                                      : null,
+                            ),
+                            child: Center(
+                              child: Text(
+                                'PM',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 15,
+                                  fontWeight:
+                                      !_isAM
+                                          ? FontWeight.w700
+                                          : FontWeight.w500,
+                                  color:
+                                      !_isAM
+                                          ? _accentPrimary
+                                          : _textMuted.withOpacity(0.6),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
