@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../../shared/models/kundali_data_model.dart';
 import '../../../core/providers/kundli_provider.dart';
 import '../../../core/services/kundali_calculation_service.dart';
+import '../../../core/services/sweph_service.dart';
 import '../widgets/kundali_chart_painter.dart';
 import '../widgets/interactive_kundli_chart.dart';
 import '../widgets/interactive_south_indian_chart.dart';
@@ -2998,6 +2999,8 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
               ),
             ],
           ),
+          // Data mode indicator - shows if using real Swiss Ephemeris or sample data
+          _buildDataModeIndicator(),
           const SizedBox(height: 12),
           AspectRatio(
             aspectRatio: 1,
@@ -3127,6 +3130,46 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
               });
             },
           ),
+    );
+  }
+
+  /// Build the data mode indicator showing if using real Swiss Ephemeris or sample data
+  Widget _buildDataModeIndicator() {
+    final isUsingRealData = SwephService.nativeLibraryAvailable;
+    final indicatorColor = isUsingRealData ? Colors.green : Colors.orange;
+    final icon =
+        isUsingRealData
+            ? Icons.precision_manufacturing_rounded
+            : Icons.data_object_rounded;
+    final text =
+        isUsingRealData
+            ? '🔬 Swiss Ephemeris (Accurate)'
+            : '📊 Sample Data (Demo)';
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: indicatorColor.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: indicatorColor.withOpacity(0.4), width: 0.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: indicatorColor),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: GoogleFonts.dmMono(
+              fontSize: 9,
+              fontWeight: FontWeight.w600,
+              color: indicatorColor,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

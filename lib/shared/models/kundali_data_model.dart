@@ -16,7 +16,7 @@ class KundaliData {
   final ChartStyle chartStyle;
   final String language;
 
-  // Calculated Data
+  // Calculated Data (currently static)
   final AscendantInfo ascendant;
   final Map<String, PlanetPosition> planetPositions;
   final List<House> houses;
@@ -63,7 +63,7 @@ class KundaliData {
     this.isPrimary = false,
   });
 
-  /// Create from birth details
+  /// Create from birth details using Swiss Ephemeris calculations
   factory KundaliData.fromBirthDetails({
     required String id,
     required String name,
@@ -77,52 +77,59 @@ class KundaliData {
     String language = 'English',
     bool isPrimary = false,
   }) {
-    // Calculate all astrological data
-    final planetPositions =
-        KundaliCalculationService.calculatePlanetaryPositions(
-          birthDateTime,
-          latitude,
-          longitude,
-        );
-
+    // Calculate planetary positions using Swiss Ephemeris
+    final planetPositions = KundaliCalculationService.calculatePlanetaryPositions(
+      birthDateTime: birthDateTime,
+      latitude: latitude,
+      longitude: longitude,
+      timezone: timezone,
+    );
+    
+    // Calculate ascendant using Swiss Ephemeris
     final ascendant = KundaliCalculationService.calculateAscendant(
-      birthDateTime,
-      latitude,
-      longitude,
+      birthDateTime: birthDateTime,
+      latitude: latitude,
+      longitude: longitude,
+      timezone: timezone,
     );
-
+    
+    // Calculate houses using Swiss Ephemeris
     final houses = KundaliCalculationService.calculateHouses(
-      ascendant.longitude,
+      birthDateTime: birthDateTime,
+      latitude: latitude,
+      longitude: longitude,
+      timezone: timezone,
+      planetPositions: planetPositions,
     );
+    
+    // Calculate Navamsa chart (D9)
+    final navamsaChart = KundaliCalculationService.calculateNavamsaChart(planetPositions);
+    
+    // Calculate Dasha info based on Moon's nakshatra
+    final moonPosition = planetPositions['Moon'];
+    final dashaInfo = moonPosition != null
+        ? KundaliCalculationService.calculateDashaInfo(birthDateTime, moonPosition.longitude)
+        : KundaliCalculationService.getSampleDashaInfo(birthDateTime);
 
-    // Assign planets to houses
-    KundaliCalculationService.assignPlanetsToHouses(
-      houses,
-      planetPositions,
-      ascendant.longitude,
-    );
+    // Extract key information from calculated data
+    final moonSign = planetPositions['Moon']?.sign ?? 'Aries';
+    final sunSign = planetPositions['Sun']?.sign ?? 'Aries';
+    final birthNakshatra = planetPositions['Moon']?.nakshatra ?? 'Ashwini';
+    
+    // Get nakshatra pada from Moon's position
+    int birthNakshatraPada = 1;
+    if (moonPosition != null) {
+      final nakshatraSpan = 360.0 / 27.0;
+      final degreeInNakshatra = moonPosition.longitude % nakshatraSpan;
+      final padaSpan = nakshatraSpan / 4.0;
+      birthNakshatraPada = (degreeInNakshatra / padaSpan).floor() + 1;
+    }
 
-    // Calculate Dasha
-    final moonPosition = planetPositions['Moon']!;
-    final dashaInfo = KundaliCalculationService.calculateVimshottariDasha(
-      birthDateTime,
-      moonPosition.longitude,
-    );
-
-    // Calculate Navamsa
-    final navamsaChart = KundaliCalculationService.calculateNavamsaChart(
-      planetPositions,
-    );
-
-    // Extract key information
-    final moonSign = planetPositions['Moon']!.sign;
-    final sunSign = planetPositions['Sun']!.sign;
-    final birthNakshatra = moonPosition.nakshatra;
-    final birthNakshatraPada = _calculateNakshatraPada(moonPosition.longitude);
-
-    // Check for Yogas and Doshas
-    final yogas = _checkYogas(planetPositions, houses);
-    final doshas = _checkDoshas(planetPositions, houses);
+    // Detect yogas based on planetary positions
+    final yogas = _detectYogas(planetPositions, ascendant);
+    
+    // Detect doshas based on planetary positions
+    final doshas = _detectDoshas(planetPositions);
 
     return KundaliData(
       id: id,
@@ -150,95 +157,141 @@ class KundaliData {
       isPrimary: isPrimary,
     );
   }
-
-  static int _calculateNakshatraPada(double moonLongitude) {
-    double nakshatraDegree = (moonLongitude % 360) * 27 / 360;
-    double padaPortion = (nakshatraDegree % 1) * 4;
-    return padaPortion.floor() + 1;
-  }
-
-  static List<String> _checkYogas(
-    Map<String, PlanetPosition> planets,
-    List<House> houses,
+  
+  /// Detect yogas based on planetary positions
+  static List<String> _detectYogas(
+    Map<String, PlanetPosition> positions,
+    AscendantInfo ascendant,
   ) {
-    List<String> yogas = [];
-
-    // Check for Gajakesari Yoga (Jupiter and Moon)
-    final jupiter = planets['Jupiter']!;
-    final moon = planets['Moon']!;
-    int houseDiff = (jupiter.house - moon.house).abs();
-    if (houseDiff == 0 || houseDiff == 4 || houseDiff == 7 || houseDiff == 10) {
-      yogas.add('Gajakesari Yoga');
+    final yogas = <String>[];
+    
+    // Gajakesari Yoga: Jupiter in kendra (1,4,7,10) from Moon
+    final moon = positions['Moon'];
+    final jupiter = positions['Jupiter'];
+    if (moon != null && jupiter != null) {
+      final moonHouse = moon.house;
+      final jupiterHouse = jupiter.house;
+      final distance = ((jupiterHouse - moonHouse).abs()) % 12;
+      if (distance == 0 || distance == 3 || distance == 6 || distance == 9) {
+        yogas.add('Gajakesari Yoga');
+      }
     }
-
-    // Check for Budhaditya Yoga (Sun and Mercury)
-    final sun = planets['Sun']!;
-    final mercury = planets['Mercury']!;
-    if (sun.house == mercury.house) {
+    
+    // Budhaditya Yoga: Sun and Mercury conjunct
+    final sun = positions['Sun'];
+    final mercury = positions['Mercury'];
+    if (sun != null && mercury != null && sun.sign == mercury.sign) {
       yogas.add('Budhaditya Yoga');
     }
-
-    // Check for Hamsa Yoga (Jupiter in Kendra)
-    if ([1, 4, 7, 10].contains(jupiter.house)) {
-      if (jupiter.sign == 'Sagittarius' ||
-          jupiter.sign == 'Pisces' ||
-          jupiter.sign == 'Cancer') {
+    
+    // Hamsa Yoga: Jupiter in kendra in own/exalted sign
+    if (jupiter != null) {
+      final jupiterHouse = jupiter.house;
+      final isKendra = jupiterHouse == 1 || jupiterHouse == 4 || jupiterHouse == 7 || jupiterHouse == 10;
+      final isStrong = jupiter.sign == 'Sagittarius' || jupiter.sign == 'Pisces' || jupiter.sign == 'Cancer';
+      if (isKendra && isStrong) {
         yogas.add('Hamsa Yoga');
       }
     }
-
-    // Add more yoga checks as needed
-
+    
+    // Malavya Yoga: Venus in kendra in own/exalted sign
+    final venus = positions['Venus'];
+    if (venus != null) {
+      final venusHouse = venus.house;
+      final isKendra = venusHouse == 1 || venusHouse == 4 || venusHouse == 7 || venusHouse == 10;
+      final isStrong = venus.sign == 'Taurus' || venus.sign == 'Libra' || venus.sign == 'Pisces';
+      if (isKendra && isStrong) {
+        yogas.add('Malavya Yoga');
+      }
+    }
+    
+    // Bhadra Yoga: Mercury in kendra in own/exalted sign
+    if (mercury != null) {
+      final mercuryHouse = mercury.house;
+      final isKendra = mercuryHouse == 1 || mercuryHouse == 4 || mercuryHouse == 7 || mercuryHouse == 10;
+      final isStrong = mercury.sign == 'Gemini' || mercury.sign == 'Virgo';
+      if (isKendra && isStrong) {
+        yogas.add('Bhadra Yoga');
+      }
+    }
+    
+    // Ruchaka Yoga: Mars in kendra in own/exalted sign
+    final mars = positions['Mars'];
+    if (mars != null) {
+      final marsHouse = mars.house;
+      final isKendra = marsHouse == 1 || marsHouse == 4 || marsHouse == 7 || marsHouse == 10;
+      final isStrong = mars.sign == 'Aries' || mars.sign == 'Scorpio' || mars.sign == 'Capricorn';
+      if (isKendra && isStrong) {
+        yogas.add('Ruchaka Yoga');
+      }
+    }
+    
+    // Sasa Yoga: Saturn in kendra in own/exalted sign
+    final saturn = positions['Saturn'];
+    if (saturn != null) {
+      final saturnHouse = saturn.house;
+      final isKendra = saturnHouse == 1 || saturnHouse == 4 || saturnHouse == 7 || saturnHouse == 10;
+      final isStrong = saturn.sign == 'Capricorn' || saturn.sign == 'Aquarius' || saturn.sign == 'Libra';
+      if (isKendra && isStrong) {
+        yogas.add('Sasa Yoga');
+      }
+    }
+    
     return yogas;
   }
-
-  static List<String> _checkDoshas(
-    Map<String, PlanetPosition> planets,
-    List<House> houses,
-  ) {
-    List<String> doshas = [];
-
-    // Check for Mangal Dosha
-    final mars = planets['Mars']!;
-    if ([1, 2, 4, 7, 8, 12].contains(mars.house)) {
-      doshas.add('Mangal Dosha');
+  
+  /// Detect doshas based on planetary positions
+  static List<String> _detectDoshas(Map<String, PlanetPosition> positions) {
+    final doshas = <String>[];
+    
+    // Manglik Dosha: Mars in 1, 4, 7, 8, or 12 house
+    final mars = positions['Mars'];
+    if (mars != null) {
+      final marsHouse = mars.house;
+      if (marsHouse == 1 || marsHouse == 4 || marsHouse == 7 || marsHouse == 8 || marsHouse == 12) {
+        doshas.add('Manglik Dosha');
+      }
     }
-
-    // Check for Kaal Sarp Dosha
-    final rahu = planets['Rahu']!;
-    final ketu = planets['Ketu']!;
-    bool allPlanetsBetweenNodes = true;
-
-    for (var planet in planets.values) {
-      if (planet.planet != 'Rahu' && planet.planet != 'Ketu') {
-        double relPos = (planet.longitude - rahu.longitude) % 360;
-        double ketuRelPos = (ketu.longitude - rahu.longitude) % 360;
-        if (relPos > ketuRelPos) {
-          allPlanetsBetweenNodes = false;
+    
+    // Kaal Sarp Dosha: All planets between Rahu and Ketu
+    final rahu = positions['Rahu'];
+    final ketu = positions['Ketu'];
+    if (rahu != null && ketu != null) {
+      final rahuLong = rahu.longitude;
+      final ketuLong = ketu.longitude;
+      bool allBetween = true;
+      
+      for (var entry in positions.entries) {
+        if (entry.key == 'Rahu' || entry.key == 'Ketu') continue;
+        final planetLong = entry.value.longitude;
+        
+        // Check if planet is between Rahu and Ketu
+        bool isBetween;
+        if (rahuLong < ketuLong) {
+          isBetween = planetLong > rahuLong && planetLong < ketuLong;
+        } else {
+          isBetween = planetLong > rahuLong || planetLong < ketuLong;
+        }
+        
+        if (!isBetween) {
+          allBetween = false;
           break;
         }
       }
+      
+      if (allBetween) {
+        doshas.add('Kaal Sarp Dosha');
+      }
     }
-
-    if (allPlanetsBetweenNodes) {
-      doshas.add('Kaal Sarp Dosha');
+    
+    // Pitra Dosha: Sun conjunct with Rahu or Ketu, or Sun in 9th house with malefic
+    final sun = positions['Sun'];
+    if (sun != null && rahu != null) {
+      if (sun.sign == rahu.sign) {
+        doshas.add('Pitra Dosha');
+      }
     }
-
-    // Check for Sade Sati (if Saturn is near Moon)
-    final saturn = planets['Saturn']!;
-    final moon = planets['Moon']!;
-    int moonSignIndex = KundaliCalculationService.zodiacSigns.indexOf(
-      moon.sign,
-    );
-    int saturnSignIndex = KundaliCalculationService.zodiacSigns.indexOf(
-      saturn.sign,
-    );
-
-    if ((saturnSignIndex - moonSignIndex).abs() <= 1 ||
-        (saturnSignIndex - moonSignIndex).abs() == 11) {
-      doshas.add('Sade Sati');
-    }
-
+    
     return doshas;
   }
 
@@ -264,7 +317,6 @@ class KundaliData {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
       'isPrimary': isPrimary,
-      // Store calculated data for offline access
       'ascendant': {
         'longitude': ascendant.longitude,
         'sign': ascendant.sign,
@@ -278,6 +330,7 @@ class KundaliData {
           'signDegree': value.signDegree,
           'nakshatra': value.nakshatra,
           'house': value.house,
+          'isRetrograde': value.isRetrograde,
         }),
       ),
       'dashaInfo': {
@@ -417,7 +470,6 @@ extension KundaliTypeExtension on KundaliType {
     }
   }
 
-  /// Get short name with D-chart notation
   String get shortName {
     switch (this) {
       case KundaliType.lagna:
@@ -465,7 +517,6 @@ extension KundaliTypeExtension on KundaliType {
     }
   }
 
-  /// Get subtitle/alternate name for display
   String get subtitle {
     switch (this) {
       case KundaliType.lagna:
@@ -560,7 +611,6 @@ extension KundaliTypeExtension on KundaliType {
     }
   }
 
-  /// Get the category of the chart type
   String get category {
     switch (this) {
       case KundaliType.lagna:
@@ -576,7 +626,6 @@ extension KundaliTypeExtension on KundaliType {
     }
   }
 
-  /// Get division number for divisional charts
   int? get division {
     switch (this) {
       case KundaliType.hora:
