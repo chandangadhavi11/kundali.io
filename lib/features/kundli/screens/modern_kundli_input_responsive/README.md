@@ -59,3 +59,5 @@ After generation → `ModernKundliDisplayScreen`
 - `intl` - Date formatting
 - `app_colors.dart` - Theme colors
 
+
+

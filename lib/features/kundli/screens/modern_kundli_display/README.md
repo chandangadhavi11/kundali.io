@@ -49,3 +49,5 @@ Full-featured modern Kundali chart display with tabbed sections and comprehensiv
 - `app_colors.dart` - Theme colors
 - `kundali_chart_painter.dart` - Chart rendering
 
+
+

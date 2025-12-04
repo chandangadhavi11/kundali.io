@@ -52,3 +52,5 @@ Uses `AuthProvider` for authentication state management.
 - `provider` - State management
 - `font_awesome_flutter` - Social login icons
 
+
+

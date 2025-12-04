@@ -79,7 +79,28 @@ class AppRouter {
       GoRoute(
         path: '/kundli/input',
         name: 'kundliInput',
-        builder: (context, state) => const KundliInputScreen(),
+        pageBuilder: (context, state) => CustomTransitionPage(
+          key: state.pageKey,
+          child: const KundliInputScreen(),
+          transitionDuration: const Duration(milliseconds: 200),
+          reverseTransitionDuration: const Duration(milliseconds: 150),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            // Fast, smooth slide-up transition
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.08),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+              )),
+              child: FadeTransition(
+                opacity: animation,
+                child: child,
+              ),
+            );
+          },
+        ),
       ),
       GoRoute(
         path: '/kundli/display',

@@ -26,3 +26,5 @@ Daily, weekly, and monthly horoscope predictions with zodiac-based content.
 - Animated star ratings
 - Share horoscope functionality
 
+
+

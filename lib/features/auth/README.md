@@ -29,3 +29,5 @@ Splash → Onboarding (first time) → Login/Signup → Profile Setup → Home
 - Form validation
 - Responsive layouts (mobile/tablet/desktop)
 
+
+

@@ -82,3 +82,5 @@ Uses `AuthProvider` for registration.
 - `provider` - State management
 - `intl` - Date formatting
 
+
+

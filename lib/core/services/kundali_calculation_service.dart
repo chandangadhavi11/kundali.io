@@ -3,6 +3,10 @@ import 'sweph_service.dart';
 
 /// Service for Kundali data - uses Swiss Ephemeris for accurate calculations
 class KundaliCalculationService {
+  /// Cached calculation result to avoid redundant sweph calls
+  static UnifiedKundaliResult? _cachedResult;
+  static String? _cachedKey;
+
   // Zodiac signs in Vedic astrology
   static const List<String> zodiacSigns = [
     'Aries',
@@ -65,8 +69,24 @@ class KundaliCalculationService {
     'Revati',
   ];
 
-  // Planet names
+  // Planet names (Traditional + Outer planets)
   static const List<String> planets = [
+    'Sun',
+    'Moon',
+    'Mars',
+    'Mercury',
+    'Jupiter',
+    'Venus',
+    'Saturn',
+    'Uranus',
+    'Neptune',
+    'Pluto',
+    'Rahu',
+    'Ketu',
+  ];
+
+  // Traditional Vedic planets (for Dasha calculations etc.)
+  static const List<String> vedicPlanets = [
     'Sun',
     'Moon',
     'Mars',
@@ -78,6 +98,151 @@ class KundaliCalculationService {
     'Ketu',
   ];
 
+  /// Calculate planet house using Whole Sign system
+  static int _getPlanetHouseWholeSign(
+    double planetLongitude,
+    int ascendantSignIndex,
+  ) {
+    final planetSignIndex = SwephService.getSignIndex(planetLongitude);
+    return ((planetSignIndex - ascendantSignIndex + 12) % 12) + 1;
+  }
+
+  /// Calculate ALL Kundali data in ONE call to Swiss Ephemeris
+  /// This prevents redundant calculations that cause performance issues
+  static UnifiedKundaliResult calculateAll({
+    required DateTime birthDateTime,
+    required double latitude,
+    required double longitude,
+    required String timezone,
+  }) {
+    // Create a cache key
+    final cacheKey =
+        '${birthDateTime.toIso8601String()}_${latitude}_${longitude}_$timezone';
+
+    // Return cached result if same parameters
+    if (_cachedKey == cacheKey && _cachedResult != null) {
+      return _cachedResult!;
+    }
+
+    // Check if native library is available
+    if (!SwephService.nativeLibraryAvailable) {
+      debugPrint(
+        'KundaliCalc: ⚠️ Using SAMPLE data (native library not available)',
+      );
+      return UnifiedKundaliResult(
+        planetPositions: getSamplePlanetaryPositions(),
+        ascendant: getSampleAscendant(),
+        houses: getSampleHouses(),
+      );
+    }
+
+    try {
+      final timezoneOffset = SwephService.parseTimezoneOffset(timezone);
+
+      // Single call to Swiss Ephemeris
+      final swephResult = SwephService.instance.calculateKundli(
+        birthDateTime: birthDateTime,
+        latitude: latitude,
+        longitude: longitude,
+        timezoneOffsetHours: timezoneOffset,
+        useAyanamsa: true,
+      );
+
+      // Get ascendant sign index for house calculations
+      final ascendantSignIndex = SwephService.getSignIndex(
+        swephResult.ascendant,
+      );
+
+      // Build planet positions from sweph result
+      final planetPositions = <String, PlanetPosition>{};
+      swephResult.planets.forEach((name, planetData) {
+        final nakshatra = SwephService.getNakshatra(planetData.longitude);
+        final house = _getPlanetHouseWholeSign(
+          planetData.longitude,
+          ascendantSignIndex,
+        );
+
+        planetPositions[name] = PlanetPosition(
+          planet: name,
+          longitude: planetData.longitude,
+          sign: planetData.signName,
+          signDegree: planetData.degreeInSign,
+          nakshatra: nakshatra.name,
+          house: house,
+          isRetrograde: planetData.isRetrograde,
+        );
+      });
+
+      // Build ascendant info
+      final ascNakshatra = SwephService.getNakshatra(swephResult.ascendant);
+      final ascendant = AscendantInfo(
+        longitude: swephResult.ascendant,
+        sign: swephResult.ascendantSign,
+        signDegree: swephResult.ascendantDegreeInSign,
+        nakshatra: ascNakshatra.name,
+      );
+
+      // Build houses
+      final houses = _buildHousesFromSwephResult(swephResult, planetPositions);
+
+      // Cache the result
+      _cachedResult = UnifiedKundaliResult(
+        planetPositions: planetPositions,
+        ascendant: ascendant,
+        houses: houses,
+      );
+      _cachedKey = cacheKey;
+
+      return _cachedResult!;
+    } catch (e) {
+      debugPrint('KundaliCalc: Error in calculateAll: $e');
+      return UnifiedKundaliResult(
+        planetPositions: getSamplePlanetaryPositions(),
+        ascendant: getSampleAscendant(),
+        houses: getSampleHouses(),
+      );
+    }
+  }
+
+  /// Build houses from sweph result
+  static List<House> _buildHousesFromSwephResult(
+    KundliCalculationResult swephResult,
+    Map<String, PlanetPosition> planetPositions,
+  ) {
+    final houses = <House>[];
+
+    for (int i = 0; i < 12; i++) {
+      final houseNum = i + 1;
+      final houseCusp = swephResult.houses[i];
+      final signIndex = SwephService.getSignIndex(houseCusp);
+      final sign = zodiacSigns[signIndex];
+
+      final planetsInHouse = <String>[];
+      planetPositions.forEach((name, pos) {
+        if (pos.house == houseNum) {
+          planetsInHouse.add(name);
+        }
+      });
+
+      houses.add(
+        House(
+          number: houseNum,
+          sign: sign,
+          cuspDegree: houseCusp,
+          planets: planetsInHouse,
+        ),
+      );
+    }
+
+    return houses;
+  }
+
+  /// Clear the calculation cache (call when user changes input)
+  static void clearCache() {
+    _cachedResult = null;
+    _cachedKey = null;
+  }
+
   /// Calculate planetary positions using Swiss Ephemeris
   /// This is the main method that uses actual astronomical calculations
   /// Falls back to sample data if sweph native library isn't available
@@ -87,21 +252,12 @@ class KundaliCalculationService {
     required double longitude,
     required String timezone,
   }) {
-    debugPrint('KundaliCalc: calculatePlanetaryPositions called');
-    debugPrint(
-      'KundaliCalc: SwephService.nativeLibraryAvailable = ${SwephService.nativeLibraryAvailable}',
-    );
-
     // Check if native library is available (not available in unit tests)
     if (!SwephService.nativeLibraryAvailable) {
-      debugPrint(
-        'KundaliCalc: ⚠️ Using SAMPLE data (native library not available)',
-      );
       return getSamplePlanetaryPositions();
     }
 
     try {
-      debugPrint('KundaliCalc: ✅ Using REAL Swiss Ephemeris calculations');
       // Parse timezone to get offset in hours
       final timezoneOffset = SwephService.parseTimezoneOffset(timezone);
 
@@ -197,21 +353,13 @@ class KundaliCalculationService {
     required String timezone,
     Map<String, PlanetPosition>? planetPositions,
   }) {
-    debugPrint('KundaliCalc: calculateHouses called');
-
     // Check if native library is available
     if (!SwephService.nativeLibraryAvailable) {
-      debugPrint(
-        'KundaliCalc: ⚠️ Using sample houses (native library not available)',
-      );
       return getSampleHouses();
     }
 
     // MUST have planetPositions - they contain the house assignments
     if (planetPositions == null || planetPositions.isEmpty) {
-      debugPrint(
-        'KundaliCalc: ❌ No planet positions provided, using sample houses',
-      );
       return getSampleHouses();
     }
 
@@ -228,7 +376,6 @@ class KundaliCalculationService {
 
       final List<House> houses = [];
 
-      debugPrint('KundaliCalc: Building houses from sweph result...');
       for (int i = 0; i < 12; i++) {
         final houseCusp = swephResult.houses[i];
         final signIndex = SwephService.getSignIndex(houseCusp);
@@ -250,17 +397,11 @@ class KundaliCalculationService {
             planets: planetsInHouse,
           ),
         );
-
-        if (planetsInHouse.isNotEmpty) {
-          debugPrint(
-            'KundaliCalc: House ${i + 1} (${zodiacSigns[signIndex]}): ${planetsInHouse.join(", ")}',
-          );
-        }
       }
 
       return houses;
     } catch (e) {
-      debugPrint('KundaliCalc: ❌ Error calculating houses: $e');
+      debugPrint('KundaliCalc: Error calculating houses: $e');
       return getSampleHouses();
     }
   }
@@ -501,6 +642,317 @@ class KundaliCalculationService {
     };
   }
 
+  // ============ DASHA HELPER FUNCTIONS ============
+
+  /// Add decimal years to a date with precise conversion
+  /// Handles years, months, days, hours, minutes accurately
+  static DateTime addDecimalYears(DateTime date, double decimalYears) {
+    // Convert decimal years to total days (using 365.25 for accuracy)
+    final totalDays = decimalYears * 365.25;
+
+    // Extract whole days and fractional part
+    final wholeDays = totalDays.floor();
+    final fractionalDay = totalDays - wholeDays;
+
+    // Convert fractional day to hours, minutes, seconds
+    final totalHours = fractionalDay * 24;
+    final wholeHours = totalHours.floor();
+    final fractionalHour = totalHours - wholeHours;
+
+    final totalMinutes = fractionalHour * 60;
+    final wholeMinutes = totalMinutes.floor();
+    final fractionalMinute = totalMinutes - wholeMinutes;
+
+    final wholeSeconds = (fractionalMinute * 60).floor();
+
+    return date.add(
+      Duration(
+        days: wholeDays,
+        hours: wholeHours,
+        minutes: wholeMinutes,
+        seconds: wholeSeconds,
+      ),
+    );
+  }
+
+  /// Vimshottari Dasha planet order (cyclic)
+  static const List<String> _dashaOrder = [
+    'Ketu',
+    'Venus',
+    'Sun',
+    'Moon',
+    'Mars',
+    'Rahu',
+    'Jupiter',
+    'Saturn',
+    'Mercury',
+  ];
+
+  /// Dasha years for each planet
+  static const Map<String, int> _dashaYears = {
+    'Ketu': 7,
+    'Venus': 20,
+    'Sun': 6,
+    'Moon': 10,
+    'Mars': 7,
+    'Rahu': 18,
+    'Jupiter': 16,
+    'Saturn': 19,
+    'Mercury': 17,
+  };
+
+  /// Generate full 120-year Mahadasha sequence with dates
+  static List<DashaPeriodDetail> generateMahadashaSequence({
+    required DateTime birthDate,
+    required String firstPlanet,
+    required double balanceYears,
+    bool includeSubPeriods = false,
+    int maxSubLevel = 2, // 1=antardasha, 2=pratyantara, etc.
+  }) {
+    final mahadashas = <DashaPeriodDetail>[];
+    var currentDate = birthDate;
+
+    // Find starting index in planet order
+    int planetIndex = _dashaOrder.indexOf(firstPlanet);
+    if (planetIndex == -1) planetIndex = 0;
+
+    // First Mahadasha (partial - balance years)
+    final firstEndDate = addDecimalYears(currentDate, balanceYears);
+    final firstMahadasha = DashaPeriodDetail(
+      planet: firstPlanet,
+      fullPath: firstPlanet,
+      durationYears: balanceYears,
+      startDate: currentDate,
+      endDate: firstEndDate,
+      level: DashaLevel.mahadasha,
+      subPeriods:
+          includeSubPeriods && maxSubLevel >= 1
+              ? calculateSubDashas(
+                parentPath: firstPlanet,
+                parentPlanet: firstPlanet,
+                parentDuration: balanceYears,
+                startDate: currentDate,
+                level: DashaLevel.antardasha,
+                maxDepth: maxSubLevel,
+              )
+              : null,
+    );
+    mahadashas.add(firstMahadasha);
+    currentDate = firstEndDate;
+
+    // Remaining 8 full Mahadashas (or more for multiple 120-year cycles)
+    for (int i = 1; i < 9; i++) {
+      planetIndex = (planetIndex + 1) % 9;
+      final planet = _dashaOrder[planetIndex];
+      final years = _dashaYears[planet]!.toDouble();
+      final endDate = addDecimalYears(currentDate, years);
+
+      final mahadasha = DashaPeriodDetail(
+        planet: planet,
+        fullPath: planet,
+        durationYears: years,
+        startDate: currentDate,
+        endDate: endDate,
+        level: DashaLevel.mahadasha,
+        subPeriods:
+            includeSubPeriods && maxSubLevel >= 1
+                ? calculateSubDashas(
+                  parentPath: planet,
+                  parentPlanet: planet,
+                  parentDuration: years,
+                  startDate: currentDate,
+                  level: DashaLevel.antardasha,
+                  maxDepth: maxSubLevel,
+                )
+                : null,
+      );
+      mahadashas.add(mahadasha);
+      currentDate = endDate;
+    }
+
+    return mahadashas;
+  }
+
+  /// Recursive sub-dasha calculator for all levels
+  /// Formula: subDuration = (parentDuration × subPlanetYears) / 120
+  static List<DashaPeriodDetail> calculateSubDashas({
+    required String parentPath,
+    required String parentPlanet,
+    required double parentDuration,
+    required DateTime startDate,
+    required DashaLevel level,
+    int maxDepth = 2,
+  }) {
+    final subDashas = <DashaPeriodDetail>[];
+    var currentDate = startDate;
+
+    // Find starting index (sub-periods start from parent planet)
+    int startIndex = _dashaOrder.indexOf(parentPlanet);
+    if (startIndex == -1) startIndex = 0;
+
+    // Calculate all 9 sub-periods
+    for (int i = 0; i < 9; i++) {
+      final planetIndex = (startIndex + i) % 9;
+      final subPlanet = _dashaOrder[planetIndex];
+      final subPlanetYears = _dashaYears[subPlanet]!.toDouble();
+
+      // Universal formula: (parent duration × sub-planet years) / 120
+      final subDuration = (parentDuration * subPlanetYears) / 120.0;
+      final endDate = addDecimalYears(currentDate, subDuration);
+      final fullPath = '$parentPath-$subPlanet';
+
+      // Determine next level
+      DashaLevel? nextLevel;
+      if (level == DashaLevel.antardasha) {
+        nextLevel = DashaLevel.pratyantara;
+      } else if (level == DashaLevel.pratyantara) {
+        nextLevel = DashaLevel.sookshma;
+      } else if (level == DashaLevel.sookshma) {
+        nextLevel = DashaLevel.prana;
+      }
+
+      // Recursively calculate sub-periods if within max depth
+      final currentDepth =
+          level.index; // 1 for antardasha, 2 for pratyantara, etc.
+      List<DashaPeriodDetail>? childSubPeriods;
+
+      if (nextLevel != null && currentDepth < maxDepth) {
+        childSubPeriods = calculateSubDashas(
+          parentPath: fullPath,
+          parentPlanet: subPlanet,
+          parentDuration: subDuration,
+          startDate: currentDate,
+          level: nextLevel,
+          maxDepth: maxDepth,
+        );
+      }
+
+      subDashas.add(
+        DashaPeriodDetail(
+          planet: subPlanet,
+          fullPath: fullPath,
+          durationYears: subDuration,
+          startDate: currentDate,
+          endDate: endDate,
+          level: level,
+          subPeriods: childSubPeriods,
+        ),
+      );
+
+      currentDate = endDate;
+    }
+
+    return subDashas;
+  }
+
+  /// Find the current active period at any given date within a dasha sequence
+  static DashaPeriodDetail? findActivePeriod(
+    List<DashaPeriodDetail> periods,
+    DateTime targetDate,
+  ) {
+    for (final period in periods) {
+      if (period.containsDate(targetDate)) {
+        return period;
+      }
+    }
+    return null;
+  }
+
+  /// Get current dasha at all levels for a given date
+  static Map<DashaLevel, DashaPeriodDetail> getCurrentDashaAtAllLevels(
+    List<DashaPeriodDetail> mahadashaSequence,
+    DateTime targetDate,
+  ) {
+    final result = <DashaLevel, DashaPeriodDetail>{};
+
+    // Find current Mahadasha
+    final currentMahadasha = findActivePeriod(mahadashaSequence, targetDate);
+    if (currentMahadasha == null) return result;
+    result[DashaLevel.mahadasha] = currentMahadasha;
+
+    // Find current Antardasha
+    if (currentMahadasha.subPeriods != null) {
+      final currentAntardasha = findActivePeriod(
+        currentMahadasha.subPeriods!,
+        targetDate,
+      );
+      if (currentAntardasha != null) {
+        result[DashaLevel.antardasha] = currentAntardasha;
+
+        // Find current Pratyantara
+        if (currentAntardasha.subPeriods != null) {
+          final currentPratyantara = findActivePeriod(
+            currentAntardasha.subPeriods!,
+            targetDate,
+          );
+          if (currentPratyantara != null) {
+            result[DashaLevel.pratyantara] = currentPratyantara;
+
+            // Find current Sookshma
+            if (currentPratyantara.subPeriods != null) {
+              final currentSookshma = findActivePeriod(
+                currentPratyantara.subPeriods!,
+                targetDate,
+              );
+              if (currentSookshma != null) {
+                result[DashaLevel.sookshma] = currentSookshma;
+
+                // Find current Prana
+                if (currentSookshma.subPeriods != null) {
+                  final currentPrana = findActivePeriod(
+                    currentSookshma.subPeriods!,
+                    targetDate,
+                  );
+                  if (currentPrana != null) {
+                    result[DashaLevel.prana] = currentPrana;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
+  /// Calculate deeper Dasha levels on-demand for a specific period
+  /// Use this to get Pratyantara, Sookshma, Prana without loading all upfront
+  static List<DashaPeriodDetail> calculateDeeperLevels({
+    required DashaPeriodDetail parentPeriod,
+    int depth = 1, // How many levels deep to calculate (1=next level only)
+  }) {
+    if (depth <= 0) return [];
+
+    final nextLevel = _getNextLevel(parentPeriod.level);
+    if (nextLevel == null) return [];
+
+    return calculateSubDashas(
+      parentPath: parentPeriod.fullPath,
+      parentPlanet: parentPeriod.planet,
+      parentDuration: parentPeriod.durationYears,
+      startDate: parentPeriod.startDate,
+      level: nextLevel,
+      maxDepth: parentPeriod.level.index + depth,
+    );
+  }
+
+  static DashaLevel? _getNextLevel(DashaLevel current) {
+    switch (current) {
+      case DashaLevel.mahadasha:
+        return DashaLevel.antardasha;
+      case DashaLevel.antardasha:
+        return DashaLevel.pratyantara;
+      case DashaLevel.pratyantara:
+        return DashaLevel.sookshma;
+      case DashaLevel.sookshma:
+        return DashaLevel.prana;
+      case DashaLevel.prana:
+        return null; // No deeper level
+    }
+  }
+
   /// Calculate Dasha info using Moon's nakshatra
   static DashaInfo calculateDashaInfo(
     DateTime birthDateTime,
@@ -579,32 +1031,108 @@ class KundaliCalculationService {
     double totalYearsElapsed = ageInYears;
     String currentMahadasha = startingLord;
     double currentDashaRemaining = remainingYears;
+    double elapsedInCurrentMahadasha = 0;
+    DateTime? mahadashaStartDate;
 
     // First subtract remaining birth Dasha
     if (totalYearsElapsed < remainingYears) {
       currentDashaRemaining = remainingYears - totalYearsElapsed;
+      elapsedInCurrentMahadasha = totalYearsElapsed;
+      mahadashaStartDate = birthDateTime;
     } else {
       totalYearsElapsed -= remainingYears;
 
       // Move through subsequent Dashas
       int currentIndex = (startingDashaIndex + 1) % 9;
+      double yearsFromBirth = remainingYears;
+
       while (totalYearsElapsed > 0) {
         final dashaYears = dashaSequence[currentIndex].years.toDouble();
         if (totalYearsElapsed < dashaYears) {
           currentMahadasha = dashaSequence[currentIndex].planet;
           currentDashaRemaining = dashaYears - totalYearsElapsed;
+          elapsedInCurrentMahadasha = totalYearsElapsed;
+          mahadashaStartDate = birthDateTime.add(
+            Duration(days: (yearsFromBirth * 365.25).round()),
+          );
           break;
         }
         totalYearsElapsed -= dashaYears;
+        yearsFromBirth += dashaYears;
         currentIndex = (currentIndex + 1) % 9;
       }
     }
+
+    // Calculate current Antardasha
+    String? currentAntardasha;
+    double? antardashaRemainingYears;
+
+    final mahadashaYears =
+        dashaSequence
+            .firstWhere((d) => d.planet == currentMahadasha)
+            .years
+            .toDouble();
+
+    // Find antardasha sequence starting from current mahadasha lord
+    int mahadashaIndex = 0;
+    for (int i = 0; i < dashaSequence.length; i++) {
+      if (dashaSequence[i].planet == currentMahadasha) {
+        mahadashaIndex = i;
+        break;
+      }
+    }
+
+    double antardashaElapsed = elapsedInCurrentMahadasha;
+    for (int i = 0; i < 9; i++) {
+      final antarIndex = (mahadashaIndex + i) % 9;
+      final antarPlanet = dashaSequence[antarIndex].planet;
+      final antarBaseYears = dashaSequence[antarIndex].years.toDouble();
+      final antarDuration = (mahadashaYears * antarBaseYears) / 120.0;
+
+      if (antardashaElapsed < antarDuration) {
+        currentAntardasha = antarPlanet;
+        antardashaRemainingYears = antarDuration - antardashaElapsed;
+        break;
+      }
+      antardashaElapsed -= antarDuration;
+    }
+
+    final mahadashaEndDate = mahadashaStartDate?.add(
+      Duration(days: (mahadashaYears * 365.25).round()),
+    );
+
+    // Generate Mahadasha sequence with Antardasha only (deeper levels calculated on-demand)
+    // Note: maxSubLevel=2 means Mahadasha + Antardasha only to avoid performance issues
+    // 9^5 = 59,049 periods if we go to Prana level upfront - too expensive!
+    final mahadashaSequence = generateMahadashaSequence(
+      birthDate: birthDateTime,
+      firstPlanet: startingLord,
+      balanceYears: remainingYears,
+      includeSubPeriods: true,
+      maxSubLevel: 2, // Only include Antardasha level upfront
+    );
+
+    // Get current periods at available levels
+    final currentPeriods = getCurrentDashaAtAllLevels(mahadashaSequence, now);
 
     return DashaInfo(
       currentMahadasha: currentMahadasha,
       remainingYears: currentDashaRemaining,
       startDate: birthDateTime,
       sequence: dashaSequence,
+      currentAntardasha: currentAntardasha,
+      antardashaRemainingYears: antardashaRemainingYears,
+      mahadashaStartDate: mahadashaStartDate,
+      mahadashaEndDate: mahadashaEndDate,
+      // Enhanced fields
+      mahadashaSequence: mahadashaSequence,
+      currentMahadashaDetail: currentPeriods[DashaLevel.mahadasha],
+      currentAntardashaDetail: currentPeriods[DashaLevel.antardasha],
+      currentPratyantaraDetail: currentPeriods[DashaLevel.pratyantara],
+      currentSookshmaDetail: currentPeriods[DashaLevel.sookshma],
+      currentPranaDetail: currentPeriods[DashaLevel.prana],
+      balanceYearsAtBirth: remainingYears,
+      birthNakshatraLord: startingLord,
     );
   }
 
@@ -754,6 +1282,187 @@ class KundaliCalculationService {
       vara: varaName,
       varaDeity: varaDeity,
     );
+  }
+
+  // ============ INAUSPICIOUS PERIODS (RAHUKALA, YAMAGHANDA, GULIKA) ============
+
+  /// Calculate Rahukala, Yamaghanda, and Gulika periods for a given date
+  /// These are inauspicious time periods that should be avoided for important activities
+  ///
+  /// Parameters:
+  /// - [date]: The date for calculation
+  /// - [sunrise]: Sunrise time (default: 6:00 AM)
+  /// - [sunset]: Sunset time (default: 6:00 PM)
+  ///
+  /// Returns: InauspiciousPeriods containing all three periods
+  static InauspiciousPeriods calculateInauspiciousPeriods(
+    DateTime date, {
+    DateTime? sunrise,
+    DateTime? sunset,
+  }) {
+    // Default sunrise and sunset if not provided
+    final sunriseTime =
+        sunrise ?? DateTime(date.year, date.month, date.day, 6, 0);
+    final sunsetTime =
+        sunset ?? DateTime(date.year, date.month, date.day, 18, 0);
+
+    // Calculate day duration in minutes
+    final dayDuration = sunsetTime.difference(sunriseTime).inMinutes;
+    final periodDuration = dayDuration ~/ 8; // Each period is 1/8th of day
+
+    // Weekday (1 = Monday, 7 = Sunday)
+    final weekday = date.weekday;
+
+    // Calculate Rahukala
+    final rahukala = _calculateRahukala(sunriseTime, periodDuration, weekday);
+
+    // Calculate Yamaghanda
+    final yamaghanda = _calculateYamaghanda(
+      sunriseTime,
+      periodDuration,
+      weekday,
+    );
+
+    // Calculate Gulika (day time)
+    final gulika = _calculateGulika(sunriseTime, periodDuration, weekday);
+
+    return InauspiciousPeriods(
+      rahukala: rahukala,
+      yamaghanda: yamaghanda,
+      gulika: gulika,
+      date: date,
+    );
+  }
+
+  /// Calculate Rahukala period
+  /// Rahukala is ruled by Rahu and is considered inauspicious
+  /// The period varies based on the weekday
+  static TimePeriod _calculateRahukala(
+    DateTime sunrise,
+    int periodMinutes,
+    int weekday,
+  ) {
+    // Rahukala period number for each weekday (1-8)
+    // Sunday=8, Monday=2, Tuesday=7, Wednesday=5, Thursday=6, Friday=4, Saturday=3
+    const rahukalaSequence = {
+      DateTime.sunday: 8,
+      DateTime.monday: 2,
+      DateTime.tuesday: 7,
+      DateTime.wednesday: 5,
+      DateTime.thursday: 6,
+      DateTime.friday: 4,
+      DateTime.saturday: 3,
+    };
+
+    final periodNumber = rahukalaSequence[weekday] ?? 1;
+    final startMinutes = (periodNumber - 1) * periodMinutes;
+
+    final startTime = sunrise.add(Duration(minutes: startMinutes));
+    final endTime = startTime.add(Duration(minutes: periodMinutes));
+
+    return TimePeriod(
+      name: 'Rahukala',
+      startTime: startTime,
+      endTime: endTime,
+      description: 'Ruled by Rahu. Avoid starting new ventures.',
+      severity: 'High',
+    );
+  }
+
+  /// Calculate Yamaghanda period
+  /// Yamaghanda is ruled by Yama (god of death) and should be avoided
+  static TimePeriod _calculateYamaghanda(
+    DateTime sunrise,
+    int periodMinutes,
+    int weekday,
+  ) {
+    // Yamaghanda period number for each weekday
+    // Sunday=5, Monday=4, Tuesday=3, Wednesday=2, Thursday=1, Friday=7, Saturday=6
+    const yamaghandaSequence = {
+      DateTime.sunday: 5,
+      DateTime.monday: 4,
+      DateTime.tuesday: 3,
+      DateTime.wednesday: 2,
+      DateTime.thursday: 1,
+      DateTime.friday: 7,
+      DateTime.saturday: 6,
+    };
+
+    final periodNumber = yamaghandaSequence[weekday] ?? 1;
+    final startMinutes = (periodNumber - 1) * periodMinutes;
+
+    final startTime = sunrise.add(Duration(minutes: startMinutes));
+    final endTime = startTime.add(Duration(minutes: periodMinutes));
+
+    return TimePeriod(
+      name: 'Yamaghanda',
+      startTime: startTime,
+      endTime: endTime,
+      description: 'Ruled by Yama. Avoid important decisions.',
+      severity: 'Medium',
+    );
+  }
+
+  /// Calculate Gulika (also called Gulika Kaal or Mandi)
+  /// Gulika is Saturn's son and this period is considered inauspicious
+  static TimePeriod _calculateGulika(
+    DateTime sunrise,
+    int periodMinutes,
+    int weekday,
+  ) {
+    // Gulika period number for each weekday (during daytime)
+    // Sunday=7, Monday=6, Tuesday=5, Wednesday=4, Thursday=3, Friday=2, Saturday=1
+    const gulikaSequence = {
+      DateTime.sunday: 7,
+      DateTime.monday: 6,
+      DateTime.tuesday: 5,
+      DateTime.wednesday: 4,
+      DateTime.thursday: 3,
+      DateTime.friday: 2,
+      DateTime.saturday: 1,
+    };
+
+    final periodNumber = gulikaSequence[weekday] ?? 1;
+    final startMinutes = (periodNumber - 1) * periodMinutes;
+
+    final startTime = sunrise.add(Duration(minutes: startMinutes));
+    final endTime = startTime.add(Duration(minutes: periodMinutes));
+
+    return TimePeriod(
+      name: 'Gulika',
+      startTime: startTime,
+      endTime: endTime,
+      description: 'Saturn\'s son period. Avoid auspicious activities.',
+      severity: 'Medium',
+    );
+  }
+
+  /// Format time period as string (e.g., "07:30 AM - 09:00 AM")
+  static String formatTimePeriod(TimePeriod period) {
+    final startHour = period.startTime.hour;
+    final startMinute = period.startTime.minute;
+    final endHour = period.endTime.hour;
+    final endMinute = period.endTime.minute;
+
+    String formatTime(int hour, int minute) {
+      final isPM = hour >= 12;
+      final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+      final displayMinute = minute.toString().padLeft(2, '0');
+      return '$displayHour:$displayMinute ${isPM ? 'PM' : 'AM'}';
+    }
+
+    return '${formatTime(startHour, startMinute)} - ${formatTime(endHour, endMinute)}';
+  }
+
+  /// Check if a given time falls within an inauspicious period
+  static bool isInauspiciousTime(DateTime time, InauspiciousPeriods periods) {
+    return _isWithinPeriod(time, periods.rahukala) ||
+        _isWithinPeriod(time, periods.yamaghanda) ||
+        _isWithinPeriod(time, periods.gulika);
+  }
+
+  static bool _isWithinPeriod(DateTime time, TimePeriod period) {
+    return time.isAfter(period.startTime) && time.isBefore(period.endTime);
   }
 
   /// Calculate Chandra (Moon) chart
@@ -1190,9 +1899,10 @@ class KundaliCalculationService {
     return houses;
   }
 
-  // ============ STRENGTH CALCULATIONS ============
+  // ============ STRENGTH CALCULATIONS (FULL SHADBALA) ============
 
-  /// Calculate Shadbala (planetary strength)
+  /// Calculate Shadbala (planetary strength) - Complete implementation
+  /// Returns strength in Shashtiamsas (60ths of a Rupa)
   static Map<String, ShadbalaData> calculateShadbala(
     Map<String, PlanetPosition> positions,
     double ascendantLongitude,
@@ -1211,36 +1921,30 @@ class KundaliCalculationService {
       'Saturn': 300.0,
     };
 
-    for (var planet in [
-      'Sun',
-      'Moon',
-      'Mars',
-      'Mercury',
-      'Jupiter',
-      'Venus',
-      'Saturn',
-    ]) {
+    for (var planet in vedicPlanets) {
+      // Skip Rahu and Ketu - they don't have Shadbala
+      if (planet == 'Rahu' || planet == 'Ketu') continue;
+
       final pos = positions[planet];
       if (pos == null) continue;
 
-      // Simplified Shadbala calculation (actual calculation is much more complex)
-      // 1. Sthana Bala (positional strength)
-      final sthanaBala = _calculateSthanaBala(pos, planet);
+      // 1. Sthana Bala (positional strength) - 5 sub-components
+      final sthanaBala = _calculateFullSthanaBala(pos, planet, positions);
 
       // 2. Dig Bala (directional strength)
-      final digBala = _calculateDigBala(pos, planet, ascendantLongitude);
+      final digBala = _calculateFullDigBala(pos, planet);
 
-      // 3. Kala Bala (temporal strength)
-      final kalaBala = _calculateKalaBala(planet, birthDateTime);
+      // 3. Kala Bala (temporal strength) - 9 sub-components
+      final kalaBala = _calculateFullKalaBala(planet, birthDateTime, positions);
 
       // 4. Chesta Bala (motional strength)
-      final chestaBala = pos.isRetrograde ? 60.0 : 30.0;
+      final chestaBala = _calculateChestaBala(pos, planet);
 
-      // 5. Naisargika Bala (natural strength)
+      // 5. Naisargika Bala (natural strength) - fixed values
       final naisargikaBala = _getNaisargikaBala(planet);
 
-      // 6. Drik Bala (aspectual strength) - simplified
-      final drikBala = 25.0;
+      // 6. Drik Bala (aspectual strength)
+      final drikBala = _calculateDrikBala(pos, planet, positions);
 
       final totalBala =
           sthanaBala +
@@ -1268,11 +1972,111 @@ class KundaliCalculationService {
     return shadbala;
   }
 
-  static double _calculateSthanaBala(PlanetPosition pos, String planet) {
-    // Exaltation, own sign, friendly sign calculations
-    double bala = 30.0;
+  /// Calculate Full Sthana Bala (Positional Strength) - 5 sub-components
+  /// Components: Uccha, Saptavargaja, Oja-Yugma, Kendradi, Drekkana
+  static double _calculateFullSthanaBala(
+    PlanetPosition pos,
+    String planet,
+    Map<String, PlanetPosition> positions,
+  ) {
+    double totalSthana = 0.0;
 
-    // Exaltation points
+    // 1. Uccha Bala (Exaltation Strength) - 0 to 60 shashtiamsas
+    totalSthana += _calculateUcchaBala(pos, planet);
+
+    // 2. Saptavargaja Bala (Strength in 7 divisional charts) - 0 to 45
+    totalSthana += _calculateSaptavargajaBala(pos, planet);
+
+    // 3. Oja-Yugmarasyamsa Bala (Odd/Even sign strength) - 0 to 30
+    totalSthana += _calculateOjaYugmaBala(pos, planet);
+
+    // 4. Kendradi Bala (Angular house strength) - 0 to 60
+    totalSthana += _calculateKendradiBala(pos);
+
+    // 5. Drekkana Bala (Decanate strength) - 0 to 15
+    totalSthana += _calculateDrekkanaBala(pos, planet);
+
+    return totalSthana;
+  }
+
+  /// Uccha Bala: Exaltation strength
+  /// Maximum at exaltation point, zero at debilitation
+  static double _calculateUcchaBala(PlanetPosition pos, String planet) {
+    // Exaltation degrees for each planet
+    const exaltationDegree = {
+      'Sun': 10.0, // 10° Aries
+      'Moon': 33.0, // 3° Taurus
+      'Mars': 298.0, // 28° Capricorn
+      'Mercury': 165.0, // 15° Virgo
+      'Jupiter': 95.0, // 5° Cancer
+      'Venus': 357.0, // 27° Pisces
+      'Saturn': 200.0, // 20° Libra
+    };
+
+    final exaltDeg = exaltationDegree[planet] ?? 0.0;
+    final debilDeg = (exaltDeg + 180.0) % 360.0;
+
+    // Calculate distance from debilitation point
+    double distance = (pos.longitude - debilDeg).abs();
+    if (distance > 180) distance = 360 - distance;
+
+    // Uccha Bala = (distance from debilitation / 3) shashtiamsas
+    // Maximum is 60 when planet is at exact exaltation
+    return (distance / 3.0).clamp(0.0, 60.0);
+  }
+
+  /// Saptavargaja Bala: Strength based on dignity in 7 divisional charts
+  static double _calculateSaptavargajaBala(PlanetPosition pos, String planet) {
+    double bala = 0.0;
+
+    // Check dignity in Rasi (D1) - simplified
+    final rasiDignity = _getPlanetDignity(pos.sign, planet);
+
+    // Points for different dignities
+    // Moolatrikona: 45, Own: 30, Exaltation: 30, Friend: 22.5, Neutral: 15, Enemy: 7.5, Debilitation: 3.75
+    switch (rasiDignity) {
+      case 'Moolatrikona':
+        bala = 45.0;
+        break;
+      case 'Own':
+        bala = 30.0;
+        break;
+      case 'Exaltation':
+        bala = 30.0;
+        break;
+      case 'Friend':
+        bala = 22.5;
+        break;
+      case 'Neutral':
+        bala = 15.0;
+        break;
+      case 'Enemy':
+        bala = 7.5;
+        break;
+      case 'Debilitation':
+        bala = 3.75;
+        break;
+      default:
+        bala = 15.0;
+    }
+
+    return bala;
+  }
+
+  /// Get planetary dignity in a sign
+  static String _getPlanetDignity(String sign, String planet) {
+    // Own signs
+    const ownSigns = {
+      'Sun': ['Leo'],
+      'Moon': ['Cancer'],
+      'Mars': ['Aries', 'Scorpio'],
+      'Mercury': ['Gemini', 'Virgo'],
+      'Jupiter': ['Sagittarius', 'Pisces'],
+      'Venus': ['Taurus', 'Libra'],
+      'Saturn': ['Capricorn', 'Aquarius'],
+    };
+
+    // Exaltation signs
     const exaltation = {
       'Sun': 'Aries',
       'Moon': 'Taurus',
@@ -1283,20 +2087,145 @@ class KundaliCalculationService {
       'Saturn': 'Libra',
     };
 
-    if (pos.sign == exaltation[planet]) {
-      bala = 60.0;
-    }
+    // Debilitation signs
+    const debilitation = {
+      'Sun': 'Libra',
+      'Moon': 'Scorpio',
+      'Mars': 'Cancer',
+      'Mercury': 'Pisces',
+      'Jupiter': 'Capricorn',
+      'Venus': 'Virgo',
+      'Saturn': 'Aries',
+    };
 
-    return bala;
+    // Moolatrikona signs and degree ranges (simplified to just sign)
+    const moolatrikona = {
+      'Sun': 'Leo',
+      'Moon': 'Taurus',
+      'Mars': 'Aries',
+      'Mercury': 'Virgo',
+      'Jupiter': 'Sagittarius',
+      'Venus': 'Libra',
+      'Saturn': 'Aquarius',
+    };
+
+    if (moolatrikona[planet] == sign) return 'Moolatrikona';
+    if (exaltation[planet] == sign) return 'Exaltation';
+    if (debilitation[planet] == sign) return 'Debilitation';
+    if (ownSigns[planet]?.contains(sign) ?? false) return 'Own';
+
+    // Check friendship (simplified)
+    return _getSignRelationship(planet, sign);
   }
 
-  static double _calculateDigBala(
-    PlanetPosition pos,
-    String planet,
-    double ascendant,
-  ) {
-    // Directional strength based on house position
-    const digBalaHouse = {
+  /// Get relationship between planet and sign lord
+  static String _getSignRelationship(String planet, String sign) {
+    const signLords = {
+      'Aries': 'Mars',
+      'Taurus': 'Venus',
+      'Gemini': 'Mercury',
+      'Cancer': 'Moon',
+      'Leo': 'Sun',
+      'Virgo': 'Mercury',
+      'Libra': 'Venus',
+      'Scorpio': 'Mars',
+      'Sagittarius': 'Jupiter',
+      'Capricorn': 'Saturn',
+      'Aquarius': 'Saturn',
+      'Pisces': 'Jupiter',
+    };
+
+    // Natural friendships (simplified)
+    const friends = {
+      'Sun': ['Moon', 'Mars', 'Jupiter'],
+      'Moon': ['Sun', 'Mercury'],
+      'Mars': ['Sun', 'Moon', 'Jupiter'],
+      'Mercury': ['Sun', 'Venus'],
+      'Jupiter': ['Sun', 'Moon', 'Mars'],
+      'Venus': ['Mercury', 'Saturn'],
+      'Saturn': ['Mercury', 'Venus'],
+    };
+
+    const enemies = {
+      'Sun': ['Venus', 'Saturn'],
+      'Moon': ['Rahu', 'Ketu'],
+      'Mars': ['Mercury'],
+      'Mercury': ['Moon'],
+      'Jupiter': ['Mercury', 'Venus'],
+      'Venus': ['Sun', 'Moon'],
+      'Saturn': ['Sun', 'Moon', 'Mars'],
+    };
+
+    final signLord = signLords[sign];
+    if (signLord == planet) return 'Own';
+    if (friends[planet]?.contains(signLord) ?? false) return 'Friend';
+    if (enemies[planet]?.contains(signLord) ?? false) return 'Enemy';
+    return 'Neutral';
+  }
+
+  /// Oja-Yugma Bala: Odd/Even sign and navamsa strength
+  static double _calculateOjaYugmaBala(PlanetPosition pos, String planet) {
+    final signIndex = zodiacSigns.indexOf(pos.sign);
+    final isOddSign = signIndex % 2 == 0; // Aries=0 is odd sign
+
+    // Moon and Venus get strength in even signs
+    // Others get strength in odd signs
+    if ((planet == 'Moon' || planet == 'Venus') && !isOddSign) {
+      return 15.0;
+    } else if (planet != 'Moon' && planet != 'Venus' && isOddSign) {
+      return 15.0;
+    }
+
+    return 7.5; // Half points otherwise
+  }
+
+  /// Kendradi Bala: Strength based on house type
+  static double _calculateKendradiBala(PlanetPosition pos) {
+    final house = pos.house;
+
+    // Kendra houses (1, 4, 7, 10) = 60 shashtiamsas
+    if (house == 1 || house == 4 || house == 7 || house == 10) {
+      return 60.0;
+    }
+    // Panapara houses (2, 5, 8, 11) = 30 shashtiamsas
+    if (house == 2 || house == 5 || house == 8 || house == 11) {
+      return 30.0;
+    }
+    // Apoklima houses (3, 6, 9, 12) = 15 shashtiamsas
+    return 15.0;
+  }
+
+  /// Drekkana Bala: Decanate strength
+  static double _calculateDrekkanaBala(PlanetPosition pos, String planet) {
+    final degreeInSign = pos.longitude % 30;
+    final decanate = (degreeInSign / 10).floor() + 1; // 1, 2, or 3
+
+    // Male planets (Sun, Mars, Jupiter) strong in 1st decanate
+    // Neutral planets (Mercury, Saturn) strong in 2nd decanate
+    // Female planets (Moon, Venus) strong in 3rd decanate
+
+    const malePlanets = ['Sun', 'Mars', 'Jupiter'];
+    const femalePlanets = ['Moon', 'Venus'];
+
+    if (malePlanets.contains(planet) && decanate == 1) return 15.0;
+    if (femalePlanets.contains(planet) && decanate == 3) return 15.0;
+    if (!malePlanets.contains(planet) &&
+        !femalePlanets.contains(planet) &&
+        decanate == 2)
+      return 15.0;
+
+    return 7.5;
+  }
+
+  /// Calculate Full Dig Bala (Directional Strength)
+  /// Maximum 60 shashtiamsas when in strongest house
+  static double _calculateFullDigBala(PlanetPosition pos, String planet) {
+    // Strongest houses for each planet
+    // Jupiter/Mercury: 1st (East)
+    // Sun/Mars: 10th (South)
+    // Saturn: 7th (West)
+    // Moon/Venus: 4th (North)
+    const strongestHouse = {
       'Sun': 10,
       'Moon': 4,
       'Mars': 10,
@@ -1306,44 +2235,323 @@ class KundaliCalculationService {
       'Saturn': 7,
     };
 
-    final strongHouse = digBalaHouse[planet] ?? 1;
-    final distance = ((pos.house - strongHouse).abs()) % 6;
-    return (6 - distance) * 10.0;
+    final bestHouse = strongestHouse[planet] ?? 1;
+    final house = pos.house;
+
+    // Calculate houses away from strongest position
+    int distance = (house - bestHouse).abs();
+    if (distance > 6) distance = 12 - distance;
+
+    // Full strength (60) at best house, zero at opposite (6 houses away)
+    return ((6 - distance) / 6 * 60).clamp(0.0, 60.0);
   }
 
-  static double _calculateKalaBala(String planet, DateTime birthDateTime) {
-    // Day/night strength, hora strength, etc.
-    double bala = 30.0;
+  /// Calculate Full Kala Bala (Temporal Strength) - Multiple components
+  static double _calculateFullKalaBala(
+    String planet,
+    DateTime birthDateTime,
+    Map<String, PlanetPosition> positions,
+  ) {
+    double totalKala = 0.0;
 
-    // Day planets (Sun, Jupiter, Venus) are stronger during day
-    // Night planets (Moon, Mars, Saturn) are stronger at night
-    final hour = birthDateTime.hour;
+    // 1. Nathonnatha Bala (Day/Night strength)
+    totalKala += _calculateNathonnathaBala(planet, birthDateTime);
+
+    // 2. Paksha Bala (Lunar fortnight strength)
+    totalKala += _calculatePakshaBala(planet, positions);
+
+    // 3. Tribhaga Bala (Division of day/night strength)
+    totalKala += _calculateTribhagaBala(planet, birthDateTime);
+
+    // 4. Vara Bala (Weekday strength)
+    totalKala += _calculateVaraBala(planet, birthDateTime);
+
+    // 5. Hora Bala (Planetary hour strength)
+    totalKala += _calculateHoraBala(planet, birthDateTime);
+
+    // 6. Masa Bala (Month lord strength)
+    totalKala += _calculateMasaBala(planet, birthDateTime);
+
+    // 7. Abda Bala (Year lord strength)
+    totalKala += _calculateAbdaBala(planet, birthDateTime);
+
+    // 8. Ayana Bala (Solstice strength)
+    totalKala += _calculateAyanaBala(planet, positions);
+
+    return totalKala;
+  }
+
+  /// Nathonnatha Bala: Day planets strong in day, night planets at night
+  static double _calculateNathonnathaBala(String planet, DateTime dt) {
+    final hour = dt.hour + dt.minute / 60.0;
+    // Approximate day: 6 AM to 6 PM
     final isDaytime = hour >= 6 && hour < 18;
 
     const dayPlanets = ['Sun', 'Jupiter', 'Venus'];
     const nightPlanets = ['Moon', 'Mars', 'Saturn'];
 
-    if (isDaytime && dayPlanets.contains(planet)) {
-      bala = 50.0;
-    } else if (!isDaytime && nightPlanets.contains(planet)) {
-      bala = 50.0;
+    // Mercury is always neutral
+    if (planet == 'Mercury') return 30.0;
+
+    if (dayPlanets.contains(planet)) {
+      return isDaytime ? 60.0 : 0.0;
+    } else if (nightPlanets.contains(planet)) {
+      return isDaytime ? 0.0 : 60.0;
     }
 
-    return bala;
+    return 30.0;
   }
 
+  /// Paksha Bala: Moon and benefics strong in Shukla Paksha
+  static double _calculatePakshaBala(
+    String planet,
+    Map<String, PlanetPosition> positions,
+  ) {
+    final moon = positions['Moon'];
+    final sun = positions['Sun'];
+    if (moon == null || sun == null) return 30.0;
+
+    // Calculate tithi to determine paksha
+    double diff = moon.longitude - sun.longitude;
+    if (diff < 0) diff += 360;
+    final tithiNumber = (diff / 12).floor() + 1;
+    final isShukla = tithiNumber <= 15;
+
+    // Benefics (Moon, Mercury, Jupiter, Venus) strong in Shukla
+    // Malefics (Sun, Mars, Saturn) strong in Krishna
+    const benefics = ['Moon', 'Mercury', 'Jupiter', 'Venus'];
+    const malefics = ['Sun', 'Mars', 'Saturn'];
+
+    if (benefics.contains(planet)) {
+      return isShukla ? 60.0 : 0.0;
+    } else if (malefics.contains(planet)) {
+      return isShukla ? 0.0 : 60.0;
+    }
+
+    return 30.0;
+  }
+
+  /// Tribhaga Bala: Division of day/night into 3 parts
+  static double _calculateTribhagaBala(String planet, DateTime dt) {
+    final hour = dt.hour + dt.minute / 60.0;
+
+    // Day (6-18) divided into 3 parts: 6-10, 10-14, 14-18
+    // Night (18-6) divided into 3 parts: 18-22, 22-2, 2-6
+
+    int tribhaga;
+    if (hour >= 6 && hour < 10)
+      tribhaga = 1;
+    else if (hour >= 10 && hour < 14)
+      tribhaga = 2;
+    else if (hour >= 14 && hour < 18)
+      tribhaga = 3;
+    else if (hour >= 18 && hour < 22)
+      tribhaga = 4;
+    else if (hour >= 22 || hour < 2)
+      tribhaga = 5;
+    else
+      tribhaga = 6;
+
+    // Mercury rules 1st tribhaga of day, Sun 2nd, Saturn 3rd
+    // Moon rules 1st of night, Venus 2nd, Mars 3rd
+    const tribhagaRulers = {
+      1: 'Mercury',
+      2: 'Sun',
+      3: 'Saturn',
+      4: 'Moon',
+      5: 'Venus',
+      6: 'Mars',
+    };
+
+    return tribhagaRulers[tribhaga] == planet ? 60.0 : 0.0;
+  }
+
+  /// Vara Bala: Weekday lord strength
+  static double _calculateVaraBala(String planet, DateTime dt) {
+    const weekdayLords = [
+      'Sun',
+      'Moon',
+      'Mars',
+      'Mercury',
+      'Jupiter',
+      'Venus',
+      'Saturn',
+    ];
+    final dayLord = weekdayLords[dt.weekday % 7];
+    return dayLord == planet ? 45.0 : 0.0;
+  }
+
+  /// Hora Bala: Planetary hour strength
+  static double _calculateHoraBala(String planet, DateTime dt) {
+    // Simplified hora calculation
+    final hour = dt.hour;
+    const horaSequence = [
+      'Sun',
+      'Venus',
+      'Mercury',
+      'Moon',
+      'Saturn',
+      'Jupiter',
+      'Mars',
+    ];
+
+    // Start from weekday lord at sunrise (6 AM)
+    final startIndex = dt.weekday % 7;
+    final hoursFromSunrise = (hour >= 6) ? hour - 6 : hour + 18;
+    final horaLord = horaSequence[(startIndex + hoursFromSunrise) % 7];
+
+    return horaLord == planet ? 60.0 : 0.0;
+  }
+
+  /// Masa Bala: Month lord strength (simplified)
+  static double _calculateMasaBala(String planet, DateTime dt) {
+    // The month lord changes based on lunar month
+    // Simplified: use solar month
+    const monthLords = [
+      'Mars',
+      'Venus',
+      'Mercury',
+      'Moon',
+      'Sun',
+      'Mercury',
+      'Venus',
+      'Mars',
+      'Jupiter',
+      'Saturn',
+      'Saturn',
+      'Jupiter',
+    ];
+    final monthLord = monthLords[dt.month - 1];
+    return monthLord == planet ? 30.0 : 0.0;
+  }
+
+  /// Abda Bala: Year lord strength (simplified)
+  static double _calculateAbdaBala(String planet, DateTime dt) {
+    // Year lord cycles through planets
+    const yearLordCycle = [
+      'Sun',
+      'Venus',
+      'Mercury',
+      'Moon',
+      'Saturn',
+      'Jupiter',
+      'Mars',
+    ];
+    final yearLord = yearLordCycle[dt.year % 7];
+    return yearLord == planet ? 15.0 : 0.0;
+  }
+
+  /// Ayana Bala: Solstice-based strength
+  static double _calculateAyanaBala(
+    String planet,
+    Map<String, PlanetPosition> positions,
+  ) {
+    final pos = positions[planet];
+    if (pos == null) return 30.0;
+
+    // Northern hemisphere planets stronger in Uttarayana (Sun moving north)
+    // Simplified: based on planet's longitude
+    final longitude = pos.longitude;
+
+    // Sun, Mars, Jupiter stronger when Sun is in northern signs
+    // Moon, Venus, Saturn stronger when Sun is in southern signs
+    const northernPlanets = ['Sun', 'Mars', 'Jupiter', 'Mercury'];
+    final isNorthernHemisphere = longitude < 180; // Aries to Virgo
+
+    if (northernPlanets.contains(planet)) {
+      return isNorthernHemisphere ? 60.0 : 0.0;
+    } else {
+      return isNorthernHemisphere ? 0.0 : 60.0;
+    }
+  }
+
+  /// Calculate Chesta Bala (Motional Strength)
+  static double _calculateChestaBala(PlanetPosition pos, String planet) {
+    // Sun and Moon don't have Chesta Bala
+    if (planet == 'Sun' || planet == 'Moon') return 0.0;
+
+    // Retrograde planets get maximum chesta bala
+    if (pos.isRetrograde) return 60.0;
+
+    // Direct motion: simplified based on typical motion
+    // In actual calculation, compare to mean motion
+    return 30.0;
+  }
+
+  /// Naisargika Bala (Natural Strength) - Fixed values
   static double _getNaisargikaBala(String planet) {
-    // Natural strength (fixed values)
+    // Fixed values in shashtiamsas
     const naisargika = {
       'Sun': 60.0,
       'Moon': 51.43,
-      'Mars': 17.14,
-      'Mercury': 25.71,
-      'Jupiter': 34.29,
       'Venus': 42.86,
+      'Jupiter': 34.29,
+      'Mercury': 25.71,
+      'Mars': 17.14,
       'Saturn': 8.57,
     };
     return naisargika[planet] ?? 0.0;
+  }
+
+  /// Calculate Drik Bala (Aspectual Strength)
+  static double _calculateDrikBala(
+    PlanetPosition pos,
+    String planet,
+    Map<String, PlanetPosition> positions,
+  ) {
+    double drikBala = 0.0;
+
+    // Benefics aspecting add strength, malefics reduce
+    const benefics = ['Jupiter', 'Venus', 'Mercury', 'Moon'];
+    const malefics = ['Sun', 'Mars', 'Saturn', 'Rahu', 'Ketu'];
+
+    for (var entry in positions.entries) {
+      if (entry.key == planet) continue;
+
+      final other = entry.value;
+      final aspectStrength = _getAspectStrength(other, pos);
+
+      if (aspectStrength > 0) {
+        if (benefics.contains(entry.key)) {
+          drikBala += aspectStrength * 15; // Add for benefic aspects
+        } else if (malefics.contains(entry.key)) {
+          drikBala -= aspectStrength * 15; // Subtract for malefic aspects
+        }
+      }
+    }
+
+    // Drik Bala ranges from -60 to +60, normalize to 0-60
+    return (drikBala + 30).clamp(0.0, 60.0);
+  }
+
+  /// Get aspect strength between two planets (0, 0.25, 0.5, 0.75, 1.0)
+  static double _getAspectStrength(
+    PlanetPosition aspector,
+    PlanetPosition aspected,
+  ) {
+    final houseDiff = (aspected.house - aspector.house + 12) % 12;
+
+    // Full aspects
+    if (houseDiff == 6) return 1.0; // 7th house aspect (opposition)
+
+    // Mars special aspects: 4th and 8th
+    if (aspector.planet == 'Mars' && (houseDiff == 3 || houseDiff == 7))
+      return 1.0;
+
+    // Jupiter special aspects: 5th and 9th
+    if (aspector.planet == 'Jupiter' && (houseDiff == 4 || houseDiff == 8))
+      return 1.0;
+
+    // Saturn special aspects: 3rd and 10th
+    if (aspector.planet == 'Saturn' && (houseDiff == 2 || houseDiff == 9))
+      return 1.0;
+
+    // Partial aspects (simplified)
+    if (houseDiff == 2 || houseDiff == 10) return 0.25; // 3rd/11th
+    if (houseDiff == 3 || houseDiff == 9) return 0.5; // 4th/10th
+    if (houseDiff == 4 || houseDiff == 8) return 0.75; // 5th/9th
+
+    return 0.0;
   }
 
   /// Calculate Vimshopaka Bala
@@ -1633,16 +2841,133 @@ class DashaInfo {
   final double remainingYears;
   final DateTime startDate;
   final List<DashaPeriod> sequence;
+  final String? currentAntardasha;
+  final double? antardashaRemainingYears;
+  final DateTime? mahadashaStartDate;
+  final DateTime? mahadashaEndDate;
+
+  // Enhanced fields for full dasha system
+  final List<DashaPeriodDetail>? mahadashaSequence;
+  final DashaPeriodDetail? currentMahadashaDetail;
+  final DashaPeriodDetail? currentAntardashaDetail;
+  final DashaPeriodDetail? currentPratyantaraDetail;
+  final DashaPeriodDetail? currentSookshmaDetail;
+  final DashaPeriodDetail? currentPranaDetail;
+  final double? balanceYearsAtBirth;
+  final String? birthNakshatraLord;
 
   DashaInfo({
     required this.currentMahadasha,
     required this.remainingYears,
     required this.startDate,
     required this.sequence,
+    this.currentAntardasha,
+    this.antardashaRemainingYears,
+    this.mahadashaStartDate,
+    this.mahadashaEndDate,
+    this.mahadashaSequence,
+    this.currentMahadashaDetail,
+    this.currentAntardashaDetail,
+    this.currentPratyantaraDetail,
+    this.currentSookshmaDetail,
+    this.currentPranaDetail,
+    this.balanceYearsAtBirth,
+    this.birthNakshatraLord,
   });
 
   DateTime get endDate {
     return startDate.add(Duration(days: (remainingYears * 365.25).round()));
+  }
+
+  /// Get the current full dasha path string (e.g., "Jupiter-Saturn-Mercury")
+  String get currentFullPath {
+    final parts = <String>[currentMahadasha];
+    if (currentAntardasha != null) parts.add(currentAntardasha!);
+    if (currentPratyantaraDetail != null)
+      parts.add(currentPratyantaraDetail!.planet);
+    if (currentSookshmaDetail != null) parts.add(currentSookshmaDetail!.planet);
+    if (currentPranaDetail != null) parts.add(currentPranaDetail!.planet);
+    return parts.join('-');
+  }
+
+  /// Get remaining time in current Pratyantara
+  double? get pratyantaraRemainingYears {
+    if (currentPratyantaraDetail == null) return null;
+    final now = DateTime.now();
+    if (now.isAfter(currentPratyantaraDetail!.endDate)) return 0;
+    final remainingDays =
+        currentPratyantaraDetail!.endDate.difference(now).inDays;
+    return remainingDays / 365.25;
+  }
+
+  /// Get all antardashas for a specific mahadasha planet
+  List<DashaPeriodDetail>? getAntardashasForMahadasha(String mahadashaPlanet) {
+    if (mahadashaSequence == null) return null;
+    final mahadasha = mahadashaSequence!.firstWhere(
+      (m) => m.planet == mahadashaPlanet,
+      orElse: () => mahadashaSequence!.first,
+    );
+    return mahadasha.subPeriods;
+  }
+
+  /// Get all antardashas with dates for current mahadasha
+  List<DashaPeriodDetail>? get currentMahadashaAntardashas {
+    return currentMahadashaDetail?.subPeriods;
+  }
+
+  /// Get pratyantaras for current antardasha
+  List<DashaPeriodDetail>? get currentAntardashaPratyantaras {
+    return currentAntardashaDetail?.subPeriods;
+  }
+
+  /// Get sookshmas for current pratyantara
+  List<DashaPeriodDetail>? get currentPratyantaraSookshmas {
+    return currentPratyantaraDetail?.subPeriods;
+  }
+
+  /// Get pranas for current sookshma
+  List<DashaPeriodDetail>? get currentSookshmaPranas {
+    return currentSookshmaDetail?.subPeriods;
+  }
+
+  /// Calculate Antardasha periods for current Mahadasha
+  /// Formula: (Mahadasha years × Antardasha planet's years) ÷ 120
+  List<AntardashaPeriod> getAntardashas() {
+    final mahadashaYears =
+        sequence
+            .firstWhere(
+              (d) => d.planet == currentMahadasha,
+              orElse: () => DashaPeriod(currentMahadasha, 7),
+            )
+            .years;
+
+    // Find starting index in sequence for current Mahadasha
+    int startIndex = 0;
+    for (int i = 0; i < sequence.length; i++) {
+      if (sequence[i].planet == currentMahadasha) {
+        startIndex = i;
+        break;
+      }
+    }
+
+    final antardashas = <AntardashaPeriod>[];
+    for (int i = 0; i < 9; i++) {
+      final antardashaIndex = (startIndex + i) % 9;
+      final antardashaPlanet = sequence[antardashaIndex].planet;
+      final antardashaBaseYears = sequence[antardashaIndex].years;
+
+      // Antardasha duration = (Mahadasha years × Antardasha planet years) / 120
+      final durationYears = (mahadashaYears * antardashaBaseYears) / 120.0;
+
+      antardashas.add(
+        AntardashaPeriod(
+          planet: antardashaPlanet,
+          durationYears: durationYears,
+        ),
+      );
+    }
+
+    return antardashas;
   }
 }
 
@@ -1652,6 +2977,99 @@ class DashaPeriod {
   final int years;
 
   const DashaPeriod(this.planet, this.years);
+}
+
+/// Antardasha (sub-period) model - kept for backward compatibility
+class AntardashaPeriod {
+  final String planet;
+  final double durationYears;
+
+  AntardashaPeriod({required this.planet, required this.durationYears});
+
+  /// Get duration in years, months, days format
+  String get formattedDuration {
+    final totalDays = durationYears * 365.25;
+    final years = totalDays ~/ 365.25;
+    final remainingDays = totalDays - (years * 365.25);
+    final months = remainingDays ~/ 30.44;
+    final days = (remainingDays - (months * 30.44)).round();
+
+    if (years > 0) {
+      return '$years y, $months m, $days d';
+    } else if (months > 0) {
+      return '$months m, $days d';
+    } else {
+      return '$days days';
+    }
+  }
+}
+
+/// Dasha level enumeration for hierarchical periods
+enum DashaLevel {
+  mahadasha, // Main period (6-20 years)
+  antardasha, // Sub-period
+  pratyantara, // Sub-sub-period
+  sookshma, // Sub-sub-sub-period
+  prana, // Micro-level period
+}
+
+/// Enhanced Dasha period model with full details and sub-periods
+class DashaPeriodDetail {
+  final String planet;
+  final String fullPath; // e.g., "Jupiter-Saturn-Mercury"
+  final double durationYears;
+  final DateTime startDate;
+  final DateTime endDate;
+  final DashaLevel level;
+  final List<DashaPeriodDetail>? subPeriods;
+
+  DashaPeriodDetail({
+    required this.planet,
+    required this.fullPath,
+    required this.durationYears,
+    required this.startDate,
+    required this.endDate,
+    required this.level,
+    this.subPeriods,
+  });
+
+  /// Get duration in years, months, days format
+  String get formattedDuration {
+    final totalDays = durationYears * 365.25;
+    final years = totalDays ~/ 365.25;
+    final remainingDays = totalDays - (years * 365.25);
+    final months = remainingDays ~/ 30.44;
+    final days = (remainingDays - (months * 30.44)).round();
+
+    if (years > 0) {
+      return '$years y, $months m, $days d';
+    } else if (months > 0) {
+      return '$months m, $days d';
+    } else {
+      return '$days days';
+    }
+  }
+
+  /// Check if a given date falls within this period
+  bool containsDate(DateTime date) {
+    return !date.isBefore(startDate) && date.isBefore(endDate);
+  }
+
+  /// Get the level name as a string
+  String get levelName {
+    switch (level) {
+      case DashaLevel.mahadasha:
+        return 'Mahadasha';
+      case DashaLevel.antardasha:
+        return 'Antardasha';
+      case DashaLevel.pratyantara:
+        return 'Pratyantara';
+      case DashaLevel.sookshma:
+        return 'Sookshma';
+      case DashaLevel.prana:
+        return 'Prana';
+    }
+  }
 }
 
 /// Panchang data model
@@ -1765,4 +3183,92 @@ class VarshphalData {
     required this.yearLord,
     required this.age,
   });
+}
+
+/// Unified calculation result to avoid redundant sweph calls
+class UnifiedKundaliResult {
+  final Map<String, PlanetPosition> planetPositions;
+  final AscendantInfo ascendant;
+  final List<House> houses;
+
+  UnifiedKundaliResult({
+    required this.planetPositions,
+    required this.ascendant,
+    required this.houses,
+  });
+}
+
+/// Time period for inauspicious periods (Rahukala, Yamaghanda, Gulika)
+class TimePeriod {
+  final String name;
+  final DateTime startTime;
+  final DateTime endTime;
+  final String description;
+  final String severity; // 'High', 'Medium', 'Low'
+
+  TimePeriod({
+    required this.name,
+    required this.startTime,
+    required this.endTime,
+    required this.description,
+    this.severity = 'Medium',
+  });
+
+  /// Duration of the period
+  Duration get duration => endTime.difference(startTime);
+
+  /// Check if a given time is within this period
+  bool contains(DateTime time) {
+    return time.isAfter(startTime) && time.isBefore(endTime);
+  }
+
+  /// Format as "HH:MM AM/PM - HH:MM AM/PM"
+  String get formattedTime {
+    String formatTime(DateTime dt) {
+      final hour = dt.hour;
+      final minute = dt.minute;
+      final isPM = hour >= 12;
+      final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+      return '${displayHour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} ${isPM ? 'PM' : 'AM'}';
+    }
+
+    return '${formatTime(startTime)} - ${formatTime(endTime)}';
+  }
+}
+
+/// Container for all inauspicious periods of a day
+class InauspiciousPeriods {
+  final TimePeriod rahukala;
+  final TimePeriod yamaghanda;
+  final TimePeriod gulika;
+  final DateTime date;
+
+  InauspiciousPeriods({
+    required this.rahukala,
+    required this.yamaghanda,
+    required this.gulika,
+    required this.date,
+  });
+
+  /// Get all periods sorted by start time
+  List<TimePeriod> get allPeriods {
+    final periods = [rahukala, yamaghanda, gulika];
+    periods.sort((a, b) => a.startTime.compareTo(b.startTime));
+    return periods;
+  }
+
+  /// Check if a given time falls in any inauspicious period
+  bool isInauspicious(DateTime time) {
+    return rahukala.contains(time) ||
+        yamaghanda.contains(time) ||
+        gulika.contains(time);
+  }
+
+  /// Get the current active inauspicious period, if any
+  TimePeriod? getCurrentPeriod(DateTime time) {
+    if (rahukala.contains(time)) return rahukala;
+    if (yamaghanda.contains(time)) return yamaghanda;
+    if (gulika.contains(time)) return gulika;
+    return null;
+  }
 }

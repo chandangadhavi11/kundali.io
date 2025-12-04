@@ -22,6 +22,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   // Scroll controller
   final ScrollController _scrollController = ScrollController();
+  
+  // Navigation loading state
+  bool _isNavigating = false;
 
   @override
   void initState() {
@@ -129,6 +132,10 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
           ),
+          
+          // Navigation Loading Overlay
+          if (_isNavigating)
+            _buildNavigationLoader(),
         ],
       ),
     );
@@ -610,9 +617,24 @@ class _HomeScreenState extends State<HomeScreen>
     required String route,
   }) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        if (_isNavigating) return; // Prevent double taps
         HapticFeedback.mediumImpact();
-        context.go(route);
+        
+        // Show loading overlay immediately for instant feedback
+        setState(() => _isNavigating = true);
+        
+        // Short delay to render the loader
+        await Future.delayed(const Duration(milliseconds: 100));
+        
+        if (!mounted) return;
+        context.push(route);
+        
+        // Keep loader visible during transition, then hide
+        await Future.delayed(const Duration(milliseconds: 300));
+        if (mounted) {
+          setState(() => _isNavigating = false);
+        }
       },
       child: Container(
         height: 100,
@@ -999,6 +1021,87 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  Widget _buildNavigationLoader() {
+    return AnimatedOpacity(
+      opacity: _isNavigating ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 150),
+      child: Container(
+        color: const Color(0xFF0A0612).withOpacity(0.85),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Cosmic loading spinner
+              SizedBox(
+                width: 60,
+                height: 60,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Outer ring
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0, end: 1),
+                      duration: const Duration(milliseconds: 1500),
+                      builder: (context, value, child) {
+                        return Transform.rotate(
+                          angle: value * 2 * math.pi,
+                          child: Container(
+                            width: 60,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: const Color(0xFFE8B931).withOpacity(0.3),
+                                width: 2,
+                              ),
+                            ),
+                            child: CustomPaint(
+                              painter: _LoaderArcPainter(
+                                color: const Color(0xFFE8B931),
+                                progress: value,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    // Inner glow
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            const Color(0xFFE8B931).withOpacity(0.2),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Center icon
+                    const Text('✨', style: TextStyle(fontSize: 20)),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Loading text
+              Text(
+                'Opening Birth Chart...',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.9),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildAnimatedItem({required double delay, required Widget child}) {
     return AnimatedBuilder(
       animation: _staggerController,
@@ -1052,5 +1155,33 @@ class _HomeScreenState extends State<HomeScreen>
       'Pisces': '♓',
     };
     return symbols[sign] ?? '✦';
+  }
+}
+
+// Custom painter for the loading arc animation
+class _LoaderArcPainter extends CustomPainter {
+  final Color color;
+  final double progress;
+
+  _LoaderArcPainter({required this.color, required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    final startAngle = -math.pi / 2;
+    final sweepAngle = math.pi * 0.8;
+    
+    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _LoaderArcPainter oldDelegate) {
+    return oldDelegate.progress != progress;
   }
 }

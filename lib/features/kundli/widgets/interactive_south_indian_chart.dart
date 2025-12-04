@@ -719,9 +719,21 @@ class _HouseDetailModal extends StatelessWidget {
   }
 
   Color _getPlanetColor(String planet) {
-    final hash = planet.hashCode;
-    final hue = (hash % 360).abs().toDouble();
-    return HSLColor.fromAHSL(1.0, hue, 0.6, 0.5).toColor();
+    const colors = {
+      'Sun': Color(0xFFD4AF37),      // Gold
+      'Moon': Color(0xFF6EE7B7),     // Mint green
+      'Mars': Color(0xFFF87171),     // Red
+      'Mercury': Color(0xFF34D399),  // Emerald
+      'Jupiter': Color(0xFFFBBF24),  // Amber
+      'Venus': Color(0xFFF472B6),    // Pink
+      'Saturn': Color(0xFF9CA3AF),   // Gray
+      'Uranus': Color(0xFF22D3EE),   // Cyan
+      'Neptune': Color(0xFF818CF8),  // Indigo
+      'Pluto': Color(0xFF94A3B8),    // Slate
+      'Rahu': Color(0xFFA78BFA),     // Purple
+      'Ketu': Color(0xFFC2410C),     // Orange-red
+    };
+    return colors[planet] ?? const Color(0xFF9CA3AF);
   }
 }
 

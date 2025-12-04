@@ -66,3 +66,5 @@ Carousel of user reviews with:
 - `font_awesome_flutter` - Icons
 - `app_colors.dart` - Theme colors
 
+
+

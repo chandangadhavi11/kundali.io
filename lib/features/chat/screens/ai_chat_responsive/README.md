@@ -47,3 +47,5 @@ class ChatMessage {
 ## Dependencies
 - `app_colors.dart` - Theme colors
 
+
+

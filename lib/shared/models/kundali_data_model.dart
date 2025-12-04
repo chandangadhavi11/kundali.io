@@ -77,35 +77,22 @@ class KundaliData {
     String language = 'English',
     bool isPrimary = false,
   }) {
-    // Calculate planetary positions using Swiss Ephemeris
-    final planetPositions = KundaliCalculationService.calculatePlanetaryPositions(
+    // Use unified calculation to avoid multiple Swiss Ephemeris calls
+    final unifiedResult = KundaliCalculationService.calculateAll(
       birthDateTime: birthDateTime,
       latitude: latitude,
       longitude: longitude,
       timezone: timezone,
     );
-    
-    // Calculate ascendant using Swiss Ephemeris
-    final ascendant = KundaliCalculationService.calculateAscendant(
-      birthDateTime: birthDateTime,
-      latitude: latitude,
-      longitude: longitude,
-      timezone: timezone,
-    );
-    
-    // Calculate houses using Swiss Ephemeris
-    final houses = KundaliCalculationService.calculateHouses(
-      birthDateTime: birthDateTime,
-      latitude: latitude,
-      longitude: longitude,
-      timezone: timezone,
-      planetPositions: planetPositions,
-    );
-    
-    // Calculate Navamsa chart (D9)
+
+    final planetPositions = unifiedResult.planetPositions;
+    final ascendant = unifiedResult.ascendant;
+    final houses = unifiedResult.houses;
+
+    // Calculate Navamsa chart (D9) - this is pure calculation, no sweph call
     final navamsaChart = KundaliCalculationService.calculateNavamsaChart(planetPositions);
-    
-    // Calculate Dasha info based on Moon's nakshatra
+
+    // Calculate Dasha info based on Moon's nakshatra - this is pure calculation, no sweph call
     final moonPosition = planetPositions['Moon'];
     final dashaInfo = moonPosition != null
         ? KundaliCalculationService.calculateDashaInfo(birthDateTime, moonPosition.longitude)
@@ -158,36 +145,44 @@ class KundaliData {
     );
   }
   
-  /// Detect yogas based on planetary positions
+  /// Helper to check if a house is a Kendra (1, 4, 7, 10)
+  static bool _isKendra(int house) => house == 1 || house == 4 || house == 7 || house == 10;
+  
+  /// Helper to check if a house is a Trikona (1, 5, 9)
+  static bool _isTrikona(int house) => house == 1 || house == 5 || house == 9;
+  
+  /// Helper to check if planets are conjunct (same sign)
+  static bool _areConjunct(PlanetPosition? p1, PlanetPosition? p2) {
+    if (p1 == null || p2 == null) return false;
+    return p1.sign == p2.sign;
+  }
+  
+  /// Helper to get house distance from Moon
+  static int _houseFromMoon(PlanetPosition? planet, PlanetPosition? moon) {
+    if (planet == null || moon == null) return -1;
+    return ((planet.house - moon.house + 12) % 12) + 1;
+  }
+
+  /// Detect yogas based on planetary positions (expanded with 15+ yogas)
   static List<String> _detectYogas(
     Map<String, PlanetPosition> positions,
     AscendantInfo ascendant,
   ) {
     final yogas = <String>[];
     
-    // Gajakesari Yoga: Jupiter in kendra (1,4,7,10) from Moon
-    final moon = positions['Moon'];
-    final jupiter = positions['Jupiter'];
-    if (moon != null && jupiter != null) {
-      final moonHouse = moon.house;
-      final jupiterHouse = jupiter.house;
-      final distance = ((jupiterHouse - moonHouse).abs()) % 12;
-      if (distance == 0 || distance == 3 || distance == 6 || distance == 9) {
-        yogas.add('Gajakesari Yoga');
-      }
-    }
-    
-    // Budhaditya Yoga: Sun and Mercury conjunct
     final sun = positions['Sun'];
+    final moon = positions['Moon'];
+    final mars = positions['Mars'];
     final mercury = positions['Mercury'];
-    if (sun != null && mercury != null && sun.sign == mercury.sign) {
-      yogas.add('Budhaditya Yoga');
-    }
+    final jupiter = positions['Jupiter'];
+    final venus = positions['Venus'];
+    final saturn = positions['Saturn'];
+    
+    // ============ PANCHA MAHAPURUSHA YOGAS ============
     
     // Hamsa Yoga: Jupiter in kendra in own/exalted sign
     if (jupiter != null) {
-      final jupiterHouse = jupiter.house;
-      final isKendra = jupiterHouse == 1 || jupiterHouse == 4 || jupiterHouse == 7 || jupiterHouse == 10;
+      final isKendra = _isKendra(jupiter.house);
       final isStrong = jupiter.sign == 'Sagittarius' || jupiter.sign == 'Pisces' || jupiter.sign == 'Cancer';
       if (isKendra && isStrong) {
         yogas.add('Hamsa Yoga');
@@ -195,10 +190,8 @@ class KundaliData {
     }
     
     // Malavya Yoga: Venus in kendra in own/exalted sign
-    final venus = positions['Venus'];
     if (venus != null) {
-      final venusHouse = venus.house;
-      final isKendra = venusHouse == 1 || venusHouse == 4 || venusHouse == 7 || venusHouse == 10;
+      final isKendra = _isKendra(venus.house);
       final isStrong = venus.sign == 'Taurus' || venus.sign == 'Libra' || venus.sign == 'Pisces';
       if (isKendra && isStrong) {
         yogas.add('Malavya Yoga');
@@ -207,8 +200,7 @@ class KundaliData {
     
     // Bhadra Yoga: Mercury in kendra in own/exalted sign
     if (mercury != null) {
-      final mercuryHouse = mercury.house;
-      final isKendra = mercuryHouse == 1 || mercuryHouse == 4 || mercuryHouse == 7 || mercuryHouse == 10;
+      final isKendra = _isKendra(mercury.house);
       final isStrong = mercury.sign == 'Gemini' || mercury.sign == 'Virgo';
       if (isKendra && isStrong) {
         yogas.add('Bhadra Yoga');
@@ -216,10 +208,8 @@ class KundaliData {
     }
     
     // Ruchaka Yoga: Mars in kendra in own/exalted sign
-    final mars = positions['Mars'];
     if (mars != null) {
-      final marsHouse = mars.house;
-      final isKendra = marsHouse == 1 || marsHouse == 4 || marsHouse == 7 || marsHouse == 10;
+      final isKendra = _isKendra(mars.house);
       final isStrong = mars.sign == 'Aries' || mars.sign == 'Scorpio' || mars.sign == 'Capricorn';
       if (isKendra && isStrong) {
         yogas.add('Ruchaka Yoga');
@@ -227,25 +217,160 @@ class KundaliData {
     }
     
     // Sasa Yoga: Saturn in kendra in own/exalted sign
-    final saturn = positions['Saturn'];
     if (saturn != null) {
-      final saturnHouse = saturn.house;
-      final isKendra = saturnHouse == 1 || saturnHouse == 4 || saturnHouse == 7 || saturnHouse == 10;
+      final isKendra = _isKendra(saturn.house);
       final isStrong = saturn.sign == 'Capricorn' || saturn.sign == 'Aquarius' || saturn.sign == 'Libra';
       if (isKendra && isStrong) {
         yogas.add('Sasa Yoga');
       }
     }
     
+    // ============ RAJA YOGAS ============
+    
+    // Gajakesari Yoga: Jupiter in kendra (1,4,7,10) from Moon
+    if (moon != null && jupiter != null) {
+      final distanceFromMoon = _houseFromMoon(jupiter, moon);
+      if (distanceFromMoon == 1 || distanceFromMoon == 4 || distanceFromMoon == 7 || distanceFromMoon == 10) {
+        yogas.add('Gajakesari Yoga');
+      }
+    }
+    
+    // Budhaditya Yoga: Sun and Mercury conjunct
+    if (_areConjunct(sun, mercury)) {
+      yogas.add('Budhaditya Yoga');
+    }
+    
+    // Chandra-Mangal Yoga: Moon and Mars conjunct
+    if (_areConjunct(moon, mars)) {
+      yogas.add('Chandra-Mangal Yoga');
+    }
+    
+    // Lakshmi Yoga: Venus in own/exalted sign and 9th lord strong
+    if (venus != null) {
+      final venusStrong = venus.sign == 'Taurus' || venus.sign == 'Libra' || venus.sign == 'Pisces';
+      final venusInKendra = _isKendra(venus.house);
+      if (venusStrong && venusInKendra) {
+        yogas.add('Lakshmi Yoga');
+      }
+    }
+    
+    // ============ DHANA YOGAS ============
+    
+    // Dhana Yoga: 2nd and 11th lords connected (simplified: planets in 2nd and 11th)
+    final planetsIn2nd = positions.values.where((p) => p.house == 2).toList();
+    final planetsIn11th = positions.values.where((p) => p.house == 11).toList();
+    if (planetsIn2nd.isNotEmpty && planetsIn11th.isNotEmpty) {
+      // Check if benefics are involved
+      final beneficsIn2nd = planetsIn2nd.where((p) => 
+        p.planet == 'Jupiter' || p.planet == 'Venus' || p.planet == 'Mercury' || p.planet == 'Moon'
+      ).isNotEmpty;
+      final beneficsIn11th = planetsIn11th.where((p) => 
+        p.planet == 'Jupiter' || p.planet == 'Venus' || p.planet == 'Mercury' || p.planet == 'Moon'
+      ).isNotEmpty;
+      if (beneficsIn2nd || beneficsIn11th) {
+        yogas.add('Dhana Yoga');
+      }
+    }
+    
+    // ============ LUNAR YOGAS ============
+    
+    // Sunafa Yoga: Planet (not Sun/Rahu/Ketu) in 2nd from Moon
+    if (moon != null) {
+      final moonHouse = moon.house;
+      final secondFromMoon = (moonHouse % 12) + 1;
+      final planetsInSecondFromMoon = positions.values.where((p) => 
+        p.house == secondFromMoon && 
+        p.planet != 'Sun' && p.planet != 'Rahu' && p.planet != 'Ketu' && p.planet != 'Moon'
+      ).toList();
+      if (planetsInSecondFromMoon.isNotEmpty) {
+        yogas.add('Sunafa Yoga');
+      }
+      
+      // Anafa Yoga: Planet (not Sun/Rahu/Ketu) in 12th from Moon
+      final twelfthFromMoon = moonHouse == 1 ? 12 : moonHouse - 1;
+      final planetsInTwelfthFromMoon = positions.values.where((p) => 
+        p.house == twelfthFromMoon && 
+        p.planet != 'Sun' && p.planet != 'Rahu' && p.planet != 'Ketu' && p.planet != 'Moon'
+      ).toList();
+      if (planetsInTwelfthFromMoon.isNotEmpty) {
+        yogas.add('Anafa Yoga');
+      }
+      
+      // Durudhura Yoga: Planets in both 2nd and 12th from Moon
+      if (planetsInSecondFromMoon.isNotEmpty && planetsInTwelfthFromMoon.isNotEmpty) {
+        yogas.add('Durudhura Yoga');
+      }
+    }
+    
+    // ============ OTHER BENEFIC YOGAS ============
+    
+    // Amala Yoga: Only benefic in 10th house
+    final planetsIn10th = positions.values.where((p) => p.house == 10).toList();
+    if (planetsIn10th.length == 1) {
+      final planetIn10th = planetsIn10th.first;
+      if (planetIn10th.planet == 'Jupiter' || planetIn10th.planet == 'Venus' || 
+          planetIn10th.planet == 'Mercury' || planetIn10th.planet == 'Moon') {
+        yogas.add('Amala Yoga');
+      }
+    }
+    
+    // Saraswati Yoga: Jupiter, Venus, Mercury in Kendra/Trikona, Jupiter strong
+    if (jupiter != null && venus != null && mercury != null) {
+      final jupiterInKendraTrikona = _isKendra(jupiter.house) || _isTrikona(jupiter.house);
+      final venusInKendraTrikona = _isKendra(venus.house) || _isTrikona(venus.house);
+      final mercuryInKendraTrikona = _isKendra(mercury.house) || _isTrikona(mercury.house);
+      final jupiterStrong = jupiter.sign == 'Sagittarius' || jupiter.sign == 'Pisces' || jupiter.sign == 'Cancer';
+      
+      if (jupiterInKendraTrikona && venusInKendraTrikona && mercuryInKendraTrikona && jupiterStrong) {
+        yogas.add('Saraswati Yoga');
+      }
+    }
+    
+    // Gaja Yoga: Benefic lord of 9th in 9th house
+    final planetsIn9th = positions.values.where((p) => p.house == 9).toList();
+    if (planetsIn9th.isNotEmpty) {
+      final beneficIn9th = planetsIn9th.where((p) => 
+        p.planet == 'Jupiter' || p.planet == 'Venus'
+      ).isNotEmpty;
+      if (beneficIn9th) {
+        yogas.add('Bhagya Yoga');
+      }
+    }
+    
+    // Viparita Raja Yoga: 6th/8th/12th lords in dusthana (6,8,12)
+    final planetsIn6th = positions.values.where((p) => p.house == 6).toList();
+    final planetsIn8th = positions.values.where((p) => p.house == 8).toList();
+    final planetsIn12th = positions.values.where((p) => p.house == 12).toList();
+    if (planetsIn6th.isNotEmpty || planetsIn8th.isNotEmpty || planetsIn12th.isNotEmpty) {
+      // Simplified: check if malefics are in dusthana (good placement for malefics)
+      final maleficsInDusthana = [
+        ...planetsIn6th.where((p) => p.planet == 'Saturn' || p.planet == 'Mars' || p.planet == 'Rahu'),
+        ...planetsIn8th.where((p) => p.planet == 'Saturn' || p.planet == 'Mars' || p.planet == 'Rahu'),
+        ...planetsIn12th.where((p) => p.planet == 'Saturn' || p.planet == 'Mars' || p.planet == 'Rahu'),
+      ];
+      if (maleficsInDusthana.length >= 2) {
+        yogas.add('Viparita Raja Yoga');
+      }
+    }
+    
     return yogas;
   }
   
-  /// Detect doshas based on planetary positions
+  /// Detect doshas based on planetary positions (expanded with more doshas)
   static List<String> _detectDoshas(Map<String, PlanetPosition> positions) {
     final doshas = <String>[];
     
-    // Manglik Dosha: Mars in 1, 4, 7, 8, or 12 house
+    final sun = positions['Sun'];
+    final moon = positions['Moon'];
     final mars = positions['Mars'];
+    final jupiter = positions['Jupiter'];
+    final saturn = positions['Saturn'];
+    final rahu = positions['Rahu'];
+    final ketu = positions['Ketu'];
+    
+    // ============ MAJOR DOSHAS ============
+    
+    // Manglik Dosha: Mars in 1, 4, 7, 8, or 12 house
     if (mars != null) {
       final marsHouse = mars.house;
       if (marsHouse == 1 || marsHouse == 4 || marsHouse == 7 || marsHouse == 8 || marsHouse == 12) {
@@ -254,8 +379,6 @@ class KundaliData {
     }
     
     // Kaal Sarp Dosha: All planets between Rahu and Ketu
-    final rahu = positions['Rahu'];
-    final ketu = positions['Ketu'];
     if (rahu != null && ketu != null) {
       final rahuLong = rahu.longitude;
       final ketuLong = ketu.longitude;
@@ -263,6 +386,9 @@ class KundaliData {
       
       for (var entry in positions.entries) {
         if (entry.key == 'Rahu' || entry.key == 'Ketu') continue;
+        // Skip outer planets
+        if (entry.key == 'Uranus' || entry.key == 'Neptune' || entry.key == 'Pluto') continue;
+        
         final planetLong = entry.value.longitude;
         
         // Check if planet is between Rahu and Ketu
@@ -284,15 +410,71 @@ class KundaliData {
       }
     }
     
-    // Pitra Dosha: Sun conjunct with Rahu or Ketu, or Sun in 9th house with malefic
-    final sun = positions['Sun'];
-    if (sun != null && rahu != null) {
-      if (sun.sign == rahu.sign) {
+    // Pitra Dosha: Sun conjunct with Rahu or Ketu
+    if (sun != null) {
+      if (_areConjunct(sun, rahu) || _areConjunct(sun, ketu)) {
         doshas.add('Pitra Dosha');
       }
     }
     
-    return doshas;
+    // ============ GRAHAN DOSHAS ============
+    
+    // Surya Grahan Dosha: Sun with Rahu or Ketu
+    if (_areConjunct(sun, rahu)) {
+      doshas.add('Surya Grahan Dosha');
+    }
+    if (_areConjunct(sun, ketu)) {
+      doshas.add('Surya Grahan Dosha');
+    }
+    
+    // Chandra Grahan Dosha: Moon with Rahu or Ketu
+    if (_areConjunct(moon, rahu)) {
+      doshas.add('Chandra Grahan Dosha');
+    }
+    if (_areConjunct(moon, ketu)) {
+      doshas.add('Chandra Grahan Dosha');
+    }
+    
+    // ============ OTHER DOSHAS ============
+    
+    // Shrapit Dosha: Saturn and Rahu conjunct
+    if (_areConjunct(saturn, rahu)) {
+      doshas.add('Shrapit Dosha');
+    }
+    
+    // Guru Chandal Yoga (Dosha): Jupiter and Rahu conjunct
+    if (_areConjunct(jupiter, rahu)) {
+      doshas.add('Guru Chandal Yoga');
+    }
+    
+    // Kemdrum Dosha: No planets in 2nd or 12th from Moon
+    if (moon != null) {
+      final moonHouse = moon.house;
+      final secondFromMoon = (moonHouse % 12) + 1;
+      final twelfthFromMoon = moonHouse == 1 ? 12 : moonHouse - 1;
+      
+      final planetsIn2ndFromMoon = positions.values.where((p) => 
+        p.house == secondFromMoon && 
+        p.planet != 'Sun' && p.planet != 'Rahu' && p.planet != 'Ketu' && p.planet != 'Moon'
+      ).toList();
+      
+      final planetsIn12thFromMoon = positions.values.where((p) => 
+        p.house == twelfthFromMoon && 
+        p.planet != 'Sun' && p.planet != 'Rahu' && p.planet != 'Ketu' && p.planet != 'Moon'
+      ).toList();
+      
+      if (planetsIn2ndFromMoon.isEmpty && planetsIn12thFromMoon.isEmpty) {
+        doshas.add('Kemdrum Dosha');
+      }
+    }
+    
+    // Angarak Dosha: Mars and Rahu conjunct
+    if (_areConjunct(mars, rahu)) {
+      doshas.add('Angarak Dosha');
+    }
+    
+    // Remove duplicates
+    return doshas.toSet().toList();
   }
 
   /// Convert to JSON for storage

@@ -58,7 +58,7 @@ class AppConstants {
     'मीन',
   ];
 
-  // Planets
+  // Planets (Traditional + Outer planets)
   static const List<String> planets = [
     'Sun',
     'Moon',
@@ -67,6 +67,9 @@ class AppConstants {
     'Jupiter',
     'Venus',
     'Saturn',
+    'Uranus',
+    'Neptune',
+    'Pluto',
     'Rahu',
     'Ketu',
   ];
@@ -79,6 +82,9 @@ class AppConstants {
     'बृहस्पति',
     'शुक्र',
     'शनि',
+    'यूरेनस',
+    'नेपच्यून',
+    'प्लूटो',
     'राहु',
     'केतु',
   ];

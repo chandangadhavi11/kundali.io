@@ -252,6 +252,9 @@ class NorthIndianChartPainter extends CustomPainter {
       'Jupiter': '♃',
       'Venus': '♀',
       'Saturn': '♄',
+      'Uranus': '♅',
+      'Neptune': '♆',
+      'Pluto': '♇',
       'Rahu': 'ॐ',
       'Ketu': '☋',
     };
@@ -486,6 +489,9 @@ class SouthIndianChartPainter extends CustomPainter {
       'Jupiter': '♃',
       'Venus': '♀',
       'Saturn': '♄',
+      'Uranus': '♅',
+      'Neptune': '♆',
+      'Pluto': '♇',
       'Rahu': 'Ra',
       'Ketu': 'Ke',
     };

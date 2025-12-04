@@ -1201,15 +1201,11 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
             ),
             child: Row(
               children: [
-                Icon(
-                  panchang.paksha == 'Shukla'
-                      ? Icons.brightness_2_rounded
-                      : Icons.brightness_3_rounded,
-                  size: 28,
-                  color:
-                      panchang.paksha == 'Shukla'
-                          ? const Color(0xFFFBBF24)
-                          : const Color(0xFF9CA3AF),
+                // Realistic Moon Phase Widget
+                _MoonPhaseWidget(
+                  tithiNumber: panchang.tithiNumber,
+                  paksha: panchang.paksha,
+                  size: 44,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -3882,13 +3878,27 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
             alignment: Alignment.centerLeft,
             child: Padding(
               padding: const EdgeInsets.only(left: 2),
-              child: Text(
-                'Dasha Sequence',
-                style: GoogleFonts.dmSans(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: _textSecondary,
-                ),
+              child: Row(
+                children: [
+                  Text(
+                    'Dasha Sequence',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: _textSecondary,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '• Tap to explore',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color: _accentSecondary.withOpacity(0.7),
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -3908,66 +3918,77 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                   child: Opacity(opacity: value, child: child),
                 );
               },
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color:
-                      isCurrent
-                          ? _accentSecondary.withOpacity(0.1)
-                          : _surfaceColor.withOpacity(0.4),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
+              child: GestureDetector(
+                onTap: () => _showDashaDetails(period.planet, dasha),
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
                     color:
                         isCurrent
-                            ? _accentSecondary.withOpacity(0.3)
-                            : _borderColor.withOpacity(0.4),
-                    width: 0.5,
+                            ? _accentSecondary.withOpacity(0.1)
+                            : _surfaceColor.withOpacity(0.4),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color:
+                          isCurrent
+                              ? _accentSecondary.withOpacity(0.3)
+                              : _borderColor.withOpacity(0.4),
+                      width: 0.5,
+                    ),
                   ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: _getPlanetColor(period.planet).withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(7),
-                      ),
-                      child: Center(
-                        child: Text(
-                          _getPlanetSymbol(period.planet),
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: _getPlanetColor(period.planet),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: _getPlanetColor(
+                            period.planet,
+                          ).withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                        child: Center(
+                          child: Text(
+                            _getPlanetSymbol(period.planet),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: _getPlanetColor(period.planet),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        period.planet,
-                        style: GoogleFonts.dmSans(
-                          fontSize: 12,
-                          fontWeight:
-                              isCurrent ? FontWeight.w600 : FontWeight.w500,
-                          color: _textPrimary,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          period.planet,
+                          style: GoogleFonts.dmSans(
+                            fontSize: 12,
+                            fontWeight:
+                                isCurrent ? FontWeight.w600 : FontWeight.w500,
+                            color: _textPrimary,
+                          ),
                         ),
                       ),
-                    ),
-                    Text(
-                      '${period.years} years',
-                      style: GoogleFonts.dmMono(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                        color: _textMuted,
+                      Text(
+                        '${period.years} years',
+                        style: GoogleFonts.dmMono(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: _textMuted,
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 6),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 16,
+                        color: _textMuted.withOpacity(0.6),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -3975,6 +3996,767 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
         ],
       ),
     );
+  }
+
+  /// Show detailed Dasha information with drill-down capability
+  void _showDashaDetails(String mahadashaPlanet, DashaInfo dasha) {
+    final mahadashaDetail = dasha.mahadashaSequence?.firstWhere(
+      (m) => m.planet == mahadashaPlanet,
+      orElse: () => dasha.mahadashaSequence!.first,
+    );
+
+    if (mahadashaDetail == null) {
+      // Fallback if detailed sequence not available
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Detailed dasha data not available for $mahadashaPlanet',
+          ),
+          backgroundColor: _accentSecondary,
+        ),
+      );
+      return;
+    }
+
+    _showDashaPeriodSheet(mahadashaDetail, []);
+  }
+
+  /// Show bottom sheet for a Dasha period with its sub-periods
+  void _showDashaPeriodSheet(
+    DashaPeriodDetail period,
+    List<String> breadcrumbs,
+  ) {
+    final levelColors = {
+      DashaLevel.mahadasha: const Color(0xFFE8B931),
+      DashaLevel.antardasha: const Color(0xFFA78BFA),
+      DashaLevel.pratyantara: const Color(0xFF6EE7B7),
+      DashaLevel.sookshma: const Color(0xFF60A5FA),
+      DashaLevel.prana: const Color(0xFFF472B6),
+    };
+
+    final levelColor = levelColors[period.level] ?? _accentSecondary;
+    final newBreadcrumbs = [...breadcrumbs, period.planet];
+    final now = DateTime.now();
+    final isCurrentPeriod = period.containsDate(now);
+
+    // Check if we need to calculate deeper sub-periods
+    final hasSubPeriods =
+        period.subPeriods != null && period.subPeriods!.isNotEmpty;
+    final nextLevel = _getNextLevel(period.level);
+    final canDrillDeeper = nextLevel != null;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder:
+          (context) => DraggableScrollableSheet(
+            initialChildSize: 0.7,
+            minChildSize: 0.4,
+            maxChildSize: 0.92,
+            builder:
+                (context, scrollController) => Container(
+                  decoration: BoxDecoration(
+                    color: _bgSecondary,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                    border: Border.all(
+                      color: levelColor.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      // Handle bar
+                      Container(
+                        margin: const EdgeInsets.only(top: 12),
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: _borderColor,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      // Header
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Breadcrumbs
+                            if (breadcrumbs.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () => Navigator.pop(context),
+                                      child: Icon(
+                                        Icons.arrow_back_ios_rounded,
+                                        size: 14,
+                                        color: _textMuted,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        breadcrumbs.join(' → '),
+                                        style: GoogleFonts.dmSans(
+                                          fontSize: 11,
+                                          color: _textMuted,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            // Period info
+                            Row(
+                              children: [
+                                Container(
+                                  width: 48,
+                                  height: 48,
+                                  decoration: BoxDecoration(
+                                    color: levelColor.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(
+                                      color: levelColor.withOpacity(0.3),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      _getPlanetSymbol(period.planet),
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        color: levelColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 3,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: levelColor.withOpacity(
+                                                0.15,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              period.levelName,
+                                              style: GoogleFonts.dmSans(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w600,
+                                                color: levelColor,
+                                              ),
+                                            ),
+                                          ),
+                                          if (isCurrentPeriod) ...[
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 6,
+                                                    vertical: 2,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: const Color(
+                                                  0xFF6EE7B7,
+                                                ).withOpacity(0.2),
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
+                                              ),
+                                              child: Text(
+                                                'ACTIVE',
+                                                style: GoogleFonts.dmMono(
+                                                  fontSize: 8,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: const Color(
+                                                    0xFF6EE7B7,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${period.planet} ${period.levelName}',
+                                        style: GoogleFonts.dmSans(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                          color: _textPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            // Period dates and duration
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: _surfaceColor.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: _borderColor.withOpacity(0.4),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Start',
+                                          style: GoogleFonts.dmSans(
+                                            fontSize: 9,
+                                            color: _textMuted,
+                                          ),
+                                        ),
+                                        Text(
+                                          _needsTimeDisplay(period.level)
+                                              ? _formatDateWithTime(
+                                                period.startDate,
+                                              )
+                                              : _formatDate(period.startDate),
+                                          style: GoogleFonts.dmMono(
+                                            fontSize:
+                                                _needsTimeDisplay(period.level)
+                                                    ? 10
+                                                    : 11,
+                                            fontWeight: FontWeight.w500,
+                                            color: _textSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 1,
+                                    height: 28,
+                                    color: _borderColor,
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 12),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'End',
+                                            style: GoogleFonts.dmSans(
+                                              fontSize: 9,
+                                              color: _textMuted,
+                                            ),
+                                          ),
+                                          Text(
+                                            _needsTimeDisplay(period.level)
+                                                ? _formatDateWithTime(
+                                                  period.endDate,
+                                                )
+                                                : _formatDate(period.endDate),
+                                            style: GoogleFonts.dmMono(
+                                              fontSize:
+                                                  _needsTimeDisplay(
+                                                        period.level,
+                                                      )
+                                                      ? 10
+                                                      : 11,
+                                              fontWeight: FontWeight.w500,
+                                              color: _textSecondary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 1,
+                                    height: 28,
+                                    color: _borderColor,
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 12),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Duration',
+                                            style: GoogleFonts.dmSans(
+                                              fontSize: 9,
+                                              color: _textMuted,
+                                            ),
+                                          ),
+                                          Text(
+                                            _formatDuration(
+                                              period.durationYears,
+                                            ),
+                                            style: GoogleFonts.dmMono(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                              color: levelColor,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Sub-periods list
+                      if (canDrillDeeper)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            children: [
+                              Text(
+                                '${_getLevelDisplayName(nextLevel)} Periods',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: _textSecondary,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              if (hasSubPeriods)
+                                Text(
+                                  '(${period.subPeriods!.length})',
+                                  style: GoogleFonts.dmSans(
+                                    fontSize: 11,
+                                    color: _textMuted,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(height: 8),
+                      // Sub-periods list
+                      Expanded(
+                        child:
+                            hasSubPeriods
+                                ? ListView.builder(
+                                  controller: scrollController,
+                                  padding: const EdgeInsets.fromLTRB(
+                                    16,
+                                    0,
+                                    16,
+                                    24,
+                                  ),
+                                  itemCount: period.subPeriods!.length,
+                                  itemBuilder: (context, index) {
+                                    final subPeriod = period.subPeriods![index];
+                                    final isSubCurrent = subPeriod.containsDate(
+                                      now,
+                                    );
+                                    final subLevelColor =
+                                        levelColors[subPeriod.level] ??
+                                        _textMuted;
+                                    final canDrillDeeperSub =
+                                        _getNextLevel(subPeriod.level) != null;
+
+                                    return GestureDetector(
+                                      onTap:
+                                          canDrillDeeperSub
+                                              ? () {
+                                                Navigator.pop(context);
+                                                // Calculate deeper levels on demand
+                                                final deeperPeriod =
+                                                    _ensureSubPeriods(
+                                                      subPeriod,
+                                                    );
+                                                _showDashaPeriodSheet(
+                                                  deeperPeriod,
+                                                  newBreadcrumbs,
+                                                );
+                                              }
+                                              : null,
+                                      child: Container(
+                                        margin: const EdgeInsets.only(
+                                          bottom: 6,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 10,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              isSubCurrent
+                                                  ? subLevelColor.withOpacity(
+                                                    0.1,
+                                                  )
+                                                  : _surfaceColor.withOpacity(
+                                                    0.4,
+                                                  ),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                          border: Border.all(
+                                            color:
+                                                isSubCurrent
+                                                    ? subLevelColor.withOpacity(
+                                                      0.3,
+                                                    )
+                                                    : _borderColor.withOpacity(
+                                                      0.3,
+                                                    ),
+                                            width: 0.5,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 32,
+                                              height: 32,
+                                              decoration: BoxDecoration(
+                                                color: _getPlanetColor(
+                                                  subPeriod.planet,
+                                                ).withOpacity(0.12),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  _getPlanetSymbol(
+                                                    subPeriod.planet,
+                                                  ),
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: _getPlanetColor(
+                                                      subPeriod.planet,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        subPeriod.planet,
+                                                        style: GoogleFonts.dmSans(
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              isSubCurrent
+                                                                  ? FontWeight
+                                                                      .w600
+                                                                  : FontWeight
+                                                                      .w500,
+                                                          color: _textPrimary,
+                                                        ),
+                                                      ),
+                                                      if (isSubCurrent) ...[
+                                                        const SizedBox(
+                                                          width: 8,
+                                                        ),
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 5,
+                                                                vertical: 2,
+                                                              ),
+                                                          decoration: BoxDecoration(
+                                                            color: const Color(
+                                                              0xFF6EE7B7,
+                                                            ).withOpacity(0.2),
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  4,
+                                                                ),
+                                                          ),
+                                                          child: Text(
+                                                            'NOW',
+                                                            style: GoogleFonts.dmMono(
+                                                              fontSize: 7,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color:
+                                                                  const Color(
+                                                                    0xFF6EE7B7,
+                                                                  ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    _needsTimeDisplay(
+                                                          subPeriod.level,
+                                                        )
+                                                        ? '${_formatDateShortWithTime(subPeriod.startDate)} - ${_formatDateShortWithTime(subPeriod.endDate)}'
+                                                        : '${_formatDateShort(subPeriod.startDate)} - ${_formatDateShort(subPeriod.endDate)}',
+                                                    style: GoogleFonts.dmMono(
+                                                      fontSize:
+                                                          _needsTimeDisplay(
+                                                                subPeriod.level,
+                                                              )
+                                                              ? 8
+                                                              : 9,
+                                                      color: _textMuted,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Text(
+                                              _formatDuration(
+                                                subPeriod.durationYears,
+                                              ),
+                                              style: GoogleFonts.dmMono(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w500,
+                                                color: _textMuted,
+                                              ),
+                                            ),
+                                            if (canDrillDeeperSub) ...[
+                                              const SizedBox(width: 4),
+                                              Icon(
+                                                Icons.chevron_right_rounded,
+                                                size: 16,
+                                                color: _textMuted.withOpacity(
+                                                  0.5,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                )
+                                : Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(32),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.hourglass_empty_rounded,
+                                          size: 48,
+                                          color: _textMuted.withOpacity(0.3),
+                                        ),
+                                        const SizedBox(height: 12),
+                                        Text(
+                                          'Sub-periods calculating...',
+                                          style: GoogleFonts.dmSans(
+                                            fontSize: 13,
+                                            color: _textMuted,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Please wait or try again',
+                                          style: GoogleFonts.dmSans(
+                                            fontSize: 11,
+                                            color: _textMuted.withOpacity(0.6),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                      ),
+                    ],
+                  ),
+                ),
+          ),
+    );
+  }
+
+  /// Get the next dasha level (for drilling deeper)
+  DashaLevel? _getNextLevel(DashaLevel current) {
+    switch (current) {
+      case DashaLevel.mahadasha:
+        return DashaLevel.antardasha;
+      case DashaLevel.antardasha:
+        return DashaLevel.pratyantara;
+      case DashaLevel.pratyantara:
+        return DashaLevel.sookshma;
+      case DashaLevel.sookshma:
+        return DashaLevel.prana;
+      case DashaLevel.prana:
+        return null; // Deepest level
+    }
+  }
+
+  /// Get display name for a dasha level
+  String _getLevelDisplayName(DashaLevel level) {
+    switch (level) {
+      case DashaLevel.mahadasha:
+        return 'Mahadasha';
+      case DashaLevel.antardasha:
+        return 'Antardasha';
+      case DashaLevel.pratyantara:
+        return 'Pratyantara';
+      case DashaLevel.sookshma:
+        return 'Sookshma';
+      case DashaLevel.prana:
+        return 'Prana';
+    }
+  }
+
+  /// Ensure sub-periods are calculated for deeper drill-down
+  DashaPeriodDetail _ensureSubPeriods(DashaPeriodDetail period) {
+    if (period.subPeriods != null && period.subPeriods!.isNotEmpty) {
+      return period;
+    }
+
+    // Calculate sub-periods on demand
+    final nextLevel = _getNextLevel(period.level);
+    if (nextLevel == null) return period;
+
+    final subPeriods = KundaliCalculationService.calculateSubDashas(
+      parentPath: period.fullPath,
+      parentPlanet: period.planet,
+      parentDuration: period.durationYears,
+      startDate: period.startDate,
+      level: nextLevel,
+      maxDepth: 1, // Only calculate one level deep at a time
+    );
+
+    return DashaPeriodDetail(
+      planet: period.planet,
+      fullPath: period.fullPath,
+      durationYears: period.durationYears,
+      startDate: period.startDate,
+      endDate: period.endDate,
+      level: period.level,
+      subPeriods: subPeriods,
+    );
+  }
+
+  /// Format date for display
+  String _formatDate(DateTime date) {
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
+
+  /// Format date with time for shorter periods
+  String _formatDateWithTime(DateTime date) {
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '${date.day} ${months[date.month - 1]} ${date.year}, $hour:$minute';
+  }
+
+  /// Format date in short form
+  String _formatDateShort(DateTime date) {
+    return '${date.day}/${date.month}/${date.year.toString().substring(2)}';
+  }
+
+  /// Format date in short form with time for Sookshma/Prana levels
+  String _formatDateShortWithTime(DateTime date) {
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '${date.day}/${date.month} $hour:$minute';
+  }
+
+  /// Format duration based on length - shows hours/minutes for short periods
+  String _formatDuration(double durationYears) {
+    final totalDays = durationYears * 365.25;
+
+    if (totalDays >= 365) {
+      final years = totalDays ~/ 365.25;
+      final remainingDays = totalDays - (years * 365.25);
+      final months = remainingDays ~/ 30.44;
+      final days = (remainingDays - (months * 30.44)).round();
+      return '$years y, $months m, $days d';
+    } else if (totalDays >= 30) {
+      final months = totalDays ~/ 30.44;
+      final days = (totalDays - (months * 30.44)).round();
+      return '$months m, $days d';
+    } else if (totalDays >= 1) {
+      final days = totalDays.floor();
+      final hours = ((totalDays - days) * 24).round();
+      if (hours > 0) {
+        return '$days d, $hours h';
+      }
+      return '$days days';
+    } else {
+      // Less than a day - show hours and minutes
+      final totalHours = totalDays * 24;
+      if (totalHours >= 1) {
+        final hours = totalHours.floor();
+        final minutes = ((totalHours - hours) * 60).round();
+        if (minutes > 0) {
+          return '$hours h, $minutes m';
+        }
+        return '$hours hours';
+      } else {
+        // Less than an hour - show minutes
+        final minutes = (totalHours * 60).round();
+        if (minutes > 0) {
+          return '$minutes min';
+        }
+        return '< 1 min';
+      }
+    }
+  }
+
+  /// Check if the dasha level needs time display (Sookshma and Prana)
+  bool _needsTimeDisplay(DashaLevel level) {
+    return level == DashaLevel.sookshma || level == DashaLevel.prana;
   }
 
   // ============ STRENGTH TAB (Shadbala, Vimshopaka, Ashtakavarga) ============
@@ -4754,6 +5536,12 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       DateTime.now().year,
     );
 
+    // Calculate inauspicious periods for birth date
+    final inauspiciousPeriods =
+        KundaliCalculationService.calculateInauspiciousPeriods(
+          _kundaliData!.birthDateTime,
+        );
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
@@ -4772,6 +5560,18 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
 
           const SizedBox(height: 24),
 
+          // Inauspicious Periods
+          _buildSectionHeader(
+            'Inauspicious Periods',
+            'Rahukala, Yamaghanda & Gulika at birth',
+            Icons.warning_amber_rounded,
+            const Color(0xFFF87171),
+          ),
+          const SizedBox(height: 12),
+          _buildInauspiciousPeriodsCard(inauspiciousPeriods),
+
+          const SizedBox(height: 24),
+
           // Varshphal
           _buildSectionHeader(
             'Varshphal ${varshphal.year}',
@@ -4781,6 +5581,323 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
           ),
           const SizedBox(height: 12),
           _buildVarshphalCard(varshphal),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInauspiciousPeriodsCard(InauspiciousPeriods periods) {
+    // Check if birth time falls in any inauspicious period
+    final birthTime = _kundaliData!.birthDateTime;
+    final currentPeriod = periods.getCurrentPeriod(birthTime);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFF87171).withOpacity(0.08),
+            const Color(0xFFFBBF24).withOpacity(0.04),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFF87171).withOpacity(0.2),
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        children: [
+          // Birth time warning if applicable
+          if (currentPeriod != null) ...[
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF87171).withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: const Color(0xFFF87171).withOpacity(0.3),
+                  width: 0.5,
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Color(0xFFF87171),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Birth during ${currentPeriod.name}',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFFF87171),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          currentPeriod.description,
+                          style: GoogleFonts.dmSans(
+                            fontSize: 10,
+                            color: _textMuted,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+
+          // Rahukala
+          _buildInauspiciousPeriodRow(
+            periods.rahukala,
+            const Color(0xFFF87171),
+            Icons.do_not_disturb_on_rounded,
+          ),
+          const SizedBox(height: 10),
+
+          // Yamaghanda
+          _buildInauspiciousPeriodRow(
+            periods.yamaghanda,
+            const Color(0xFFFBBF24),
+            Icons.warning_rounded,
+          ),
+          const SizedBox(height: 10),
+
+          // Gulika
+          _buildInauspiciousPeriodRow(
+            periods.gulika,
+            const Color(0xFFA78BFA),
+            Icons.brightness_3_rounded,
+          ),
+
+          const SizedBox(height: 12),
+
+          // Visual timeline
+          _buildInauspiciousTimeline(periods),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInauspiciousPeriodRow(
+    TimePeriod period,
+    Color color,
+    IconData icon,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: _surfaceColor.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withOpacity(0.15), width: 0.5),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 16),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  period.name,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: _textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  period.description,
+                  style: GoogleFonts.dmSans(fontSize: 9, color: _textMuted),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              period.formattedTime,
+              style: GoogleFonts.dmMono(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInauspiciousTimeline(InauspiciousPeriods periods) {
+    // Visual timeline showing 6 AM to 6 PM
+    final startHour = 6;
+    final endHour = 18;
+    final totalMinutes = (endHour - startHour) * 60;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.schedule_rounded, size: 12, color: _textMuted),
+            const SizedBox(width: 6),
+            Text(
+              'Day Timeline (6 AM - 6 PM)',
+              style: GoogleFonts.dmSans(fontSize: 10, color: _textMuted),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 24,
+          child: Stack(
+            children: [
+              // Background bar
+              Container(
+                height: 8,
+                margin: const EdgeInsets.only(top: 8),
+                decoration: BoxDecoration(
+                  color: _surfaceColor,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              // Rahukala period
+              _buildTimelineSegment(
+                periods.rahukala,
+                startHour,
+                totalMinutes,
+                const Color(0xFFF87171),
+              ),
+              // Yamaghanda period
+              _buildTimelineSegment(
+                periods.yamaghanda,
+                startHour,
+                totalMinutes,
+                const Color(0xFFFBBF24),
+              ),
+              // Gulika period
+              _buildTimelineSegment(
+                periods.gulika,
+                startHour,
+                totalMinutes,
+                const Color(0xFFA78BFA),
+              ),
+              // Birth time marker
+              _buildBirthTimeMarker(startHour, totalMinutes),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
+        // Hour markers
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '6 AM',
+              style: GoogleFonts.dmMono(fontSize: 8, color: _textMuted),
+            ),
+            Text(
+              '9 AM',
+              style: GoogleFonts.dmMono(fontSize: 8, color: _textMuted),
+            ),
+            Text(
+              '12 PM',
+              style: GoogleFonts.dmMono(fontSize: 8, color: _textMuted),
+            ),
+            Text(
+              '3 PM',
+              style: GoogleFonts.dmMono(fontSize: 8, color: _textMuted),
+            ),
+            Text(
+              '6 PM',
+              style: GoogleFonts.dmMono(fontSize: 8, color: _textMuted),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTimelineSegment(
+    TimePeriod period,
+    int startHour,
+    int totalMinutes,
+    Color color,
+  ) {
+    final periodStartMinutes =
+        (period.startTime.hour - startHour) * 60 + period.startTime.minute;
+    final periodEndMinutes =
+        (period.endTime.hour - startHour) * 60 + period.endTime.minute;
+
+    // Calculate position and width
+    final startFraction = (periodStartMinutes / totalMinutes).clamp(0.0, 1.0);
+    final endFraction = (periodEndMinutes / totalMinutes).clamp(0.0, 1.0);
+    final width = endFraction - startFraction;
+
+    if (width <= 0) return const SizedBox();
+
+    return Positioned(
+      left:
+          startFraction *
+          (MediaQuery.of(context).size.width - 64), // Account for padding
+      top: 8,
+      child: Container(
+        width: width * (MediaQuery.of(context).size.width - 64),
+        height: 8,
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.7),
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBirthTimeMarker(int startHour, int totalMinutes) {
+    final birthTime = _kundaliData!.birthDateTime;
+    final birthMinutes = (birthTime.hour - startHour) * 60 + birthTime.minute;
+    final fraction = (birthMinutes / totalMinutes).clamp(0.0, 1.0);
+
+    return Positioned(
+      left: fraction * (MediaQuery.of(context).size.width - 68),
+      top: 0,
+      child: Column(
+        children: [
+          Container(
+            width: 2,
+            height: 24,
+            decoration: BoxDecoration(
+              color: _accentPrimary,
+              borderRadius: BorderRadius.circular(1),
+            ),
+          ),
         ],
       ),
     );
@@ -5086,98 +6203,744 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Summary Card
+          _buildYogaSummaryCard(),
+          const SizedBox(height: 16),
+
           if (_kundaliData!.yogas.isNotEmpty) ...[
-            _buildYogaSection(
-              'Yogas Present',
-              _kundaliData!.yogas,
+            _buildYogaSectionHeader(
+              'Auspicious Yogas',
+              '${_kundaliData!.yogas.length} present',
               const Color(0xFF6EE7B7),
               Icons.auto_awesome_rounded,
             ),
+            const SizedBox(height: 10),
+            ..._kundaliData!.yogas.asMap().entries.map((entry) {
+              final index = entry.key;
+              final yogaName = entry.value;
+              return _buildYogaDetailCard(yogaName, index, false);
+            }),
             const SizedBox(height: 20),
           ],
+
           if (_kundaliData!.doshas.isNotEmpty) ...[
-            _buildYogaSection(
+            _buildYogaSectionHeader(
               'Doshas Present',
-              _kundaliData!.doshas,
+              '${_kundaliData!.doshas.length} present',
               const Color(0xFFF87171),
               Icons.warning_amber_rounded,
             ),
+            const SizedBox(height: 10),
+            ..._kundaliData!.doshas.asMap().entries.map((entry) {
+              final index = entry.key;
+              final doshaName = entry.value;
+              return _buildYogaDetailCard(doshaName, index, true);
+            }),
             const SizedBox(height: 20),
           ],
+
           _buildInsightsSection(),
         ],
       ),
     );
   }
 
-  Widget _buildYogaSection(
+  Widget _buildYogaSummaryCard() {
+    final yogaCount = _kundaliData!.yogas.length;
+    final doshaCount = _kundaliData!.doshas.length;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            _accentSecondary.withOpacity(0.12),
+            _accentPrimary.withOpacity(0.06),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: _accentSecondary.withOpacity(0.2),
+          width: 0.5,
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6EE7B7).withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: Color(0xFF6EE7B7),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '$yogaCount',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF6EE7B7),
+                  ),
+                ),
+                Text(
+                  'Yogas',
+                  style: GoogleFonts.dmSans(fontSize: 10, color: _textMuted),
+                ),
+              ],
+            ),
+          ),
+          Container(width: 1, height: 60, color: _borderColor),
+          Expanded(
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF87171).withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Color(0xFFF87171),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '$doshaCount',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFFF87171),
+                  ),
+                ),
+                Text(
+                  'Doshas',
+                  style: GoogleFonts.dmSans(fontSize: 10, color: _textMuted),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildYogaSectionHeader(
     String title,
-    List<String> items,
+    String subtitle,
     Color color,
     IconData icon,
   ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Row(
-          children: [
-            Icon(icon, size: 14, color: color),
-            const SizedBox(width: 6),
-            Text(
-              title,
-              style: GoogleFonts.dmSans(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: _textPrimary,
-              ),
-            ),
-          ],
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: GoogleFonts.dmSans(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: _textPrimary,
+          ),
         ),
-        const SizedBox(height: 10),
-        Wrap(
-          spacing: 6,
-          runSpacing: 6,
-          children:
-              items.asMap().entries.map((entry) {
-                final index = entry.key;
-                final item = entry.value;
-                return TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  duration: Duration(milliseconds: 300 + (index * 60)),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, value, child) {
-                    return Transform.scale(
-                      scale: 0.9 + (0.1 * value),
-                      child: Opacity(opacity: value, child: child),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: color.withOpacity(0.15),
-                        width: 0.5,
-                      ),
-                    ),
-                    child: Text(
-                      item,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: color,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
+        const SizedBox(width: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            subtitle,
+            style: GoogleFonts.dmSans(
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
+          ),
         ),
       ],
     );
+  }
+
+  Widget _buildYogaDetailCard(String yogaName, int index, bool isDosha) {
+    final color = isDosha ? const Color(0xFFF87171) : const Color(0xFF6EE7B7);
+    final yogaInfo = _getYogaInfo(yogaName, isDosha);
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 350 + (index * 60)),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 10 * (1 - value)),
+          child: Opacity(opacity: value, child: child),
+        );
+      },
+      child: GestureDetector(
+        onTap: () => _showYogaDetailsSheet(yogaName, isDosha),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: _surfaceColor.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color.withOpacity(0.15), width: 0.5),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      isDosha
+                          ? Icons.warning_amber_rounded
+                          : Icons.auto_awesome_rounded,
+                      color: color,
+                      size: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          yogaName,
+                          style: GoogleFonts.dmSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: _textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          yogaInfo['type'] ??
+                              (isDosha ? 'Dosha' : 'Benefic Yoga'),
+                          style: GoogleFonts.dmSans(
+                            fontSize: 10,
+                            color: color,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: _textMuted.withOpacity(0.5),
+                    size: 18,
+                  ),
+                ],
+              ),
+              if (yogaInfo['description'] != null) ...[
+                const SizedBox(height: 10),
+                Text(
+                  yogaInfo['description']!,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 11,
+                    color: _textMuted,
+                    height: 1.4,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Map<String, String> _getYogaInfo(String yogaName, bool isDosha) {
+    // Map yoga names to their type and brief description
+    final yogaInfoMap = {
+      // Pancha Mahapurusha Yogas
+      'Hamsa Yoga': {
+        'type': 'Pancha Mahapurusha',
+        'description':
+            'Jupiter in Kendra in own/exalted sign. Bestows wisdom and spiritual growth.',
+      },
+      'Malavya Yoga': {
+        'type': 'Pancha Mahapurusha',
+        'description':
+            'Venus in Kendra in own/exalted sign. Grants beauty, wealth, and luxury.',
+      },
+      'Bhadra Yoga': {
+        'type': 'Pancha Mahapurusha',
+        'description':
+            'Mercury in Kendra in own sign. Gives intelligence and communication skills.',
+      },
+      'Ruchaka Yoga': {
+        'type': 'Pancha Mahapurusha',
+        'description':
+            'Mars in Kendra in own/exalted sign. Bestows courage and leadership.',
+      },
+      'Sasa Yoga': {
+        'type': 'Pancha Mahapurusha',
+        'description':
+            'Saturn in Kendra in own/exalted sign. Grants authority and discipline.',
+      },
+
+      // Raja Yogas
+      'Gajakesari Yoga': {
+        'type': 'Raja Yoga',
+        'description':
+            'Jupiter in Kendra from Moon. Brings fame, wisdom, and prosperity.',
+      },
+      'Budhaditya Yoga': {
+        'type': 'Raja Yoga',
+        'description':
+            'Sun-Mercury conjunction. Grants sharp intellect and communication skills.',
+      },
+      'Chandra-Mangal Yoga': {
+        'type': 'Dhana Yoga',
+        'description':
+            'Moon-Mars conjunction. Creates wealth through courage and determination.',
+      },
+      'Lakshmi Yoga': {
+        'type': 'Dhana Yoga',
+        'description':
+            'Strong Venus in Kendra. Brings abundant wealth and luxury.',
+      },
+      'Viparita Raja Yoga': {
+        'type': 'Raja Yoga',
+        'description':
+            'Dusthana lords in dusthana. Success through unconventional means.',
+      },
+
+      // Lunar Yogas
+      'Sunafa Yoga': {
+        'type': 'Lunar Yoga',
+        'description': 'Planet in 2nd from Moon. Brings self-earned wealth.',
+      },
+      'Anafa Yoga': {
+        'type': 'Lunar Yoga',
+        'description':
+            'Planet in 12th from Moon. Grants good personality and fame.',
+      },
+      'Durudhura Yoga': {
+        'type': 'Lunar Yoga',
+        'description':
+            'Planets in both 2nd and 12th from Moon. Blessed with comforts.',
+      },
+
+      // Other Yogas
+      'Dhana Yoga': {
+        'type': 'Dhana Yoga',
+        'description':
+            '2nd and 11th house connection. Indicates wealth accumulation.',
+      },
+      'Amala Yoga': {
+        'type': 'Benefic Yoga',
+        'description':
+            'Benefic planet in 10th house. Pure and charitable nature.',
+      },
+      'Saraswati Yoga': {
+        'type': 'Benefic Yoga',
+        'description':
+            'Jupiter, Venus, Mercury well placed. Learning and wisdom.',
+      },
+      'Bhagya Yoga': {
+        'type': 'Benefic Yoga',
+        'description': 'Benefic in 9th house. Good fortune and luck.',
+      },
+
+      // Doshas
+      'Manglik Dosha': {
+        'type': 'Dosha',
+        'description':
+            'Mars in 1, 4, 7, 8, or 12. May affect marriage compatibility.',
+      },
+      'Kaal Sarp Dosha': {
+        'type': 'Dosha',
+        'description':
+            'All planets between Rahu-Ketu axis. Karmic challenges and delays.',
+      },
+      'Pitra Dosha': {
+        'type': 'Dosha',
+        'description': 'Sun afflicted by Rahu/Ketu. Ancestral karma issues.',
+      },
+      'Surya Grahan Dosha': {
+        'type': 'Grahan Dosha',
+        'description': 'Sun with Rahu/Ketu. May affect career and father.',
+      },
+      'Chandra Grahan Dosha': {
+        'type': 'Grahan Dosha',
+        'description': 'Moon with Rahu/Ketu. May affect mental peace.',
+      },
+      'Shrapit Dosha': {
+        'type': 'Dosha',
+        'description': 'Saturn-Rahu conjunction. Past life karmic debt.',
+      },
+      'Guru Chandal Yoga': {
+        'type': 'Dosha',
+        'description':
+            'Jupiter-Rahu conjunction. May affect wisdom and ethics.',
+      },
+      'Kemdrum Dosha': {
+        'type': 'Dosha',
+        'description': 'No planets 2nd/12th from Moon. Emotional challenges.',
+      },
+      'Angarak Dosha': {
+        'type': 'Dosha',
+        'description': 'Mars-Rahu conjunction. Anger and conflict issues.',
+      },
+    };
+
+    return yogaInfoMap[yogaName] ??
+        {
+          'type': isDosha ? 'Dosha' : 'Benefic Yoga',
+          'description':
+              isDosha
+                  ? 'This dosha may create certain challenges. Tap for details and remedies.'
+                  : 'This yoga brings positive influences to your chart. Tap for details.',
+        };
+  }
+
+  void _showYogaDetailsSheet(String yogaName, bool isDosha) {
+    final color = isDosha ? const Color(0xFFF87171) : const Color(0xFF6EE7B7);
+    final yogaDetails = _getFullYogaDetails(yogaName, isDosha);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder:
+          (context) => DraggableScrollableSheet(
+            initialChildSize: 0.65,
+            minChildSize: 0.4,
+            maxChildSize: 0.85,
+            builder:
+                (context, scrollController) => Container(
+                  decoration: BoxDecoration(
+                    color: _bgSecondary,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                    border: Border.all(color: color.withOpacity(0.3), width: 1),
+                  ),
+                  child: Column(
+                    children: [
+                      // Handle bar
+                      Container(
+                        margin: const EdgeInsets.only(top: 12),
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: _borderColor,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      // Header
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: color.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Icon(
+                                isDosha
+                                    ? Icons.warning_amber_rounded
+                                    : Icons.auto_awesome_rounded,
+                                color: color,
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    yogaName,
+                                    style: GoogleFonts.dmSans(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      color: _textPrimary,
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: color.withOpacity(0.12),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      yogaDetails['type']!,
+                                      style: GoogleFonts.dmSans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                        color: color,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Content
+                      Expanded(
+                        child: ListView(
+                          controller: scrollController,
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                          children: [
+                            // Description
+                            _buildYogaDetailSection(
+                              'What is ${yogaName}?',
+                              yogaDetails['description']!,
+                              Icons.info_outline_rounded,
+                              _accentSecondary,
+                            ),
+                            const SizedBox(height: 16),
+                            // Effects
+                            _buildYogaDetailSection(
+                              isDosha ? 'Potential Effects' : 'Benefits',
+                              yogaDetails['effects']!,
+                              isDosha
+                                  ? Icons.warning_amber_outlined
+                                  : Icons.star_outline_rounded,
+                              isDosha
+                                  ? const Color(0xFFFBBF24)
+                                  : const Color(0xFF6EE7B7),
+                            ),
+                            const SizedBox(height: 16),
+                            // Remedies (for doshas) or Enhancement (for yogas)
+                            _buildYogaDetailSection(
+                              isDosha ? 'Remedies' : 'How to Strengthen',
+                              yogaDetails['remedies']!,
+                              Icons.healing_rounded,
+                              const Color(0xFF60A5FA),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+          ),
+    );
+  }
+
+  Widget _buildYogaDetailSection(
+    String title,
+    String content,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _surfaceColor.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: _borderColor.withOpacity(0.4), width: 0.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 14, color: color),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: GoogleFonts.dmSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            content,
+            style: GoogleFonts.dmSans(
+              fontSize: 12,
+              color: _textSecondary,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Map<String, String> _getFullYogaDetails(String yogaName, bool isDosha) {
+    // Full details for each yoga/dosha
+    final detailsMap = {
+      // Pancha Mahapurusha Yogas
+      'Hamsa Yoga': {
+        'type': 'Pancha Mahapurusha Yoga',
+        'description':
+            'Hamsa Yoga is formed when Jupiter is placed in a Kendra house (1st, 4th, 7th, or 10th) in its own sign (Sagittarius or Pisces) or its exaltation sign (Cancer). This is one of the five great person yogas in Vedic astrology.',
+        'effects':
+            'The native is blessed with divine qualities, profound wisdom, and spiritual inclination. They gain respect from learned people, achieve good fortune, and lead a virtuous life. They often have a handsome appearance and enjoy longevity.',
+        'remedies':
+            'To strengthen this yoga: Worship Lord Vishnu regularly, study and teach sacred scriptures, perform charitable acts especially on Thursdays, wear yellow clothes and donate yellow items like turmeric, bananas, or gold.',
+      },
+      'Malavya Yoga': {
+        'type': 'Pancha Mahapurusha Yoga',
+        'description':
+            'Malavya Yoga forms when Venus occupies a Kendra house (1st, 4th, 7th, or 10th) in its own sign (Taurus or Libra) or exaltation sign (Pisces). Named after the Malavya people known for their refined culture.',
+        'effects':
+            'Bestows physical beauty, artistic talents, luxurious lifestyle, happy marriage, and material wealth. The native has a magnetic personality, refined taste, and enjoys sensual pleasures while maintaining dignity.',
+        'remedies':
+            'To enhance: Worship Goddess Lakshmi, appreciate and support arts, maintain beauty and cleanliness, donate white items on Fridays, wear white or pastel colors, and practice gratitude for life\'s pleasures.',
+      },
+      'Bhadra Yoga': {
+        'type': 'Pancha Mahapurusha Yoga',
+        'description':
+            'Bhadra Yoga occurs when Mercury is placed in a Kendra house (1st, 4th, 7th, or 10th) in its own sign (Gemini or Virgo). The word "Bhadra" means auspicious or blessed.',
+        'effects':
+            'Grants exceptional intelligence, eloquence, success in business and communication. The native excels in education, writing, trading, and analytical work. They are respected for their knowledge and wit.',
+        'remedies':
+            'To strengthen: Worship Lord Vishnu, pursue continuous learning and teaching, donate green items on Wednesdays, engage in writing or public speaking, keep an emerald or wear green clothes.',
+      },
+      'Ruchaka Yoga': {
+        'type': 'Pancha Mahapurusha Yoga',
+        'description':
+            'Ruchaka Yoga is formed when Mars occupies a Kendra house (1st, 4th, 7th, or 10th) in its own sign (Aries or Scorpio) or exaltation (Capricorn). Named after the Ruchaka warrior clan.',
+        'effects':
+            'Bestows courage, valor, strong physique, and leadership abilities. Success in military, sports, or competitive fields. The native is fearless, commands respect, and achieves through bold decisive action.',
+        'remedies':
+            'To enhance: Worship Lord Hanuman, practice physical discipline and martial arts, donate red items on Tuesdays, engage in competitive sports, channel aggression constructively through exercise.',
+      },
+      'Sasa Yoga': {
+        'type': 'Pancha Mahapurusha Yoga',
+        'description':
+            'Sasa Yoga forms when Saturn is in a Kendra house (1st, 4th, 7th, or 10th) in its own sign (Capricorn or Aquarius) or exaltation (Libra). It represents mastery over limitations.',
+        'effects':
+            'Grants authority, command over subordinates, success in politics or administration. Wealth comes through hard work and perseverance. The native rises to high positions through patience and discipline.',
+        'remedies':
+            'To strengthen: Worship Lord Shani, serve elderly and disabled people, donate black items on Saturdays, practice patience and discipline, engage in social service, avoid shortcuts.',
+      },
+
+      // Raja Yogas
+      'Gajakesari Yoga': {
+        'type': 'Raja Yoga',
+        'description':
+            'One of the most auspicious yogas, formed when Jupiter is in a Kendra (1st, 4th, 7th, or 10th house) from the Moon. The name means "elephant-lion" symbolizing royal power and dignity.',
+        'effects':
+            'The native gains wisdom, intelligence, excellent reputation, wealth, and leadership qualities. They are respected in society, achieve success through righteous conduct, and enjoy a position of influence.',
+        'remedies':
+            'To enhance: Worship Lord Ganesha and Jupiter, chant Guru mantras on Thursdays, donate yellow items, support educational institutions, practice generosity and ethical living.',
+      },
+      'Budhaditya Yoga': {
+        'type': 'Raja Yoga',
+        'description':
+            'Formed when the Sun and Mercury are conjunct in the same sign. "Budha" (Mercury) + "Aditya" (Sun) creates intellectual brilliance illuminated by soul\'s light.',
+        'effects':
+            'Grants sharp intellect, excellent communication skills, success in education, fame through intellectual pursuits. The native excels in writing, speaking, analysis, and administrative work.',
+        'remedies':
+            'To strengthen: Worship Lord Vishnu, recite Gayatri Mantra at sunrise, donate green items on Wednesday, pursue learning and teaching, maintain ethical standards in communication.',
+      },
+
+      // Doshas
+      'Manglik Dosha': {
+        'type': 'Major Dosha',
+        'description':
+            'Also called Mangal Dosha or Kuja Dosha, formed when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. Affects about 40% of people.',
+        'effects':
+            'May cause delays in marriage, conflicts with spouse, or challenges in married life. The strong energy of Mars needs proper channeling. Effects vary based on Mars\' sign and aspects.',
+        'remedies':
+            'Perform Mangal Shanti Puja, chant Hanuman Chalisa daily, fast on Tuesdays, marry another Manglik (cancels effect), perform Kumbh Vivah ritual, donate red lentils and red clothes on Tuesday.',
+      },
+      'Kaal Sarp Dosha': {
+        'type': 'Major Dosha',
+        'description':
+            'Occurs when all seven planets are hemmed between Rahu and Ketu. There are 12 types based on Rahu\'s house position. Represents karmic patterns from past lives.',
+        'effects':
+            'May bring sudden ups and downs, struggles, delays in success, and unexpected events. The native\'s life follows unusual patterns. Effects depend on which planets are closest to nodes.',
+        'remedies':
+            'Visit Trimbakeshwar or Kalahasti temple for Kaal Sarp Puja, chant Maha Mrityunjaya Mantra 108 times daily, donate to snake conservation, feed birds daily, wear Gomed after consultation.',
+      },
+      'Pitra Dosha': {
+        'type': 'Ancestral Dosha',
+        'description':
+            'Formed when Sun is afflicted by Rahu or Ketu, or when the 9th house (father, ancestors) is severely afflicted. Indicates unresolved ancestral karma.',
+        'effects':
+            'May affect father, career, fortune, and overall progress until remedied. The native may face obstacles that seem to have no logical cause. Family patterns may repeat.',
+        'remedies':
+            'Perform Pitra Tarpan on every Amavasya (new moon), do Shradh rituals annually, feed crows and dogs, donate to elderly care homes, visit Gaya for Pind Daan if possible.',
+      },
+      'Guru Chandal Yoga': {
+        'type': 'Dosha',
+        'description':
+            'Forms when Jupiter (Guru) is conjunct with Rahu (Chandal means outcaste). Jupiter\'s wisdom is clouded by Rahu\'s illusions and unconventional influences.',
+        'effects':
+            'May affect wisdom, spirituality, and traditional values. The native may have unconventional or unorthodox beliefs, face challenges with teachers or gurus, or experience confusion in moral matters.',
+        'remedies':
+            'Worship Lord Vishnu regularly, show respect to teachers and elders, study traditional scriptures, perform Jupiter and Rahu remedies on respective days, maintain ethical conduct.',
+      },
+      'Kemdrum Dosha': {
+        'type': 'Lunar Dosha',
+        'description':
+            'Occurs when the Moon has no planets in its 2nd or 12th house (excluding Sun, Rahu, and Ketu). The Moon lacks support from neighboring planets.',
+        'effects':
+            'May cause emotional instability, feelings of loneliness or lack of support, and mental disturbances. The native may struggle with poverty or feel emotionally unsupported despite material success.',
+        'remedies':
+            'Strengthen Moon by wearing pearl or moonstone (after consultation), chant Chandra mantra on Mondays, fast on Monday, wear white clothes, serve mother and elderly women.',
+      },
+      'Shrapit Dosha': {
+        'type': 'Karmic Dosha',
+        'description':
+            'Forms when Saturn and Rahu are conjunct in any house. "Shrapit" means cursed, indicating heavy karmic debt from past lives that must be resolved.',
+        'effects':
+            'Causes delays and obstacles that require patience to overcome. The native may face repeated setbacks in specific life areas depending on the house of conjunction.',
+        'remedies':
+            'Perform Shrapit Dosha Nivaran Puja, serve disabled and elderly people, chant Saturn and Rahu mantras, donate black items on Saturday, practice extreme patience and karma yoga.',
+      },
+    };
+
+    // Default details for yogas/doshas not in the map
+    if (!detailsMap.containsKey(yogaName)) {
+      return {
+        'type': isDosha ? 'Dosha' : 'Benefic Yoga',
+        'description':
+            isDosha
+                ? 'This is a challenging planetary combination that may create certain obstacles in life. Its effects depend on the overall strength of the horoscope and other supportive factors.'
+                : 'This is an auspicious planetary combination that brings positive influences to your chart. Its full benefits manifest based on the overall horoscope strength.',
+        'effects':
+            isDosha
+                ? 'The specific effects depend on the houses and signs involved. Generally, doshas indicate areas where extra attention and remedial measures can help smooth the life path.'
+                : 'This yoga enhances success, prosperity, and positive outcomes in the areas of life it influences. The stronger the participating planets, the more pronounced the benefits.',
+        'remedies':
+            isDosha
+                ? 'General remedies include: regular prayer and meditation, charitable activities, respecting elders, maintaining ethical conduct, and wearing gemstones after proper consultation with an astrologer.'
+                : 'To maximize benefits: honor the planets forming this yoga through their respective mantras and charitable acts, live according to dharma, and utilize the talents this yoga provides for good purposes.',
+      };
+    }
+
+    return detailsMap[yogaName]!;
   }
 
   Widget _buildInsightsSection() {
@@ -5326,6 +7089,9 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       'Jupiter': Color(0xFFFBBF24),
       'Venus': Color(0xFFF472B6),
       'Saturn': Color(0xFF9CA3AF),
+      'Uranus': Color(0xFF22D3EE), // Cyan/Electric blue
+      'Neptune': Color(0xFF818CF8), // Indigo/Deep blue
+      'Pluto': Color(0xFF94A3B8), // Slate/Dark gray
       'Rahu': Color(0xFFA78BFA),
       'Ketu': Color(0xFFC2410C),
     };
@@ -5341,6 +7107,9 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       'Jupiter': '♃',
       'Venus': '♀',
       'Saturn': '♄',
+      'Uranus': '♅',
+      'Neptune': '♆',
+      'Pluto': '♇',
       'Rahu': '☊',
       'Ketu': '☋',
     };
@@ -7570,5 +9339,259 @@ class _CustomTimePickerState extends State<_CustomTimePicker> {
         ],
       ),
     );
+  }
+}
+
+/// A widget that displays a realistic moon phase based on tithi
+class _MoonPhaseWidget extends StatelessWidget {
+  final int tithiNumber; // 1-15
+  final String paksha; // 'Shukla' or 'Krishna'
+  final double size;
+
+  const _MoonPhaseWidget({
+    required this.tithiNumber,
+    required this.paksha,
+    this.size = 44,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFFBBF24).withOpacity(0.3),
+            blurRadius: 12,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: CustomPaint(
+        size: Size(size, size),
+        painter: _MoonPhasePainter(tithiNumber: tithiNumber, paksha: paksha),
+      ),
+    );
+  }
+}
+
+/// Custom painter for realistic moon phase visualization
+class _MoonPhasePainter extends CustomPainter {
+  final int tithiNumber;
+  final String paksha;
+
+  _MoonPhasePainter({required this.tithiNumber, required this.paksha});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2 - 1;
+
+    // Calculate phase (0.0 to 1.0 representing the lunar cycle)
+    // Shukla Paksha: Tithi 1 = just after new moon, Tithi 15 = full moon
+    // Krishna Paksha: Tithi 1 = just after full moon, Tithi 15 = new moon
+    bool isWaxing = paksha == 'Shukla';
+
+    // Phase: 0 = new moon, 0.5 = full moon, 1 = new moon again
+    double phase;
+    if (isWaxing) {
+      // Shukla: tithi 1 → phase ~0, tithi 15 → phase 0.5 (full moon)
+      phase = (tithiNumber - 1) / 30.0;
+    } else {
+      // Krishna: tithi 1 → phase ~0.5 (just past full), tithi 15 → phase ~1 (new moon)
+      phase = 0.5 + (tithiNumber - 1) / 30.0;
+    }
+
+    // Draw dark moon background (the shadow side)
+    final darkPaint =
+        Paint()
+          ..color = const Color(0xFF1A1425)
+          ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, radius, darkPaint);
+
+    // Draw subtle craters on dark side
+    _drawCraters(canvas, center, radius, 0.3);
+
+    // Draw the illuminated portion
+    _drawIlluminatedMoon(canvas, center, radius, phase);
+
+    // Add rim light
+    final rimPaint =
+        Paint()
+          ..color = Colors.white.withOpacity(0.2)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 0.5;
+    canvas.drawCircle(center, radius, rimPaint);
+  }
+
+  void _drawCraters(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    double opacity,
+  ) {
+    final random = math.Random(42);
+    final craterPaint =
+        Paint()
+          ..color = const Color(0xFF0D0A12).withOpacity(opacity)
+          ..style = PaintingStyle.fill;
+
+    for (int i = 0; i < 5; i++) {
+      final angle = random.nextDouble() * 2 * math.pi;
+      final dist = random.nextDouble() * radius * 0.65;
+      final r = radius * (0.08 + random.nextDouble() * 0.12);
+
+      canvas.drawCircle(
+        Offset(
+          center.dx + math.cos(angle) * dist,
+          center.dy + math.sin(angle) * dist,
+        ),
+        r,
+        craterPaint,
+      );
+    }
+  }
+
+  void _drawIlluminatedMoon(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    double phase,
+  ) {
+    // Illumination: 0 at new moon, 1 at full moon, 0 at new moon again
+    // phase 0 or 1 = new moon (0% illumination)
+    // phase 0.5 = full moon (100% illumination)
+    final illumination = (1 - (2 * (phase - 0.5)).abs());
+
+    if (illumination < 0.02) return; // New moon - nothing to draw
+
+    // Determine which side is lit
+    // phase < 0.5 = waxing (right side lit)
+    // phase > 0.5 = waning (left side lit)
+    final bool rightSideLit = phase < 0.5;
+
+    // Moon gradient for 3D look
+    final moonPaint =
+        Paint()
+          ..shader = RadialGradient(
+            center: Alignment(rightSideLit ? 0.3 : -0.3, -0.25),
+            radius: 0.9,
+            colors: const [
+              Color(0xFFFFFCF0), // Bright center
+              Color(0xFFF5E8C8), // Moon yellow
+              Color(0xFFE8D5A0), // Edge
+            ],
+            stops: const [0.0, 0.6, 1.0],
+          ).createShader(Rect.fromCircle(center: center, radius: radius));
+
+    canvas.save();
+
+    // Clip to moon circle
+    canvas.clipPath(
+      Path()..addOval(Rect.fromCircle(center: center, radius: radius)),
+    );
+
+    // Full moon case
+    if (illumination > 0.98) {
+      canvas.drawCircle(center, radius, moonPaint);
+      _drawCraters(canvas, center, radius, 0.15);
+      canvas.restore();
+      return;
+    }
+
+    // Create the illuminated shape using the terminator curve
+    final path = Path();
+
+    // The terminator is an ellipse. Its x-scale determines the phase appearance.
+    // terminatorScale: -1 = crescent (shadow bulges into lit side)
+    //                   0 = half moon (straight line terminator)
+    //                  +1 = gibbous (lit side bulges into shadow)
+    //
+    // For waxing: illumination 0→0.5 = crescent→half, 0.5→1 = half→gibbous→full
+    // For waning: same but mirrored
+
+    final double terminatorScale;
+    if (illumination <= 0.5) {
+      // Crescent phase: terminator curves inward (negative scale)
+      terminatorScale = -(1 - illumination * 2);
+    } else {
+      // Gibbous phase: terminator curves outward (positive scale)
+      terminatorScale = (illumination - 0.5) * 2;
+    }
+
+    // Build the path
+    if (rightSideLit) {
+      // Right side lit (waxing)
+      // Draw right semicircle (the lit outer edge)
+      path.moveTo(center.dx, center.dy - radius);
+      path.arcTo(
+        Rect.fromCircle(center: center, radius: radius),
+        -math.pi / 2,
+        math.pi,
+        false,
+      );
+
+      // Draw terminator curve back to top
+      // This is an ellipse with width = radius * terminatorScale
+      if (terminatorScale.abs() < 0.01) {
+        // Half moon - straight line
+        path.lineTo(center.dx, center.dy - radius);
+      } else {
+        path.arcTo(
+          Rect.fromCenter(
+            center: center,
+            width: (radius * terminatorScale).abs() * 2,
+            height: radius * 2,
+          ),
+          math.pi / 2,
+          terminatorScale > 0 ? math.pi : -math.pi,
+          false,
+        );
+      }
+    } else {
+      // Left side lit (waning)
+      // Draw left semicircle (the lit outer edge)
+      path.moveTo(center.dx, center.dy - radius);
+      path.arcTo(
+        Rect.fromCircle(center: center, radius: radius),
+        -math.pi / 2,
+        -math.pi,
+        false,
+      );
+
+      // Draw terminator curve back to top
+      if (terminatorScale.abs() < 0.01) {
+        // Half moon - straight line
+        path.lineTo(center.dx, center.dy - radius);
+      } else {
+        path.arcTo(
+          Rect.fromCenter(
+            center: center,
+            width: (radius * terminatorScale).abs() * 2,
+            height: radius * 2,
+          ),
+          math.pi / 2,
+          terminatorScale > 0 ? -math.pi : math.pi,
+          false,
+        );
+      }
+    }
+
+    path.close();
+    canvas.drawPath(path, moonPaint);
+
+    // Draw craters on lit portion
+    canvas.clipPath(path);
+    _drawCraters(canvas, center, radius, 0.12);
+
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _MoonPhasePainter oldDelegate) {
+    return oldDelegate.tithiNumber != tithiNumber ||
+        oldDelegate.paksha != paksha;
   }
 }

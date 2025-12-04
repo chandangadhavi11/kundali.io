@@ -46,3 +46,5 @@ Advanced responsive Kundali display with circular charts, adaptive cards, and ge
 - `app_colors.dart` - Theme colors
 - `kundali_data_model.dart` - Data model
 
+
+

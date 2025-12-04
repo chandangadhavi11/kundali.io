@@ -61,11 +61,16 @@ class _KundliInputScreenState extends State<KundliInputScreen>
     super.initState();
     _initializeDefaultValues();
     _initializeAnimations();
-
+    // Note: Removed auto-generate on init to avoid heavy calculations on the input screen
+    // User will generate Kundali when they tap the "Generate Kundali" button
+    
+    // Defer animation start to after first frame for smoother transition
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(milliseconds: 300), () {
-        if (mounted) _autoGenerateKundali();
-      });
+      if (mounted) {
+        _fadeController.forward();
+        _slideController.forward();
+        _shimmerController.repeat();
+      }
     });
   }
 
@@ -111,51 +116,11 @@ class _KundliInputScreenState extends State<KundliInputScreen>
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
-    // Shimmer animation
+    // Shimmer animation - deferred start
     _shimmerController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
-    )..repeat();
-
-    // Start animations
-    _fadeController.forward();
-    _slideController.forward();
-  }
-
-  Future<void> _autoGenerateKundali() async {
-    setState(() => _isLoading = true);
-
-    final birthDateTime = DateTime(
-      _selectedDate.year,
-      _selectedDate.month,
-      _selectedDate.day,
-      _selectedTime.hour,
-      _selectedTime.minute,
     );
-
-    final provider = context.read<KundliProvider>();
-
-    await provider.generateKundali(
-      name: _nameController.text,
-      birthDateTime: birthDateTime,
-      birthPlace: _placeController.text,
-      latitude: _latitude ?? 28.6139,
-      longitude: _longitude ?? 77.2090,
-      timezone: _timezone,
-      gender: _selectedGender,
-      isPrimary: false,
-      chartStyle: _chartStyle,
-      language: _language,
-    );
-
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-        if (provider.error.isEmpty && provider.currentKundali != null) {
-          _currentKundali = provider.currentKundali;
-        }
-      });
-    }
   }
 
   @override
@@ -1519,22 +1484,30 @@ class _KundliInputScreenState extends State<KundliInputScreen>
   }
 }
 
-// Custom painter for subtle noise texture
+// Custom painter for subtle noise texture - optimized for performance
 class _NoisePainter extends CustomPainter {
+  // Pre-generated points for performance
+  static List<Offset>? _cachedPoints;
+  static Size? _cachedSize;
+  
   @override
   void paint(Canvas canvas, Size size) {
-    final random = math.Random(42);
-    final paint = Paint()..color = Colors.white;
-
-    for (var i = 0; i < 2000; i++) {
-      canvas.drawCircle(
-        Offset(
+    // Use cached points if size matches
+    if (_cachedPoints == null || _cachedSize != size) {
+      final random = math.Random(42);
+      _cachedPoints = List.generate(
+        300, // Reduced from 2000 to 300 for much better performance
+        (_) => Offset(
           random.nextDouble() * size.width,
           random.nextDouble() * size.height,
         ),
-        0.5,
-        paint,
       );
+      _cachedSize = size;
+    }
+    
+    final paint = Paint()..color = Colors.white;
+    for (final point in _cachedPoints!) {
+      canvas.drawCircle(point, 0.5, paint);
     }
   }
 

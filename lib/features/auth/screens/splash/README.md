@@ -52,3 +52,5 @@ The Splash Screen displays the app branding while initializing the application a
 - `AppConstants.appName` - App display name
 - `AppColors.cosmicGradient` - Background gradient
 
+
+

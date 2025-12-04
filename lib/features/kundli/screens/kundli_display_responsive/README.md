@@ -44,3 +44,5 @@ Full responsive implementation of Kundali chart visualization with SVG charts an
 - `app_colors.dart` - Theme colors
 - `kundali_data_model.dart` - Data model
 
+
+

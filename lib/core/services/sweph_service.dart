@@ -83,11 +83,6 @@ class SwephService {
     required double timezoneOffsetHours,
     bool useAyanamsa = true,
   }) {
-    debugPrint('SwephService: ========== CALCULATING KUNDLI ==========');
-    debugPrint('SwephService: Birth: $birthDateTime');
-    debugPrint('SwephService: Location: $latitude, $longitude');
-    debugPrint('SwephService: Timezone: $timezoneOffsetHours hours');
-
     // Step 1: Convert local time to UT (Universal Time)
     final double hourDecimal = birthDateTime.hour +
         birthDateTime.minute / 60.0 +
@@ -104,7 +99,6 @@ class SwephService {
 
     // Adjust for timezone to get UT (subtract timezone offset)
     final double julianDayUT = julianDayLocal - (timezoneOffsetHours / 24.0);
-    debugPrint('SwephService: Julian Day UT: $julianDayUT');
 
     // Step 2: Set Ayanamsa for Vedic calculations (Lahiri)
     if (useAyanamsa) {
@@ -120,7 +114,6 @@ class SwephService {
     final double ayanamsaValue = useAyanamsa
         ? Sweph.swe_get_ayanamsa_ut(julianDayUT)
         : 0.0;
-    debugPrint('SwephService: Ayanamsa (Lahiri): ${ayanamsaValue.toStringAsFixed(4)}°');
 
     // Step 4: Calculate houses (TROPICAL first, then convert to sidereal)
     // Using Placidus for house cusps calculation
@@ -130,13 +123,9 @@ class SwephService {
     final double tropicalAscendant = housesData.ascmc[AscmcIndex.SE_ASC.index];
     final double tropicalMC = housesData.ascmc[AscmcIndex.SE_MC.index];
 
-    debugPrint('SwephService: Tropical Ascendant: ${tropicalAscendant.toStringAsFixed(2)}°');
-
     // Convert ascendant to sidereal
     final double siderealAscendant = _normalizeDegree(tropicalAscendant - ayanamsaValue);
     final double siderealMC = _normalizeDegree(tropicalMC - ayanamsaValue);
-
-    debugPrint('SwephService: Sidereal Ascendant: ${siderealAscendant.toStringAsFixed(2)}° (${getSignName(siderealAscendant)})');
 
     // For Vedic astrology, use WHOLE SIGN houses
     // House 1 starts at 0° of the ascendant sign
@@ -144,8 +133,6 @@ class SwephService {
     final List<double> siderealHouseCusps = List.generate(12, (i) {
       return ((ascendantSignIndex + i) % 12) * 30.0;
     });
-
-    debugPrint('SwephService: House cusps (whole sign): ${siderealHouseCusps.map((h) => getSignName(h)).join(', ')}');
 
     // Step 5: Calculate planetary positions (TROPICAL, then convert)
     final Map<String, PlanetaryPosition> planets = {};
@@ -167,6 +154,12 @@ class SwephService {
     planets['Venus'] = _calculatePlanet(HeavenlyBody.SE_VENUS, julianDayUT, calcFlag, ayanamsaValue);
     // Saturn
     planets['Saturn'] = _calculatePlanet(HeavenlyBody.SE_SATURN, julianDayUT, calcFlag, ayanamsaValue);
+    // Uranus
+    planets['Uranus'] = _calculatePlanet(HeavenlyBody.SE_URANUS, julianDayUT, calcFlag, ayanamsaValue);
+    // Neptune
+    planets['Neptune'] = _calculatePlanet(HeavenlyBody.SE_NEPTUNE, julianDayUT, calcFlag, ayanamsaValue);
+    // Pluto
+    planets['Pluto'] = _calculatePlanet(HeavenlyBody.SE_PLUTO, julianDayUT, calcFlag, ayanamsaValue);
     // Rahu (True Node)
     planets['Rahu'] = _calculatePlanet(HeavenlyBody.SE_TRUE_NODE, julianDayUT, calcFlag, ayanamsaValue);
 
@@ -180,14 +173,6 @@ class SwephService {
       speedLatitude: rahuPos.speedLatitude,
       isRetrograde: true, // Rahu/Ketu always retrograde in Vedic
     );
-
-    // Log all planetary positions
-    debugPrint('SwephService: === PLANETARY POSITIONS ===');
-    for (final entry in planets.entries) {
-      final p = entry.value;
-      final house = _getPlanetHouseWholeSign(p.longitude, ascendantSignIndex);
-      debugPrint('SwephService: ${entry.key}: ${p.longitude.toStringAsFixed(2)}° = ${p.signName} ${p.degreeInSign.toStringAsFixed(2)}° | House $house ${p.isRetrograde ? "(R)" : ""}');
-    }
 
     return KundliCalculationResult(
       julianDay: julianDayUT,
@@ -233,13 +218,6 @@ class SwephService {
         isRetrograde: false,
       );
     }
-  }
-
-  /// Get house number for a planet using WHOLE SIGN system
-  static int _getPlanetHouseWholeSign(double planetLongitude, int ascendantSignIndex) {
-    final planetSignIndex = getSignIndex(planetLongitude);
-    // House = (planet sign - ascendant sign + 12) % 12 + 1
-    return ((planetSignIndex - ascendantSignIndex + 12) % 12) + 1;
   }
 
   /// Normalize degree to 0-360 range

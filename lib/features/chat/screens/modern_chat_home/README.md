@@ -58,3 +58,5 @@ The Modern Chat Home Screen serves as the main hub for chat features, including 
 - Custom widgets from `../widgets/`
 - `app_colors.dart` - Theme colors
 
+
+

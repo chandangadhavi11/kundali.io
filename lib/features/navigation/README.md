@@ -38,3 +38,5 @@ Provides the main app shell with responsive navigation UI that adapts to differe
 - Smooth mode transitions
 - Route-based index tracking
 
+
+

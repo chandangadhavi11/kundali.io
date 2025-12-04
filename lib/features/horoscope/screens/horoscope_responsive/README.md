@@ -56,3 +56,5 @@ All 12 zodiac signs with:
 ## Dependencies
 - `app_colors.dart` - Theme colors
 
+
+
