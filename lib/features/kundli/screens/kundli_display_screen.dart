@@ -5280,14 +5280,18 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
   // ============ TRANSIT TAB ============
 
   Widget _buildTransitTab() {
-    // For demo, we'll use current positions (in real app, would get from ephemeris)
-    // Here we simulate current transits
-    final currentPositions = _getSimulatedCurrentPositions();
+    // Calculate REAL current planetary positions using Swiss Ephemeris
+    final currentPositions = _getCurrentTransitPositions();
     final transits = KundaliCalculationService.calculateTransits(
       _kundaliData!.planetPositions,
       currentPositions,
       _kundaliData!.moonSign,
     );
+
+    // Format current date for display
+    final now = DateTime.now();
+    final dateStr =
+        '${now.day}/${now.month}/${now.year} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -5302,51 +5306,201 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
             const Color(0xFF22D3EE),
           ),
           const SizedBox(height: 4),
-          Text(
-            'Effects calculated from your Moon sign: ${_kundaliData!.moonSign}',
-            style: GoogleFonts.dmSans(fontSize: 10, color: _textMuted),
+          Row(
+            children: [
+              Icon(Icons.access_time_rounded, size: 12, color: _textMuted),
+              const SizedBox(width: 4),
+              Text(
+                'As of $dateStr',
+                style: GoogleFonts.dmSans(fontSize: 10, color: _textMuted),
+              ),
+              const Spacer(),
+              Text(
+                'Moon sign: ${_kundaliData!.moonSign}',
+                style: GoogleFonts.dmSans(
+                  fontSize: 10,
+                  color: _accentSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 14),
+
+          // Current planetary positions summary
+          _buildCurrentPositionsSummary(currentPositions),
+          const SizedBox(height: 16),
+
+          // Transit effects
+          _buildSectionHeader(
+            'Transit Effects',
+            'Impact on your chart',
+            Icons.trending_up_rounded,
+            const Color(0xFF6EE7B7),
+          ),
+          const SizedBox(height: 12),
           ...transits.entries.map((entry) => _buildTransitCard(entry.value)),
         ],
       ),
     );
   }
 
-  Map<String, PlanetPosition> _getSimulatedCurrentPositions() {
-    // Simulate current planetary positions (in real app, calculate from current date)
-    final now = DateTime.now();
-    final dayOfYear = now.difference(DateTime(now.year)).inDays;
+  /// Calculate REAL current planetary positions using Swiss Ephemeris
+  /// This replaces the old simulated positions with actual astronomical calculations
+  Map<String, PlanetPosition> _getCurrentTransitPositions() {
+    try {
+      // Use current date/time with the same location as birth chart
+      // (Location doesn't significantly affect planetary longitudes, mainly affects houses/ascendant)
+      final now = DateTime.now();
 
-    Map<String, PlanetPosition> positions = {};
-    final planetSpeeds = {
-      'Sun': 1.0,
-      'Moon': 13.0,
-      'Mars': 0.5,
-      'Mercury': 1.2,
-      'Jupiter': 0.08,
-      'Venus': 1.0,
-      'Saturn': 0.03,
-      'Rahu': -0.05,
-      'Ketu': -0.05,
-    };
-
-    for (var planet in planetSpeeds.keys) {
-      double longitude =
-          (dayOfYear * planetSpeeds[planet]! * 0.5 + planet.hashCode) % 360;
-      int signIndex = (longitude / 30).floor();
-      positions[planet] = PlanetPosition(
-        planet: planet,
-        longitude: longitude,
-        sign: KundaliCalculationService.zodiacSigns[signIndex],
-        signDegree: longitude % 30,
-        nakshatra:
-            KundaliCalculationService.nakshatras[(longitude / 13.333).floor() %
-                27],
-        house: 1,
+      // Calculate using the same Swiss Ephemeris service used for birth chart
+      final result = KundaliCalculationService.calculateAll(
+        birthDateTime: now,
+        latitude: _kundaliData!.latitude,
+        longitude: _kundaliData!.longitude,
+        timezone: _kundaliData!.timezone,
       );
+
+      return result.planetPositions;
+    } catch (e) {
+      // Fallback to birth positions if calculation fails (shouldn't happen)
+      debugPrint('Transit calculation error: $e');
+      return _kundaliData!.planetPositions;
     }
-    return positions;
+  }
+
+  /// Build a summary card showing current planetary positions
+  Widget _buildCurrentPositionsSummary(Map<String, PlanetPosition> positions) {
+    final vedicPlanets = [
+      'Sun',
+      'Moon',
+      'Mars',
+      'Mercury',
+      'Jupiter',
+      'Venus',
+      'Saturn',
+      'Rahu',
+      'Ketu',
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF22D3EE).withOpacity(0.08),
+            const Color(0xFF6EE7B7).withOpacity(0.04),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: const Color(0xFF22D3EE).withOpacity(0.2),
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.public_rounded,
+                size: 14,
+                color: const Color(0xFF22D3EE),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Current Sky Positions',
+                style: GoogleFonts.dmSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: _textPrimary,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6EE7B7).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  'LIVE',
+                  style: GoogleFonts.dmMono(
+                    fontSize: 8,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF6EE7B7),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children:
+                vedicPlanets.map((planet) {
+                  final pos = positions[planet];
+                  if (pos == null) return const SizedBox();
+
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _surfaceColor.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _getPlanetColor(planet).withOpacity(0.2),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _getPlanetSymbol(planet),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _getPlanetColor(planet),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              pos.sign,
+                              style: GoogleFonts.dmSans(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: _textPrimary,
+                              ),
+                            ),
+                            Text(
+                              '${pos.signDegree.toStringAsFixed(1)}°${pos.isRetrograde ? ' ℞' : ''}',
+                              style: GoogleFonts.dmMono(
+                                fontSize: 8,
+                                color:
+                                    pos.isRetrograde
+                                        ? const Color(0xFFF87171)
+                                        : _textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildTransitCard(TransitData transit) {

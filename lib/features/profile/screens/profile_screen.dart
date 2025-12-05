@@ -74,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             slivers: [
               // Animated App Bar
               SliverAppBar(
-                expandedHeight: 260,
+                expandedHeight: 320,
                 floating: false,
                 pinned: true,
                 backgroundColor: _scrollOffset > 100

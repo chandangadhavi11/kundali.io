@@ -41,6 +41,9 @@ dependencies:
   # API & Networking
   dio: ^5.7.0
   connectivity_plus: ^6.0.5
+  
+  # AI Integration
+  google_generative_ai: ^0.4.6
 
   # Date & Time
   intl: ^0.20.0

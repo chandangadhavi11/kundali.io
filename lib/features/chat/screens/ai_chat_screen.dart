@@ -3,13 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui';
 import '../../../core/providers/auth_provider.dart';
+import '../../../core/providers/chat_provider.dart';
+import '../../../core/providers/kundli_provider.dart';
 import '../../../shared/widgets/auth_required_dialog.dart';
+import '../../../shared/models/chat_conversation.dart';
 
 // Premium Cosmic Colors
 class _CosmicColors {
   static const background = Color(0xFF0A0612);
   static const cardDark = Color(0xFF16101F);
-  static const cardLight = Color(0xFF1E1528);
   static const golden = Color(0xFFE8B931);
   static const goldenLight = Color(0xFFF5D563);
   static const textPrimary = Color(0xFFFAFAFA);
@@ -17,6 +19,8 @@ class _CosmicColors {
   static const accent = Color(0xFF6C5CE7);
   static const userBubble = Color(0xFF2D1F42);
   static const aiBubble = Color(0xFF16101F);
+  static const success = Color(0xFF00B894);
+  static const error = Color(0xFFFF6B6B);
 }
 
 class AiChatScreen extends StatefulWidget {
@@ -36,14 +40,12 @@ class _AiChatScreenState extends State<AiChatScreen>
   late AnimationController _typingController;
 
   bool _isTyping = false;
-  bool _isAiTyping = false;
-
-  final List<ChatMessage> _messages = [];
+  bool _showHistory = false;
 
   final List<Map<String, dynamic>> _quickActions = [
-    {'label': 'My Kundli', 'icon': Icons.auto_awesome_rounded},
-    {'label': 'Today\'s Transit', 'icon': Icons.timeline_rounded},
-    {'label': 'Partner Match', 'icon': Icons.favorite_rounded},
+    {'label': 'My Kundli', 'icon': Icons.auto_awesome_rounded, 'action': 'kundli'},
+    {'label': 'Today\'s Transit', 'icon': Icons.timeline_rounded, 'action': 'transit'},
+    {'label': 'Partner Match', 'icon': Icons.favorite_rounded, 'action': 'match'},
   ];
 
   final List<String> _quickPrompts = [
@@ -58,7 +60,7 @@ class _AiChatScreenState extends State<AiChatScreen>
   void initState() {
     super.initState();
     _initializeAnimations();
-    _initializeChat();
+    _initializeKundaliContext();
   }
 
   void _initializeAnimations() {
@@ -80,15 +82,16 @@ class _AiChatScreenState extends State<AiChatScreen>
     });
   }
 
-  void _initializeChat() {
-    _messages.add(
-      ChatMessage(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        text: 'Hello! I\'m your AI Astrology Assistant. I can help you understand your birth chart, provide personalized predictions, and answer any astrological questions you may have. How can I assist you today?',
-        isUser: false,
-        timestamp: DateTime.now(),
-      ),
-    );
+  void _initializeKundaliContext() {
+    // Set up Kundali context for personalized responses
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final kundliProvider = context.read<KundliProvider>();
+      final chatProvider = context.read<ChatProvider>();
+      
+      if (kundliProvider.primaryKundali != null) {
+        chatProvider.setActiveKundali(kundliProvider.primaryKundali);
+      }
+    });
   }
 
   @override
@@ -114,38 +117,12 @@ class _AiChatScreenState extends State<AiChatScreen>
       return;
     }
 
-    final userMessage = ChatMessage(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      text: _messageController.text,
-      isUser: true,
-      timestamp: DateTime.now(),
-    );
-
-    setState(() {
-      _messages.add(userMessage);
-      _isAiTyping = true;
-    });
-
+    final chatProvider = context.read<ChatProvider>();
+    final message = _messageController.text;
     _messageController.clear();
+    
+    await chatProvider.sendMessage(message);
     _scrollToBottom();
-
-    // Simulate AI response
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _messages.add(
-            ChatMessage(
-              id: DateTime.now().millisecondsSinceEpoch.toString(),
-              text: 'Based on your birth chart and current planetary positions, I can see interesting developments ahead. The conjunction of Jupiter with your natal Moon suggests a period of emotional growth and potential opportunities in your personal relationships. Would you like me to elaborate on any specific area?',
-              isUser: false,
-              timestamp: DateTime.now(),
-            ),
-          );
-          _isAiTyping = false;
-        });
-        _scrollToBottom();
-      }
-    });
   }
 
   void _scrollToBottom() {
@@ -160,38 +137,214 @@ class _AiChatScreenState extends State<AiChatScreen>
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _CosmicColors.background,
-      body: Stack(
-        children: [
-          // Cosmic background
-          _buildCosmicBackground(),
+  void _handleQuickAction(String action) async {
+    final chatProvider = context.read<ChatProvider>();
+    final authProvider = context.read<AuthProvider>();
+    
+    if (!authProvider.isAuthenticated) {
+      await AuthRequiredDialog.show(
+        context,
+        feature: 'AI Astrologer',
+        description: 'Sign in to use this feature.',
+      );
+      return;
+    }
 
-          // Main content
-          SafeArea(
-            child: Column(
-              children: [
-                // Premium Header
-                _buildPremiumHeader(),
+    switch (action) {
+      case 'kundli':
+        final result = await chatProvider.handleMyKundliAction();
+        if (result == 'no_kundali') {
+          _showCreateKundliDialog();
+        }
+        break;
+      case 'transit':
+        await chatProvider.handleTodaysTransitAction();
+        break;
+      case 'match':
+        final result = await chatProvider.handlePartnerMatchAction();
+        if (result == 'no_kundali') {
+          _showCreateKundliDialog();
+        } else if (result == 'compatibility') {
+          // Optionally navigate to compatibility screen
+        }
+        break;
+    }
+    _scrollToBottom();
+  }
 
-                // Messages area
-                Expanded(child: _buildMessagesArea()),
-
-                // Quick actions (only when few messages)
-                if (_messages.length <= 1) _buildQuickActions(),
-
-                // Quick prompts (only when few messages)
-                if (_messages.length <= 1) _buildQuickPrompts(),
-
-                // Input area
-                _buildInputArea(),
-              ],
+  void _showCreateKundliDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: _CosmicColors.cardDark,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          'Create Your Kundli',
+          style: TextStyle(color: _CosmicColors.textPrimary),
+        ),
+        content: Text(
+          'To get personalized insights, please create your birth chart first.',
+          style: TextStyle(color: _CosmicColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Later', style: TextStyle(color: _CosmicColors.textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/kundli-input');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _CosmicColors.golden,
+              foregroundColor: _CosmicColors.background,
             ),
+            child: const Text('Create Now'),
           ),
         ],
       ),
+    );
+  }
+
+  void _showApiKeyDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: _CosmicColors.cardDark,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.key_rounded, color: _CosmicColors.golden),
+            const SizedBox(width: 8),
+            Text('Gemini API Key', style: TextStyle(color: _CosmicColors.textPrimary)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Enter your Google Gemini API key to enable AI-powered responses.',
+              style: TextStyle(color: _CosmicColors.textSecondary, fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              style: TextStyle(color: _CosmicColors.textPrimary),
+              decoration: InputDecoration(
+                hintText: 'AIza...',
+                hintStyle: TextStyle(color: _CosmicColors.textSecondary.withOpacity(0.5)),
+                filled: true,
+                fillColor: _CosmicColors.background,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: _CosmicColors.golden.withOpacity(0.3)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: _CosmicColors.golden.withOpacity(0.3)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: _CosmicColors.golden),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () {
+                // Open link to get API key
+              },
+              child: Text(
+                'Get your free API key from Google AI Studio',
+                style: TextStyle(
+                  color: _CosmicColors.golden,
+                  fontSize: 12,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel', style: TextStyle(color: _CosmicColors.textSecondary)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              if (controller.text.trim().isNotEmpty) {
+                final chatProvider = context.read<ChatProvider>();
+                final success = await chatProvider.setApiKey(controller.text.trim());
+                if (success && mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('API key saved successfully!'),
+                      backgroundColor: _CosmicColors.success,
+                    ),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _CosmicColors.golden,
+              foregroundColor: _CosmicColors.background,
+            ),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ChatProvider>(
+      builder: (context, chatProvider, _) {
+        return Scaffold(
+          backgroundColor: _CosmicColors.background,
+          body: Stack(
+            children: [
+              // Cosmic background
+              _buildCosmicBackground(),
+
+              // Main content
+              SafeArea(
+                child: Column(
+                  children: [
+                    // Premium Header
+                    _buildPremiumHeader(chatProvider),
+
+                    // Messages area
+                    Expanded(child: _buildMessagesArea(chatProvider)),
+
+                    // Quick actions (only when few messages)
+                    if (chatProvider.messages.length <= 1 && !chatProvider.isAiTyping) 
+                      _buildQuickActions(),
+
+                    // Quick prompts (only when few messages)
+                    if (chatProvider.messages.length <= 1 && !chatProvider.isAiTyping) 
+                      _buildQuickPrompts(),
+
+                    // Free questions remaining indicator
+                    if (!chatProvider.isPremium && chatProvider.freeQuestionsRemaining > 0)
+                      _buildFreeQuestionsIndicator(chatProvider),
+
+                    // Input area
+                    _buildInputArea(chatProvider),
+                  ],
+                ),
+              ),
+              
+              // Conversation history drawer
+              if (_showHistory) _buildHistoryDrawer(chatProvider),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -210,7 +363,7 @@ class _AiChatScreenState extends State<AiChatScreen>
     );
   }
 
-  Widget _buildPremiumHeader() {
+  Widget _buildPremiumHeader(ChatProvider chatProvider) {
     return FadeTransition(
       opacity: _entryController,
       child: SlideTransition(
@@ -299,7 +452,7 @@ class _AiChatScreenState extends State<AiChatScreen>
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            'PRO',
+                            chatProvider.hasApiKey ? 'PRO' : 'DEMO',
                             style: TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w700,
@@ -317,13 +470,17 @@ class _AiChatScreenState extends State<AiChatScreen>
                           width: 6,
                           height: 6,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF00B894),
+                            color: chatProvider.hasApiKey 
+                                ? _CosmicColors.success 
+                                : _CosmicColors.golden,
                             shape: BoxShape.circle,
                           ),
                         ),
                         const SizedBox(width: 5),
                         Text(
-                          'Online • Ready to assist',
+                          chatProvider.hasApiKey 
+                              ? 'Online • Ready to assist'
+                              : 'Demo mode • Add API key',
                           style: TextStyle(
                             fontSize: 12,
                             color: _CosmicColors.textSecondary,
@@ -335,13 +492,77 @@ class _AiChatScreenState extends State<AiChatScreen>
                 ),
               ),
 
+              // History button
+              _buildGlassButton(
+                icon: Icons.history_rounded,
+                onTap: () => setState(() => _showHistory = !_showHistory),
+              ),
+              
+              const SizedBox(width: 8),
+
               // More options
               _buildGlassButton(
                 icon: Icons.more_vert_rounded,
-                onTap: () {},
+                onTap: () => _showOptionsMenu(),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showOptionsMenu() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: _CosmicColors.cardDark,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.key_rounded, color: _CosmicColors.golden),
+              title: Text('Set API Key', style: TextStyle(color: _CosmicColors.textPrimary)),
+              subtitle: Text(
+                'Enable AI-powered responses',
+                style: TextStyle(color: _CosmicColors.textSecondary, fontSize: 12),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _showApiKeyDialog();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.add_circle_outline, color: _CosmicColors.textPrimary),
+              title: Text('New Conversation', style: TextStyle(color: _CosmicColors.textPrimary)),
+              onTap: () {
+                Navigator.pop(context);
+                context.read<ChatProvider>().startNewConversation();
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.delete_outline, color: _CosmicColors.error),
+              title: Text('Clear Chat', style: TextStyle(color: _CosmicColors.textPrimary)),
+              onTap: () {
+                Navigator.pop(context);
+                context.read<ChatProvider>().clearChat();
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
         ),
       ),
     );
@@ -382,17 +603,20 @@ class _AiChatScreenState extends State<AiChatScreen>
     );
   }
 
-  Widget _buildMessagesArea() {
+  Widget _buildMessagesArea(ChatProvider chatProvider) {
+    final messages = chatProvider.messages;
+    final itemCount = messages.length + (chatProvider.isAiTyping ? 1 : 0);
+    
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      itemCount: _messages.length + (_isAiTyping ? 1 : 0),
+      itemCount: itemCount,
       itemBuilder: (context, index) {
-        if (index == _messages.length && _isAiTyping) {
+        if (index == messages.length && chatProvider.isAiTyping) {
           return _buildTypingIndicator();
         }
 
-        final message = _messages[index];
+        final message = messages[index];
         return TweenAnimationBuilder<double>(
           duration: const Duration(milliseconds: 400),
           tween: Tween(begin: 0.0, end: 1.0),
@@ -408,7 +632,7 @@ class _AiChatScreenState extends State<AiChatScreen>
     );
   }
 
-  Widget _buildMessageBubble(ChatMessage message) {
+  Widget _buildMessageBubble(message) {
     final isUser = message.isUser;
 
     return Padding(
@@ -568,7 +792,7 @@ class _AiChatScreenState extends State<AiChatScreen>
             child: GestureDetector(
               onTap: () {
                 HapticFeedback.lightImpact();
-                _messageController.text = action['label'];
+                _handleQuickAction(action['action']);
               },
               child: Container(
                 margin: EdgeInsets.only(
@@ -658,7 +882,31 @@ class _AiChatScreenState extends State<AiChatScreen>
     );
   }
 
-  Widget _buildInputArea() {
+  Widget _buildFreeQuestionsIndicator(ChatProvider chatProvider) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.stars_rounded,
+            size: 14,
+            color: _CosmicColors.golden,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '${chatProvider.freeQuestionsRemaining} free questions remaining today',
+            style: TextStyle(
+              fontSize: 12,
+              color: _CosmicColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInputArea(ChatProvider chatProvider) {
     return ClipRRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -712,12 +960,15 @@ class _AiChatScreenState extends State<AiChatScreen>
                   child: TextField(
                     controller: _messageController,
                     focusNode: _focusNode,
+                    enabled: !chatProvider.isLoading,
                     style: TextStyle(
                       fontSize: 15,
                       color: _CosmicColors.textPrimary,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Type your message...',
+                      hintText: chatProvider.canAskQuestion 
+                          ? 'Type your message...'
+                          : 'Daily limit reached',
                       hintStyle: TextStyle(
                         fontSize: 15,
                         color: _CosmicColors.textSecondary.withOpacity(0.5),
@@ -734,13 +985,15 @@ class _AiChatScreenState extends State<AiChatScreen>
 
               // Send button
               GestureDetector(
-                onTap: _isTyping ? _sendMessage : null,
+                onTap: (_isTyping && chatProvider.canAskQuestion && !chatProvider.isLoading) 
+                    ? _sendMessage 
+                    : null,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    gradient: _isTyping
+                    gradient: (_isTyping && chatProvider.canAskQuestion)
                         ? LinearGradient(
                             colors: [
                               _CosmicColors.golden,
@@ -748,9 +1001,11 @@ class _AiChatScreenState extends State<AiChatScreen>
                             ],
                           )
                         : null,
-                    color: _isTyping ? null : Colors.white.withOpacity(0.06),
+                    color: (_isTyping && chatProvider.canAskQuestion) 
+                        ? null 
+                        : Colors.white.withOpacity(0.06),
                     borderRadius: BorderRadius.circular(14),
-                    boxShadow: _isTyping
+                    boxShadow: (_isTyping && chatProvider.canAskQuestion)
                         ? [
                             BoxShadow(
                               color: _CosmicColors.golden.withOpacity(0.3),
@@ -760,14 +1015,260 @@ class _AiChatScreenState extends State<AiChatScreen>
                           ]
                         : null,
                   ),
-                  child: Icon(
-                    Icons.send_rounded,
-                    color: _isTyping
-                        ? _CosmicColors.background
-                        : _CosmicColors.textSecondary.withOpacity(0.5),
-                    size: 20,
+                  child: chatProvider.isLoading
+                      ? Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation(
+                              _CosmicColors.golden,
+                            ),
+                          ),
+                        )
+                      : Icon(
+                          Icons.send_rounded,
+                          color: (_isTyping && chatProvider.canAskQuestion)
+                              ? _CosmicColors.background
+                              : _CosmicColors.textSecondary.withOpacity(0.5),
+                          size: 20,
+                        ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHistoryDrawer(ChatProvider chatProvider) {
+    return GestureDetector(
+      onTap: () => setState(() => _showHistory = false),
+      child: Container(
+        color: Colors.black.withOpacity(0.5),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () {}, // Prevent closing when tapping drawer
+              child: Container(
+                width: 300,
+                height: double.infinity,
+                decoration: BoxDecoration(
+                  color: _CosmicColors.cardDark,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 20,
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            Icon(Icons.history_rounded, color: _CosmicColors.golden),
+                            const SizedBox(width: 12),
+                            Text(
+                              'Chat History',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: _CosmicColors.textPrimary,
+                              ),
+                            ),
+                            const Spacer(),
+                            IconButton(
+                              icon: Icon(Icons.close, color: _CosmicColors.textSecondary),
+                              onPressed: () => setState(() => _showHistory = false),
+                            ),
+                          ],
+                        ),
+                      ),
+                      
+                      // New chat button
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            chatProvider.startNewConversation();
+                            setState(() => _showHistory = false);
+                          },
+                          icon: const Icon(Icons.add, size: 18),
+                          label: const Text('New Conversation'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _CosmicColors.golden,
+                            foregroundColor: _CosmicColors.background,
+                            minimumSize: const Size(double.infinity, 44),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      // Conversations list
+                      Expanded(
+                        child: chatProvider.allConversations.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.chat_bubble_outline,
+                                      size: 48,
+                                      color: _CosmicColors.textSecondary.withOpacity(0.3),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      'No conversations yet',
+                                      style: TextStyle(
+                                        color: _CosmicColors.textSecondary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : ListView.builder(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                itemCount: chatProvider.allConversations.length,
+                                itemBuilder: (context, index) {
+                                  final conversation = chatProvider.allConversations[index];
+                                  final isSelected = chatProvider.currentConversation?.id == conversation.id;
+                                  
+                                  return _buildConversationTile(
+                                    conversation,
+                                    isSelected,
+                                    chatProvider,
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
                   ),
                 ),
+              ),
+            ),
+            Expanded(child: Container()),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildConversationTile(
+    ChatConversation conversation,
+    bool isSelected,
+    ChatProvider chatProvider,
+  ) {
+    return Dismissible(
+      key: Key(conversation.id),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 16),
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(
+          color: _CosmicColors.error,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      confirmDismiss: (direction) async {
+        return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: _CosmicColors.cardDark,
+            title: Text('Delete Conversation', style: TextStyle(color: _CosmicColors.textPrimary)),
+            content: Text(
+              'Are you sure you want to delete this conversation?',
+              style: TextStyle(color: _CosmicColors.textSecondary),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text('Cancel', style: TextStyle(color: _CosmicColors.textSecondary)),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(backgroundColor: _CosmicColors.error),
+                child: const Text('Delete'),
+              ),
+            ],
+          ),
+        ) ?? false;
+      },
+      onDismissed: (direction) {
+        chatProvider.deleteConversation(conversation.id);
+      },
+      child: GestureDetector(
+        onTap: () {
+          chatProvider.loadConversation(conversation.id);
+          setState(() => _showHistory = false);
+        },
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: isSelected 
+                ? _CosmicColors.golden.withOpacity(0.1) 
+                : Colors.white.withOpacity(0.03),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected 
+                  ? _CosmicColors.golden.withOpacity(0.3)
+                  : Colors.transparent,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  if (conversation.isPinned)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: Icon(
+                        Icons.push_pin,
+                        size: 14,
+                        color: _CosmicColors.golden,
+                      ),
+                    ),
+                  Expanded(
+                    child: Text(
+                      conversation.title,
+                      style: TextStyle(
+                        color: _CosmicColors.textPrimary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Text(
+                    _formatDate(conversation.updatedAt),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: _CosmicColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                conversation.lastMessagePreview,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _CosmicColors.textSecondary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -781,19 +1282,18 @@ class _AiChatScreenState extends State<AiChatScreen>
     final period = time.hour >= 12 ? 'PM' : 'AM';
     return '${hour == 0 ? 12 : hour}:${time.minute.toString().padLeft(2, '0')} $period';
   }
-}
 
-// Chat message model
-class ChatMessage {
-  final String id;
-  final String text;
-  final bool isUser;
-  final DateTime timestamp;
-
-  ChatMessage({
-    required this.id,
-    required this.text,
-    required this.isUser,
-    required this.timestamp,
-  });
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final messageDate = DateTime(date.year, date.month, date.day);
+    
+    if (messageDate == today) {
+      return _formatTime(date);
+    } else if (messageDate == today.subtract(const Duration(days: 1))) {
+      return 'Yesterday';
+    } else {
+      return '${date.day}/${date.month}';
+    }
+  }
 }

@@ -16,6 +16,8 @@ class AppConstants {
   static const String themeKey = 'app_theme';
   static const String onboardingKey = 'onboarding_completed';
   static const String savedKundlisKey = 'saved_kundlis';
+  static const String geminiApiKey = 'gemini_api_key';
+  static const String chatConversationsKey = 'chat_conversations';
 
   // Limits
   static const int freeAiQuestionsPerDay = 3;

@@ -16,6 +16,7 @@ import 'core/providers/language_provider.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/providers/compatibility_provider.dart';
 import 'core/services/sweph_service.dart';
+import 'core/services/chat_storage_service.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
@@ -35,6 +36,9 @@ void main() async {
 
   // Initialize Swiss Ephemeris for astronomical calculations
   await SwephService.initialize();
+
+  // Initialize Chat Storage Service for AI chat persistence
+  await ChatStorageService.instance.initialize();
 
   // Initialize Firebase (commented out for now as it needs configuration)
   // await Firebase.initializeApp();

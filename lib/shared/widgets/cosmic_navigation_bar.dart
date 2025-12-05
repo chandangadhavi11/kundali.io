@@ -173,7 +173,7 @@ class _CosmicNavigationBarState extends State<CosmicNavigationBar>
                 curve: Curves.easeOutCubic,
                 width: isSelected ? 4 : 0,
                 height: 4,
-                margin: const EdgeInsets.only(bottom: 6),
+                margin: const EdgeInsets.only(bottom: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFFE8B931),
                   borderRadius: BorderRadius.circular(2),
@@ -192,7 +192,7 @@ class _CosmicNavigationBarState extends State<CosmicNavigationBar>
               AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 curve: Curves.easeOutCubic,
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: isSelected
                     ? BoxDecoration(
                         gradient: RadialGradient(

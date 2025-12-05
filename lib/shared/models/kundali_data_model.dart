@@ -77,6 +77,9 @@ class KundaliData {
     String language = 'English',
     bool isPrimary = false,
   }) {
+    // Clear any cached results to ensure fresh calculation
+    KundaliCalculationService.clearCache();
+    
     // Use unified calculation to avoid multiple Swiss Ephemeris calls
     final unifiedResult = KundaliCalculationService.calculateAll(
       birthDateTime: birthDateTime,

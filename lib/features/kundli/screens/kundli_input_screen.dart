@@ -63,7 +63,7 @@ class _KundliInputScreenState extends State<KundliInputScreen>
     _initializeAnimations();
     // Note: Removed auto-generate on init to avoid heavy calculations on the input screen
     // User will generate Kundali when they tap the "Generate Kundali" button
-    
+
     // Defer animation start to after first frame for smoother transition
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -1494,7 +1494,7 @@ class _NoisePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     // Use cached points if size matches
     if (_cachedPoints == null || _cachedSize != size) {
-      final random = math.Random(42);
+    final random = math.Random(42);
       _cachedPoints = List.generate(
         300, // Reduced from 2000 to 300 for much better performance
         (_) => Offset(

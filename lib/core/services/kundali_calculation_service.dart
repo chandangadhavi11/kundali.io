@@ -7,6 +7,509 @@ class KundaliCalculationService {
   static UnifiedKundaliResult? _cachedResult;
   static String? _cachedKey;
 
+  // ============ TEST FUNCTION FOR VERIFICATION ============
+
+  /// Standalone test function to verify planetary calculations
+  /// Call this function to test specific dates without affecting the app
+  ///
+  /// Usage example:
+  /// ```dart
+  /// KundaliCalculationService.testCalculation(
+  ///   year: 2025, month: 12, day: 5,
+  ///   hour: 13, minute: 5, second: 44,
+  ///   latitude: 28.6139, longitude: 77.2090, // Delhi
+  ///   timezone: 'IST',
+  /// );
+  /// ```
+  ///
+  /// Expected output for Dec 5, 2025:
+  /// - Jupiter should be in Gemini ~29° (to match other apps)
+  /// - Moon should be in Taurus
+  /// - Sun should be in Scorpio
+  static Map<String, dynamic> testCalculation({
+    required int year,
+    required int month,
+    required int day,
+    required int hour,
+    required int minute,
+    int second = 0,
+    required double latitude,
+    required double longitude,
+    String timezone = 'IST',
+  }) {
+    debugPrint('\n');
+    debugPrint(
+      '╔══════════════════════════════════════════════════════════════╗',
+    );
+    debugPrint(
+      '║           KUNDALI CALCULATION TEST                           ║',
+    );
+    debugPrint(
+      '╠══════════════════════════════════════════════════════════════╣',
+    );
+    debugPrint(
+      '║ INPUT PARAMETERS:                                            ║',
+    );
+    debugPrint(
+      '║ Date: $day/$month/$year                                      ',
+    );
+    debugPrint(
+      '║ Time: $hour:$minute:$second                                  ',
+    );
+    debugPrint(
+      '║ Location: Lat $latitude, Long $longitude                     ',
+    );
+    debugPrint(
+      '║ Timezone: $timezone                                          ',
+    );
+    debugPrint(
+      '╠══════════════════════════════════════════════════════════════╣',
+    );
+
+    try {
+      final birthDateTime = DateTime(year, month, day, hour, minute, second);
+
+      // Get timezone offset
+      final timezoneOffset = SwephService.parseTimezoneOffset(timezone);
+      debugPrint(
+        '║ Timezone Offset: ${timezoneOffset}h                         ',
+      );
+
+      // Calculate using Swiss Ephemeris
+      final swephResult = SwephService.instance.calculateKundli(
+        birthDateTime: birthDateTime,
+        latitude: latitude,
+        longitude: longitude,
+        timezoneOffsetHours: timezoneOffset,
+        useAyanamsa: true,
+      );
+
+      debugPrint(
+        '╠══════════════════════════════════════════════════════════════╣',
+      );
+      debugPrint(
+        '║ CALCULATION RESULTS:                                         ║',
+      );
+      debugPrint(
+        '║ Ayanamsa: ${swephResult.ayanamsa.toStringAsFixed(4)}°                              ',
+      );
+      debugPrint(
+        '║ Ascendant: ${swephResult.ascendantSign} ${swephResult.ascendantDegreeInSign.toStringAsFixed(2)}°        ',
+      );
+      debugPrint(
+        '╠══════════════════════════════════════════════════════════════╣',
+      );
+      debugPrint(
+        '║ PLANETARY POSITIONS:                                         ║',
+      );
+
+      final Map<String, Map<String, dynamic>> results = {};
+
+      // Key planets to check
+      final keyPlanets = [
+        'Sun',
+        'Moon',
+        'Mars',
+        'Mercury',
+        'Jupiter',
+        'Venus',
+        'Saturn',
+        'Rahu',
+        'Ketu',
+      ];
+
+      for (var planet in keyPlanets) {
+        final pos = swephResult.planets[planet];
+        if (pos != null) {
+          final sign = pos.signName;
+          final degree = pos.degreeInSign;
+          final retro = pos.isRetrograde ? ' (R)' : '';
+
+          results[planet] = {
+            'sign': sign,
+            'degree': degree,
+            'longitude': pos.longitude,
+            'isRetrograde': pos.isRetrograde,
+          };
+
+          // Format output with padding
+          final planetPadded = planet.padRight(8);
+          final signPadded = sign.padRight(12);
+          debugPrint(
+            '║ $planetPadded: $signPadded ${degree.toStringAsFixed(2)}°$retro',
+          );
+        }
+      }
+
+      debugPrint(
+        '╠══════════════════════════════════════════════════════════════╣',
+      );
+      debugPrint(
+        '║ VERIFICATION CHECKLIST:                                      ║',
+      );
+
+      // Verify key planets
+      // Jupiter verification
+      final jupiter = results['Jupiter'];
+      if (jupiter != null) {
+        debugPrint(
+          '║ Jupiter: ${jupiter['sign']} ${(jupiter['degree'] as double).toStringAsFixed(2)}° (Long: ${(jupiter['longitude'] as double).toStringAsFixed(2)}°)',
+        );
+      }
+
+      // Saturn verification
+      final saturn = results['Saturn'];
+      if (saturn != null) {
+        debugPrint(
+          '║ Saturn:  ${saturn['sign']} ${(saturn['degree'] as double).toStringAsFixed(2)}° (Long: ${(saturn['longitude'] as double).toStringAsFixed(2)}°)',
+        );
+      }
+
+      // Show sign boundaries for reference
+      debugPrint(
+        '╠══════════════════════════════════════════════════════════════╣',
+      );
+      debugPrint(
+        '║ SIGN BOUNDARIES (Sidereal):                                  ║',
+      );
+      debugPrint(
+        '║ Gemini: 60° - 90°  |  Cancer: 90° - 120°                     ║',
+      );
+      debugPrint(
+        '║ Aquarius: 300° - 330°  |  Pisces: 330° - 360°                ║',
+      );
+
+      debugPrint(
+        '╚══════════════════════════════════════════════════════════════╝',
+      );
+      debugPrint('\n');
+
+      return {
+        'success': true,
+        'ayanamsa': swephResult.ayanamsa,
+        'ascendant': {
+          'sign': swephResult.ascendantSign,
+          'degree': swephResult.ascendantDegreeInSign,
+        },
+        'planets': results,
+      };
+    } catch (e) {
+      debugPrint('║ ❌ ERROR: $e');
+      debugPrint(
+        '╚══════════════════════════════════════════════════════════════╝',
+      );
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
+  /// Quick test with default values (Dec 5, 2025, 13:38:40, Delhi)
+  /// Call: KundaliCalculationService.quickTest();
+  static Map<String, dynamic> quickTest() {
+    return testCalculation(
+      year: 2025,
+      month: 12,
+      day: 5,
+      hour: 13,
+      minute: 38,
+      second: 40,
+      latitude: 28.6139, // Delhi
+      longitude: 77.2090,
+      timezone: 'IST',
+    );
+  }
+
+  /// Compare our calculations with expected values from other app
+  /// This helps diagnose ayanamsa differences
+  static void compareWithOtherApp() {
+    debugPrint('\n');
+    debugPrint(
+      '╔══════════════════════════════════════════════════════════════╗',
+    );
+    debugPrint(
+      '║      COMPARISON WITH OTHER APP (Dec 5, 2025, 13:38:40)       ║',
+    );
+    debugPrint(
+      '╠══════════════════════════════════════════════════════════════╣',
+    );
+
+    // Expected values from other app (Dec 5, 2025, 13:38:40 IST, Delhi)
+    // Format: sign, degree in sign
+    final expectedPositions = {
+      'Sun': {'sign': 'Scorpio', 'degree': 19.23},
+      'Moon': {'sign': 'Taurus', 'degree': 24.51},
+      'Mars': {'sign': 'Scorpio', 'degree': 28.33},
+      'Mercury': {'sign': 'Libra', 'degree': 28.91},
+      'Jupiter': {'sign': 'Gemini', 'degree': 29.95},
+      'Venus': {'sign': 'Scorpio', 'degree': 11.45},
+      'Saturn': {'sign': 'Pisces', 'degree': 0.97},
+      'Rahu': {'sign': 'Aquarius', 'degree': 19.36},
+      'Ketu': {'sign': 'Leo', 'degree': 19.36},
+    };
+
+    // Run our calculation
+    final result = quickTest();
+
+    if (result['success'] == true) {
+      final ourPlanets = result['planets'] as Map<String, Map<String, dynamic>>;
+
+      debugPrint('║ Planet    | Expected         | Our App          | Match ║');
+      debugPrint(
+        '╠══════════════════════════════════════════════════════════════╣',
+      );
+
+      int matchCount = 0;
+      int totalCount = 0;
+
+      for (var planet in expectedPositions.keys) {
+        final expected = expectedPositions[planet]!;
+        final ours = ourPlanets[planet];
+
+        if (ours != null) {
+          final expectedSign = expected['sign'] as String;
+          final expectedDeg = expected['degree'] as double;
+          final ourSign = ours['sign'] as String;
+          final ourDeg = ours['degree'] as double;
+
+          final signMatch = ourSign == expectedSign;
+          final status = signMatch ? '✅' : '❌';
+
+          if (signMatch) matchCount++;
+          totalCount++;
+
+          final planetPad = planet.padRight(9);
+          final expectedStr = '$expectedSign ${expectedDeg.toStringAsFixed(1)}°'
+              .padRight(16);
+          final ourStr = '$ourSign ${ourDeg.toStringAsFixed(1)}°'.padRight(16);
+
+          debugPrint('║ $planetPad| $expectedStr | $ourStr | $status    ║');
+        }
+      }
+
+      debugPrint(
+        '╠══════════════════════════════════════════════════════════════╣',
+      );
+      debugPrint(
+        '║ RESULT: $matchCount/$totalCount planets match signs                        ║',
+      );
+
+      if (matchCount == totalCount) {
+        debugPrint(
+          '║ ✅ ALL PLANETS CORRECTLY CALCULATED!                         ║',
+        );
+      } else {
+        debugPrint(
+          '║ ⚠️  Some planets have sign mismatches                        ║',
+        );
+      }
+    }
+
+    debugPrint(
+      '╚══════════════════════════════════════════════════════════════╝',
+    );
+    debugPrint('\n');
+  }
+
+  /// Validate calculations for ANY date/time against expected values
+  /// Use this to verify our calculations match other apps
+  ///
+  /// Usage:
+  /// ```dart
+  /// KundaliCalculationService.validateCalculation(
+  ///   year: 2025, month: 12, day: 5,
+  ///   hour: 13, minute: 38, second: 40,
+  ///   latitude: 28.6139, longitude: 77.209,
+  ///   timezone: 'IST',
+  ///   expectedPositions: {
+  ///     'Sun': 'Scorpio',
+  ///     'Moon': 'Taurus',
+  ///     'Jupiter': 'Gemini',
+  ///     'Saturn': 'Pisces',
+  ///     // ... add all planets you want to verify
+  ///   },
+  /// );
+  /// ```
+  static Map<String, dynamic> validateCalculation({
+    required int year,
+    required int month,
+    required int day,
+    required int hour,
+    required int minute,
+    int second = 0,
+    required double latitude,
+    required double longitude,
+    required String timezone,
+    required Map<String, String> expectedPositions,
+  }) {
+    debugPrint('\n');
+    debugPrint(
+      '╔══════════════════════════════════════════════════════════════╗',
+    );
+    debugPrint(
+      '║              CALCULATION VALIDATION                          ║',
+    );
+    debugPrint(
+      '╠══════════════════════════════════════════════════════════════╣',
+    );
+    debugPrint('║ Date: $day/$month/$year  Time: $hour:$minute:$second');
+    debugPrint('║ Location: $latitude, $longitude ($timezone)');
+    debugPrint(
+      '╠══════════════════════════════════════════════════════════════╣',
+    );
+
+    final result = testCalculation(
+      year: year,
+      month: month,
+      day: day,
+      hour: hour,
+      minute: minute,
+      second: second,
+      latitude: latitude,
+      longitude: longitude,
+      timezone: timezone,
+    );
+
+    final validationResults = <String, bool>{};
+    int matchCount = 0;
+
+    if (result['success'] == true) {
+      final ourPlanets = result['planets'] as Map<String, Map<String, dynamic>>;
+
+      debugPrint(
+        '║ Planet    | Expected    | Our App     | Status             ║',
+      );
+      debugPrint(
+        '╠══════════════════════════════════════════════════════════════╣',
+      );
+
+      for (var planet in expectedPositions.keys) {
+        final expectedSign = expectedPositions[planet]!;
+        final ours = ourPlanets[planet];
+
+        if (ours != null) {
+          final ourSign = ours['sign'] as String;
+          final ourDeg = ours['degree'] as double;
+          final signMatch = ourSign == expectedSign;
+
+          validationResults[planet] = signMatch;
+          if (signMatch) matchCount++;
+
+          final status = signMatch ? '✅ MATCH' : '❌ MISMATCH';
+          final planetPad = planet.padRight(9);
+          final expectedPad = expectedSign.padRight(11);
+          final ourPad = '$ourSign ${ourDeg.toStringAsFixed(1)}°'.padRight(11);
+
+          debugPrint('║ $planetPad| $expectedPad | $ourPad | $status     ║');
+        }
+      }
+
+      debugPrint(
+        '╠══════════════════════════════════════════════════════════════╣',
+      );
+
+      final totalChecked = expectedPositions.length;
+      final allMatch = matchCount == totalChecked;
+
+      if (allMatch) {
+        debugPrint(
+          '║ ✅ VALIDATION PASSED: $matchCount/$totalChecked planets correct            ║',
+        );
+      } else {
+        debugPrint(
+          '║ ❌ VALIDATION FAILED: $matchCount/$totalChecked planets correct            ║',
+        );
+      }
+
+      debugPrint(
+        '╚══════════════════════════════════════════════════════════════╝',
+      );
+      debugPrint('\n');
+
+      return {
+        'success': true,
+        'allMatch': allMatch,
+        'matchCount': matchCount,
+        'totalChecked': totalChecked,
+        'results': validationResults,
+        'planets': ourPlanets,
+      };
+    }
+
+    debugPrint(
+      '║ ❌ Calculation failed                                         ║',
+    );
+    debugPrint(
+      '╚══════════════════════════════════════════════════════════════╝',
+    );
+
+    return {'success': false, 'error': result['error']};
+  }
+
+  /// Run validation tests for multiple known dates
+  /// This ensures our calculations are consistent across different times
+  static void runValidationSuite() {
+    debugPrint('\n');
+    debugPrint(
+      '═══════════════════════════════════════════════════════════════',
+    );
+    debugPrint(
+      '         RUNNING COMPREHENSIVE VALIDATION SUITE                 ',
+    );
+    debugPrint(
+      '═══════════════════════════════════════════════════════════════',
+    );
+
+    int passedTests = 0;
+    int totalTests = 0;
+
+    // Test 1: Dec 5, 2025 (our calibration date)
+    totalTests++;
+    final test1 = validateCalculation(
+      year: 2025,
+      month: 12,
+      day: 5,
+      hour: 13,
+      minute: 38,
+      second: 40,
+      latitude: 28.6139,
+      longitude: 77.209,
+      timezone: 'IST',
+      expectedPositions: {
+        'Sun': 'Scorpio',
+        'Moon': 'Taurus',
+        'Mars': 'Scorpio',
+        'Mercury': 'Libra',
+        'Jupiter': 'Gemini',
+        'Venus': 'Scorpio',
+        'Saturn': 'Pisces',
+        'Rahu': 'Aquarius',
+        'Ketu': 'Leo',
+      },
+    );
+    if (test1['allMatch'] == true) passedTests++;
+
+    // Summary
+    debugPrint(
+      '═══════════════════════════════════════════════════════════════',
+    );
+    debugPrint(
+      '         VALIDATION SUITE COMPLETE                              ',
+    );
+    debugPrint(
+      '═══════════════════════════════════════════════════════════════',
+    );
+    debugPrint('  Tests Passed: $passedTests / $totalTests');
+    if (passedTests == totalTests) {
+      debugPrint('  ✅ ALL TESTS PASSED - Calculations are accurate!');
+    } else {
+      debugPrint('  ⚠️  Some tests failed - Review ayanamsa correction');
+    }
+    debugPrint(
+      '═══════════════════════════════════════════════════════════════\n',
+    );
+  }
+
+  // ============ END TEST FUNCTION ============
+
   // Zodiac signs in Vedic astrology
   static const List<String> zodiacSigns = [
     'Aries',
