@@ -191,18 +191,6 @@ class SwephService {
     planets['Venus'] = _calculatePlanet(HeavenlyBody.SE_VENUS, julianDayUT, calcFlag, ayanamsaValue);
     // Saturn
     planets['Saturn'] = _calculatePlanet(HeavenlyBody.SE_SATURN, julianDayUT, calcFlag, ayanamsaValue);
-    
-    // Debug: Log Jupiter calculation details
-    debugPrint('=== JUPITER DEBUG ===');
-    debugPrint('Date: ${birthDateTime.toString()}');
-    debugPrint('Julian Day UT: $julianDayUT');
-    debugPrint('Ayanamsa Base: ${baseAyanamsa.toStringAsFixed(4)}°');
-    debugPrint('Ayanamsa Correction: +${ayanamsaCorrection}°');
-    debugPrint('Ayanamsa Total: ${ayanamsaValue.toStringAsFixed(4)}°');
-    debugPrint('Jupiter Sidereal: ${planets['Jupiter']!.longitude.toStringAsFixed(4)}°');
-    debugPrint('Jupiter Sign: ${planets['Jupiter']!.signName}');
-    debugPrint('Jupiter Degree in Sign: ${planets['Jupiter']!.degreeInSign.toStringAsFixed(2)}°');
-    debugPrint('======================');
     // Uranus
     planets['Uranus'] = _calculatePlanet(HeavenlyBody.SE_URANUS, julianDayUT, calcFlag, ayanamsaValue);
     // Neptune
@@ -247,22 +235,6 @@ class SwephService {
 
       // Convert to sidereal by subtracting ayanamsa
       final siderealLongitude = _normalizeDegree(result.longitude - ayanamsa);
-      
-      // Debug for key boundary planets (only log when near sign boundaries)
-      if (body == HeavenlyBody.SE_JUPITER) {
-        final degInSign = getDegreeInSign(siderealLongitude);
-        // Only log if near boundary (first or last 2 degrees of sign)
-        if (degInSign < 2 || degInSign > 28) {
-          debugPrint('🪐 Jupiter: ${getSignName(siderealLongitude)} ${degInSign.toStringAsFixed(2)}° (Long: ${siderealLongitude.toStringAsFixed(2)}°, Ayanamsa: ${ayanamsa.toStringAsFixed(2)}°)');
-        }
-      }
-      if (body == HeavenlyBody.SE_SATURN) {
-        final degInSign = getDegreeInSign(siderealLongitude);
-        // Only log if near boundary (first or last 2 degrees of sign)
-        if (degInSign < 2 || degInSign > 28) {
-          debugPrint('🪐 Saturn: ${getSignName(siderealLongitude)} ${degInSign.toStringAsFixed(2)}° (Long: ${siderealLongitude.toStringAsFixed(2)}°)');
-        }
-      }
 
       return PlanetaryPosition(
         longitude: siderealLongitude,

@@ -518,12 +518,161 @@ class KundaliData {
           'isRetrograde': value.isRetrograde,
         }),
       ),
+      'houses': houses.map((h) => {
+        'number': h.number,
+        'sign': h.sign,
+        'cuspDegree': h.cuspDegree,
+        'planets': h.planets,
+      }).toList(),
       'dashaInfo': {
         'currentMahadasha': dashaInfo.currentMahadasha,
         'remainingYears': dashaInfo.remainingYears,
         'startDate': dashaInfo.startDate.toIso8601String(),
+        'sequence': dashaInfo.sequence.map((s) => {
+          'planet': s.planet,
+          'years': s.years,
+        }).toList(),
       },
     };
+  }
+
+  /// Default dasha sequence for fallback
+  static const _defaultDashaSequence = [
+    DashaPeriod('Ketu', 7),
+    DashaPeriod('Venus', 20),
+    DashaPeriod('Sun', 6),
+    DashaPeriod('Moon', 10),
+    DashaPeriod('Mars', 7),
+    DashaPeriod('Rahu', 18),
+    DashaPeriod('Jupiter', 16),
+    DashaPeriod('Saturn', 19),
+    DashaPeriod('Mercury', 17),
+  ];
+
+  /// Create from JSON without recalculating (for loading from storage)
+  factory KundaliData.fromJson(Map<String, dynamic> json) {
+    // Parse chart style
+    ChartStyle chartStyle = ChartStyle.northIndian;
+    if (json['chartStyle'] != null) {
+      final styleStr = json['chartStyle'].toString();
+      if (styleStr.contains('southIndian')) {
+        chartStyle = ChartStyle.southIndian;
+      }
+    }
+
+    // Parse ascendant
+    final ascJson = json['ascendant'] as Map<String, dynamic>;
+    final ascendant = AscendantInfo(
+      longitude: (ascJson['longitude'] as num).toDouble(),
+      sign: ascJson['sign'] as String,
+      signDegree: (ascJson['signDegree'] as num).toDouble(),
+      nakshatra: ascJson['nakshatra'] as String,
+    );
+
+    // Parse planet positions
+    final planetsJson = json['planetPositions'] as Map<String, dynamic>;
+    final planetPositions = planetsJson.map((key, value) {
+      final pJson = value as Map<String, dynamic>;
+      return MapEntry(
+        key,
+        PlanetPosition(
+          planet: key,
+          longitude: (pJson['longitude'] as num).toDouble(),
+          sign: pJson['sign'] as String,
+          signDegree: (pJson['signDegree'] as num).toDouble(),
+          nakshatra: pJson['nakshatra'] as String,
+          house: pJson['house'] as int? ?? 1,
+          isRetrograde: pJson['isRetrograde'] as bool? ?? false,
+        ),
+      );
+    });
+
+    // Parse houses
+    final birthDt = DateTime.parse(json['birthDateTime'] as String);
+    final lat = (json['latitude'] as num).toDouble();
+    final lon = (json['longitude'] as num).toDouble();
+    final tz = json['timezone'] as String;
+    
+    List<House> houses = [];
+    if (json['houses'] != null) {
+      final housesJson = json['houses'] as List<dynamic>;
+      houses = housesJson.map((hJson) {
+        final h = hJson as Map<String, dynamic>;
+        return House(
+          number: h['number'] as int,
+          sign: h['sign'] as String,
+          cuspDegree: (h['cuspDegree'] as num?)?.toDouble() ?? 0.0,
+          planets: (h['planets'] as List<dynamic>?)?.cast<String>() ?? [],
+        );
+      }).toList();
+    } else {
+      // Generate basic houses if not stored (fallback)
+      houses = KundaliCalculationService.calculateHouses(
+        birthDateTime: birthDt,
+        latitude: lat,
+        longitude: lon,
+        timezone: tz,
+        planetPositions: planetPositions,
+      );
+    }
+
+    // Parse dasha info
+    final dashaJson = json['dashaInfo'] as Map<String, dynamic>?;
+    DashaInfo dashaInfo;
+    if (dashaJson != null) {
+      final sequenceJson = dashaJson['sequence'] as List<dynamic>?;
+      final sequence = sequenceJson?.map((s) {
+        final sMap = s as Map<String, dynamic>;
+        return DashaPeriod(sMap['planet'] as String, sMap['years'] as int);
+      }).toList() ?? _defaultDashaSequence;
+      
+      dashaInfo = DashaInfo(
+        currentMahadasha: dashaJson['currentMahadasha'] as String? ?? 'Ketu',
+        remainingYears: (dashaJson['remainingYears'] as num?)?.toDouble() ?? 7.0,
+        startDate: dashaJson['startDate'] != null
+            ? DateTime.parse(dashaJson['startDate'] as String)
+            : DateTime.now(),
+        sequence: sequence,
+      );
+    } else {
+      // Fallback dasha calculation if not stored
+      final moonPos = planetPositions['Moon'];
+      final birthDt = DateTime.parse(json['birthDateTime'] as String);
+      dashaInfo = moonPos != null
+          ? KundaliCalculationService.calculateDashaInfo(birthDt, moonPos.longitude)
+          : KundaliCalculationService.getSampleDashaInfo(birthDt);
+    }
+
+    return KundaliData(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      birthDateTime: DateTime.parse(json['birthDateTime'] as String),
+      birthPlace: json['birthPlace'] as String,
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+      timezone: json['timezone'] as String,
+      gender: json['gender'] as String,
+      chartStyle: chartStyle,
+      language: json['language'] as String? ?? 'English',
+      ascendant: ascendant,
+      planetPositions: planetPositions,
+      houses: houses,
+      dashaInfo: dashaInfo,
+      navamsaChart: null, // Will be recalculated on demand if needed
+      moonSign: json['moonSign'] as String? ?? planetPositions['Moon']?.sign ?? 'Aries',
+      sunSign: json['sunSign'] as String? ?? planetPositions['Sun']?.sign ?? 'Aries',
+      birthNakshatra: json['birthNakshatra'] as String? ?? planetPositions['Moon']?.nakshatra ?? 'Ashwini',
+      birthNakshatraPada: json['birthNakshatraPada'] as int? ?? 1,
+      yogas: (json['yogas'] as List<dynamic>?)?.cast<String>() ?? [],
+      doshas: (json['doshas'] as List<dynamic>?)?.cast<String>() ?? [],
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
+          : null,
+      isPrimary: json['isPrimary'] as bool? ?? false,
+    );
   }
 
   /// Create a copy with updated values

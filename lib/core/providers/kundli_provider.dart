@@ -281,21 +281,9 @@ class KundliProvider extends ChangeNotifier {
       if (data != null) {
         final List<dynamic> jsonList = json.decode(data);
         _savedKundalis =
-            jsonList.map((json) {
-              // Recreate KundaliData from stored JSON
-              return KundaliData.fromBirthDetails(
-                id: json['id'],
-                name: json['name'],
-                birthDateTime: DateTime.parse(json['birthDateTime']),
-                birthPlace: json['birthPlace'],
-                latitude: json['latitude'],
-                longitude: json['longitude'],
-                timezone: json['timezone'],
-                gender: json['gender'],
-                chartStyle: _parseChartStyle(json['chartStyle']),
-                language: json['language'],
-                isPrimary: json['isPrimary'] ?? false,
-              );
+            jsonList.map((jsonData) {
+              // Restore KundaliData from stored JSON WITHOUT recalculating
+              return KundaliData.fromJson(jsonData as Map<String, dynamic>);
             }).toList();
 
         // Find primary Kundali
