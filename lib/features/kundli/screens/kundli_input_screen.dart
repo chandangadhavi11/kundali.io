@@ -77,7 +77,13 @@ class _KundliInputScreenState extends State<KundliInputScreen>
   void _initializeDefaultValues() {
     _selectedDate = DateTime.now();
     _selectedTime = TimeOfDay.now();
-    _nameController.text = 'Today\'s Chart';
+    
+    // Generate a descriptive default name with date and time
+    final now = DateTime.now();
+    final dateStr = DateFormat('d MMM yyyy').format(now);
+    final timeStr = DateFormat('h:mm a').format(now);
+    _nameController.text = '$dateStr, $timeStr';
+    
     _placeController.text = 'New Delhi, India';
     _latitude = 28.6139;
     _longitude = 77.2090;
@@ -185,6 +191,8 @@ class _KundliInputScreenState extends State<KundliInputScreen>
                                 _buildChartPreview(),
                                 const SizedBox(height: 28),
                               ],
+                              // Recent Profiles Section
+                              _buildRecentProfilesSection(context.watch<KundliProvider>()),
                               _buildAnimatedField(0, _buildNameField()),
                               const SizedBox(height: 20),
                               _buildAnimatedField(1, _buildGenderSelector()),
@@ -494,15 +502,464 @@ class _KundliInputScreenState extends State<KundliInputScreen>
     );
   }
 
-  Widget _buildNameField() {
-    return _buildFieldContainer(
-      label: 'Name',
-      child: _buildInputField(
-        controller: _nameController,
-        focusNode: _nameFocusNode,
-        hint: 'Enter name',
-        prefixIcon: Icons.person_outline_rounded,
+  Widget _buildRecentProfilesSection(KundliProvider provider) {
+    final savedProfiles = provider.savedKundalis;
+    
+    // Don't show if no saved profiles
+    if (savedProfiles.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 12 * (1 - value)),
+          child: Opacity(opacity: value, child: child),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section Header
+          Padding(
+            padding: const EdgeInsets.only(left: 2, bottom: 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        _accentSecondary.withOpacity(0.3),
+                        _accentSecondary.withOpacity(0.15),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Icon(
+                    Icons.history_rounded,
+                    size: 11,
+                    color: _accentSecondary,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Quick Fill from Saved',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: _textSecondary,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${savedProfiles.length} profile${savedProfiles.length > 1 ? 's' : ''}',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: _textMuted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Horizontal scrollable profile cards
+          SizedBox(
+            height: 88,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: savedProfiles.length,
+              itemBuilder: (context, index) {
+                final profile = savedProfiles[savedProfiles.length - 1 - index]; // Show most recent first
+                final isPrimary = profile.isPrimary;
+                
+                return TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: Duration(milliseconds: 300 + (index * 60)),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, animValue, child) {
+                    return Transform.translate(
+                      offset: Offset(20 * (1 - animValue), 0),
+                      child: Opacity(opacity: animValue, child: child),
+                    );
+                  },
+                  child: _buildProfileCard(profile, isPrimary, index),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 24),
+          // Divider with "or create new" text
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 0.5,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        _borderColor.withOpacity(0.6),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'or enter new details',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: _textMuted.withOpacity(0.8),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  height: 0.5,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        _borderColor.withOpacity(0.6),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+        ],
       ),
+    );
+  }
+
+  Widget _buildProfileCard(KundaliData profile, bool isPrimary, int index) {
+    final formattedDate = DateFormat('d MMM yyyy').format(profile.birthDateTime);
+    final formattedTime = DateFormat('h:mm a').format(profile.birthDateTime);
+    
+    // Generate a unique gradient based on profile
+    final gradientColors = _getProfileGradient(index);
+    
+    return GestureDetector(
+      onTapDown: (_) => _setPressed('profile_${profile.id}', true),
+      onTapUp: (_) => _setPressed('profile_${profile.id}', false),
+      onTapCancel: () => _setPressed('profile_${profile.id}', false),
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        _fillFromProfile(profile);
+        _showProfileSelectedFeedback(profile.name);
+      },
+      child: AnimatedScale(
+        scale: _isPressed('profile_${profile.id}') ? 0.96 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOutCubic,
+        child: Container(
+          width: 160,
+          margin: EdgeInsets.only(right: 10, left: index == 0 ? 0 : 0),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                gradientColors[0].withOpacity(0.12),
+                gradientColors[1].withOpacity(0.06),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isPrimary
+                  ? _accentPrimary.withOpacity(0.4)
+                  : gradientColors[0].withOpacity(0.2),
+              width: isPrimary ? 1.0 : 0.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: gradientColors[0].withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              // Background decoration
+              Positioned(
+                right: -8,
+                top: -8,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        gradientColors[0].withOpacity(0.15),
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Content
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Top row with avatar and primary badge
+                    Row(
+                      children: [
+                        Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: gradientColors,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Text(
+                              profile.name.isNotEmpty 
+                                  ? profile.name[0].toUpperCase() 
+                                  : '?',
+                              style: GoogleFonts.dmSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            profile.name,
+                            style: GoogleFonts.dmSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: _textPrimary,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (isPrimary)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 5,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _accentPrimary.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Icon(
+                              Icons.star_rounded,
+                              size: 10,
+                              color: _accentPrimary,
+                            ),
+                          ),
+                      ],
+                    ),
+                    // Bottom info
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_today_rounded,
+                              size: 9,
+                              color: _textMuted,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              formattedDate,
+                              style: GoogleFonts.dmSans(
+                                fontSize: 10,
+                                color: _textMuted,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              formattedTime,
+                              style: GoogleFonts.dmSans(
+                                fontSize: 10,
+                                color: _textMuted.withOpacity(0.8),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.place_rounded,
+                              size: 9,
+                              color: _textMuted,
+                            ),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                profile.birthPlace,
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 10,
+                                  color: _textMuted.withOpacity(0.8),
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              // Tap indicator
+              Positioned(
+                right: 8,
+                bottom: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: _surfaceColor.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 10,
+                    color: gradientColors[0],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Color> _getProfileGradient(int index) {
+    final gradients = [
+      [const Color(0xFFA78BFA), const Color(0xFF818CF8)], // Purple
+      [const Color(0xFF6EE7B7), const Color(0xFF34D399)], // Emerald
+      [const Color(0xFFFBBF24), const Color(0xFFF59E0B)], // Amber
+      [const Color(0xFF60A5FA), const Color(0xFF3B82F6)], // Blue
+      [const Color(0xFFF472B6), const Color(0xFFEC4899)], // Pink
+      [const Color(0xFF4ADE80), const Color(0xFF22C55E)], // Green
+      [const Color(0xFFFB923C), const Color(0xFFF97316)], // Orange
+      [const Color(0xFF38BDF8), const Color(0xFF0EA5E9)], // Sky
+    ];
+    return gradients[index % gradients.length];
+  }
+
+  void _fillFromProfile(KundaliData profile) {
+    setState(() {
+      _nameController.text = profile.name;
+      _selectedDate = profile.birthDateTime;
+      _selectedTime = TimeOfDay.fromDateTime(profile.birthDateTime);
+      _placeController.text = profile.birthPlace;
+      _latitude = profile.latitude;
+      _longitude = profile.longitude;
+      _selectedGender = profile.gender;
+      _chartStyle = profile.chartStyle;
+      _isPrimary = profile.isPrimary;
+    });
+  }
+
+  void _showProfileSelectedFeedback(String name) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: _successColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Icon(
+                Icons.check_rounded,
+                color: _successColor,
+                size: 14,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Filled details from "$name"',
+                style: GoogleFonts.dmSans(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: _textPrimary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: _surfaceColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: _successColor.withOpacity(0.3),
+            width: 0.5,
+          ),
+        ),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 2),
+        elevation: 8,
+      ),
+    );
+  }
+
+  Widget _buildNameField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildFieldContainer(
+          label: 'Name',
+          child: _buildInputField(
+            controller: _nameController,
+            focusNode: _nameFocusNode,
+            hint: 'Enter name',
+            prefixIcon: Icons.person_outline_rounded,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 4, top: 6),
+          child: Text(
+            'You can customize this name to identify your chart easily',
+            style: GoogleFonts.dmSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w400,
+              color: _textMuted.withOpacity(0.8),
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -568,6 +1025,10 @@ class _KundliInputScreenState extends State<KundliInputScreen>
                   fontWeight: FontWeight.w400,
                 ),
                 border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                filled: false,
+                fillColor: Colors.transparent,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 12),
               ),
               validator: (v) => v?.isEmpty ?? true ? 'Required' : null,
@@ -1588,6 +2049,13 @@ class _LocationSheetState extends State<_LocationSheet>
 
   @override
   Widget build(BuildContext context) {
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final isKeyboardVisible = keyboardHeight > 0;
+    // Expand sheet height when keyboard is visible to keep list accessible
+    final sheetHeight = isKeyboardVisible
+        ? MediaQuery.of(context).size.height * 0.9
+        : MediaQuery.of(context).size.height * 0.6;
+
     return SlideTransition(
       position: Tween<Offset>(
         begin: const Offset(0, 0.1),
@@ -1598,9 +2066,9 @@ class _LocationSheetState extends State<_LocationSheet>
       child: FadeTransition(
         opacity: _animController,
         child: Container(
-          height: MediaQuery.of(context).size.height * 0.6,
+          height: sheetHeight,
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
+            bottom: keyboardHeight,
           ),
           decoration: const BoxDecoration(
             color: _bgSecondary,
@@ -1651,6 +2119,10 @@ class _LocationSheetState extends State<_LocationSheet>
                             hintText: 'Search city...',
                             hintStyle: GoogleFonts.dmSans(color: _textMuted),
                             border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            filled: false,
+                            fillColor: Colors.transparent,
                             contentPadding: const EdgeInsets.symmetric(
                               horizontal: 12,
                             ),

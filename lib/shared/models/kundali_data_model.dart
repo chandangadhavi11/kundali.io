@@ -22,6 +22,10 @@ class KundaliData {
   final List<House> houses;
   final DashaInfo dashaInfo;
   final Map<String, PlanetPosition>? navamsaChart;
+  
+  // Multi-Dasha System
+  final YoginiDashaInfo? yoginiDashaInfo;
+  final CharDashaInfo? charDashaInfo;
 
   // Additional Info
   final String moonSign;
@@ -52,6 +56,8 @@ class KundaliData {
     required this.houses,
     required this.dashaInfo,
     this.navamsaChart,
+    this.yoginiDashaInfo,
+    this.charDashaInfo,
     required this.moonSign,
     required this.sunSign,
     required this.birthNakshatra,
@@ -101,6 +107,19 @@ class KundaliData {
         ? KundaliCalculationService.calculateDashaInfo(birthDateTime, moonPosition.longitude)
         : KundaliCalculationService.getSampleDashaInfo(birthDateTime);
 
+    // Calculate Yogini Dasha (36-year cycle)
+    final yoginiDashaInfo = moonPosition != null
+        ? KundaliCalculationService.calculateYoginiDasha(birthDateTime, moonPosition.longitude)
+        : null;
+
+    // Calculate Char Dasha (Jaimini system)
+    final charDashaInfo = KundaliCalculationService.calculateCharDasha(
+      birthDateTime,
+      ascendant,
+      planetPositions,
+      navamsaChart,
+    );
+
     // Extract key information from calculated data
     final moonSign = planetPositions['Moon']?.sign ?? 'Aries';
     final sunSign = planetPositions['Sun']?.sign ?? 'Aries';
@@ -137,6 +156,8 @@ class KundaliData {
       houses: houses,
       dashaInfo: dashaInfo,
       navamsaChart: navamsaChart,
+      yoginiDashaInfo: yoginiDashaInfo,
+      charDashaInfo: charDashaInfo,
       moonSign: moonSign,
       sunSign: sunSign,
       birthNakshatra: birthNakshatra,
@@ -643,6 +664,20 @@ class KundaliData {
           : KundaliCalculationService.getSampleDashaInfo(birthDt);
     }
 
+    // Calculate Yogini and Char Dasha on load (not stored in JSON for simplicity)
+    final moonPos = planetPositions['Moon'];
+    final yoginiDashaInfo = moonPos != null
+        ? KundaliCalculationService.calculateYoginiDasha(birthDt, moonPos.longitude)
+        : null;
+    
+    final navamsaChart = KundaliCalculationService.calculateNavamsaChart(planetPositions);
+    final charDashaInfo = KundaliCalculationService.calculateCharDasha(
+      birthDt,
+      ascendant,
+      planetPositions,
+      navamsaChart,
+    );
+
     return KundaliData(
       id: json['id'] as String,
       name: json['name'] as String,
@@ -658,7 +693,9 @@ class KundaliData {
       planetPositions: planetPositions,
       houses: houses,
       dashaInfo: dashaInfo,
-      navamsaChart: null, // Will be recalculated on demand if needed
+      navamsaChart: navamsaChart,
+      yoginiDashaInfo: yoginiDashaInfo,
+      charDashaInfo: charDashaInfo,
       moonSign: json['moonSign'] as String? ?? planetPositions['Moon']?.sign ?? 'Aries',
       sunSign: json['sunSign'] as String? ?? planetPositions['Sun']?.sign ?? 'Aries',
       birthNakshatra: json['birthNakshatra'] as String? ?? planetPositions['Moon']?.nakshatra ?? 'Ashwini',
@@ -697,6 +734,8 @@ class KundaliData {
       houses: houses,
       dashaInfo: dashaInfo,
       navamsaChart: navamsaChart,
+      yoginiDashaInfo: yoginiDashaInfo,
+      charDashaInfo: charDashaInfo,
       moonSign: moonSign,
       sunSign: sunSign,
       birthNakshatra: birthNakshatra,
