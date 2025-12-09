@@ -221,3 +221,5 @@ class MessageStatusAdapter extends TypeAdapter<MessageStatus> {
           typeId == other.typeId;
 }
 
+
+
