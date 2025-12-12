@@ -1,6 +1,6 @@
 # kundali_app
 
-A new Flutter project.
+A new Flutter Learning project.
 
 ## Getting Started
 
