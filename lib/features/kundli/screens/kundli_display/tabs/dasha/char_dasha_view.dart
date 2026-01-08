@@ -738,7 +738,7 @@ class _CharHeroCardState extends State<_CharHeroCard>
   }
 }
 
-// Refined Progress Bar for Char Dasha
+// Refined Progress Bar for Char Dasha - Premium elegant thin design
 class _RefinedCharProgressBar extends StatelessWidget {
   final double progress;
   final Color color;
@@ -747,42 +747,98 @@ class _RefinedCharProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Create lighter gradient colors from the base color
+    final baseColor = color;
+    final lightColor = Color.lerp(baseColor, Colors.white, 0.35)!;
+    final paleColor = Color.lerp(baseColor, Colors.white, 0.55)!;
+    final clampedProgress = progress.clamp(0.0, 1.0);
+    
     return Container(
-      height: 6,
+      height: 3,
       decoration: BoxDecoration(
-        color: const Color(0xFF262432),
-        borderRadius: BorderRadius.circular(3),
+        color: const Color(0xFF1A181F),
+        borderRadius: BorderRadius.circular(1.5),
+        border: Border.all(
+          color: const Color(0xFF2A2838).withOpacity(0.5),
+          width: 0.5,
+        ),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final width = constraints.maxWidth * progress.clamp(0.0, 1.0);
+          final width = constraints.maxWidth * clampedProgress;
           return Stack(
             children: [
+              // Progress fill with elegant gradient
               AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 400),
+                curve: Curves.easeOutQuart,
                 width: width,
                 decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(3),
+                  borderRadius: BorderRadius.circular(1.5),
+                  gradient: LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      paleColor.withOpacity(0.6),
+                      lightColor.withOpacity(0.8),
+                      baseColor.withOpacity(0.9),
+                    ],
+                    stops: const [0.0, 0.4, 1.0],
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: color.withOpacity(0.4),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                      color: baseColor.withOpacity(0.25),
+                      blurRadius: 4,
+                      spreadRadius: 0,
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    // Subtle highlight line at top
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        height: 1,
+                        decoration: BoxDecoration(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(1.5),
+                          ),
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Colors.white.withOpacity(0.0),
+                              Colors.white.withOpacity(0.25),
+                              Colors.white.withOpacity(0.15),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-              if (width > 8)
+              // Leading edge glow dot
+              if (width > 4)
                 Positioned(
-                  left: 4,
-                  top: 1.5,
+                  left: width - 1.5,
+                  top: 0,
+                  bottom: 0,
                   child: Container(
-                    width: width * 0.4,
-                    height: 1.5,
+                    width: 3,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.25),
-                      borderRadius: BorderRadius.circular(1),
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: baseColor.withOpacity(0.4),
+                          blurRadius: 3,
+                          spreadRadius: 0,
+                        ),
+                      ],
                     ),
                   ),
                 ),

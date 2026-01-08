@@ -934,7 +934,7 @@ class ActiveNowBadge extends StatelessWidget {
   }
 }
 
-/// Progress Bar Widget
+/// Progress Bar Widget - Premium elegant thin design
 class DashaProgressBar extends StatelessWidget {
   final double progress;
   final Color color;
@@ -944,31 +944,84 @@ class DashaProgressBar extends StatelessWidget {
     super.key,
     required this.progress,
     required this.color,
-    this.height = 8,
+    this.height = 3,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          height: height,
-          decoration: BoxDecoration(
-            color: DashaColors.border.withOpacity(0.3),
-            borderRadius: BorderRadius.circular(height / 2),
-          ),
+    // Create lighter gradient colors from the base color
+    final baseColor = color;
+    final lightColor = Color.lerp(baseColor, Colors.white, 0.35)!;
+    final paleColor = Color.lerp(baseColor, Colors.white, 0.55)!;
+    final clampedProgress = progress.clamp(0.0, 1.0);
+    
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A181F),
+        borderRadius: BorderRadius.circular(height / 2),
+        border: Border.all(
+          color: DashaColors.border.withOpacity(0.3),
+          width: 0.5,
         ),
-        FractionallySizedBox(
-          widthFactor: progress.clamp(0.0, 1.0),
-          child: Container(
-            height: height,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(height / 2),
+      ),
+      child: Stack(
+        children: [
+          // Progress fill with elegant gradient
+          FractionallySizedBox(
+            widthFactor: clampedProgress,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(height / 2),
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    paleColor.withOpacity(0.6),
+                    lightColor.withOpacity(0.8),
+                    baseColor.withOpacity(0.9),
+                  ],
+                  stops: const [0.0, 0.4, 1.0],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: baseColor.withOpacity(0.25),
+                    blurRadius: 4,
+                    spreadRadius: 0,
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  // Subtle highlight line at top
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 1,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(height / 2),
+                        ),
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.white.withOpacity(0.0),
+                            Colors.white.withOpacity(0.25),
+                            Colors.white.withOpacity(0.15),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

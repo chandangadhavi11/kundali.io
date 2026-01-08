@@ -417,21 +417,23 @@ InsightData _getChartStrengthInsight(
   int weakCount,
   int totalPlanets,
 ) {
-  final strengthLevel = avgStrength >= 100
-      ? 'Excellent'
-      : avgStrength >= 75
+  final strengthLevel =
+      avgStrength >= 100
+          ? 'Excellent'
+          : avgStrength >= 75
           ? 'Good'
           : avgStrength >= 50
-              ? 'Average'
-              : 'Needs Support';
+          ? 'Average'
+          : 'Needs Support';
 
-  final strengthColor = avgStrength >= 100
-      ? _Colors.emerald
-      : avgStrength >= 75
+  final strengthColor =
+      avgStrength >= 100
+          ? _Colors.emerald
+          : avgStrength >= 75
           ? _Colors.sky
           : avgStrength >= 50
-              ? _Colors.amber
-              : _Colors.coral;
+          ? _Colors.amber
+          : _Colors.coral;
 
   return InsightData(
     title: 'Chart Strength',
@@ -448,8 +450,8 @@ InsightData _getChartStrengthInsight(
       avgStrength >= 100
           ? 'Excellent! Most planets can deliver strong results'
           : avgStrength >= 75
-              ? 'Good strength with minor areas to improve'
-              : 'Consider remedies for weak planets',
+          ? 'Good strength with minor areas to improve'
+          : 'Consider remedies for weak planets',
     ],
     accentColor: strengthColor,
     icon: Icons.insights_rounded,
@@ -496,7 +498,11 @@ InsightData _getVimshopakaBalaInsight(VimshopakaBalaData data) {
     description:
         'Vimshopaka Bala (20-point strength) evaluates planetary strength across 16 divisional charts (Shodasavarga). Each planet is scored out of ${maxScore.toStringAsFixed(0)} points based on its dignity (exalted, own sign, friendly, etc.) in each divisional chart.',
     significance:
-        '${data.planet} scores ${score.toStringAsFixed(1)}/${maxScore.toStringAsFixed(0)} (${data.percentage.toStringAsFixed(0)}%), classified as "${data.strength}". ${data.strength == "Strong" ? "This planet has excellent dignity across divisional charts." : data.strength == "Medium" ? "This planet has moderate dignity." : "This planet may need strengthening."}',
+        '${data.planet} scores ${score.toStringAsFixed(1)}/${maxScore.toStringAsFixed(0)} (${data.percentage.toStringAsFixed(0)}%), classified as "${data.strength}". ${data.strength == "Strong"
+            ? "This planet has excellent dignity across divisional charts."
+            : data.strength == "Medium"
+            ? "This planet has moderate dignity."
+            : "This planet may need strengthening."}',
     keyPoints: [
       'Vimshopaka Score: ${score.toStringAsFixed(2)}/${maxScore.toStringAsFixed(0)}',
       'Percentage: ${data.percentage.toStringAsFixed(1)}%',
@@ -513,21 +519,30 @@ InsightData _getVimshopakaBalaInsight(VimshopakaBalaData data) {
 
 InsightData _getAshtakavargaInsight(String sign, int points, String type) {
   final isStrong = points >= (type == 'SAV' ? 28 : 4);
-  final color = isStrong ? _Colors.emerald : points >= (type == 'SAV' ? 25 : 3) ? _Colors.amber : _Colors.coral;
+  final color =
+      isStrong
+          ? _Colors.emerald
+          : points >= (type == 'SAV' ? 25 : 3)
+          ? _Colors.amber
+          : _Colors.coral;
 
   return InsightData(
     title: type == 'SAV' ? 'Sarvashtakavarga' : 'Ashtakavarga',
     value: '$sign - $points points',
-    description: type == 'SAV'
-        ? 'Sarvashtakavarga (SAV) is the combined Ashtakavarga points of all 7 planets for each sign. It shows the overall strength of each sign for transits and results. Maximum possible is 56 points (8 points × 7 planets).'
-        : 'Ashtakavarga shows benefic points (0-8) each planet contributes to each sign. Points ≥4 are auspicious. This helps predict transit effects - planets transiting signs with higher points give better results.',
-    significance: type == 'SAV'
-        ? '$sign has $points SAV points. ${points >= 28 ? "This sign is strong and transits through it generally give positive results." : "Transits through this sign may need more attention."}'
-        : '$sign has $points bindus. ${points >= 4 ? "Transits of this planet through $sign are generally favorable." : "Extra care needed during transits through this sign."}',
+    description:
+        type == 'SAV'
+            ? 'Sarvashtakavarga (SAV) is the combined Ashtakavarga points of all 7 planets for each sign. It shows the overall strength of each sign for transits and results. Maximum possible is 56 points (8 points × 7 planets).'
+            : 'Ashtakavarga shows benefic points (0-8) each planet contributes to each sign. Points ≥4 are auspicious. This helps predict transit effects - planets transiting signs with higher points give better results.',
+    significance:
+        type == 'SAV'
+            ? '$sign has $points SAV points. ${points >= 28 ? "This sign is strong and transits through it generally give positive results." : "Transits through this sign may need more attention."}'
+            : '$sign has $points bindus. ${points >= 4 ? "Transits of this planet through $sign are generally favorable." : "Extra care needed during transits through this sign."}',
     keyPoints: [
       'Sign: $sign',
       'Points: $points${type == 'SAV' ? '/56' : '/8'}',
-      type == 'SAV' ? 'Type: Sarvashtakavarga (Combined)' : 'Type: Bhinna Ashtakavarga (Individual)',
+      type == 'SAV'
+          ? 'Type: Sarvashtakavarga (Combined)'
+          : 'Type: Bhinna Ashtakavarga (Individual)',
       type == 'SAV' ? 'Strong: ≥28 points' : 'Auspicious: ≥4 points',
       'Used for transit predictions',
     ],
@@ -545,7 +560,8 @@ InsightData _getLagnaLordStrengthInsight(
 
   return InsightData(
     title: 'Lagna Lord Strength',
-    value: '$lagnaLord (${strength?.percentageOfRequired.toStringAsFixed(0) ?? "N/A"}%)',
+    value:
+        '$lagnaLord (${strength?.percentageOfRequired.toStringAsFixed(0) ?? "N/A"}%)',
     description:
         'The Lagna Lord (Ascendant Lord) is the most important planet in your chart. It rules your Ascendant sign and represents your overall life path, personality, and vitality. Its strength directly impacts your ability to achieve success.',
     significance:
@@ -686,40 +702,42 @@ class _StrengthTabState extends State<StrengthTab> {
     );
 
     final strengthRanking = _calculateStrengthRanking(shadbala);
-    final strongestPlanet = strengthRanking.isNotEmpty ? strengthRanking.first : null;
-    final weakestPlanet = strengthRanking.isNotEmpty ? strengthRanking.last : null;
+    final strongestPlanet =
+        strengthRanking.isNotEmpty ? strengthRanking.first : null;
+    final weakestPlanet =
+        strengthRanking.isNotEmpty ? strengthRanking.last : null;
 
     return Stack(
       children: [
         SingleChildScrollView(
           controller: _scrollController,
-      physics: const BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ═══════════════════════════════════════════════════════════════
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ═══════════════════════════════════════════════════════════════
               // OVERVIEW SECTION
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['overview'],
                 sectionKey: _sectionKeys['overview']!,
                 accentColor: _Colors.violet,
                 child: _AnimatedCardWrapper(
                   child: _StrengthHeroCard(
-            shadbala: shadbala,
-            strongestPlanet: strongestPlanet,
-            weakestPlanet: weakestPlanet,
+                    shadbala: shadbala,
+                    strongestPlanet: strongestPlanet,
+                    weakestPlanet: weakestPlanet,
                     ascendantSign: widget.kundaliData.ascendant.sign,
                   ),
                 ),
-          ),
+              ),
 
               const SizedBox(height: _DesignTokens.space24),
 
-          // ═══════════════════════════════════════════════════════════════
-          // SHADBALA SECTION
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
+              // SHADBALA SECTION
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['shadbala'],
                 sectionKey: _sectionKeys['shadbala']!,
@@ -728,15 +746,12 @@ class _StrengthTabState extends State<StrengthTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-            title: 'Shadbala (षड्बल)',
-            subtitle: 'Six-fold planetary strength',
+                      title: 'Shadbala (षड्बल)',
+                      subtitle: 'Six-fold planetary strength',
                       accentColor: _Colors.rose,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
-                    _AnimatedCardWrapper(
-                      delay: 50,
-                      child: _ShadbalaLegend(),
-                    ),
+                    _AnimatedCardWrapper(delay: 50, child: _ShadbalaLegend()),
                     const SizedBox(height: _DesignTokens.space12),
                     ...shadbala.entries.toList().asMap().entries.map((entry) {
                       final index = entry.key;
@@ -746,7 +761,7 @@ class _StrengthTabState extends State<StrengthTab> {
                         child: _PremiumShadbalaCard(
                           data: planetEntry.value,
                           rank: strengthRanking.indexOf(planetEntry.key) + 1,
-                totalPlanets: strengthRanking.length,
+                          totalPlanets: strengthRanking.length,
                         ),
                       );
                     }),
@@ -756,9 +771,9 @@ class _StrengthTabState extends State<StrengthTab> {
 
               const SizedBox(height: _DesignTokens.space24),
 
-          // ═══════════════════════════════════════════════════════════════
-          // VIMSHOPAKA BALA SECTION
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
+              // VIMSHOPAKA BALA SECTION
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['vimshopaka'],
                 sectionKey: _sectionKeys['vimshopaka']!,
@@ -767,8 +782,8 @@ class _StrengthTabState extends State<StrengthTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-            title: 'Vimshopaka Bala',
-            subtitle: 'Divisional chart strength (20-point scale)',
+                      title: 'Vimshopaka Bala',
+                      subtitle: 'Divisional chart strength (20-point scale)',
                       accentColor: _Colors.sky,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -787,9 +802,9 @@ class _StrengthTabState extends State<StrengthTab> {
 
               const SizedBox(height: _DesignTokens.space24),
 
-          // ═══════════════════════════════════════════════════════════════
-          // ASHTAKAVARGA SECTION
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
+              // ASHTAKAVARGA SECTION
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['ashtakavarga'],
                 sectionKey: _sectionKeys['ashtakavarga']!,
@@ -798,19 +813,25 @@ class _StrengthTabState extends State<StrengthTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-            title: 'Ashtakavarga (अष्टकवर्ग)',
-            subtitle: 'Transit strength by sign',
+                      title: 'Ashtakavarga (अष्टकवर्ग)',
+                      subtitle: 'Transit strength by sign',
                       accentColor: _Colors.emerald,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
                     _AnimatedCardWrapper(
                       delay: 50,
-                      child: _AshtakavargaSummaryCard(ashtakavarga: ashtakavarga, sav: sav),
+                      child: _AshtakavargaSummaryCard(
+                        ashtakavarga: ashtakavarga,
+                        sav: sav,
+                      ),
                     ),
                     const SizedBox(height: _DesignTokens.space12),
                     _AnimatedCardWrapper(
                       delay: 100,
-                      child: _AshtakavargaHeatmap(ashtakavarga: ashtakavarga, sav: sav),
+                      child: _AshtakavargaHeatmap(
+                        ashtakavarga: ashtakavarga,
+                        sav: sav,
+                      ),
                     ),
                   ],
                 ),
@@ -836,7 +857,10 @@ class _StrengthTabState extends State<StrengthTab> {
 
   List<String> _calculateStrengthRanking(Map<String, ShadbalaData> shadbala) {
     final entries = shadbala.entries.toList();
-    entries.sort((a, b) => b.value.percentageOfRequired.compareTo(a.value.percentageOfRequired));
+    entries.sort(
+      (a, b) =>
+          b.value.percentageOfRequired.compareTo(a.value.percentageOfRequired),
+    );
     return entries.map((e) => e.key).toList();
   }
 }
@@ -857,7 +881,8 @@ class _AnimatedSectionWrapper extends StatefulWidget {
   });
 
   @override
-  State<_AnimatedSectionWrapper> createState() => _AnimatedSectionWrapperState();
+  State<_AnimatedSectionWrapper> createState() =>
+      _AnimatedSectionWrapperState();
 }
 
 class _AnimatedSectionWrapperState extends State<_AnimatedSectionWrapper> {
@@ -892,7 +917,8 @@ class _SectionAnimationProvider extends InheritedWidget {
   });
 
   static _SectionAnimationProvider? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<_SectionAnimationProvider>();
+    return context
+        .dependOnInheritedWidgetOfExactType<_SectionAnimationProvider>();
   }
 
   @override
@@ -940,11 +966,17 @@ class _AnimatedSectionHeaderState extends State<_AnimatedSectionHeader>
 
     _textPulseAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 0.0,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 30,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween(
+          begin: 1.0,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 70,
       ),
     ]).animate(_controller);
@@ -973,27 +1005,28 @@ class _AnimatedSectionHeaderState extends State<_AnimatedSectionHeader>
         final textPulse = _textPulseAnimation.value;
         final underlineWidth = _underlineAnimation.value;
 
-        final textColor = Color.lerp(
-          _Colors.textTertiary,
-          widget.accentColor,
-          textPulse * 0.8,
-        )!;
+        final textColor =
+            Color.lerp(
+              _Colors.textTertiary,
+              widget.accentColor,
+              textPulse * 0.8,
+            )!;
 
         return Padding(
           padding: const EdgeInsets.only(left: _DesignTokens.space4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
+            children: [
+              Text(
                 widget.title.toUpperCase(),
                 style: GoogleFonts.inter(
                   fontSize: 11,
-                    fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: 1.0,
                   color: textColor,
-                  ),
                 ),
+              ),
               if (widget.subtitle != null) ...[
                 const SizedBox(height: 2),
                 Text(
@@ -1012,7 +1045,9 @@ class _AnimatedSectionHeaderState extends State<_AnimatedSectionHeader>
                     height: 2,
                     width: maxWidth * underlineWidth,
                     decoration: BoxDecoration(
-                      color: widget.accentColor.withOpacity(0.6 + textPulse * 0.4),
+                      color: widget.accentColor.withOpacity(
+                        0.6 + textPulse * 0.4,
+                      ),
                       borderRadius: BorderRadius.circular(1),
                     ),
                   );
@@ -1055,22 +1090,34 @@ class _AnimatedCardWrapperState extends State<_AnimatedCardWrapper>
 
     _scaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 1.025).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 1.0,
+          end: 1.025,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 35,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.025, end: 1.0).chain(CurveTween(curve: Curves.elasticOut)),
+        tween: Tween(
+          begin: 1.025,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.elasticOut)),
         weight: 65,
       ),
     ]).animate(_controller);
 
     _shadowAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 0.0,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 30,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween(
+          begin: 1.0,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 70,
       ),
     ]).animate(_controller);
@@ -1107,19 +1154,22 @@ class _AnimatedCardWrapperState extends State<_AnimatedCardWrapper>
         return Transform.scale(
           scale: scale,
           child: Container(
-            decoration: shadow > 0.01
-                ? BoxDecoration(
-                    borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
-                    boxShadow: [
-                      BoxShadow(
-                        color: accentColor.withOpacity(shadow * 0.2),
-                        blurRadius: 16 * shadow,
-                        spreadRadius: -4,
-                        offset: Offset(0, 4 * shadow),
+            decoration:
+                shadow > 0.01
+                    ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(
+                        _DesignTokens.radiusLg,
                       ),
-                    ],
-                  )
-                : null,
+                      boxShadow: [
+                        BoxShadow(
+                          color: accentColor.withOpacity(shadow * 0.2),
+                          blurRadius: 16 * shadow,
+                          spreadRadius: -4,
+                          offset: Offset(0, 4 * shadow),
+                        ),
+                      ],
+                    )
+                    : null,
             child: child,
           ),
         );
@@ -1220,7 +1270,9 @@ class _StrengthHeroCardState extends State<_StrengthHeroCard>
         .map((d) => d.percentageOfRequired)
         .fold<double>(0.0, (a, b) => a + b);
     final avgStrength =
-        widget.shadbala.isNotEmpty ? totalPercentage / widget.shadbala.length : 0.0;
+        widget.shadbala.isNotEmpty
+            ? totalPercentage / widget.shadbala.length
+            : 0.0;
     final strongCount = widget.shadbala.values.where((d) => d.isStrong).length;
     final weakCount = widget.shadbala.values.length - strongCount;
     _showInsightSheet(
@@ -1245,7 +1297,9 @@ class _StrengthHeroCardState extends State<_StrengthHeroCard>
         .map((d) => d.percentageOfRequired)
         .fold<double>(0.0, (a, b) => a + b);
     final avgStrength =
-        widget.shadbala.isNotEmpty ? totalPercentage / widget.shadbala.length : 0.0;
+        widget.shadbala.isNotEmpty
+            ? totalPercentage / widget.shadbala.length
+            : 0.0;
     final strongCount = widget.shadbala.values.where((d) => d.isStrong).length;
     final weakCount = widget.shadbala.values.length - strongCount;
     final lagnaLord = _getLagnaLord(widget.ascendantSign);
@@ -1260,114 +1314,109 @@ class _StrengthHeroCardState extends State<_StrengthHeroCard>
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: child,
-          );
+          return Transform.scale(scale: _scaleAnimation.value, child: child);
         },
         child: Container(
           padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
+          decoration: BoxDecoration(
             color: const Color(0xFF141218),
             borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-              color: const Color(0xFF262432),
-              width: 1,
-            ),
+            border: Border.all(color: const Color(0xFF262432), width: 1),
           ),
-        child: Column(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+            children: [
               // Header row with gauge and title
-            Row(
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
+                children: [
                   // Compact strength gauge
                   _CompactStrengthGauge(
                     percentage: avgStrength,
                     color: strengthColor,
                   ),
                   const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         // Level badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: strengthColor.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              strengthLevel.toUpperCase(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: strengthColor.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            strengthLevel.toUpperCase(),
                             style: GoogleFonts.inter(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w600,
-                                color: strengthColor,
-                                letterSpacing: 0.5,
-                              ),
+                              fontSize: 9,
+                              fontWeight: FontWeight.w600,
+                              color: strengthColor,
+                              letterSpacing: 0.5,
                             ),
                           ),
+                        ),
                         const SizedBox(height: 6),
-                      Text(
-                        'Chart Strength',
+                        Text(
+                          'Chart Strength',
                           style: GoogleFonts.instrumentSans(
-                          fontSize: 18,
+                            fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                             letterSpacing: -0.3,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         // Strong/Weak count
-                      Row(
-                        children: [
+                        Row(
+                          children: [
                             _MiniStatBadge(
-                            icon: Icons.trending_up_rounded,
-                            value: '$strongCount',
-                            label: 'Strong',
-                            color: _Colors.emerald,
-                          ),
-                          const SizedBox(width: 12),
+                              icon: Icons.trending_up_rounded,
+                              value: '$strongCount',
+                              label: 'Strong',
+                              color: _Colors.emerald,
+                            ),
+                            const SizedBox(width: 12),
                             _MiniStatBadge(
-                            icon: Icons.trending_down_rounded,
-                            value: '$weakCount',
-                            label: 'Weak',
-                            color: _Colors.amber,
-                          ),
-                        ],
-                      ),
-                    ],
+                              icon: Icons.trending_down_rounded,
+                              value: '$weakCount',
+                              label: 'Weak',
+                              color: _Colors.amber,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
                   // Info icon
                   Icon(
                     Icons.info_outline_rounded,
                     size: 18,
                     color: const Color(0xFF6E6A7A),
-                ),
-              ],
-            ),
+                  ),
+                ],
+              ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Strongest and Weakest planets row
-            Row(
-              children: [
-                if (widget.strongestPlanet != null)
-                  Expanded(
+              Row(
+                children: [
+                  if (widget.strongestPlanet != null)
+                    Expanded(
                       child: _CompactPlanetCard(
-                      label: 'Strongest',
-                      planet: widget.strongestPlanet!,
-                      percentage:
-                          widget.shadbala[widget.strongestPlanet]
-                              ?.percentageOfRequired ??
-                          0,
-                      isPositive: true,
+                        label: 'Strongest',
+                        planet: widget.strongestPlanet!,
+                        percentage:
+                            widget
+                                .shadbala[widget.strongestPlanet]
+                                ?.percentageOfRequired ??
+                            0,
+                        isPositive: true,
                         onTap: () {
                           if (widget.shadbala[widget.strongestPlanet] != null) {
                             HapticFeedback.selectionClick();
@@ -1381,19 +1430,20 @@ class _StrengthHeroCardState extends State<_StrengthHeroCard>
                             );
                           }
                         },
+                      ),
                     ),
-                  ),
-                const SizedBox(width: 10),
-                if (widget.weakestPlanet != null)
-                  Expanded(
+                  const SizedBox(width: 10),
+                  if (widget.weakestPlanet != null)
+                    Expanded(
                       child: _CompactPlanetCard(
-                      label: 'Weakest',
-                      planet: widget.weakestPlanet!,
-                      percentage:
-                          widget.shadbala[widget.weakestPlanet]
-                              ?.percentageOfRequired ??
-                          0,
-                      isPositive: false,
+                        label: 'Weakest',
+                        planet: widget.weakestPlanet!,
+                        percentage:
+                            widget
+                                .shadbala[widget.weakestPlanet]
+                                ?.percentageOfRequired ??
+                            0,
+                        isPositive: false,
                         onTap: () {
                           if (widget.shadbala[widget.weakestPlanet] != null) {
                             HapticFeedback.selectionClick();
@@ -1407,20 +1457,20 @@ class _StrengthHeroCardState extends State<_StrengthHeroCard>
                             );
                           }
                         },
+                      ),
                     ),
-                  ),
-              ],
-            ),
+                ],
+              ),
 
               // Lagna Lord
-            if (lagnaLordStrength != null) ...[
+              if (lagnaLordStrength != null) ...[
                 const SizedBox(height: 12),
                 _CompactLagnaLordRow(
-                lagnaLord: lagnaLord,
-                ascendantSign: widget.ascendantSign,
-                strength: lagnaLordStrength,
-              ),
-            ],
+                  lagnaLord: lagnaLord,
+                  ascendantSign: widget.ascendantSign,
+                  strength: lagnaLordStrength,
+                ),
+              ],
             ],
           ),
         ),
@@ -1436,10 +1486,7 @@ class _CompactStrengthGauge extends StatefulWidget {
   final double percentage;
   final Color color;
 
-  const _CompactStrengthGauge({
-    required this.percentage,
-    required this.color,
-  });
+  const _CompactStrengthGauge({required this.percentage, required this.color});
 
   @override
   State<_CompactStrengthGauge> createState() => _CompactStrengthGaugeState();
@@ -1457,11 +1504,14 @@ class _CompactStrengthGaugeState extends State<_CompactStrengthGauge>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
-    _progressAnim = Tween<double>(begin: 0, end: widget.percentage / 100).animate(
+
+    _progressAnim = Tween<double>(
+      begin: 0,
+      end: widget.percentage / 100,
+    ).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
     );
-    
+
     Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) _animController.forward();
     });
@@ -1625,25 +1675,23 @@ class _CompactPlanetCardState extends State<_CompactPlanetCard> {
         duration: const Duration(milliseconds: 100),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: _isPressed
-              ? color.withOpacity(0.08)
-              : const Color(0xFF1A181F),
+          color: _isPressed ? color.withOpacity(0.08) : const Color(0xFF1A181F),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: _isPressed
-                ? color.withOpacity(0.3)
-                : const Color(0xFF2A2838),
+            color:
+                _isPressed ? color.withOpacity(0.3) : const Color(0xFF2A2838),
             width: _isPressed ? 1 : 0.5,
           ),
-          boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: color.withOpacity(0.15),
-                    blurRadius: 12,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : null,
+          boxShadow:
+              _isPressed
+                  ? [
+                    BoxShadow(
+                      color: color.withOpacity(0.15),
+                      blurRadius: 12,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : null,
         ),
         child: Row(
           children: [
@@ -1787,25 +1835,28 @@ class _CompactLagnaLordRowState extends State<_CompactLagnaLordRow> {
         duration: const Duration(milliseconds: 100),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: _isPressed
-              ? _Colors.violet.withOpacity(0.08)
-              : const Color(0xFF1A181F),
+          color:
+              _isPressed
+                  ? _Colors.violet.withOpacity(0.08)
+                  : const Color(0xFF1A181F),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: _isPressed
-                ? _Colors.violet.withOpacity(0.3)
-                : const Color(0xFF2A2838),
+            color:
+                _isPressed
+                    ? _Colors.violet.withOpacity(0.3)
+                    : const Color(0xFF2A2838),
             width: _isPressed ? 1 : 0.5,
           ),
-          boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: _Colors.violet.withOpacity(0.12),
-                    blurRadius: 12,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : null,
+          boxShadow:
+              _isPressed
+                  ? [
+                    BoxShadow(
+                      color: _Colors.violet.withOpacity(0.12),
+                      blurRadius: 12,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : null,
         ),
         child: Row(
           children: [
@@ -2075,7 +2126,11 @@ class _InteractivePlanetHighlightState
         if (widget.shadbalaData != null) {
           _showInsightSheet(
             context,
-            _getShadbalaInsight(widget.shadbalaData!, widget.rank, widget.total),
+            _getShadbalaInsight(
+              widget.shadbalaData!,
+              widget.rank,
+              widget.total,
+            ),
           );
         }
       },
@@ -2084,25 +2139,23 @@ class _InteractivePlanetHighlightState
         duration: const Duration(milliseconds: 100),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: _isPressed 
-              ? color.withOpacity(0.12) 
-              : const Color(0xFF1A181F),
+          color: _isPressed ? color.withOpacity(0.12) : const Color(0xFF1A181F),
           borderRadius: BorderRadius.circular(_DesignTokens.radiusMd),
           border: Border.all(
-            color: _isPressed 
-                ? color.withOpacity(0.35) 
-                : const Color(0xFF2A2838),
+            color:
+                _isPressed ? color.withOpacity(0.35) : const Color(0xFF2A2838),
             width: _isPressed ? 1.5 : 0.5,
           ),
-          boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: color.withOpacity(0.15),
-                    blurRadius: 12,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : null,
+          boxShadow:
+              _isPressed
+                  ? [
+                    BoxShadow(
+                      color: color.withOpacity(0.15),
+                      blurRadius: 12,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : null,
         ),
         child: Row(
           children: [
@@ -2137,10 +2190,10 @@ class _InteractivePlanetHighlightState
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: planetColor.withOpacity(0.12),
-              child: Center(
-                child: Text(
-                  _getPlanetSymbol(widget.planet),
-                  style: TextStyle(fontSize: 16, color: planetColor),
+                      child: Center(
+                        child: Text(
+                          _getPlanetSymbol(widget.planet),
+                          style: TextStyle(fontSize: 16, color: planetColor),
                         ),
                       ),
                     );
@@ -2167,8 +2220,8 @@ class _InteractivePlanetHighlightState
                         duration: const Duration(milliseconds: 100),
                         opacity: _isPressed ? 1.0 : 0.5,
                         child: Icon(
-                        Icons.chevron_right_rounded,
-                        size: 12,
+                          Icons.chevron_right_rounded,
+                          size: 12,
                           color: color,
                         ),
                       ),
@@ -2203,12 +2256,12 @@ class _InteractivePlanetHighlightState
                   ),
                   const SizedBox(width: 3),
                   Text(
-                '${widget.percentage.toStringAsFixed(0)}%',
-                style: GoogleFonts.jetBrainsMono(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: color,
-                ),
+                    '${widget.percentage.toStringAsFixed(0)}%',
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: color,
+                    ),
                   ),
                 ],
               ),
@@ -2243,7 +2296,8 @@ class _InteractiveLagnaLordCardState extends State<_InteractiveLagnaLordCard> {
   Widget build(BuildContext context) {
     final planetColor = _getPlanetColor(widget.lagnaLord);
     final zodiacColor = _getZodiacColor(widget.ascendantSign);
-    final strengthColor = widget.strength.isStrong ? _Colors.emerald : _Colors.amber;
+    final strengthColor =
+        widget.strength.isStrong ? _Colors.emerald : _Colors.amber;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -2264,25 +2318,28 @@ class _InteractiveLagnaLordCardState extends State<_InteractiveLagnaLordCard> {
         duration: const Duration(milliseconds: 100),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: _isPressed
-              ? _Colors.violet.withOpacity(0.08)
-              : const Color(0xFF1A181F),
+          color:
+              _isPressed
+                  ? _Colors.violet.withOpacity(0.08)
+                  : const Color(0xFF1A181F),
           borderRadius: BorderRadius.circular(_DesignTokens.radiusMd),
           border: Border.all(
-            color: _isPressed
-                ? _Colors.violet.withOpacity(0.35)
-                : const Color(0xFF2A2838),
+            color:
+                _isPressed
+                    ? _Colors.violet.withOpacity(0.35)
+                    : const Color(0xFF2A2838),
             width: _isPressed ? 1.5 : 0.5,
           ),
-          boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: _Colors.violet.withOpacity(0.12),
-                    blurRadius: 12,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : null,
+          boxShadow:
+              _isPressed
+                  ? [
+                    BoxShadow(
+                      color: _Colors.violet.withOpacity(0.12),
+                      blurRadius: 12,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : null,
         ),
         child: Row(
           children: [
@@ -2347,8 +2404,8 @@ class _InteractiveLagnaLordCardState extends State<_InteractiveLagnaLordCard> {
                         duration: const Duration(milliseconds: 100),
                         opacity: _isPressed ? 1.0 : 0.5,
                         child: Icon(
-                        Icons.chevron_right_rounded,
-                        size: 14,
+                          Icons.chevron_right_rounded,
+                          size: 14,
                           color: _Colors.violet,
                         ),
                       ),
@@ -2376,7 +2433,7 @@ class _InteractiveLagnaLordCardState extends State<_InteractiveLagnaLordCard> {
                         ),
                         child: Text(
                           widget.ascendantSign,
-                        style: GoogleFonts.inter(
+                          style: GoogleFonts.inter(
                             fontSize: 8,
                             fontWeight: FontWeight.w500,
                             color: zodiacColor,
@@ -2411,12 +2468,12 @@ class _InteractiveLagnaLordCardState extends State<_InteractiveLagnaLordCard> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                '${widget.strength.percentageOfRequired.toStringAsFixed(0)}%',
-                style: GoogleFonts.jetBrainsMono(
+                    '${widget.strength.percentageOfRequired.toStringAsFixed(0)}%',
+                    style: GoogleFonts.jetBrainsMono(
                       fontSize: 11,
-                  fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w700,
                       color: strengthColor,
-                ),
+                    ),
                   ),
                 ],
               ),
@@ -2479,7 +2536,9 @@ class _StrengthGaugeState extends State<_StrengthGauge>
               ],
             ),
             border: Border.all(
-              color: widget.color.withOpacity(0.3 + 0.1 * _pulseAnimation.value),
+              color: widget.color.withOpacity(
+                0.3 + 0.1 * _pulseAnimation.value,
+              ),
               width: 3,
             ),
             boxShadow: [
@@ -2529,52 +2588,49 @@ class _ShadbalaLegend extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF141218),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFF262432),
-          width: 1,
-        ),
+        border: Border.all(color: const Color(0xFF262432), width: 1),
       ),
       child: SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Row(
-        children: const [
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          children: const [
             _CompactLegendChip(
-            label: 'Sthana',
-            hint: 'Position',
-            color: _Colors.violet,
-          ),
+              label: 'Sthana',
+              hint: 'Position',
+              color: _Colors.violet,
+            ),
             SizedBox(width: 6),
             _CompactLegendChip(
-            label: 'Dig',
-            hint: 'Direction',
-            color: _Colors.sky,
-          ),
+              label: 'Dig',
+              hint: 'Direction',
+              color: _Colors.sky,
+            ),
             SizedBox(width: 6),
             _CompactLegendChip(
-            label: 'Kala',
-            hint: 'Time',
-            color: _Colors.emerald,
-          ),
+              label: 'Kala',
+              hint: 'Time',
+              color: _Colors.emerald,
+            ),
             SizedBox(width: 6),
             _CompactLegendChip(
-            label: 'Chesta',
-            hint: 'Motion',
-            color: _Colors.amber,
-          ),
+              label: 'Chesta',
+              hint: 'Motion',
+              color: _Colors.amber,
+            ),
             SizedBox(width: 6),
             _CompactLegendChip(
-            label: 'Naisarg',
-            hint: 'Natural',
-            color: _Colors.rose,
-          ),
+              label: 'Naisarg',
+              hint: 'Natural',
+              color: _Colors.rose,
+            ),
             SizedBox(width: 6),
             _CompactLegendChip(
-            label: 'Drik',
-            hint: 'Aspect',
-            color: _Colors.teal,
-          ),
-        ],
+              label: 'Drik',
+              hint: 'Aspect',
+              color: _Colors.teal,
+            ),
+          ],
         ),
       ),
     );
@@ -2595,35 +2651,32 @@ class _CompactLegendChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-          color: color.withOpacity(0.2),
-          width: 0.5,
-        ),
-        ),
-        child: Column(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.2), width: 0.5),
+      ),
+      child: Column(
         mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
+        children: [
+          Text(
             label,
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
               color: color,
-              ),
             ),
-            Text(
+          ),
+          Text(
             hint,
-              style: GoogleFonts.inter(
-                fontSize: 8,
+            style: GoogleFonts.inter(
+              fontSize: 8,
               fontWeight: FontWeight.w400,
               color: const Color(0xFF7C7889),
-              ),
             ),
-          ],
+          ),
+        ],
       ),
     );
   }
@@ -2705,39 +2758,39 @@ class _PremiumShadbalaCardState extends State<_PremiumShadbalaCard>
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: child,
-          );
+          return Transform.scale(scale: _scaleAnimation.value, child: child);
         },
-            child: AnimatedContainer(
+        child: AnimatedContainer(
           duration: const Duration(milliseconds: 100),
-              margin: const EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(
-            color: _isPressed
-                ? planetColor.withOpacity(0.04)
-                : const Color(0xFF141218),
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            color:
+                _isPressed
+                    ? planetColor.withOpacity(0.04)
+                    : const Color(0xFF141218),
             borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: _isPressed
-                  ? planetColor.withOpacity(0.35)
-                  : isTopRank
+            border: Border.all(
+              color:
+                  _isPressed
+                      ? planetColor.withOpacity(0.35)
+                      : isTopRank
                       ? _Colors.emerald.withOpacity(0.3)
-                          : isBottomRank
-                          ? _Colors.coral.withOpacity(0.2)
-                          : const Color(0xFF262432),
+                      : isBottomRank
+                      ? _Colors.coral.withOpacity(0.2)
+                      : const Color(0xFF262432),
               width: _isPressed ? 1.5 : 1,
-                ),
-                boxShadow: _isPressed
+            ),
+            boxShadow:
+                _isPressed
                     ? [
-                        BoxShadow(
-                          color: planetColor.withOpacity(0.15),
-                          blurRadius: 16,
-                      spreadRadius: -4,
-                            ),
-                          ]
-                        : null,
-              ),
+                      BoxShadow(
+                        color: planetColor.withOpacity(0.15),
+                        blurRadius: 16,
+                        spreadRadius: -4,
+                      ),
+                    ]
+                    : null,
+          ),
           child: Column(
             children: [
               // Main content
@@ -2745,29 +2798,31 @@ class _PremiumShadbalaCardState extends State<_PremiumShadbalaCard>
                 padding: const EdgeInsets.all(14),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                  children: [
                     // Planet image with rank badge
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
                         Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               // Deep ambient shadow
-                                  BoxShadow(
+                              BoxShadow(
                                 color: Colors.black.withOpacity(0.2),
-                                    blurRadius: 10,
+                                blurRadius: 10,
                                 spreadRadius: -3,
                                 offset: const Offset(0, 4),
                               ),
                               // Color accent glow
                               BoxShadow(
-                                color: planetColor.withOpacity(_isPressed ? 0.3 : 0.15),
+                                color: planetColor.withOpacity(
+                                  _isPressed ? 0.3 : 0.15,
+                                ),
                                 blurRadius: _isPressed ? 16 : 10,
-                                    spreadRadius: -2,
+                                spreadRadius: -2,
                                 offset: const Offset(0, 3),
                               ),
                             ],
@@ -2782,9 +2837,9 @@ class _PremiumShadbalaCardState extends State<_PremiumShadbalaCard>
                               errorBuilder: (context, error, stackTrace) {
                                 return Container(
                                   color: planetColor.withOpacity(0.12),
-                        child: Center(
-                          child: Text(
-                            _getPlanetSymbol(widget.data.planet),
+                                  child: Center(
+                                    child: Text(
+                                      _getPlanetSymbol(widget.data.planet),
                                       style: TextStyle(
                                         fontSize: 22,
                                         color: planetColor,
@@ -2793,24 +2848,25 @@ class _PremiumShadbalaCardState extends State<_PremiumShadbalaCard>
                                   ),
                                 );
                               },
+                            ),
                           ),
                         ),
-                      ),
-                      Positioned(
+                        Positioned(
                           right: -5,
                           top: -5,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 6,
                               vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                              color: isTopRank
-                                  ? _Colors.emerald
-                                  : isBottomRank
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                                  isTopRank
+                                      ? _Colors.emerald
+                                      : isBottomRank
                                       ? _Colors.coral
                                       : const Color(0xFF3A3848),
-                            borderRadius: BorderRadius.circular(6),
+                              borderRadius: BorderRadius.circular(6),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.3),
@@ -2818,89 +2874,93 @@ class _PremiumShadbalaCardState extends State<_PremiumShadbalaCard>
                                   offset: const Offset(0, 2),
                                 ),
                               ],
-                          ),
-                          child: Text(
-                            '#${widget.rank}',
-                            style: GoogleFonts.jetBrainsMono(
+                            ),
+                            child: Text(
+                              '#${widget.rank}',
+                              style: GoogleFonts.jetBrainsMono(
                                 fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 14),
-                    
+                      ],
+                    ),
+                    const SizedBox(width: 14),
+
                     // Planet info
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           // Planet name row
-                        Row(
-                          children: [
-                            Text(
-                              widget.data.planet,
+                          Row(
+                            children: [
+                              Text(
+                                widget.data.planet,
                                 style: GoogleFonts.instrumentSans(
                                   fontSize: 17,
                                   fontWeight: FontWeight.w600,
-                                  color: _isPressed ? planetColor : Colors.white,
+                                  color:
+                                      _isPressed ? planetColor : Colors.white,
                                   letterSpacing: -0.3,
                                 ),
                               ),
                               if (isTopRank) ...[
-                              const SizedBox(width: 6),
-                              const Text('👑', style: TextStyle(fontSize: 12)),
-                            ],
+                                const SizedBox(width: 6),
+                                const Text(
+                                  '👑',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ],
                             ],
                           ),
                           const SizedBox(height: 6),
-                          
+
                           // Rupas info with subtle chip
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
                               vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
+                            ),
+                            decoration: BoxDecoration(
                               color: const Color(0xFF1A181F),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
                               '${widget.data.totalBala.toStringAsFixed(1)} / ${widget.data.requiredBala.toStringAsFixed(0)} Rupas',
                               style: GoogleFonts.jetBrainsMono(
-                                  fontSize: 10,
+                                fontSize: 10,
                                 fontWeight: FontWeight.w500,
                                 color: const Color(0xFF8B8798),
-                                ),
                               ),
                             ),
+                          ),
                         ],
                       ),
                     ),
-                    
+
                     // Status badge + info icon
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                            AnimatedOpacity(
+                        AnimatedOpacity(
                           duration: const Duration(milliseconds: 100),
                           opacity: _isPressed ? 1.0 : 0.5,
-                              child: Icon(
-                                Icons.info_outline_rounded,
-                                size: 14,
-                                color: planetColor,
-                              ),
-                            ),
+                          child: Icon(
+                            Icons.info_outline_rounded,
+                            size: 14,
+                            color: planetColor,
+                          ),
+                        ),
                         const SizedBox(height: 10),
-                            Container(
+                        Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
                             vertical: 6,
                           ),
-                              decoration: BoxDecoration(
+                          decoration: BoxDecoration(
                             color: strengthColor.withOpacity(0.12),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
@@ -2931,9 +2991,9 @@ class _PremiumShadbalaCardState extends State<_PremiumShadbalaCard>
                           ),
                         ),
                       ],
-                            ),
-                          ],
-                        ),
+                    ),
+                  ],
+                ),
               ),
 
               // Progress bar section
@@ -2941,9 +3001,9 @@ class _PremiumShadbalaCardState extends State<_PremiumShadbalaCard>
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: _MinimalProgressBar(
                   percentage: percentage,
-                                color: strengthColor,
-                              ),
-                            ),
+                  color: strengthColor,
+                ),
+              ),
 
               const SizedBox(height: 12),
 
@@ -2960,24 +3020,21 @@ class _PremiumShadbalaCardState extends State<_PremiumShadbalaCard>
                   ),
                 ),
                 child: _MinimalBalaRow(data: widget.data),
-                  ),
-                ],
               ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// Minimal Progress Bar - Clean animated progress
+// Premium Progress Bar - Elegant thin design with gradient
 class _MinimalProgressBar extends StatefulWidget {
   final double percentage;
   final Color color;
 
-  const _MinimalProgressBar({
-    required this.percentage,
-    required this.color,
-  });
+  const _MinimalProgressBar({required this.percentage, required this.color});
 
   @override
   State<_MinimalProgressBar> createState() => _MinimalProgressBarState();
@@ -2992,16 +3049,19 @@ class _MinimalProgressBarState extends State<_MinimalProgressBar>
   void initState() {
     super.initState();
     _animController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    
+
     // Normalize to 0-1 range (assuming max 150%)
-    _progressAnim = Tween<double>(begin: 0, end: widget.percentage / 150).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
+    _progressAnim = Tween<double>(
+      begin: 0,
+      end: widget.percentage / 150,
+    ).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOutQuart),
     );
-    
-    Future.delayed(const Duration(milliseconds: 100), () {
+
+    Future.delayed(const Duration(milliseconds: 150), () {
       if (mounted) _animController.forward();
     });
   }
@@ -3014,43 +3074,131 @@ class _MinimalProgressBarState extends State<_MinimalProgressBar>
 
   @override
   Widget build(BuildContext context) {
+    // Create lighter gradient colors from the base color
+    final baseColor = widget.color;
+    final lightColor = Color.lerp(baseColor, Colors.white, 0.35)!;
+    final paleColor = Color.lerp(baseColor, Colors.white, 0.55)!;
+
     return AnimatedBuilder(
       animation: _progressAnim,
       builder: (context, child) {
+        final progress = _progressAnim.value.clamp(0.0, 1.0);
+
         return Row(
-                          children: [
+          children: [
             Expanded(
-              child: Stack(
-                children: [
-                  // Background track
-                  Container(
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2A2838),
-                      borderRadius: BorderRadius.circular(2.5),
-                    ),
+              child: Container(
+                height: 3,
+                decoration: BoxDecoration(
+                  // Subtle dark track with inner shadow effect
+                  color: const Color(0xFF1A181F),
+                  borderRadius: BorderRadius.circular(1.5),
+                  border: Border.all(
+                    color: const Color(0xFF2A2838).withOpacity(0.5),
+                    width: 0.5,
                   ),
-                  // Progress fill
-                  FractionallySizedBox(
-                    widthFactor: _progressAnim.value.clamp(0.0, 1.0),
-                    child: Container(
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: widget.color,
-                        borderRadius: BorderRadius.circular(2.5),
+                ),
+                child: Stack(
+                  children: [
+                    // Progress fill with elegant gradient
+                    FractionallySizedBox(
+                      widthFactor: progress,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(1.5),
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              paleColor.withOpacity(0.6),
+                              lightColor.withOpacity(0.8),
+                              baseColor.withOpacity(0.9),
+                            ],
+                            stops: const [0.0, 0.4, 1.0],
+                          ),
+                          boxShadow: [
+                            // Soft glow effect
+                            BoxShadow(
+                              color: baseColor.withOpacity(0.25),
+                              blurRadius: 4,
+                              spreadRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child: Stack(
+                          children: [
+                            // Subtle highlight line at top
+                            Positioned(
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height: 1,
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(1.5),
+                                  ),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    colors: [
+                                      Colors.white.withOpacity(0.0),
+                                      Colors.white.withOpacity(0.25),
+                                      Colors.white.withOpacity(0.15),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
+                    // Leading edge accent dot
+                    if (progress > 0.02)
+                      Positioned(
+                        left:
+                            (progress *
+                                (MediaQuery.of(context).size.width - 80)) -
+                            1.5,
+                        top: 0,
+                        bottom: 0,
+                        child: Container(
+                          width: 3,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.6),
+                            boxShadow: [
+                              BoxShadow(
+                                color: baseColor.withOpacity(0.4),
+                                blurRadius: 3,
+                                spreadRadius: 0,
+                              ),
+                            ],
+                          ),
                         ),
-            ],
-          ),
-        ),
-            const SizedBox(width: 12),
-            Text(
-              '${widget.percentage.toStringAsFixed(0)}%',
-              style: GoogleFonts.jetBrainsMono(
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: widget.color,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            // Percentage text with gradient effect
+            ShaderMask(
+              shaderCallback:
+                  (bounds) => LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [lightColor, baseColor],
+                  ).createShader(bounds),
+              child: Text(
+                '${widget.percentage.toStringAsFixed(0)}%',
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  letterSpacing: 0.3,
+                ),
               ),
             ),
           ],
@@ -3081,20 +3229,21 @@ class _MinimalBalaRow extends StatelessWidget {
     final minValue = balas.map((b) => b.$2).reduce((a, b) => a < b ? a : b);
 
     return Row(
-        children: balas.map((bala) {
-          final isMax = bala.$2 == maxValue;
-          final isMin = bala.$2 == minValue;
+      children:
+          balas.map((bala) {
+            final isMax = bala.$2 == maxValue;
+            final isMin = bala.$2 == minValue;
 
-          return Expanded(
-          child: _MinimalBalaCell(
-              name: bala.$1,
-              value: bala.$2,
-              color: bala.$3,
-              isMax: isMax,
-              isMin: isMin,
-            ),
-          );
-        }).toList(),
+            return Expanded(
+              child: _MinimalBalaCell(
+                name: bala.$1,
+                value: bala.$2,
+                color: bala.$3,
+                isMax: isMax,
+                isMin: isMin,
+              ),
+            );
+          }).toList(),
     );
   }
 }
@@ -3117,63 +3266,64 @@ class _MinimalBalaCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayColor = isMax
-        ? _Colors.emerald
-        : isMin
+    final displayColor =
+        isMax
+            ? _Colors.emerald
+            : isMin
             ? _Colors.coral
             : Colors.white;
 
     return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 2),
+      margin: const EdgeInsets.symmetric(horizontal: 2),
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-        decoration: BoxDecoration(
-        color: isMax
-            ? _Colors.emerald.withOpacity(0.1)
-            : isMin
-                      ? _Colors.coral.withOpacity(0.08)
-                      : Colors.transparent,
-          borderRadius: BorderRadius.circular(6),
-        border: isMax || isMin
-              ? Border.all(
-                color: isMax
-                    ? _Colors.emerald.withOpacity(0.25)
+      decoration: BoxDecoration(
+        color:
+            isMax
+                ? _Colors.emerald.withOpacity(0.1)
+                : isMin
+                ? _Colors.coral.withOpacity(0.08)
+                : Colors.transparent,
+        borderRadius: BorderRadius.circular(6),
+        border:
+            isMax || isMin
+                ? Border.all(
+                  color:
+                      isMax
+                          ? _Colors.emerald.withOpacity(0.25)
                           : _Colors.coral.withOpacity(0.2),
-                      width: 0.5,
-                    )
-                  : null,
-        ),
-        child: Column(
+                  width: 0.5,
+                )
+                : null,
+      ),
+      child: Column(
         mainAxisSize: MainAxisSize.min,
-          children: [
+        children: [
           // Color dot
-            Container(
+          Container(
             width: 5,
             height: 5,
-              decoration: BoxDecoration(
-              color: color,
-                shape: BoxShape.circle,
-              ),
-            ),
-            const SizedBox(height: 4),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          ),
+          const SizedBox(height: 4),
           // Value
-            Text(
+          Text(
             value.toStringAsFixed(0),
-              style: GoogleFonts.jetBrainsMono(
+            style: GoogleFonts.jetBrainsMono(
               fontSize: 11,
-                fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w600,
               color: displayColor,
             ),
           ),
           // Label
-            Text(
+          Text(
             name,
-              style: GoogleFonts.inter(
-                fontSize: 7,
+            style: GoogleFonts.inter(
+              fontSize: 7,
               fontWeight: FontWeight.w400,
               color: const Color(0xFF7C7889),
-              ),
             ),
-          ],
+          ),
+        ],
       ),
     );
   }
@@ -3241,15 +3391,16 @@ class _VimshopakaSummaryState extends State<_VimshopakaSummary> {
             color: _Colors.sky.withOpacity(_isPressed ? 0.3 : 0.15),
             width: _isPressed ? 1 : 0.5,
           ),
-          boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: _Colors.sky.withOpacity(0.15),
-                    blurRadius: 10,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : null,
+          boxShadow:
+              _isPressed
+                  ? [
+                    BoxShadow(
+                      color: _Colors.sky.withOpacity(0.15),
+                      blurRadius: 10,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : null,
         ),
         child: Row(
           children: [
@@ -3347,8 +3498,8 @@ class _InteractiveMiniCountState extends State<_InteractiveMiniCount> {
                 widget.label == 'Strong'
                     ? 'Planets with 15-20 Vimshopaka points (75-100%). These planets have excellent dignity across divisional charts and give strong results.'
                     : widget.label == 'Med'
-                        ? 'Planets with 10-15 Vimshopaka points (50-75%). These planets have moderate dignity and give balanced results.'
-                        : 'Planets with 0-10 Vimshopaka points (<50%). These planets may need strengthening through remedies.',
+                    ? 'Planets with 10-15 Vimshopaka points (50-75%). These planets have moderate dignity and give balanced results.'
+                    : 'Planets with 0-10 Vimshopaka points (<50%). These planets may need strengthening through remedies.',
             significance:
                 'You have ${widget.count} ${widget.label.toLowerCase()} planet(s) based on Vimshopaka Bala scoring.',
             keyPoints: [
@@ -3357,8 +3508,8 @@ class _InteractiveMiniCountState extends State<_InteractiveMiniCount> {
               widget.label == 'Strong'
                   ? 'Score Range: 15-20 points (75-100%)'
                   : widget.label == 'Med'
-                      ? 'Score Range: 10-15 points (50-75%)'
-                      : 'Score Range: 0-10 points (0-50%)',
+                  ? 'Score Range: 10-15 points (50-75%)'
+                  : 'Score Range: 0-10 points (0-50%)',
             ],
             accentColor: widget.color,
             icon: Icons.grid_view_rounded,
@@ -3392,10 +3543,7 @@ class _InteractiveMiniCountState extends State<_InteractiveMiniCount> {
             const SizedBox(width: 3),
             Text(
               widget.label,
-              style: GoogleFonts.inter(
-                fontSize: 8,
-                color: widget.color,
-              ),
+              style: GoogleFonts.inter(fontSize: 8, color: widget.color),
             ),
           ],
         ),
@@ -3416,16 +3564,14 @@ class _VimshopakaBarsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: _Colors.surface.withOpacity(0.4),
         borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
-        border: Border.all(
-          color: _Colors.border.withOpacity(0.3),
-          width: 0.5,
-        ),
+        border: Border.all(color: _Colors.border.withOpacity(0.3), width: 0.5),
       ),
       child: Column(
-        children: vimshopaka.entries.map((entry) {
-          final data = entry.value;
-          return _InteractiveVimshopakaPlanetRow(data: data);
-        }).toList(),
+        children:
+            vimshopaka.entries.map((entry) {
+              final data = entry.value;
+              return _InteractiveVimshopakaPlanetRow(data: data);
+            }).toList(),
       ),
     );
   }
@@ -3448,9 +3594,10 @@ class _InteractiveVimshopakaPlanetRowState
   @override
   Widget build(BuildContext context) {
     final data = widget.data;
-    final color = data.strength == 'Strong'
-        ? _Colors.emerald
-        : data.strength == 'Medium'
+    final color =
+        data.strength == 'Strong'
+            ? _Colors.emerald
+            : data.strength == 'Medium'
             ? _Colors.amber
             : _Colors.coral;
     final planetColor = _getPlanetColor(data.planet);
@@ -3468,26 +3615,29 @@ class _InteractiveVimshopakaPlanetRowState
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: _isPressed 
-              ? planetColor.withOpacity(0.08) 
-              : const Color(0xFF1A181F),
+          color:
+              _isPressed
+                  ? planetColor.withOpacity(0.08)
+                  : const Color(0xFF1A181F),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: _isPressed 
-                ? planetColor.withOpacity(0.35) 
-                : const Color(0xFF2A2838),
+            color:
+                _isPressed
+                    ? planetColor.withOpacity(0.35)
+                    : const Color(0xFF2A2838),
             width: _isPressed ? 1.5 : 0.5,
           ),
-                boxShadow: _isPressed
-                    ? [
-                        BoxShadow(
-                    color: planetColor.withOpacity(0.12),
-                    blurRadius: 12,
-                          spreadRadius: -2,
-                        ),
-                      ]
-                    : null,
-              ),
+          boxShadow:
+              _isPressed
+                  ? [
+                    BoxShadow(
+                      color: planetColor.withOpacity(0.12),
+                      blurRadius: 12,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : null,
+        ),
         child: Row(
           children: [
             // Planet image with premium shadow
@@ -3521,15 +3671,15 @@ class _InteractiveVimshopakaPlanetRowState
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: planetColor.withOpacity(0.12),
-              child: Center(
-                child: Text(
-                  _getPlanetSymbol(data.planet),
+                      child: Center(
+                        child: Text(
+                          _getPlanetSymbol(data.planet),
                           style: TextStyle(fontSize: 16, color: planetColor),
-                ),
-              ),
+                        ),
+                      ),
                     );
                   },
-            ),
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -3628,11 +3778,34 @@ class _AshtakavargaSummaryCardState extends State<_AshtakavargaSummaryCard> {
   bool _isPressed = false;
 
   static const _signs = [
-    'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
-    'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+    'Aries',
+    'Taurus',
+    'Gemini',
+    'Cancer',
+    'Leo',
+    'Virgo',
+    'Libra',
+    'Scorpio',
+    'Sagittarius',
+    'Capricorn',
+    'Aquarius',
+    'Pisces',
   ];
 
-  static const _signSymbols = ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'];
+  static const _signSymbols = [
+    '♈',
+    '♉',
+    '♊',
+    '♋',
+    '♌',
+    '♍',
+    '♎',
+    '♏',
+    '♐',
+    '♑',
+    '♒',
+    '♓',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -3689,15 +3862,16 @@ class _AshtakavargaSummaryCardState extends State<_AshtakavargaSummaryCard> {
             color: _Colors.emerald.withOpacity(_isPressed ? 0.3 : 0.15),
             width: _isPressed ? 1 : 0.5,
           ),
-          boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: _Colors.emerald.withOpacity(0.15),
-                    blurRadius: 10,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : null,
+          boxShadow:
+              _isPressed
+                  ? [
+                    BoxShadow(
+                      color: _Colors.emerald.withOpacity(0.15),
+                      blurRadius: 10,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : null,
         ),
         child: Column(
           children: [
@@ -3765,11 +3939,7 @@ class _AshtakavargaSummaryCardState extends State<_AshtakavargaSummaryCard> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Expanded(
-                  child: _InteractiveTotalSav(
-                    totalSav: totalSav,
-                  ),
-                ),
+                Expanded(child: _InteractiveTotalSav(totalSav: totalSav)),
               ],
             ),
           ],
@@ -3832,15 +4002,16 @@ class _InteractiveSavHighlightState extends State<_InteractiveSavHighlight> {
                 _isPressed ? widget.color.withOpacity(0.3) : Colors.transparent,
             width: 1,
           ),
-          boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: widget.color.withOpacity(0.2),
-                    blurRadius: 8,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : null,
+          boxShadow:
+              _isPressed
+                  ? [
+                    BoxShadow(
+                      color: widget.color.withOpacity(0.2),
+                      blurRadius: 8,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : null,
         ),
         child: Column(
           children: [
@@ -3922,7 +4093,11 @@ class _InteractiveTotalSavState extends State<_InteractiveTotalSav> {
             description:
                 'The Total SAV is the sum of all Sarvashtakavarga points across all 12 signs. Maximum possible is 337 points. A higher total indicates overall stronger chart for transits.',
             significance:
-                'Your total SAV of ${widget.totalSav} points ${widget.totalSav >= 300 ? "is excellent, indicating a strong overall chart" : widget.totalSav >= 250 ? "is good, showing balanced strength" : "suggests focusing on beneficial transit periods"}.',
+                'Your total SAV of ${widget.totalSav} points ${widget.totalSav >= 300
+                    ? "is excellent, indicating a strong overall chart"
+                    : widget.totalSav >= 250
+                    ? "is good, showing balanced strength"
+                    : "suggests focusing on beneficial transit periods"}.',
             keyPoints: [
               'Total SAV: ${widget.totalSav} points',
               'Maximum possible: 337 points',
@@ -3943,18 +4118,21 @@ class _InteractiveTotalSavState extends State<_InteractiveTotalSav> {
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color:
-                _isPressed ? _Colors.violet.withOpacity(0.3) : Colors.transparent,
+                _isPressed
+                    ? _Colors.violet.withOpacity(0.3)
+                    : Colors.transparent,
             width: 1,
           ),
-          boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: _Colors.violet.withOpacity(0.2),
-                    blurRadius: 8,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : null,
+          boxShadow:
+              _isPressed
+                  ? [
+                    BoxShadow(
+                      color: _Colors.violet.withOpacity(0.2),
+                      blurRadius: 8,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : null,
         ),
         child: Column(
           children: [
@@ -4002,11 +4180,34 @@ class _AshtakavargaHeatmap extends StatelessWidget {
   const _AshtakavargaHeatmap({required this.ashtakavarga, required this.sav});
 
   static const _signNames = [
-    'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
-    'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+    'Aries',
+    'Taurus',
+    'Gemini',
+    'Cancer',
+    'Leo',
+    'Virgo',
+    'Libra',
+    'Scorpio',
+    'Sagittarius',
+    'Capricorn',
+    'Aquarius',
+    'Pisces',
   ];
 
-  static const _signs = ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'];
+  static const _signs = [
+    '♈',
+    '♉',
+    '♊',
+    '♋',
+    '♌',
+    '♍',
+    '♎',
+    '♏',
+    '♐',
+    '♑',
+    '♒',
+    '♓',
+  ];
 
   Color _getHeatmapColor(int value) {
     if (value >= 6) return _Colors.emerald;
@@ -4032,10 +4233,7 @@ class _AshtakavargaHeatmap extends StatelessWidget {
       decoration: BoxDecoration(
         color: _Colors.surface.withOpacity(0.4),
         borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
-        border: Border.all(
-          color: _Colors.border.withOpacity(0.3),
-          width: 0.5,
-        ),
+        border: Border.all(color: _Colors.border.withOpacity(0.3), width: 0.5),
       ),
       child: Column(
         children: [
@@ -4052,17 +4250,19 @@ class _AshtakavargaHeatmap extends StatelessWidget {
             child: Row(
               children: [
                 const SizedBox(width: 40),
-                ..._signs.map((s) => Expanded(
-                      child: Center(
-                        child: Text(
-                          s,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: _Colors.textTertiary,
-                          ),
+                ..._signs.map(
+                  (s) => Expanded(
+                    child: Center(
+                      child: Text(
+                        s,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: _Colors.textTertiary,
                         ),
                       ),
-                    )),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -4207,15 +4407,16 @@ class _InteractiveAshtakavargaCellState
           decoration: BoxDecoration(
             color: widget.color,
             borderRadius: BorderRadius.circular(_isPressed ? 6 : 4),
-            boxShadow: _isPressed
-                ? [
-                    BoxShadow(
-                      color: widget.color.withOpacity(0.5),
-                      blurRadius: 8,
-                      spreadRadius: 0,
-                    ),
-                  ]
-                : null,
+            boxShadow:
+                _isPressed
+                    ? [
+                      BoxShadow(
+                        color: widget.color.withOpacity(0.5),
+                        blurRadius: 8,
+                        spreadRadius: 0,
+                      ),
+                    ]
+                    : null,
           ),
           child: Center(
             child: Text(
@@ -4278,15 +4479,16 @@ class _InteractiveSavCellState extends State<_InteractiveSavCell> {
           decoration: BoxDecoration(
             color: widget.color,
             borderRadius: BorderRadius.circular(_isPressed ? 6 : 4),
-            boxShadow: _isPressed
-                ? [
-                    BoxShadow(
-                      color: widget.color.withOpacity(0.5),
-                      blurRadius: 10,
-                      spreadRadius: 0,
-                    ),
-                  ]
-                : null,
+            boxShadow:
+                _isPressed
+                    ? [
+                      BoxShadow(
+                        color: widget.color.withOpacity(0.5),
+                        blurRadius: 10,
+                        spreadRadius: 0,
+                      ),
+                    ]
+                    : null,
           ),
           child: Center(
             child: Text(
