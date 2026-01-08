@@ -145,7 +145,24 @@ class NorthIndianChartPainter extends CustomPainter {
       // Calculate font sizes based on chart size
       final houseNumSize = chartSize * 0.028;
       final signSize = chartSize * 0.038;
-      final planetSize = chartSize * 0.032;
+      
+      // Planet size based on count - stays readable for 1-3 planets
+      final planetCount = house.planets.length;
+      double planetSize;
+      double lineHeight;
+      if (planetCount <= 3) {
+        // Normal readable size for 1-3 planets
+        planetSize = chartSize * 0.034;
+        lineHeight = 1.3;
+      } else if (planetCount <= 5) {
+        // Slightly smaller for 4-5 planets
+        planetSize = chartSize * 0.028;
+        lineHeight = 1.15;
+      } else {
+        // Smallest for 6+ planets (rare case)
+        planetSize = chartSize * 0.024;
+        lineHeight = 1.05;
+      }
       
       // Vertical offset adjustments
       double numOffsetY = -signSize * 1.2;
@@ -192,20 +209,62 @@ class NorthIndianChartPainter extends CustomPainter {
 
       // Draw planets in house
       if (house.planets.isNotEmpty) {
-        final planetsText = house.planets.map(_getPlanetSymbol).join(' ');
-        textPainter.text = TextSpan(
-          text: planetsText,
-          style: TextStyle(
-            fontSize: planetSize,
-            fontWeight: FontWeight.w500,
-            color: const Color(0xFF5B8DEF), // Blue for planets
-          ),
-        );
-        textPainter.layout();
-        textPainter.paint(
-          canvas,
-          Offset(pos.dx - textPainter.width / 2, pos.dy + planetOffsetY),
-        );
+        // For many planets, split into multiple lines
+        if (planetCount > 4) {
+          // Split planets into two lines for better fit
+          final midPoint = (planetCount / 2).ceil();
+          final line1 = house.planets.sublist(0, midPoint).map(_getPlanetSymbol).join(' ');
+          final line2 = house.planets.sublist(midPoint).map(_getPlanetSymbol).join(' ');
+          
+          // Draw first line
+          textPainter.text = TextSpan(
+            text: line1,
+            style: TextStyle(
+              fontSize: planetSize,
+              fontWeight: FontWeight.w500,
+              height: lineHeight,
+              color: const Color(0xFF5B8DEF), // Blue for planets
+            ),
+          );
+          textPainter.layout();
+          textPainter.paint(
+            canvas,
+            Offset(pos.dx - textPainter.width / 2, pos.dy + planetOffsetY),
+          );
+          
+          // Draw second line
+          textPainter.text = TextSpan(
+            text: line2,
+            style: TextStyle(
+              fontSize: planetSize,
+              fontWeight: FontWeight.w500,
+              height: lineHeight,
+              color: const Color(0xFF5B8DEF), // Blue for planets
+            ),
+          );
+          textPainter.layout();
+          textPainter.paint(
+            canvas,
+            Offset(pos.dx - textPainter.width / 2, pos.dy + planetOffsetY + planetSize * lineHeight),
+          );
+        } else {
+          // Single line for 1-4 planets
+          final planetsText = house.planets.map(_getPlanetSymbol).join(' ');
+          textPainter.text = TextSpan(
+            text: planetsText,
+            style: TextStyle(
+              fontSize: planetSize,
+              fontWeight: FontWeight.w500,
+              height: lineHeight,
+              color: const Color(0xFF5B8DEF), // Blue for planets
+            ),
+          );
+          textPainter.layout();
+          textPainter.paint(
+            canvas,
+            Offset(pos.dx - textPainter.width / 2, pos.dy + planetOffsetY),
+          );
+        }
       }
     }
 
@@ -425,22 +484,77 @@ class SouthIndianChartPainter extends CustomPainter {
         ),
       );
 
-      // Draw planets
+      // Draw planets with dynamic sizing based on count
       if (house.planets.isNotEmpty) {
-        final planetsText = house.planets.map(_getPlanetSymbol).join(' ');
-        textPainter.text = TextSpan(
-          text: planetsText,
-          style: textStyle?.copyWith(
-            fontSize: 11,
-            color: Colors.blue,
-            fontWeight: FontWeight.w500,
-          ),
-        );
-        textPainter.layout();
-        textPainter.paint(
-          canvas,
-          Offset(position.dx - textPainter.width / 2, position.dy + 10),
-        );
+        final planetCount = house.planets.length;
+        double planetFontSize;
+        double lineHeight;
+        
+        // Font size based on planet count - stays readable for 1-3 planets
+        if (planetCount <= 3) {
+          planetFontSize = 12;
+          lineHeight = 1.3;
+        } else if (planetCount <= 5) {
+          planetFontSize = 10;
+          lineHeight = 1.15;
+        } else {
+          planetFontSize = 9;
+          lineHeight = 1.05;
+        }
+        
+        if (planetCount > 4) {
+          // Split into two lines for many planets
+          final midPoint = (planetCount / 2).ceil();
+          final line1 = house.planets.sublist(0, midPoint).map(_getPlanetSymbol).join(' ');
+          final line2 = house.planets.sublist(midPoint).map(_getPlanetSymbol).join(' ');
+          
+          textPainter.text = TextSpan(
+            text: line1,
+            style: textStyle?.copyWith(
+              fontSize: planetFontSize,
+              height: lineHeight,
+              color: Colors.blue,
+              fontWeight: FontWeight.w500,
+            ),
+          );
+          textPainter.layout();
+          textPainter.paint(
+            canvas,
+            Offset(position.dx - textPainter.width / 2, position.dy + 8),
+          );
+          
+          textPainter.text = TextSpan(
+            text: line2,
+            style: textStyle?.copyWith(
+              fontSize: planetFontSize,
+              height: lineHeight,
+              color: Colors.blue,
+              fontWeight: FontWeight.w500,
+            ),
+          );
+          textPainter.layout();
+          textPainter.paint(
+            canvas,
+            Offset(position.dx - textPainter.width / 2, position.dy + 8 + planetFontSize * lineHeight),
+          );
+        } else {
+          // Single line for 1-4 planets
+          final planetsText = house.planets.map(_getPlanetSymbol).join(' ');
+          textPainter.text = TextSpan(
+            text: planetsText,
+            style: textStyle?.copyWith(
+              fontSize: planetFontSize,
+              height: lineHeight,
+              color: Colors.blue,
+              fontWeight: FontWeight.w500,
+            ),
+          );
+          textPainter.layout();
+          textPainter.paint(
+            canvas,
+            Offset(position.dx - textPainter.width / 2, position.dy + 10),
+          );
+        }
       }
     }
 

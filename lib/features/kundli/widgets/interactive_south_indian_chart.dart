@@ -228,28 +228,41 @@ class _InteractiveSouthIndianChartState extends State<InteractiveSouthIndianChar
   }) {
     final planets = house?.planets ?? [];
     final hasPlanets = planets.isNotEmpty;
+    final planetCount = planets.length;
     
-    final fontSize = cellSize * 0.15;
-    final smallFontSize = cellSize * 0.11;
+    // Base font sizes - larger for better readability
+    final baseFontSize = cellSize * 0.15;
+    final signFontSize = cellSize * 0.12;
+    final houseNumSize = cellSize * 0.10;
+    
+    // Planet font size - stays readable for 1-3 planets, scales down for more
+    double planetFontSize;
+    if (planetCount <= 3) {
+      // Normal readable size for 1-3 planets
+      planetFontSize = cellSize * 0.14;
+    } else if (planetCount <= 5) {
+      // Slightly smaller for 4-5 planets
+      planetFontSize = cellSize * 0.12;
+    } else {
+      // Smallest for 6+ planets (rare case)
+      planetFontSize = cellSize * 0.10;
+    }
     
     return Padding(
-      padding: EdgeInsets.all(cellSize * 0.08),
+      padding: EdgeInsets.all(cellSize * 0.06),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           // Planets (if any) - PRIMARY
           if (hasPlanets) ...[
-            Text(
-              planets.map((p) => p.length > 2 ? p.substring(0, 2) : p).join(' '),
-              style: GoogleFonts.dmSans(
-                fontSize: fontSize,
-                fontWeight: FontWeight.w700,
-                color: isActive ? Colors.white : const Color(0xFF60A5FA),
-                letterSpacing: 1,
+            Flexible(
+              child: _buildPlanetsDisplay(
+                planets: planets,
+                fontSize: planetFontSize,
+                isActive: isActive,
+                cellSize: cellSize,
               ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: cellSize * 0.02),
           ],
@@ -258,7 +271,7 @@ class _InteractiveSouthIndianChartState extends State<InteractiveSouthIndianChar
           Text(
             sign.length > 3 ? sign.substring(0, 3) : sign,
             style: GoogleFonts.dmSans(
-              fontSize: hasPlanets ? smallFontSize : fontSize,
+              fontSize: hasPlanets ? signFontSize : baseFontSize,
               fontWeight: isAscendant ? FontWeight.w600 : FontWeight.w400,
               color: isActive
                   ? Colors.white.withOpacity(0.9)
@@ -275,7 +288,7 @@ class _InteractiveSouthIndianChartState extends State<InteractiveSouthIndianChar
           Text(
             '$houseNumber',
             style: GoogleFonts.dmMono(
-              fontSize: smallFontSize * 0.9,
+              fontSize: houseNumSize,
               fontWeight: FontWeight.w500,
               color: isActive
                   ? const Color(0xFFD4AF37)
@@ -283,6 +296,75 @@ class _InteractiveSouthIndianChartState extends State<InteractiveSouthIndianChar
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Builds the planets display with proper sizing
+  /// - 1-3 planets: Full readable size with normal line height
+  /// - 4+ planets: Slightly reduced line height, scales down to fit
+  Widget _buildPlanetsDisplay({
+    required List<String> planets,
+    required double fontSize,
+    required bool isActive,
+    required double cellSize,
+  }) {
+    final planetCount = planets.length;
+    
+    // Adjust line height based on planet count - keeping decent spacing
+    double lineHeight;
+    double spacing;
+    double runSpacing;
+    
+    if (planetCount <= 3) {
+      lineHeight = 1.3;   // Normal comfortable line height
+      spacing = 4;
+      runSpacing = 2;
+    } else if (planetCount <= 5) {
+      lineHeight = 1.15;  // Slightly tighter but still readable
+      spacing = 3;
+      runSpacing = 1;
+    } else {
+      lineHeight = 1.05;  // Compact but still has decent spacing
+      spacing = 3;
+      runSpacing = 0;
+    }
+    
+    // Build planet abbreviations with adjusted line height
+    final planetWidgets = planets.map((p) {
+      final abbr = p.length > 2 ? p.substring(0, 2) : p;
+      return Text(
+        abbr,
+        style: GoogleFonts.dmSans(
+          fontSize: fontSize,
+          fontWeight: FontWeight.w700,
+          height: lineHeight,
+          color: isActive ? Colors.white : const Color(0xFF60A5FA),
+        ),
+      );
+    }).toList();
+    
+    // For 1-3 planets, use normal Wrap without scaling
+    if (planetCount <= 3) {
+      return Wrap(
+        alignment: WrapAlignment.center,
+        spacing: spacing,
+        runSpacing: runSpacing,
+        children: planetWidgets,
+      );
+    }
+    
+    // For 4+ planets, use FittedBox to ensure it fits within bounds
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: SizedBox(
+        width: cellSize * 0.85,
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: spacing,
+          runSpacing: runSpacing,
+          children: planetWidgets,
+        ),
       ),
     );
   }
@@ -375,7 +457,7 @@ class _SouthIndianGridPainter extends CustomPainter {
   }
 }
 
-/// Modal for showing house details
+/// Premium compact modal for showing house details
 class _HouseDetailModal extends StatelessWidget {
   final House house;
   final int houseIndex;
@@ -391,14 +473,14 @@ class _HouseDetailModal extends StatelessWidget {
     required this.animation,
   });
 
-  static const _bgPrimary = Color(0xFF0D0B14);
-  static const _surfaceColor = Color(0xFF1A1625);
-  static const _borderColor = Color(0xFF2A2438);
+  static const _bgPrimary = Color(0xFF0A0910);
+  static const _surfaceColor = Color(0xFF141220);
+  static const _borderColor = Color(0xFF1F1B2E);
   static const _accentPrimary = Color(0xFFD4AF37);
   static const _accentSecondary = Color(0xFF8B5CF6);
-  static const _textPrimary = Color(0xFFF1F0F5);
-  static const _textSecondary = Color(0xFFB8B5C3);
-  static const _textMuted = Color(0xFF6B6478);
+  static const _textPrimary = Color(0xFFF5F4F8);
+  static const _textSecondary = Color(0xFFA8A4B8);
+  static const _textMuted = Color(0xFF5A5568);
 
   @override
   Widget build(BuildContext context) {
@@ -409,7 +491,7 @@ class _HouseDetailModal extends StatelessWidget {
       builder: (context, child) {
         final curvedAnimation = CurvedAnimation(
           parent: animation,
-          curve: Curves.easeOutCubic,
+          curve: Curves.easeOutQuint,
         );
 
         return Stack(
@@ -417,55 +499,53 @@ class _HouseDetailModal extends StatelessWidget {
             GestureDetector(
               onTap: () => Navigator.of(context).pop(),
               child: Container(
-                color: Colors.black.withOpacity(0.6 * curvedAnimation.value),
+                color: Colors.black.withOpacity(0.75 * curvedAnimation.value),
               ),
             ),
             Center(
-              child: Transform.scale(
-                scale: 0.8 + (0.2 * curvedAnimation.value),
+              child: Transform.translate(
+                offset: Offset(0, 30 * (1 - curvedAnimation.value)),
                 child: Opacity(
                   opacity: curvedAnimation.value,
                   child: Material(
                     color: Colors.transparent,
                     child: Container(
-                      width: MediaQuery.of(context).size.width * 0.88,
-                      constraints: const BoxConstraints(maxWidth: 400, maxHeight: 550),
-                      margin: const EdgeInsets.all(24),
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      constraints: const BoxConstraints(maxWidth: 380, maxHeight: 520),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [_surfaceColor, _bgPrimary],
-                        ),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: _accentPrimary.withOpacity(0.2),
-                          width: 1,
-                        ),
+                        color: _bgPrimary,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: _borderColor, width: 1),
                         boxShadow: [
                           BoxShadow(
-                            color: _accentPrimary.withOpacity(0.15),
+                            color: Colors.black.withOpacity(0.5),
                             blurRadius: 40,
-                            spreadRadius: -10,
+                            spreadRadius: 0,
+                          ),
+                          BoxShadow(
+                            color: _accentSecondary.withOpacity(0.05),
+                            blurRadius: 60,
+                            spreadRadius: -20,
                           ),
                         ],
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(20),
                         child: SingleChildScrollView(
-                          padding: const EdgeInsets.all(24),
+                          padding: const EdgeInsets.fromLTRB(20, 18, 20, 16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               _buildHeader(context, isAscendant),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 16),
                               _buildHouseInfo(),
                               if (house.planets.isNotEmpty) ...[
-                                const SizedBox(height: 20),
+                                const SizedBox(height: 14),
                                 _buildPlanetsSection(),
                               ],
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 14),
+                              _buildSignificanceSection(),
                             ],
                           ),
                         ),
@@ -482,62 +562,63 @@ class _HouseDetailModal extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context, bool isAscendant) {
+    final accentColor = isAscendant ? _accentPrimary : _accentSecondary;
+    
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          width: 56,
-          height: 56,
+          width: 42,
+          height: 42,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                isAscendant ? _accentPrimary : _accentSecondary,
-                (isAscendant ? _accentPrimary : _accentSecondary).withOpacity(0.6),
-              ],
+              colors: [accentColor, accentColor.withOpacity(0.7)],
             ),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Center(
             child: Text(
               '${houseIndex + 1}',
-              style: GoogleFonts.dmMono(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
                 color: _bgPrimary,
               ),
             ),
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 children: [
                   Text(
                     'House ${houseIndex + 1}',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
                       color: _textPrimary,
+                      letterSpacing: -0.3,
                     ),
                   ),
                   if (isAscendant) ...[
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                       decoration: BoxDecoration(
                         color: _accentPrimary.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: _accentPrimary.withOpacity(0.3)),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
                         'ASC',
-                        style: GoogleFonts.dmMono(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
                           color: _accentPrimary,
                         ),
                       ),
@@ -545,10 +626,13 @@ class _HouseDetailModal extends StatelessWidget {
                   ],
                 ],
               ),
-              const SizedBox(height: 4),
               Text(
-                'House ${houseIndex + 1}',
-                style: GoogleFonts.dmSans(fontSize: 13, color: _textMuted),
+                _getHouseTheme(houseIndex),
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  color: _textMuted,
+                  height: 1.3,
+                ),
               ),
             ],
           ),
@@ -556,13 +640,13 @@ class _HouseDetailModal extends StatelessWidget {
         GestureDetector(
           onTap: () => Navigator.of(context).pop(),
           child: Container(
-            width: 36,
-            height: 36,
+            width: 28,
+            height: 28,
             decoration: BoxDecoration(
-              color: _borderColor.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(10),
+              color: _borderColor,
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.close_rounded, size: 18, color: _textMuted),
+            child: const Icon(Icons.close_rounded, size: 14, color: _textMuted),
           ),
         ),
       ],
@@ -570,62 +654,61 @@ class _HouseDetailModal extends StatelessWidget {
   }
 
   Widget _buildHouseInfo() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _borderColor.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _borderColor.withOpacity(0.3)),
-      ),
-      child: Column(
-        children: [
-          _buildInfoRow(
-            icon: Icons.auto_awesome_rounded,
-            label: 'Zodiac Sign',
+    return Row(
+      children: [
+        Expanded(
+          child: _buildCompactInfoTile(
+            label: 'Sign',
             value: house.sign,
             valueColor: _accentPrimary,
           ),
-          const SizedBox(height: 12),
-          _buildInfoRow(
-            icon: Icons.straighten_rounded,
-            label: 'Cusp Degree',
-            value: '${house.cuspDegree.toStringAsFixed(2)}°',
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: _buildCompactInfoTile(
+            label: 'Cusp',
+            value: '${house.cuspDegree.toStringAsFixed(1)}°',
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildInfoRow({
-    required IconData icon,
+  Widget _buildCompactInfoTile({
     required String label,
     required String value,
     Color? valueColor,
   }) {
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: _surfaceColor.withOpacity(0.5),
-            borderRadius: BorderRadius.circular(8),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: _surfaceColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _borderColor.withOpacity(0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              color: _textMuted,
+              letterSpacing: 0.3,
+            ),
           ),
-          child: Icon(icon, size: 16, color: _textMuted),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(label, style: GoogleFonts.dmSans(fontSize: 13, color: _textMuted)),
-        ),
-        Text(
-          value,
-          style: GoogleFonts.dmSans(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: valueColor ?? _textPrimary,
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: valueColor ?? _textPrimary,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -633,83 +716,142 @@ class _HouseDetailModal extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            const Icon(Icons.public_rounded, size: 16, color: _accentSecondary),
-            const SizedBox(width: 8),
-            Text(
-              'Planets in this House',
-              style: GoogleFonts.dmSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: _textSecondary,
-              ),
+        Padding(
+          padding: const EdgeInsets.only(left: 2, bottom: 8),
+          child: Text(
+            'PLANETS',
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: _textMuted,
+              letterSpacing: 1.2,
             ),
-          ],
+          ),
         ),
-        const SizedBox(height: 12),
-        ...house.planets.map((planet) => _buildPlanetCard(planet)),
+        ...house.planets.map((planet) => _buildPlanetRow(planet)),
       ],
     );
   }
 
-  Widget _buildPlanetCard(String planetName) {
+  Widget _buildPlanetRow(String planetName) {
     final position = planetPositions[planetName];
-    final symbol = planetName.length > 2 ? planetName.substring(0, 2) : planetName;
     final color = _getPlanetColor(planetName);
+    final symbol = planetName.length > 2 ? planetName.substring(0, 2) : planetName;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [color.withOpacity(0.1), color.withOpacity(0.03)],
-        ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.2)),
+        color: _surfaceColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withOpacity(0.12)),
       ),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(10),
+              color: color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Center(
               child: Text(
                 symbol,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color),
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                ),
               ),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              planetName,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: _textPrimary,
+              ),
+            ),
+          ),
+          if (position != null) ...[
+            Text(
+              '${position.sign} ${position.signDegree.toStringAsFixed(1)}°',
+              style: GoogleFonts.jetBrainsMono(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: _textSecondary,
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 6),
+              width: 3,
+              height: 3,
+              decoration: const BoxDecoration(
+                color: _textMuted,
+                shape: BoxShape.circle,
+              ),
+            ),
+            Text(
+              position.nakshatra,
+              style: GoogleFonts.inter(fontSize: 10, color: _textMuted),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSignificanceSection() {
+    final significance = _getHouseSignificance(houseIndex);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            _accentPrimary.withOpacity(0.06),
+            _accentPrimary.withOpacity(0.02),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _accentPrimary.withOpacity(0.08)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.auto_awesome_rounded,
+            size: 14,
+            color: _accentPrimary.withOpacity(0.7),
+          ),
+          const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  planetName,
-                  style: GoogleFonts.dmSans(
-                    fontSize: 15,
+                  significance['title']!,
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: _textPrimary,
+                    color: _accentPrimary,
                   ),
                 ),
-                if (position != null) ...[
-                  const SizedBox(height: 2),
-                  Text(
-                    '${position.sign} ${position.signDegree.toStringAsFixed(1)}°',
-                    style: GoogleFonts.dmMono(fontSize: 11, color: _textMuted),
+                const SizedBox(height: 3),
+                Text(
+                  significance['description']!,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    height: 1.4,
+                    color: _textSecondary,
                   ),
-                  Text(
-                    position.nakshatra,
-                    style: GoogleFonts.dmSans(fontSize: 10, color: _textMuted.withOpacity(0.7)),
-                  ),
-                ],
+                ),
               ],
             ),
           ),
@@ -720,20 +862,58 @@ class _HouseDetailModal extends StatelessWidget {
 
   Color _getPlanetColor(String planet) {
     const colors = {
-      'Sun': Color(0xFFD4AF37),      // Gold
-      'Moon': Color(0xFF6EE7B7),     // Mint green
-      'Mars': Color(0xFFF87171),     // Red
-      'Mercury': Color(0xFF34D399),  // Emerald
-      'Jupiter': Color(0xFFFBBF24),  // Amber
-      'Venus': Color(0xFFF472B6),    // Pink
-      'Saturn': Color(0xFF9CA3AF),   // Gray
-      'Uranus': Color(0xFF22D3EE),   // Cyan
-      'Neptune': Color(0xFF818CF8),  // Indigo
-      'Pluto': Color(0xFF94A3B8),    // Slate
-      'Rahu': Color(0xFFA78BFA),     // Purple
-      'Ketu': Color(0xFFC2410C),     // Orange-red
+      'Sun': Color(0xFFD4AF37),
+      'Moon': Color(0xFF6EE7B7),
+      'Mars': Color(0xFFF87171),
+      'Mercury': Color(0xFF34D399),
+      'Jupiter': Color(0xFFFBBF24),
+      'Venus': Color(0xFFF472B6),
+      'Saturn': Color(0xFF9CA3AF),
+      'Uranus': Color(0xFF22D3EE),
+      'Neptune': Color(0xFF818CF8),
+      'Pluto': Color(0xFF94A3B8),
+      'Rahu': Color(0xFFA78BFA),
+      'Ketu': Color(0xFFC2410C),
     };
     return colors[planet] ?? const Color(0xFF9CA3AF);
+  }
+
+  String _getHouseTheme(int index) {
+    const themes = [
+      'Self & Identity',
+      'Wealth & Values',
+      'Communication',
+      'Home & Roots',
+      'Creativity & Romance',
+      'Health & Service',
+      'Partnerships',
+      'Transformation',
+      'Philosophy & Fortune',
+      'Career & Status',
+      'Aspirations & Gains',
+      'Spirituality & Endings',
+    ];
+    return index < themes.length ? themes[index] : '';
+  }
+
+  Map<String, String> _getHouseSignificance(int index) {
+    const significances = [
+      {'title': 'Lagna Bhava', 'description': 'Physical body, personality, vitality, and overall life path.'},
+      {'title': 'Dhana Bhava', 'description': 'Accumulated wealth, family, speech, and early childhood.'},
+      {'title': 'Sahaja Bhava', 'description': 'Siblings, courage, short journeys, and communication skills.'},
+      {'title': 'Sukha Bhava', 'description': 'Mother, home, emotional peace, and domestic happiness.'},
+      {'title': 'Putra Bhava', 'description': 'Children, creativity, intelligence, and romance.'},
+      {'title': 'Shatru Bhava', 'description': 'Enemies, health issues, debts, and daily work.'},
+      {'title': 'Kalatra Bhava', 'description': 'Marriage, partnerships, and business relationships.'},
+      {'title': 'Randhra Bhava', 'description': 'Longevity, inheritance, occult, and transformation.'},
+      {'title': 'Dharma Bhava', 'description': 'Fortune, higher learning, spirituality, and father.'},
+      {'title': 'Karma Bhava', 'description': 'Career, reputation, authority, and public image.'},
+      {'title': 'Labha Bhava', 'description': 'Gains, income, elder siblings, and social networks.'},
+      {'title': 'Vyaya Bhava', 'description': 'Losses, expenses, foreign lands, and liberation.'},
+    ];
+    return index < significances.length 
+        ? significances[index] 
+        : {'title': 'House ${index + 1}', 'description': ''};
   }
 }
 

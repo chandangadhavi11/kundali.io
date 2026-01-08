@@ -1,105 +1,911 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
-import '../shared/constants.dart';
+import '../shared/floating_nav_bar.dart';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSIGHT DATA MODEL - For interactive explanations
+// ═══════════════════════════════════════════════════════════════════════════
+class InsightData {
+  final String title;
+  final String value;
+  final String description;
+  final String significance;
+  final List<String> keyPoints;
+  final Color accentColor;
+  final IconData icon;
+  final String? imagePath;
+
+  const InsightData({
+    required this.title,
+    required this.value,
+    required this.description,
+    required this.significance,
+    required this.keyPoints,
+    required this.accentColor,
+    required this.icon,
+    this.imagePath,
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DESIGN SYSTEM TOKENS
+// ═══════════════════════════════════════════════════════════════════════════
+class _DesignTokens {
+  _DesignTokens._();
+
+  // Spacing scale
+  static const double space4 = 4;
+  static const double space12 = 12;
+  static const double space24 = 24;
+
+  // Border radius
+  static const double radiusSm = 8;
+  static const double radiusMd = 12;
+  static const double radiusLg = 16;
+  static const double radiusXl = 20;
+}
+
+class _Colors {
+  _Colors._();
+
+  // Surfaces
+  static const Color surface = Color(0xFF16141F);
+  static const Color bgSecondary = Color(0xFF1A1825);
+
+  // Borders
+  static const Color border = Color(0xFF2A2838);
+
+  // Text
+  static const Color textPrimary = Color(0xFFF5F4F8);
+  static const Color textSecondary = Color(0xFFA09CAC);
+  static const Color textTertiary = Color(0xFF6E6A7A);
+
+  // Accent colors
+  static const Color violet = Color(0xFF9580FF);
+  static const Color emerald = Color(0xFF4ADE80);
+  static const Color sky = Color(0xFF38BDF8);
+  static const Color amber = Color(0xFFFBBF24);
+  static const Color coral = Color(0xFFF87171);
+  static const Color gold = Color(0xFFD4AF37);
+  static const Color rose = Color(0xFFF472B6);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSIGHT BOTTOM SHEET
+// ═══════════════════════════════════════════════════════════════════════════
+void _showInsightSheet(BuildContext context, InsightData insight) {
+  HapticFeedback.mediumImpact();
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black.withOpacity(0.6),
+    builder: (context) => _InsightBottomSheet(insight: insight),
+  );
+}
+
+class _InsightBottomSheet extends StatefulWidget {
+  final InsightData insight;
+
+  const _InsightBottomSheet({required this.insight});
+
+  @override
+  State<_InsightBottomSheet> createState() => _InsightBottomSheetState();
+}
+
+class _InsightBottomSheetState extends State<_InsightBottomSheet>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _slideAnimation;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+
+    _slideAnimation = Tween<double>(
+      begin: 0.3,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final insight = widget.insight;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _slideAnimation.value * 100),
+          child: Opacity(opacity: _fadeAnimation.value, child: child),
+        );
+      },
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.75,
+        ),
+        decoration: BoxDecoration(
+          color: _Colors.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border(
+            top: BorderSide(
+              color: insight.accentColor.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: insight.accentColor.withOpacity(0.15),
+              blurRadius: 40,
+              spreadRadius: -10,
+              offset: const Offset(0, -10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: insight.accentColor.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            // Content
+            Flexible(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(20, 20, 20, bottomPadding + 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Row(
+                      children: [
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                insight.accentColor.withOpacity(0.2),
+                                insight.accentColor.withOpacity(0.05),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: insight.accentColor.withOpacity(0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: Icon(
+                            insight.icon,
+                            size: 28,
+                            color: insight.accentColor,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                insight.title.toUpperCase(),
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1.2,
+                                  color: insight.accentColor,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                insight.value,
+                                style: GoogleFonts.inter(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                  color: _Colors.textPrimary,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Divider
+                    Container(
+                      height: 1,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            insight.accentColor.withOpacity(0.3),
+                            insight.accentColor.withOpacity(0.05),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Description
+                    Text(
+                      'What This Means',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                        color: _Colors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      insight.description,
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                        color: _Colors.textPrimary,
+                        height: 1.6,
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Significance card
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: insight.accentColor.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: insight.accentColor.withOpacity(0.15),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: insight.accentColor.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.auto_awesome_rounded,
+                              size: 16,
+                              color: insight.accentColor,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Significance',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: insight.accentColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  insight.significance,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                    color: _Colors.textPrimary,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Key points
+                    if (insight.keyPoints.isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      Text(
+                        'Key Points',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                          color: _Colors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ...insight.keyPoints.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final point = entry.value;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(top: 6),
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: insight.accentColor.withOpacity(
+                                    1.0 - (index * 0.12),
+                                  ),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  point,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                    color: _Colors.textSecondary,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSIGHT GENERATORS
+// ═══════════════════════════════════════════════════════════════════════════
+InsightData _getYogaOverviewInsight(
+  int yogaCount,
+  int doshaCount,
+  int strongYogas,
+  int severeDoshas,
+  String ascendant,
+) {
+  final balance = yogaCount - severeDoshas;
+  final balanceStatus = yogaCount > 0 && doshaCount == 0
+      ? 'Excellent'
+      : balance >= 3
+          ? 'Very Favorable'
+          : balance >= 1
+              ? 'Favorable'
+              : balance >= -1
+                  ? 'Mixed'
+                  : 'Challenging';
+
+  final color = balance >= 3
+      ? _Colors.emerald
+      : balance >= 0
+          ? _Colors.sky
+          : balance >= -2
+              ? _Colors.amber
+              : _Colors.coral;
+
+  return InsightData(
+    title: 'Yoga & Dosha Overview',
+    value: balanceStatus,
+    description:
+        'Yogas are auspicious planetary combinations that bestow specific benefits, while Doshas are challenging combinations that may create obstacles. The balance between them shapes your life experiences and opportunities.',
+    significance:
+        'Your chart has $yogaCount yoga(s) and $doshaCount dosha(s). $strongYogas yoga(s) are strong, and $severeDoshas dosha(s) are severe. With $ascendant Lagna, the overall balance is $balanceStatus.',
+    keyPoints: [
+      'Total Yogas: $yogaCount (Strong: $strongYogas)',
+      'Total Doshas: $doshaCount (Severe: $severeDoshas)',
+      'Ascendant: $ascendant',
+      'Overall Balance: $balanceStatus',
+      'Yogas manifest during their planetary Dasha periods',
+      'Most doshas can be mitigated through proper remedies',
+    ],
+    accentColor: color,
+    icon: Icons.balance_rounded,
+  );
+}
+
+InsightData _getYogaTypeInsight(String type, bool isYoga) {
+  final descriptions = {
+    'Raja Yoga': (
+      'Raja Yogas are the most powerful combinations that bestow kingship, authority, power, and success. They are formed by the association of lords of Kendra (1, 4, 7, 10) and Trikona (1, 5, 9) houses.',
+      'Success in career, rise to power, leadership, authority, fame',
+      _Colors.gold,
+    ),
+    'Dhana Yoga': (
+      'Dhana Yogas indicate wealth and prosperity. They are formed by the association of lords of wealth houses (2, 5, 9, 11) with each other or with benefics.',
+      'Financial prosperity, accumulation of wealth, material success',
+      _Colors.emerald,
+    ),
+    'Pancha Mahapurusha': (
+      'These are five great yogas formed when Mars, Mercury, Jupiter, Venus, or Saturn are in their own or exaltation sign in a Kendra house. They create exceptional individuals.',
+      'Outstanding personality, exceptional achievements, leadership in specific domains',
+      _Colors.violet,
+    ),
+    'Lunar Yoga': (
+      'Lunar Yogas are formed based on the Moon\'s relationship with other planets. They primarily affect the mind, emotions, and mental abilities.',
+      'Mental strength, emotional stability, intuition, memory',
+      _Colors.sky,
+    ),
+    'High': (
+      'Severe doshas require immediate attention and remedial measures. They can significantly impact the areas they govern.',
+      'May cause significant challenges in specific life areas',
+      _Colors.coral,
+    ),
+    'Moderate': (
+      'Moderate doshas have noticeable effects but are manageable with proper awareness and remedies.',
+      'Some challenges that can be overcome with effort',
+      _Colors.amber,
+    ),
+    'Low': (
+      'Low severity doshas have minimal impact and may not require intensive remedial measures.',
+      'Minor influences that are easily managed',
+      _Colors.sky,
+    ),
+  };
+
+  final info = descriptions[type] ??
+      (
+        isYoga
+            ? 'This is a beneficial planetary combination that enhances specific life areas.'
+            : 'This dosha creates certain challenges that can be addressed through remedies.',
+        'Effects vary based on the specific combination',
+        isYoga ? _Colors.gold : _Colors.coral,
+      );
+
+  return InsightData(
+    title: isYoga ? 'Yoga Type' : 'Dosha Severity',
+    value: type,
+    description: info.$1,
+    significance: info.$2,
+    keyPoints: isYoga
+        ? [
+            'Type: $type',
+            'Nature: Benefic combination',
+            'Activation: During relevant Dasha periods',
+            'Strength depends on planet dignity and aspects',
+          ]
+        : [
+            'Severity: $type',
+            'Impact varies by chart context',
+            'Remedies can mitigate effects',
+            'Consult an astrologer for personalized guidance',
+          ],
+    accentColor: info.$3,
+    icon: isYoga ? Icons.auto_awesome_rounded : Icons.warning_amber_rounded,
+  );
+}
+
+InsightData _getStrengthInsight(String strength, int count, String label) {
+  final descriptions = {
+    'Strong': (
+      'Strong yogas are fully activated and manifest their effects clearly in life. The planets involved are well-placed, dignified, and free from afflictions.',
+      _Colors.emerald,
+    ),
+    'Moderate': (
+      'Moderate strength indicates partial manifestation. The yoga is present but planets may have mixed dignity or receive both benefic and malefic influences.',
+      _Colors.amber,
+    ),
+    'Severe': (
+      'Severe doshas have strong impact and require attention. Remedial measures are recommended to mitigate their effects.',
+      _Colors.coral,
+    ),
+  };
+
+  final info = descriptions[label] ?? ('Standard strength level.', _Colors.sky);
+
+  return InsightData(
+    title: '$label ${count > 1 ? "Items" : "Item"}',
+    value: '$count $label',
+    description: info.$1,
+    significance:
+        'You have $count ${label.toLowerCase()} ${count > 1 ? "combinations" : "combination"} in your chart.',
+    keyPoints: [
+      'Count: $count',
+      'Strength Level: $label',
+      if (label == 'Strong') 'Clear manifestation expected',
+      if (label == 'Moderate') 'Partial effects with room for improvement',
+      if (label == 'Severe') 'Remedies recommended',
+    ],
+    accentColor: info.$2,
+    icon: label == 'Severe'
+        ? Icons.warning_rounded
+        : label == 'Strong'
+            ? Icons.keyboard_double_arrow_up_rounded
+            : Icons.remove_rounded,
+  );
+}
+
+InsightData _getInsightCardInsight(String title, String description, Color color) {
+  final detailedDescriptions = {
+    'Understanding': (
+      'Yogas are beneficial planetary combinations formed by specific relationships between planets and houses. They indicate areas of life where you have special potential or blessings.',
+      'Understanding your yogas helps you recognize your strengths and work with your natural talents.',
+      [
+        'Yogas enhance specific life areas',
+        'Formed by planetary positions and relationships',
+        'Each yoga has unique significations',
+        'Strength determines manifestation level',
+      ],
+    ),
+    'Activation': (
+      'Yogas don\'t always manifest constantly—they activate during the Dasha (planetary period) of the planets involved. The Dasha system in Vedic astrology determines when each yoga will give its results.',
+      'Knowing when your yogas activate helps in timing important life decisions.',
+      [
+        'Mahadasha of involved planets activates yoga',
+        'Antardasha brings sub-level activation',
+        'Transit support enhances effects',
+        'Check your Dasha periods for timing',
+      ],
+    ),
+    'Strength': (
+      'The strength of a yoga depends on the dignity of planets involved (own sign, exaltation, debilitation), aspects from benefics or malefics, and placement in houses.',
+      'Strong yogas manifest clearly while weak ones need strengthening through remedies.',
+      [
+        'Exalted/own sign planets = Strong yoga',
+        'Debilitated planets = Weak manifestation',
+        'Benefic aspects strengthen',
+        'Malefic aspects weaken',
+      ],
+    ),
+    'Remedies': (
+      'Doshas can be mitigated through various remedies including mantras, gemstones, charity, fasting, and pujas. The right remedy depends on the specific dosha and your chart.',
+      'Proper remedies performed with faith can significantly reduce dosha effects.',
+      [
+        'Mantra chanting for involved planets',
+        'Gemstones to strengthen weak planets',
+        'Charity on specific days',
+        'Fasting and pujas for afflicted planets',
+      ],
+    ),
+  };
+
+  final info = detailedDescriptions[title] ??
+      (
+        description,
+        'Important aspect of chart analysis.',
+        ['General astrological principle'],
+      );
+
+  return InsightData(
+    title: 'Astrological Insight',
+    value: title,
+    description: info.$1,
+    significance: info.$2,
+    keyPoints: info.$3,
+    accentColor: color,
+    icon: title == 'Understanding'
+        ? Icons.lightbulb_outline_rounded
+        : title == 'Activation'
+            ? Icons.schedule_rounded
+            : title == 'Strength'
+                ? Icons.fitness_center_rounded
+                : Icons.healing_outlined,
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NAVIGATION SECTION DATA
+// ═══════════════════════════════════════════════════════════════════════════
+const _sections = [
+  NavSection(id: 'overview', label: 'Overview', color: _Colors.emerald),
+  NavSection(id: 'yogas', label: 'Yogas', color: _Colors.gold),
+  NavSection(id: 'doshas', label: 'Doshas', color: _Colors.coral),
+  NavSection(id: 'insights', label: 'Insights', color: _Colors.violet),
+];
 
 /// Yogas & Doshas Tab - Shows all yogas and doshas with details
 /// Premium, elegant UI with clear visual hierarchy
-class YogasTab extends StatelessWidget {
+class YogasTab extends StatefulWidget {
   final KundaliData kundaliData;
 
   const YogasTab({super.key, required this.kundaliData});
 
   @override
+  State<YogasTab> createState() => _YogasTabState();
+}
+
+class _YogasTabState extends State<YogasTab> {
+  late final ScrollController _scrollController;
+  final Map<String, GlobalKey> _sectionKeys = {};
+  final Map<String, GlobalKey<_AnimatedSectionWrapperState>> _animatedKeys = {};
+  int _activeIndex = 0;
+  bool _isScrolling = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+
+    for (final section in _sections) {
+      _sectionKeys[section.id] = GlobalKey();
+      _animatedKeys[section.id] = GlobalKey<_AnimatedSectionWrapperState>();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isScrolling) return;
+
+    final viewportHeight = _scrollController.position.viewportDimension;
+    final triggerPoint = viewportHeight * 0.3;
+
+    int newActiveIndex = 0;
+
+    for (int i = 0; i < _sections.length; i++) {
+      final key = _sectionKeys[_sections[i].id];
+      if (key?.currentContext != null) {
+        final box = key!.currentContext!.findRenderObject() as RenderBox?;
+        if (box != null) {
+          final position = box.localToGlobal(Offset.zero);
+          if (position.dy <= triggerPoint + 100) {
+            newActiveIndex = i;
+          }
+        }
+      }
+    }
+
+    if (newActiveIndex != _activeIndex) {
+      setState(() => _activeIndex = newActiveIndex);
+    }
+  }
+
+  Future<void> _scrollToSection(int index) async {
+    final section = _sections[index];
+    final key = _sectionKeys[section.id];
+
+    if (key?.currentContext == null) return;
+
+    HapticFeedback.lightImpact();
+
+    setState(() {
+      _isScrolling = true;
+      _activeIndex = index;
+    });
+
+    await Scrollable.ensureVisible(
+      key!.currentContext!,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutCubic,
+      alignment: 0.08,
+    );
+
+    _animatedKeys[section.id]?.currentState?.triggerHighlight();
+
+    setState(() => _isScrolling = false);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final analyzedYogas = _analyzeYogas(kundaliData);
-    final analyzedDoshas = _analyzeDoshas(kundaliData);
+    final analyzedYogas = _analyzeYogas(widget.kundaliData);
+    final analyzedDoshas = _analyzeDoshas(widget.kundaliData);
 
     final strongYogas = analyzedYogas.where((y) => y['strength'] == 'Strong').length;
     final partialYogas = analyzedYogas.length - strongYogas;
     final severeDoshas = analyzedDoshas.where((d) => d['severity'] == 'High').length;
 
-    return SingleChildScrollView(
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          controller: _scrollController,
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ═══════════════════════════════════════════════════════════════
-          // HERO SUMMARY CARD
+              // OVERVIEW SECTION
           // ═══════════════════════════════════════════════════════════════
-          _YogaHeroCard(
+              _AnimatedSectionWrapper(
+                key: _animatedKeys['overview'],
+                sectionKey: _sectionKeys['overview']!,
+                accentColor: _Colors.emerald,
+                child: _AnimatedCardWrapper(
+                  child: _YogaHeroCard(
             yogaCount: analyzedYogas.length,
             doshaCount: analyzedDoshas.length,
             strongYogas: strongYogas,
             partialYogas: partialYogas,
             severeDoshas: severeDoshas,
-            ascendant: kundaliData.ascendant.sign,
+                    ascendant: widget.kundaliData.ascendant.sign,
+                  ),
+                ),
           ),
 
-          const SizedBox(height: 24),
+              const SizedBox(height: _DesignTokens.space24),
 
           // ═══════════════════════════════════════════════════════════════
           // YOGAS SECTION
           // ═══════════════════════════════════════════════════════════════
-          if (analyzedYogas.isNotEmpty) ...[
-            _SectionLabel(
+              _AnimatedSectionWrapper(
+                key: _animatedKeys['yogas'],
+                sectionKey: _sectionKeys['yogas']!,
+                accentColor: _Colors.gold,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _AnimatedSectionHeader(
               title: 'Auspicious Yogas',
               subtitle: '${analyzedYogas.length} beneficial combinations',
-              icon: Icons.auto_awesome_rounded,
-              color: KundliDisplayColors.yogaGreen,
-            ),
-            const SizedBox(height: 12),
-            _YogaTypeLegend(isYoga: true),
-            const SizedBox(height: 12),
-            ...analyzedYogas.asMap().entries.map((entry) => _PremiumYogaCard(
+                      accentColor: _Colors.gold,
+                    ),
+                    const SizedBox(height: _DesignTokens.space12),
+                    if (analyzedYogas.isNotEmpty) ...[
+                      _AnimatedCardWrapper(
+                        delay: 50,
+                        child: _YogaTypeLegend(isYoga: true),
+                      ),
+                      const SizedBox(height: _DesignTokens.space12),
+                      ...analyzedYogas.asMap().entries.map((entry) => _AnimatedCardWrapper(
+                            delay: 100 + (entry.key * 50),
+                            child: _PremiumYogaCard(
                   yogaData: entry.value,
                   index: entry.key,
                   isDosha: false,
-                  planetPositions: kundaliData.planetPositions,
-                )),
-            const SizedBox(height: 24),
-          ],
+                              planetPositions: widget.kundaliData.planetPositions,
+                            ),
+                          )),
+                    ] else ...[
+                      _AnimatedCardWrapper(
+                        delay: 50,
+                        child: _EmptyStateCard(
+                          title: 'No Yogas Detected',
+                          message: 'Standard chart configuration without special combinations.',
+                          icon: Icons.auto_awesome_outlined,
+                          color: _Colors.gold,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: _DesignTokens.space24),
 
           // ═══════════════════════════════════════════════════════════════
           // DOSHAS SECTION
           // ═══════════════════════════════════════════════════════════════
-          if (analyzedDoshas.isNotEmpty) ...[
-            _SectionLabel(
+              _AnimatedSectionWrapper(
+                key: _animatedKeys['doshas'],
+                sectionKey: _sectionKeys['doshas']!,
+                accentColor: _Colors.coral,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _AnimatedSectionHeader(
               title: 'Doshas Present',
               subtitle: '${analyzedDoshas.length} detected',
-              icon: Icons.warning_amber_rounded,
-              color: KundliDisplayColors.doshaRed,
-            ),
-            const SizedBox(height: 12),
-            _YogaTypeLegend(isYoga: false),
-            const SizedBox(height: 12),
-            ...analyzedDoshas.asMap().entries.map((entry) => _PremiumYogaCard(
+                      accentColor: _Colors.coral,
+                    ),
+                    const SizedBox(height: _DesignTokens.space12),
+                    if (analyzedDoshas.isNotEmpty) ...[
+                      _AnimatedCardWrapper(
+                        delay: 50,
+                        child: _YogaTypeLegend(isYoga: false),
+                      ),
+                      const SizedBox(height: _DesignTokens.space12),
+                      ...analyzedDoshas.asMap().entries.map((entry) => _AnimatedCardWrapper(
+                            delay: 100 + (entry.key * 50),
+                            child: _PremiumYogaCard(
                   yogaData: entry.value,
                   index: entry.key,
                   isDosha: true,
-                  planetPositions: kundaliData.planetPositions,
-                )),
-            const SizedBox(height: 24),
-          ],
+                              planetPositions: widget.kundaliData.planetPositions,
+                            ),
+                          )),
+                    ] else ...[
+                      _AnimatedCardWrapper(
+                        delay: 50,
+                        child: _EmptyStateCard(
+                          title: 'No Doshas Found',
+                          message: 'Your chart is free from major doshas.',
+                          icon: Icons.check_circle_outline_rounded,
+                          color: _Colors.emerald,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: _DesignTokens.space24),
 
           // ═══════════════════════════════════════════════════════════════
           // INSIGHTS SECTION
           // ═══════════════════════════════════════════════════════════════
-          _SectionLabel(
+              _AnimatedSectionWrapper(
+                key: _animatedKeys['insights'],
+                sectionKey: _sectionKeys['insights']!,
+                accentColor: _Colors.violet,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _AnimatedSectionHeader(
             title: 'Astrological Insights',
             subtitle: 'Understanding your chart',
-            icon: Icons.lightbulb_outline_rounded,
-            color: KundliDisplayColors.accentPrimary,
-          ),
-          const SizedBox(height: 12),
-          _InsightsGrid(
-            hasKaalSarp: kundaliData.doshas.contains('Kaal Sarp Dosha'),
-            hasManglik: kundaliData.doshas.contains('Manglik Dosha'),
+                      accentColor: _Colors.violet,
+                    ),
+                    const SizedBox(height: _DesignTokens.space12),
+                    _AnimatedCardWrapper(
+                      delay: 50,
+                      child: _InsightsGrid(
+                        hasKaalSarp: widget.kundaliData.doshas.contains('Kaal Sarp Dosha'),
+                        hasManglik: widget.kundaliData.doshas.contains('Manglik Dosha'),
+                      ),
           ),
         ],
       ),
+              ),
+            ],
+          ),
+        ),
+
+        // Floating bottom navigation
+        Positioned(
+          left: 16,
+          right: 16,
+          bottom: MediaQuery.of(context).padding.bottom + 16,
+          child: FloatingNavBar(
+            sections: _sections,
+            activeIndex: _activeIndex,
+            onTap: _scrollToSection,
+          ),
+        ),
+      ],
     );
   }
 
@@ -157,10 +963,15 @@ class YogasTab extends StatelessWidget {
         if (jupiter != null && moon != null) {
           final jupHouse = _getHouseFromSign(jupiter.sign, ascSign, signs);
           final moonHouse = _getHouseFromSign(moon.sign, ascSign, signs);
+          // Calculate Jupiter's house from Moon (not from Ascendant)
+          final jupIndex = signs.indexOf(jupiter.sign);
+          final moonIndex = signs.indexOf(moon.sign);
+          final jupHouseFromMoon = ((jupIndex - moonIndex + 12) % 12) + 1;
           result['planets'] = ['Jupiter', 'Moon'];
           result['houses'] = [jupHouse, moonHouse];
-          result['formationRule'] = 'Jupiter in Kendra from Moon';
-          result['strength'] = _isInKendra(jupHouse) ? 'Strong' : 'Moderate';
+          result['formationRule'] = 'Jupiter in H$jupHouseFromMoon from Moon';
+          // Strength based on Kendra from Moon, not from Ascendant
+          result['strength'] = _isInKendra(jupHouseFromMoon) ? 'Strong' : 'Moderate';
         }
         break;
 
@@ -370,68 +1181,297 @@ class YogasTab extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SECTION LABEL
+// ANIMATED SECTION WRAPPER
 // ═══════════════════════════════════════════════════════════════════════════
-class _SectionLabel extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
+class _AnimatedSectionWrapper extends StatefulWidget {
+  final GlobalKey sectionKey;
+  final Color accentColor;
+  final Widget child;
 
-  const _SectionLabel({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.color,
+  const _AnimatedSectionWrapper({
+    super.key,
+    required this.sectionKey,
+    required this.accentColor,
+    required this.child,
   });
 
   @override
+  State<_AnimatedSectionWrapper> createState() => _AnimatedSectionWrapperState();
+}
+
+class _AnimatedSectionWrapperState extends State<_AnimatedSectionWrapper> {
+  bool _isHighlighted = false;
+
+  void triggerHighlight() {
+    HapticFeedback.lightImpact();
+    setState(() => _isHighlighted = true);
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) setState(() => _isHighlighted = false);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, size: 16, color: color),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
+    return _SectionAnimationProvider(
+      isHighlighted: _isHighlighted,
+      accentColor: widget.accentColor,
+      child: Container(key: widget.sectionKey, child: widget.child),
+    );
+  }
+}
+
+class _SectionAnimationProvider extends InheritedWidget {
+  final bool isHighlighted;
+  final Color accentColor;
+
+  const _SectionAnimationProvider({
+    required this.isHighlighted,
+    required this.accentColor,
+    required super.child,
+  });
+
+  static _SectionAnimationProvider? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_SectionAnimationProvider>();
+  }
+
+  @override
+  bool updateShouldNotify(_SectionAnimationProvider oldWidget) {
+    return isHighlighted != oldWidget.isHighlighted;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ANIMATED SECTION HEADER
+// ═══════════════════════════════════════════════════════════════════════════
+class _AnimatedSectionHeader extends StatefulWidget {
+  final String title;
+  final String? subtitle;
+  final Color accentColor;
+
+  const _AnimatedSectionHeader({
+    required this.title,
+    this.subtitle,
+    required this.accentColor,
+  });
+
+  @override
+  State<_AnimatedSectionHeader> createState() => _AnimatedSectionHeaderState();
+}
+
+class _AnimatedSectionHeaderState extends State<_AnimatedSectionHeader>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _underlineAnimation;
+  late Animation<double> _textPulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    _underlineAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.0, 0.7, curve: Curves.easeOutCubic),
+    );
+
+    _textPulseAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 30,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 70,
+      ),
+    ]).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final provider = _SectionAnimationProvider.of(context);
+    if (provider?.isHighlighted == true) {
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final textPulse = _textPulseAnimation.value;
+        final underlineWidth = _underlineAnimation.value;
+
+        final textColor = Color.lerp(
+          _Colors.textTertiary,
+          widget.accentColor,
+          textPulse * 0.8,
+        )!;
+
+        return Padding(
+          padding: const EdgeInsets.only(left: _DesignTokens.space4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  title,
-                  style: GoogleFonts.dmSans(
-                    fontSize: 14,
+                widget.title.toUpperCase(),
+                style: GoogleFonts.inter(
+                  fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: KundliDisplayColors.textPrimary,
+                  letterSpacing: 1.0,
+                  color: textColor,
                   ),
                 ),
+              if (widget.subtitle != null) ...[
+                const SizedBox(height: 2),
                 Text(
-                  subtitle,
-                  style: GoogleFonts.dmSans(
+                  widget.subtitle!,
+                  style: GoogleFonts.inter(
                     fontSize: 10,
-                    color: KundliDisplayColors.textMuted,
+                    color: _Colors.textTertiary,
                   ),
                 ),
               ],
-            ),
+              const SizedBox(height: 4),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final maxWidth = math.min(constraints.maxWidth * 0.3, 40.0);
+                  return Container(
+                    height: 2,
+                    width: maxWidth * underlineWidth,
+                    decoration: BoxDecoration(
+                      color: widget.accentColor.withOpacity(0.6 + textPulse * 0.4),
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// YOGA HERO CARD
+// ANIMATED CARD WRAPPER
 // ═══════════════════════════════════════════════════════════════════════════
-class _YogaHeroCard extends StatelessWidget {
+class _AnimatedCardWrapper extends StatefulWidget {
+  final Widget child;
+  final int delay;
+
+  const _AnimatedCardWrapper({required this.child, this.delay = 0});
+
+  @override
+  State<_AnimatedCardWrapper> createState() => _AnimatedCardWrapperState();
+}
+
+class _AnimatedCardWrapperState extends State<_AnimatedCardWrapper>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _shadowAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 1.025).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 35,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.025, end: 1.0).chain(CurveTween(curve: Curves.elasticOut)),
+        weight: 65,
+      ),
+    ]).animate(_controller);
+
+    _shadowAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 30,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 70,
+      ),
+    ]).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final provider = _SectionAnimationProvider.of(context);
+    if (provider?.isHighlighted == true) {
+      Future.delayed(Duration(milliseconds: widget.delay), () {
+        if (mounted) _controller.forward(from: 0);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = _SectionAnimationProvider.of(context);
+    final accentColor = provider?.accentColor ?? _Colors.violet;
+
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final scale = _scaleAnimation.value;
+        final shadow = _shadowAnimation.value;
+
+        return Transform.scale(
+          scale: scale,
+          child: Container(
+            decoration: shadow > 0.01
+                ? BoxDecoration(
+                    borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
+                    boxShadow: [
+                      BoxShadow(
+                        color: accentColor.withOpacity(shadow * 0.2),
+                        blurRadius: 16 * shadow,
+                        spreadRadius: -4,
+                        offset: Offset(0, 4 * shadow),
+                      ),
+                    ],
+                  )
+                : null,
+            child: child,
+          ),
+        );
+      },
+      child: widget.child,
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// YOGA HERO CARD - Interactive
+// ═══════════════════════════════════════════════════════════════════════════
+class _YogaHeroCard extends StatefulWidget {
   final int yogaCount;
   final int doshaCount;
   final int strongYogas;
@@ -449,183 +1489,269 @@ class _YogaHeroCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final balance = yogaCount - severeDoshas;
-    final balanceStatus = _getBalanceStatus(balance, yogaCount, doshaCount);
+  State<_YogaHeroCard> createState() => _YogaHeroCardState();
+}
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            KundliDisplayColors.yogaGreen.withOpacity(0.12),
-            KundliDisplayColors.accentSecondary.withOpacity(0.06),
-            KundliDisplayColors.surfaceColor.withOpacity(0.4),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: KundliDisplayColors.yogaGreen.withOpacity(0.2),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: KundliDisplayColors.yogaGreen.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Top row with counts
-          Row(
-            children: [
-              // Yoga count
-              Expanded(
-                child: _HeroCountDisplay(
-                  count: yogaCount,
-                  label: 'Yogas',
-                  icon: Icons.auto_awesome_rounded,
-                  color: KundliDisplayColors.yogaGreen,
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 70,
-                color: KundliDisplayColors.borderColor.withOpacity(0.3),
-              ),
-              // Dosha count
-              Expanded(
-                child: _HeroCountDisplay(
-                  count: doshaCount,
-                  label: 'Doshas',
-                  icon: Icons.warning_amber_rounded,
-                  color: KundliDisplayColors.doshaRed,
-                ),
-              ),
-            ],
-          ),
+class _YogaHeroCardState extends State<_YogaHeroCard>
+    with TickerProviderStateMixin {
+  late AnimationController _controller;
+  late AnimationController _fadeController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+  bool _isPressed = false;
 
-          const SizedBox(height: 16),
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.98,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
 
-          // Balance & Details row
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: KundliDisplayColors.surfaceColor.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                // Balance status
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: _getBalanceColor(balance).withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _getBalanceIcon(balance),
-                            size: 14,
-                            color: _getBalanceColor(balance),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            balanceStatus,
-                            style: GoogleFonts.dmSans(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: _getBalanceColor(balance),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      '$ascendant Lagna',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 10,
-                        color: KundliDisplayColors.textMuted,
-                      ),
-                    ),
-                  ],
-                ),
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOut,
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.05),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOutCubic,
+    ));
+    _fadeController.forward();
+  }
 
-                const SizedBox(height: 12),
+  @override
+  void dispose() {
+    _controller.dispose();
+    _fadeController.dispose();
+    super.dispose();
+  }
 
-                // Strength breakdown
-                Row(
-                  children: [
-                    _StrengthChip(
-                      icon: Icons.keyboard_double_arrow_up_rounded,
-                      count: strongYogas,
-                      label: 'Strong',
-                      color: const Color(0xFF4ADE80),
-                    ),
-                    const SizedBox(width: 8),
-                    _StrengthChip(
-                      icon: Icons.remove_rounded,
-                      count: partialYogas,
-                      label: 'Moderate',
-                      color: const Color(0xFFFBBF24),
-                    ),
-                    const SizedBox(width: 8),
-                    _StrengthChip(
-                      icon: Icons.warning_rounded,
-                      count: severeDoshas,
-                      label: 'Severe',
-                      color: const Color(0xFFF87171),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
+  Color _getBalanceColor(int balance) {
+    if (balance >= 3) return _Colors.emerald;
+    if (balance >= 0) return _Colors.sky;
+    if (balance >= -2) return _Colors.amber;
+    return _Colors.coral;
+  }
+
+  String _getBalanceStatus(int balance, int yogas, int doshas) {
+    if (yogas > 0 && doshas == 0) return 'EXCELLENT';
+    if (balance >= 3) return 'VERY FAVORABLE';
+    if (balance >= 1) return 'FAVORABLE';
+    if (balance >= -1) return 'MIXED';
+    if (balance >= -3) return 'CHALLENGING';
+    return 'NEEDS ATTENTION';
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    setState(() => _isPressed = true);
+    _controller.forward();
+    HapticFeedback.selectionClick();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    setState(() => _isPressed = false);
+    _controller.reverse();
+    _showInsightSheet(
+      context,
+      _getYogaOverviewInsight(
+        widget.yogaCount,
+        widget.doshaCount,
+        widget.strongYogas,
+        widget.severeDoshas,
+        widget.ascendant,
       ),
     );
   }
 
-  Color _getBalanceColor(int balance) {
-    if (balance >= 3) return const Color(0xFF4ADE80);
-    if (balance >= 0) return const Color(0xFF60A5FA);
-    if (balance >= -2) return const Color(0xFFFBBF24);
-    return const Color(0xFFF87171);
+  void _onTapCancel() {
+    setState(() => _isPressed = false);
+    _controller.reverse();
   }
 
-  IconData _getBalanceIcon(int balance) {
-    if (balance >= 3) return Icons.sentiment_very_satisfied_rounded;
-    if (balance >= 0) return Icons.sentiment_satisfied_rounded;
-    if (balance >= -2) return Icons.sentiment_neutral_rounded;
-    return Icons.sentiment_dissatisfied_rounded;
-  }
+  @override
+  Widget build(BuildContext context) {
+    final balance = widget.yogaCount - widget.severeDoshas;
+    final balanceStatus = _getBalanceStatus(balance, widget.yogaCount, widget.doshaCount);
+    final balanceColor = _getBalanceColor(balance);
 
-  String _getBalanceStatus(int balance, int yogas, int doshas) {
-    if (yogas > 0 && doshas == 0) return 'Excellent Chart';
-    if (balance >= 3) return 'Very Favorable';
-    if (balance >= 1) return 'Favorable Balance';
-    if (balance >= -1) return 'Mixed Influences';
-    if (balance >= -3) return 'Needs Remedies';
-    return 'Challenging';
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: child,
+          );
+        },
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: const Color(0xFF141218),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: const Color(0xFF262432),
+                  width: 1,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header Row with Status Badge and Lagna
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: balanceColor.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          balanceStatus,
+                          style: GoogleFonts.inter(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w600,
+                            color: balanceColor,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A181F),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: const Color(0xFF2A2838),
+                            width: 0.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.adjust_rounded,
+                              size: 11,
+                              color: const Color(0xFF7C7889),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '${widget.ascendant} Lagna',
+                              style: GoogleFonts.inter(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFFB8B5C2),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Icon(
+                        Icons.info_outline_rounded,
+                        size: 16,
+                        color: const Color(0xFF6E6A7A),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // Yogas and Doshas Counts
+                  Row(
+                    children: [
+                      // Yogas Count
+                      Expanded(
+                        child: _CompactCountDisplay(
+                          count: widget.yogaCount,
+                          label: 'Yogas',
+                          icon: Icons.auto_awesome_rounded,
+                          color: _Colors.gold,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Doshas Count
+                      Expanded(
+                        child: _CompactCountDisplay(
+                          count: widget.doshaCount,
+                          label: 'Doshas',
+                          icon: Icons.warning_amber_rounded,
+                          color: _Colors.coral,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  // Strength Chips Row
+                  Row(
+                    children: [
+                      _CompactStrengthChip(
+                        icon: Icons.keyboard_double_arrow_up_rounded,
+                        count: widget.strongYogas,
+                        label: 'Strong',
+                        color: _Colors.emerald,
+                      ),
+                      const SizedBox(width: 6),
+                      _CompactStrengthChip(
+                        icon: Icons.remove_rounded,
+                        count: widget.partialYogas,
+                        label: 'Moderate',
+                        color: _Colors.amber,
+                      ),
+                      const SizedBox(width: 6),
+                      _CompactStrengthChip(
+                        icon: Icons.warning_rounded,
+                        count: widget.severeDoshas,
+                        label: 'Severe',
+                        color: _Colors.coral,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
-class _HeroCountDisplay extends StatelessWidget {
+// Compact Count Display Widget
+class _CompactCountDisplay extends StatelessWidget {
   final int count;
   final String label;
   final IconData icon;
   final Color color;
 
-  const _HeroCountDisplay({
+  const _CompactCountDisplay({
     required this.count,
     required this.label,
     required this.icon,
@@ -634,62 +1760,71 @@ class _HeroCountDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            gradient: RadialGradient(
-              colors: [
-                color.withOpacity(0.2),
-                color.withOpacity(0.08),
-              ],
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.15),
+          width: 0.5,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Count circle
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: color.withOpacity(0.4),
+                width: 2,
+              ),
             ),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: color.withOpacity(0.3),
-              width: 2,
-            ),
-          ),
-          child: Center(
-            child: Text(
-              '$count',
-              style: GoogleFonts.dmSans(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: color,
+            child: Center(
+              child: Text(
+                '$count',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 14, color: color),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: GoogleFonts.dmSans(
-                fontSize: 11,
-                color: KundliDisplayColors.textMuted,
+          const SizedBox(width: 12),
+          // Label
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, size: 14, color: color),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFFB8B5C2),
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _StrengthChip extends StatelessWidget {
+// Compact Strength Chip Widget
+class _CompactStrengthChip extends StatelessWidget {
   final IconData icon;
   final int count;
   final String label;
   final Color color;
 
-  const _StrengthChip({
+  const _CompactStrengthChip({
     required this.icon,
     required this.count,
     required this.label,
@@ -700,10 +1835,14 @@ class _StrengthChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
         decoration: BoxDecoration(
           color: color.withOpacity(0.08),
           borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: color.withOpacity(0.12),
+            width: 0.5,
+          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -712,18 +1851,20 @@ class _StrengthChip extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               '$count',
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
                 color: color,
+                letterSpacing: -0.3,
               ),
             ),
             const SizedBox(width: 4),
             Text(
               label,
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.inter(
                 fontSize: 9,
-                color: KundliDisplayColors.textMuted,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFF7C7889),
               ),
             ),
           ],
@@ -734,7 +1875,7 @@ class _StrengthChip extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// YOGA TYPE LEGEND
+// YOGA TYPE LEGEND - Interactive
 // ═══════════════════════════════════════════════════════════════════════════
 class _YogaTypeLegend extends StatelessWidget {
   final bool isYoga;
@@ -745,15 +1886,15 @@ class _YogaTypeLegend extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = isYoga
         ? [
-            ('Raja Yoga', const Color(0xFFD4AF37)),
-            ('Dhana Yoga', const Color(0xFF4ADE80)),
-            ('Pancha Mahapurusha', const Color(0xFFA78BFA)),
-            ('Lunar Yoga', const Color(0xFF60A5FA)),
+            ('Raja Yoga', _Colors.gold),
+            ('Dhana Yoga', _Colors.emerald),
+            ('Pancha Mahapurusha', _Colors.violet),
+            ('Lunar Yoga', _Colors.sky),
           ]
         : [
-            ('High', const Color(0xFFF87171)),
-            ('Moderate', const Color(0xFFFBBF24)),
-            ('Low', const Color(0xFF60A5FA)),
+            ('High', _Colors.coral),
+            ('Moderate', _Colors.amber),
+            ('Low', _Colors.sky),
           ];
 
     return SingleChildScrollView(
@@ -763,7 +1904,11 @@ class _YogaTypeLegend extends StatelessWidget {
         children: items
             .map((item) => Padding(
                   padding: const EdgeInsets.only(right: 8),
-                  child: _LegendChip(label: item.$1, color: item.$2),
+                  child: _InteractiveLegendChip(
+                    label: item.$1,
+                    color: item.$2,
+                    isYoga: isYoga,
+                  ),
                 ))
             .toList(),
       ),
@@ -771,51 +1916,260 @@ class _YogaTypeLegend extends StatelessWidget {
   }
 }
 
-class _LegendChip extends StatelessWidget {
+class _InteractiveLegendChip extends StatefulWidget {
   final String label;
   final Color color;
+  final bool isYoga;
 
-  const _LegendChip({required this.label, required this.color});
+  const _InteractiveLegendChip({
+    required this.label,
+    required this.color,
+    required this.isYoga,
+  });
+
+  @override
+  State<_InteractiveLegendChip> createState() => _InteractiveLegendChipState();
+}
+
+class _InteractiveLegendChipState extends State<_InteractiveLegendChip> {
+  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.2), width: 0.5),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+        _showInsightSheet(
+          context,
+          _getYogaTypeInsight(widget.label, widget.isYoga),
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: widget.color.withOpacity(_isPressed ? 0.18 : 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: widget.color.withOpacity(_isPressed ? 0.4 : 0.2),
+            width: _isPressed ? 1 : 0.5,
           ),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: GoogleFonts.dmSans(
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              color: color,
+          boxShadow: _isPressed
+              ? [
+                  BoxShadow(
+                    color: widget.color.withOpacity(0.15),
+                    blurRadius: 8,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              width: _isPressed ? 10 : 8,
+              height: _isPressed ? 10 : 8,
+              decoration: BoxDecoration(
+                color: widget.color,
+                shape: BoxShape.circle,
+                boxShadow: _isPressed
+                    ? [
+                        BoxShadow(
+                          color: widget.color.withOpacity(0.4),
+                          blurRadius: 4,
+                          spreadRadius: 0,
+                        ),
+                      ]
+                    : null,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 6),
+            Text(
+              widget.label,
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                fontWeight: _isPressed ? FontWeight.w600 : FontWeight.w500,
+                color: widget.color,
+              ),
+            ),
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 100),
+              opacity: _isPressed ? 1.0 : 0.0,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 4),
+                child: Icon(
+                  Icons.info_outline_rounded,
+                  size: 10,
+                  color: widget.color,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PREMIUM YOGA CARD
+// EMPTY STATE CARD - Interactive
 // ═══════════════════════════════════════════════════════════════════════════
-class _PremiumYogaCard extends StatelessWidget {
+class _EmptyStateCard extends StatefulWidget {
+  final String title;
+  final String message;
+  final IconData icon;
+  final Color color;
+
+  const _EmptyStateCard({
+    required this.title,
+    required this.message,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  State<_EmptyStateCard> createState() => _EmptyStateCardState();
+}
+
+class _EmptyStateCardState extends State<_EmptyStateCard> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final isNoYogas = widget.title.contains('No Yogas');
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+        _showInsightSheet(
+          context,
+          InsightData(
+            title: isNoYogas ? 'No Special Yogas' : 'Dosha-Free Chart',
+            value: widget.title,
+            description: isNoYogas
+                ? 'Your chart does not have any of the commonly recognized special yogas. This is normal and doesn\'t mean anything negative—many successful people have charts without named yogas. The strength of your chart comes from other factors like planet dignity, house placements, and aspects.'
+                : 'Congratulations! Your chart is free from major doshas like Manglik, Kaal Sarp, or other challenging combinations. This indicates fewer karmic obstacles in the areas typically affected by these doshas.',
+            significance: widget.message,
+            keyPoints: isNoYogas
+                ? [
+                    'Standard chart configuration',
+                    'Success depends on overall chart strength',
+                    'Dasha periods still important for timing',
+                    'Individual planet strengths matter more',
+                    'Aspects and house placements are key factors',
+                  ]
+                : [
+                    'No major doshas detected',
+                    'Fewer karmic obstacles expected',
+                    'Marriage and relationships less afflicted',
+                    'Still check for other challenging aspects',
+                    'Overall chart analysis recommended',
+                  ],
+            accentColor: widget.color,
+            icon: widget.icon,
+          ),
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: _Colors.surface.withOpacity(_isPressed ? 0.6 : 0.4),
+          borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
+          border: Border.all(
+            color: widget.color.withOpacity(_isPressed ? 0.4 : 0.2),
+            width: _isPressed ? 1 : 0.5,
+          ),
+          boxShadow: _isPressed
+              ? [
+                  BoxShadow(
+                    color: widget.color.withOpacity(0.1),
+                    blurRadius: 12,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: widget.color.withOpacity(_isPressed ? 0.2 : 0.12),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: _isPressed
+                    ? [
+                        BoxShadow(
+                          color: widget.color.withOpacity(0.2),
+                          blurRadius: 8,
+                          spreadRadius: -2,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Center(
+                child: Icon(widget.icon, size: 24, color: widget.color),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        widget.title,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: _Colors.textPrimary,
+                        ),
+                      ),
+                      const Spacer(),
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 100),
+                        opacity: _isPressed ? 1.0 : 0.4,
+                        child: Icon(
+                          Icons.info_outline_rounded,
+                          size: 14,
+                          color: widget.color,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.message,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: _Colors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PREMIUM YOGA CARD - Interactive
+// ═══════════════════════════════════════════════════════════════════════════
+class _PremiumYogaCard extends StatefulWidget {
   final Map<String, dynamic> yogaData;
   final int index;
   final bool isDosha;
@@ -829,278 +2183,46 @@ class _PremiumYogaCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final yogaName = yogaData['name'] as String;
-    final planets = yogaData['planets'] as List<String>? ?? [];
-    final strength = yogaData['strength'] as String? ?? yogaData['severity'] as String? ?? 'Moderate';
-    final formationRule = yogaData['formationRule'] as String? ?? '';
-    final yogaInfo = _getYogaInfo(yogaName, isDosha);
+  State<_PremiumYogaCard> createState() => _PremiumYogaCardState();
+}
 
-    final color = isDosha ? KundliDisplayColors.doshaRed : KundliDisplayColors.yogaGreen;
-    final strengthColor = _getStrengthColor(strength);
-    final typeColor = _getTypeColor(yogaInfo['type'] ?? '');
+class _PremiumYogaCardState extends State<_PremiumYogaCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  bool _isPressed = false;
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 250 + (index * 50)),
-      curve: Curves.easeOutCubic,
-      builder: (context, value, child) {
-        return Transform.translate(
-          offset: Offset(0, 8 * (1 - value)),
-          child: Opacity(opacity: value, child: child),
-        );
-      },
-      child: GestureDetector(
-        onTap: () => _showYogaDetails(context, yogaName, isDosha, yogaData),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 10),
-          decoration: BoxDecoration(
-            color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: strength == 'Strong' || strength == 'High'
-                  ? strengthColor.withOpacity(0.4)
-                  : color.withOpacity(0.2),
-              width: strength == 'Strong' || strength == 'High' ? 1 : 0.5,
-            ),
-            boxShadow: strength == 'Strong'
-                ? [
-                    BoxShadow(
-                      color: strengthColor.withOpacity(0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(14),
-                child: Column(
-                  children: [
-                    // Header row
-                    Row(
-                      children: [
-                        // Icon badge
-                        Container(
-                          width: 46,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                color.withOpacity(0.2),
-                                color.withOpacity(0.08),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: color.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Center(
-                            child: Icon(
-                              isDosha ? Icons.warning_amber_rounded : Icons.auto_awesome_rounded,
-                              color: color,
-                              size: 22,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        // Title and type
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      yogaName,
-                                      style: GoogleFonts.dmSans(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: KundliDisplayColors.textPrimary,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: typeColor.withOpacity(0.12),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      yogaInfo['type'] ?? (isDosha ? 'Dosha' : 'Yoga'),
-                                      style: GoogleFonts.dmMono(
-                                        fontSize: 8,
-                                        fontWeight: FontWeight.w600,
-                                        color: typeColor,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        // Strength badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: strengthColor.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(
-                                _getStrengthIcon(strength),
-                                size: 16,
-                                color: strengthColor,
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                strength.split(' ').first,
-                                style: GoogleFonts.dmSans(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w600,
-                                  color: strengthColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Planets row
-                    if (planets.isNotEmpty) ...[
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.hub_rounded,
-                              size: 12,
-                              color: KundliDisplayColors.textMuted,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Wrap(
-                                spacing: 6,
-                                runSpacing: 4,
-                                children: planets.map((planet) {
-                                  final pos = planetPositions[planet];
-                                  final planetColor = getPlanetColor(planet);
-
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: planetColor.withOpacity(0.12),
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(
-                                        color: planetColor.withOpacity(0.25),
-                                        width: 0.5,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          getPlanetSymbol(planet),
-                                          style: TextStyle(fontSize: 12, color: planetColor),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          pos != null ? '${pos.sign.substring(0, 3)}' : planet,
-                                          style: GoogleFonts.dmMono(
-                                            fontSize: 9,
-                                            color: KundliDisplayColors.textPrimary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-
-              // Formation rule footer
-              if (formationRule.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.04),
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(16),
-                      bottomRight: Radius.circular(16),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.rule_rounded,
-                        size: 12,
-                        color: KundliDisplayColors.textMuted,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          formationRule,
-                          style: GoogleFonts.dmMono(
-                            fontSize: 9,
-                            color: KundliDisplayColors.textSecondary,
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.chevron_right_rounded,
-                        size: 16,
-                        color: KundliDisplayColors.textMuted.withOpacity(0.5),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 120),
+      vsync: this,
     );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.98,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Color _getStrengthColor(String strength) {
     switch (strength) {
       case 'Strong':
-        return const Color(0xFF4ADE80);
+        return _Colors.emerald;
       case 'High':
-        return const Color(0xFFF87171);
+        return _Colors.coral;
       case 'Moderate':
-        return const Color(0xFFFBBF24);
+        return _Colors.amber;
       case 'Low':
-        return const Color(0xFF60A5FA);
+        return _Colors.sky;
       default:
-        return const Color(0xFFFBBF24);
+        return _Colors.amber;
     }
   }
 
@@ -1120,17 +2242,338 @@ class _PremiumYogaCard extends StatelessWidget {
   }
 
   Color _getTypeColor(String type) {
-    if (type.contains('Raja')) return const Color(0xFFD4AF37);
-    if (type.contains('Dhana')) return const Color(0xFF4ADE80);
-    if (type.contains('Pancha') || type.contains('Mahapurusha')) return const Color(0xFFA78BFA);
-    if (type.contains('Lunar')) return const Color(0xFF60A5FA);
-    if (type.contains('Dosha') || type.contains('Grahan')) return const Color(0xFFF87171);
-    return KundliDisplayColors.textMuted;
+    if (type.contains('Raja')) return _Colors.gold;
+    if (type.contains('Dhana')) return _Colors.emerald;
+    if (type.contains('Pancha') || type.contains('Mahapurusha')) return _Colors.violet;
+    if (type.contains('Lunar')) return _Colors.sky;
+    if (type.contains('Dosha') || type.contains('Grahan')) return _Colors.coral;
+    return _Colors.textTertiary;
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    setState(() => _isPressed = true);
+    _controller.forward();
+    HapticFeedback.selectionClick();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    setState(() => _isPressed = false);
+    _controller.reverse();
+    _showYogaDetails(
+      context,
+      widget.yogaData['name'] as String,
+      widget.isDosha,
+      widget.yogaData,
+    );
+  }
+
+  void _onTapCancel() {
+    setState(() => _isPressed = false);
+    _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final yogaName = widget.yogaData['name'] as String;
+    final planets = widget.yogaData['planets'] as List<String>? ?? [];
+    final strength = widget.yogaData['strength'] as String? ??
+        widget.yogaData['severity'] as String? ??
+        'Moderate';
+    final formationRule = widget.yogaData['formationRule'] as String? ?? '';
+    final yogaInfo = _getYogaInfo(yogaName, widget.isDosha);
+
+    final color = widget.isDosha ? _Colors.coral : _Colors.gold;
+    final strengthColor = _getStrengthColor(strength);
+    final typeColor = _getTypeColor(yogaInfo['type'] ?? '');
+
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 120),
+              margin: const EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                color: _Colors.surface.withOpacity(_isPressed ? 0.6 : 0.4),
+                borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
+                border: Border.all(
+                  color: _isPressed
+                      ? color.withOpacity(0.5)
+                      : strength == 'Strong' || strength == 'High'
+                          ? strengthColor.withOpacity(0.4)
+                          : color.withOpacity(0.2),
+                  width: _isPressed || strength == 'Strong' || strength == 'High'
+                      ? 1.5
+                      : 0.5,
+                ),
+                boxShadow: _isPressed
+                    ? [
+                        BoxShadow(
+                          color: color.withOpacity(0.18),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ]
+                    : strength == 'Strong'
+                        ? [
+                            BoxShadow(
+                              color: strengthColor.withOpacity(0.08),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : null,
+              ),
+              child: child,
+            ),
+          );
+        },
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 120),
+                        width: 46,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              color.withOpacity(_isPressed ? 0.3 : 0.2),
+                              color.withOpacity(_isPressed ? 0.15 : 0.08),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: color.withOpacity(_isPressed ? 0.5 : 0.3),
+                            width: 1,
+                          ),
+                          boxShadow: _isPressed
+                              ? [
+                                  BoxShadow(
+                                    color: color.withOpacity(0.3),
+                                    blurRadius: 10,
+                                    spreadRadius: -2,
+                                  ),
+                                ]
+                              : null,
+                        ),
+                        child: Center(
+                          child: Icon(
+                            widget.isDosha
+                                ? Icons.warning_amber_rounded
+                                : Icons.auto_awesome_rounded,
+                            color: color,
+                            size: 22,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    yogaName,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: _Colors.textPrimary,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                AnimatedOpacity(
+                                  duration: const Duration(milliseconds: 150),
+                                  opacity: _isPressed ? 1.0 : 0.3,
+                                  child: Icon(
+                                    Icons.info_outline_rounded,
+                                    size: 14,
+                                    color: color,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: typeColor.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                yogaInfo['type'] ??
+                                    (widget.isDosha ? 'Dosha' : 'Yoga'),
+                                style: GoogleFonts.jetBrainsMono(
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w600,
+                                  color: typeColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: strengthColor.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              _getStrengthIcon(strength),
+                              size: 16,
+                              color: strengthColor,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              strength.split(' ').first,
+                              style: GoogleFonts.inter(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w600,
+                                color: strengthColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  if (planets.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: _Colors.surface.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.hub_rounded,
+                            size: 12,
+                            color: _Colors.textTertiary,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Wrap(
+                              spacing: 6,
+                              runSpacing: 4,
+                              children: planets.map((planet) {
+                                final pos = widget.planetPositions[planet];
+                                final planetColor = _getPlanetColor(planet);
+
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: planetColor.withOpacity(0.12),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: planetColor.withOpacity(0.25),
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        _getPlanetSymbol(planet),
+                                        style: TextStyle(
+                                            fontSize: 12, color: planetColor),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        pos != null
+                                            ? pos.sign.substring(0, 3)
+                                            : planet,
+                                        style: GoogleFonts.jetBrainsMono(
+                                          fontSize: 9,
+                                          color: _Colors.textPrimary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+
+            if (formationRule.isNotEmpty)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(_isPressed ? 0.08 : 0.04),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(_DesignTokens.radiusLg),
+                    bottomRight: Radius.circular(_DesignTokens.radiusLg),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.rule_rounded,
+                      size: 12,
+                      color: _Colors.textTertiary,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        formationRule,
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 9,
+                          color: _Colors.textSecondary,
+                        ),
+                      ),
+                    ),
+                    AnimatedOpacity(
+                      duration: const Duration(milliseconds: 100),
+                      opacity: _isPressed ? 1.0 : 0.5,
+                      child: Icon(
+                        Icons.chevron_right_rounded,
+                        size: 16,
+                        color: color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showYogaDetails(
       BuildContext context, String yogaName, bool isDosha, Map<String, dynamic> yogaData) {
-    final color = isDosha ? KundliDisplayColors.doshaRed : KundliDisplayColors.yogaGreen;
+    final color = isDosha ? _Colors.coral : _Colors.gold;
     final details = _getFullYogaDetails(yogaName, isDosha);
     final planets = yogaData['planets'] as List<String>? ?? [];
     final formationRule = yogaData['formationRule'] as String? ?? '';
@@ -1146,24 +2589,22 @@ class _PremiumYogaCard extends StatelessWidget {
         maxChildSize: 0.9,
         builder: (context, scrollController) => Container(
           decoration: BoxDecoration(
-            color: KundliDisplayColors.bgSecondary,
+            color: _Colors.bgSecondary,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             border: Border.all(color: color.withOpacity(0.3), width: 1),
           ),
           child: Column(
             children: [
-              // Handle
               Container(
                 margin: const EdgeInsets.only(top: 12),
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: KundliDisplayColors.borderColor,
+                  color: _Colors.border,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
 
-              // Header
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Row(
@@ -1201,10 +2642,10 @@ class _PremiumYogaCard extends StatelessWidget {
                         children: [
                           Text(
                             yogaName,
-                            style: GoogleFonts.dmSans(
+                            style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
-                              color: KundliDisplayColors.textPrimary,
+                              color: _Colors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -1218,7 +2659,7 @@ class _PremiumYogaCard extends StatelessWidget {
                                 ),
                                 child: Text(
                                   details['type']!,
-                                  style: GoogleFonts.dmSans(
+                                  style: GoogleFonts.inter(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600,
                                     color: color,
@@ -1234,7 +2675,7 @@ class _PremiumYogaCard extends StatelessWidget {
                                 ),
                                 child: Text(
                                   strength,
-                                  style: GoogleFonts.dmSans(
+                                  style: GoogleFonts.inter(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600,
                                     color: _getStrengthColor(strength),
@@ -1250,27 +2691,25 @@ class _PremiumYogaCard extends StatelessWidget {
                 ),
               ),
 
-              // Content
               Expanded(
                 child: ListView(
                   controller: scrollController,
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
                   children: [
-                    // Formation
                     if (planets.isNotEmpty || formationRule.isNotEmpty)
                       _DetailSection(
                         title: 'Formation',
                         icon: Icons.architecture_rounded,
-                        color: KundliDisplayColors.accentPrimary,
+                        color: _Colors.violet,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             if (planets.isNotEmpty) ...[
                               Text(
                                 'Planets Involved',
-                                style: GoogleFonts.dmSans(
+                                style: GoogleFonts.inter(
                                   fontSize: 10,
-                                  color: KundliDisplayColors.textMuted,
+                                  color: _Colors.textTertiary,
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -1278,8 +2717,8 @@ class _PremiumYogaCard extends StatelessWidget {
                                 spacing: 8,
                                 runSpacing: 8,
                                 children: planets.map((planet) {
-                                  final pos = planetPositions[planet];
-                                  final planetColor = getPlanetColor(planet);
+                                  final pos = widget.planetPositions[planet];
+                                  final planetColor = _getPlanetColor(planet);
 
                                   return Container(
                                     padding: const EdgeInsets.all(10),
@@ -1295,7 +2734,7 @@ class _PremiumYogaCard extends StatelessWidget {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
-                                          getPlanetSymbol(planet),
+                                          _getPlanetSymbol(planet),
                                           style: TextStyle(fontSize: 16, color: planetColor),
                                         ),
                                         const SizedBox(width: 8),
@@ -1304,18 +2743,18 @@ class _PremiumYogaCard extends StatelessWidget {
                                           children: [
                                             Text(
                                               planet,
-                                              style: GoogleFonts.dmSans(
+                                              style: GoogleFonts.inter(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w600,
-                                                color: KundliDisplayColors.textPrimary,
+                                                color: _Colors.textPrimary,
                                               ),
                                             ),
                                             if (pos != null)
                                               Text(
                                                 '${pos.sign} ${pos.signDegree.toStringAsFixed(1)}°',
-                                                style: GoogleFonts.dmMono(
+                                                style: GoogleFonts.jetBrainsMono(
                                                   fontSize: 9,
-                                                  color: KundliDisplayColors.textMuted,
+                                                  color: _Colors.textTertiary,
                                                 ),
                                               ),
                                           ],
@@ -1331,23 +2770,23 @@ class _PremiumYogaCard extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
+                                  color: _Colors.surface.withOpacity(0.4),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       Icons.rule_rounded,
                                       size: 14,
-                                      color: KundliDisplayColors.textMuted,
+                                      color: _Colors.textTertiary,
                                     ),
                                     const SizedBox(width: 8),
                                     Expanded(
                                       child: Text(
                                         formationRule,
-                                        style: GoogleFonts.dmMono(
+                                        style: GoogleFonts.jetBrainsMono(
                                           fontSize: 10,
-                                          color: KundliDisplayColors.textSecondary,
+                                          color: _Colors.textSecondary,
                                         ),
                                       ),
                                     ),
@@ -1360,16 +2799,15 @@ class _PremiumYogaCard extends StatelessWidget {
 
                     const SizedBox(height: 16),
 
-                    // Description
                     _DetailSection(
                       title: 'What is $yogaName?',
                       icon: Icons.info_outline_rounded,
-                      color: KundliDisplayColors.accentSecondary,
+                      color: _Colors.sky,
                       child: Text(
                         details['description']!,
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: KundliDisplayColors.textSecondary,
+                          color: _Colors.textSecondary,
                           height: 1.5,
                         ),
                       ),
@@ -1377,16 +2815,15 @@ class _PremiumYogaCard extends StatelessWidget {
 
                     const SizedBox(height: 16),
 
-                    // Effects
                     _DetailSection(
                       title: isDosha ? 'Potential Effects' : 'Benefits',
                       icon: isDosha ? Icons.warning_amber_outlined : Icons.star_outline_rounded,
-                      color: isDosha ? const Color(0xFFFBBF24) : KundliDisplayColors.yogaGreen,
+                      color: isDosha ? _Colors.amber : _Colors.emerald,
                       child: Text(
                         details['effects']!,
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: KundliDisplayColors.textSecondary,
+                          color: _Colors.textSecondary,
                           height: 1.5,
                         ),
                       ),
@@ -1394,16 +2831,15 @@ class _PremiumYogaCard extends StatelessWidget {
 
                     const SizedBox(height: 16),
 
-                    // Remedies
                     _DetailSection(
                       title: isDosha ? 'Remedies' : 'How to Strengthen',
                       icon: Icons.healing_rounded,
-                      color: const Color(0xFF60A5FA),
+                      color: _Colors.sky,
                       child: Text(
                         details['remedies']!,
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.inter(
                           fontSize: 12,
-                          color: KundliDisplayColors.textSecondary,
+                          color: _Colors.textSecondary,
                           height: 1.5,
                         ),
                       ),
@@ -1437,7 +2873,7 @@ class _DetailSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
+        color: _Colors.surface.withOpacity(0.4),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: color.withOpacity(0.15),
@@ -1460,7 +2896,7 @@ class _DetailSection extends StatelessWidget {
               const SizedBox(width: 10),
               Text(
                 title,
-                style: GoogleFonts.dmSans(
+                style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: color,
@@ -1477,7 +2913,7 @@ class _DetailSection extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// INSIGHTS GRID
+// INSIGHTS GRID - Interactive
 // ═══════════════════════════════════════════════════════════════════════════
 class _InsightsGrid extends StatelessWidget {
   final bool hasKaalSarp;
@@ -1495,20 +2931,20 @@ class _InsightsGrid extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: _InsightCard(
+              child: _InteractiveInsightCard(
                 title: 'Understanding',
                 description: 'Yogas are beneficial combinations that enhance life areas.',
                 icon: Icons.lightbulb_outline_rounded,
-                color: KundliDisplayColors.accentPrimary,
+                color: _Colors.violet,
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: _InsightCard(
+              child: _InteractiveInsightCard(
                 title: 'Activation',
                 description: 'Yogas manifest during their planetary Dasha periods.',
                 icon: Icons.schedule_rounded,
-                color: KundliDisplayColors.yogaGreen,
+                color: _Colors.emerald,
               ),
             ),
           ],
@@ -1517,20 +2953,20 @@ class _InsightsGrid extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: _InsightCard(
+              child: _InteractiveInsightCard(
                 title: 'Strength',
                 description: 'Planet placement determines yoga manifestation level.',
                 icon: Icons.fitness_center_rounded,
-                color: const Color(0xFFFBBF24),
+                color: _Colors.amber,
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: _InsightCard(
+              child: _InteractiveInsightCard(
                 title: 'Remedies',
                 description: 'Most doshas can be mitigated through proper remedies.',
                 icon: Icons.healing_outlined,
-                color: const Color(0xFF60A5FA),
+                color: _Colors.sky,
               ),
             ),
           ],
@@ -1538,19 +2974,21 @@ class _InsightsGrid extends StatelessWidget {
         if (hasKaalSarp || hasManglik) ...[
           const SizedBox(height: 16),
           if (hasKaalSarp)
-            _SpecificRemedyCard(
+            _InteractiveRemedyCard(
               title: 'Kaal Sarp Remedy',
               description: 'Trimbakeshwar Puja recommended. Chant Maha Mrityunjaya Mantra 108 times daily.',
               icon: Icons.auto_fix_high_rounded,
-              color: const Color(0xFFF87171),
+              color: _Colors.coral,
+              doshaType: 'Kaal Sarp Dosha',
             ),
           if (hasManglik) ...[
             const SizedBox(height: 10),
-            _SpecificRemedyCard(
+            _InteractiveRemedyCard(
               title: 'Manglik Remedy',
               description: 'Perform Mangal Shanti Puja. Recite Hanuman Chalisa on Tuesdays.',
               icon: Icons.auto_fix_high_rounded,
-              color: const Color(0xFFF87171),
+              color: _Colors.coral,
+              doshaType: 'Manglik Dosha',
             ),
           ],
         ],
@@ -1559,13 +2997,13 @@ class _InsightsGrid extends StatelessWidget {
   }
 }
 
-class _InsightCard extends StatelessWidget {
+class _InteractiveInsightCard extends StatefulWidget {
   final String title;
   final String description;
   final IconData icon;
   final Color color;
 
-  const _InsightCard({
+  const _InteractiveInsightCard({
     required this.title,
     required this.description,
     required this.icon,
@@ -1573,126 +3011,288 @@ class _InsightCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.15),
-          width: 0.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, size: 14, color: color),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: GoogleFonts.dmSans(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: KundliDisplayColors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            description,
-            style: GoogleFonts.dmSans(
-              fontSize: 9,
-              color: KundliDisplayColors.textMuted,
-              height: 1.3,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  State<_InteractiveInsightCard> createState() => _InteractiveInsightCardState();
 }
 
-class _SpecificRemedyCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final IconData icon;
-  final Color color;
-
-  const _SpecificRemedyCard({
-    required this.title,
-    required this.description,
-    required this.icon,
-    required this.color,
-  });
+class _InteractiveInsightCardState extends State<_InteractiveInsightCard> {
+  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            color.withOpacity(0.1),
-            color.withOpacity(0.04),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.2),
-          width: 0.5,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, size: 18, color: color),
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+        _showInsightSheet(
+          context,
+          _getInsightCardInsight(widget.title, widget.description, widget.color),
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: _Colors.surface.withOpacity(_isPressed ? 0.6 : 0.4),
+          borderRadius: BorderRadius.circular(_DesignTokens.radiusMd),
+          border: Border.all(
+            color: widget.color.withOpacity(_isPressed ? 0.35 : 0.15),
+            width: _isPressed ? 1 : 0.5,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.dmSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: color,
+          boxShadow: _isPressed
+              ? [
+                  BoxShadow(
+                    color: widget.color.withOpacity(0.12),
+                    blurRadius: 10,
+                    spreadRadius: -2,
                   ),
+                ]
+              : null,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 100),
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: widget.color.withOpacity(_isPressed ? 0.2 : 0.12),
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: _isPressed
+                        ? [
+                            BoxShadow(
+                              color: widget.color.withOpacity(0.2),
+                              blurRadius: 6,
+                              spreadRadius: -2,
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Icon(widget.icon, size: 14, color: widget.color),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  description,
-                  style: GoogleFonts.dmSans(
-                    fontSize: 10,
-                    color: KundliDisplayColors.textSecondary,
-                    height: 1.3,
+                const Spacer(),
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 100),
+                  opacity: _isPressed ? 1.0 : 0.3,
+                  child: Icon(
+                    Icons.info_outline_rounded,
+                    size: 12,
+                    color: widget.color,
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 10),
+            Text(
+              widget.title,
+              style: GoogleFonts.inter(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: _Colors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              widget.description,
+              style: GoogleFonts.inter(
+                fontSize: 9,
+                color: _Colors.textTertiary,
+                height: 1.3,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InteractiveRemedyCard extends StatefulWidget {
+  final String title;
+  final String description;
+  final IconData icon;
+  final Color color;
+  final String doshaType;
+
+  const _InteractiveRemedyCard({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.color,
+    required this.doshaType,
+  });
+
+  @override
+  State<_InteractiveRemedyCard> createState() => _InteractiveRemedyCardState();
+}
+
+class _InteractiveRemedyCardState extends State<_InteractiveRemedyCard> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+        _showInsightSheet(
+          context,
+          InsightData(
+            title: 'Dosha Remedy',
+            value: widget.doshaType,
+            description: widget.doshaType == 'Kaal Sarp Dosha'
+                ? 'Kaal Sarp Dosha occurs when all planets are hemmed between Rahu and Ketu. This can cause delays, obstacles, and sudden changes in life. However, with proper remedies, its effects can be significantly reduced.'
+                : 'Manglik Dosha occurs when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. It primarily affects marriage and relationships but can be effectively remedied.',
+            significance: widget.description,
+            keyPoints: widget.doshaType == 'Kaal Sarp Dosha'
+                ? [
+                    'Visit Trimbakeshwar for Kaal Sarp Puja',
+                    'Chant Maha Mrityunjaya Mantra 108 times daily',
+                    'Offer milk to Shivling on Mondays',
+                    'Keep a snake made of silver in your home',
+                    'Donate to the needy on Saturdays',
+                  ]
+                : [
+                    'Perform Mangal Shanti Puja',
+                    'Recite Hanuman Chalisa on Tuesdays',
+                    'Fast on Tuesdays',
+                    'Wear Red Coral gemstone (after consultation)',
+                    'Donate red items on Tuesdays',
+                  ],
+            accentColor: widget.color,
+            icon: widget.icon,
           ),
-        ],
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              widget.color.withOpacity(_isPressed ? 0.18 : 0.1),
+              widget.color.withOpacity(_isPressed ? 0.08 : 0.04),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(_DesignTokens.radiusMd),
+          border: Border.all(
+            color: widget.color.withOpacity(_isPressed ? 0.4 : 0.2),
+            width: _isPressed ? 1 : 0.5,
+          ),
+          boxShadow: _isPressed
+              ? [
+                  BoxShadow(
+                    color: widget.color.withOpacity(0.15),
+                    blurRadius: 12,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: widget.color.withOpacity(_isPressed ? 0.25 : 0.15),
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: _isPressed
+                    ? [
+                        BoxShadow(
+                          color: widget.color.withOpacity(0.25),
+                          blurRadius: 8,
+                          spreadRadius: -2,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Icon(widget.icon, size: 18, color: widget.color),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        widget.title,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: widget.color,
+                        ),
+                      ),
+                      const Spacer(),
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 100),
+                        opacity: _isPressed ? 1.0 : 0.4,
+                        child: Icon(
+                          Icons.info_outline_rounded,
+                          size: 12,
+                          color: widget.color,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    widget.description,
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      color: _Colors.textSecondary,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// DATA HELPERS
+// HELPER FUNCTIONS
 // ═══════════════════════════════════════════════════════════════════════════
+Color _getPlanetColor(String planet) {
+  const colors = {
+    'Sun': Color(0xFFFF9F43),
+    'Moon': Color(0xFFF5F5F5),
+    'Mars': Color(0xFFEE5A5A),
+    'Mercury': Color(0xFF26DE81),
+    'Jupiter': Color(0xFFFFD93D),
+    'Venus': Color(0xFFFF6B9D),
+    'Saturn': Color(0xFF5C7AEA),
+    'Rahu': Color(0xFF9C88FF),
+    'Ketu': Color(0xFFA29BFE),
+  };
+  return colors[planet] ?? _Colors.textSecondary;
+}
+
+String _getPlanetSymbol(String planet) {
+  const symbols = {
+    'Sun': '☉',
+    'Moon': '☽',
+    'Mars': '♂',
+    'Mercury': '☿',
+    'Jupiter': '♃',
+    'Venus': '♀',
+    'Saturn': '♄',
+    'Rahu': '☊',
+    'Ketu': '☋',
+  };
+  return symbols[planet] ?? '•';
+}
+
 Map<String, String> _getYogaInfo(String yogaName, bool isDosha) {
   final yogaInfoMap = {
     'Hamsa Yoga': {'type': 'Pancha Mahapurusha'},

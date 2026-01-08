@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
@@ -525,75 +527,72 @@ class _KundliInputScreenState extends State<KundliInputScreen>
         children: [
           // Section Header
           Padding(
-            padding: const EdgeInsets.only(left: 2, bottom: 12),
+            padding: const EdgeInsets.only(left: 2, bottom: 14),
             child: Row(
               children: [
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        _accentSecondary.withOpacity(0.3),
-                        _accentSecondary.withOpacity(0.15),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: const Icon(
-                    Icons.history_rounded,
-                    size: 11,
-                    color: _accentSecondary,
+                Icon(
+                  Icons.bookmark_rounded,
+                  size: 14,
+                  color: _textMuted,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Saved Profiles',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: _textSecondary,
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  'Quick Fill from Saved',
-                  style: GoogleFonts.dmSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: _textSecondary,
-                    letterSpacing: 0.2,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: _surfaceColor,
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                ),
-                const Spacer(),
-                Text(
-                  '${savedProfiles.length} profile${savedProfiles.length > 1 ? 's' : ''}',
-                  style: GoogleFonts.dmSans(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: _textMuted,
+                  child: Text(
+                    '${savedProfiles.length}',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: _textMuted,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          // Horizontal scrollable profile cards
-          SizedBox(
-            height: 88,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              itemCount: savedProfiles.length,
-              itemBuilder: (context, index) {
-                final profile = savedProfiles[savedProfiles.length - 1 - index]; // Show most recent first
-                final isPrimary = profile.isPrimary;
-                
-                return TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0.0, end: 1.0),
-                  duration: Duration(milliseconds: 300 + (index * 60)),
-                  curve: Curves.easeOutCubic,
-                  builder: (context, animValue, child) {
-                    return Transform.translate(
-                      offset: Offset(20 * (1 - animValue), 0),
-                      child: Opacity(opacity: animValue, child: child),
-                    );
-                  },
-                  child: _buildProfileCard(profile, isPrimary, index),
-                );
-              },
+          // Horizontal scrollable profile cards - full width
+          Transform.translate(
+            offset: const Offset(-20, 0), // Compensate for parent padding
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width, // Full screen width
+              height: 88,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                clipBehavior: Clip.none,
+                padding: const EdgeInsets.symmetric(horizontal: 20), // Add padding to match content alignment
+                itemCount: savedProfiles.length,
+                itemBuilder: (context, index) {
+                  final profile = savedProfiles[savedProfiles.length - 1 - index]; // Show most recent first
+                  final isPrimary = profile.isPrimary;
+                  
+                  return TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: Duration(milliseconds: 300 + (index * 60)),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, animValue, child) {
+                      return Transform.translate(
+                        offset: Offset(20 * (1 - animValue), 0),
+                        child: Opacity(opacity: animValue, child: child),
+                      );
+                    },
+                    child: _buildProfileCard(profile, isPrimary, index),
+                  );
+                },
+              ),
             ),
           ),
           const SizedBox(height: 24),
@@ -649,9 +648,6 @@ class _KundliInputScreenState extends State<KundliInputScreen>
     final formattedDate = DateFormat('d MMM yyyy').format(profile.birthDateTime);
     final formattedTime = DateFormat('h:mm a').format(profile.birthDateTime);
     
-    // Generate a unique gradient based on profile
-    final gradientColors = _getProfileGradient(index);
-    
     return GestureDetector(
       onTapDown: (_) => _setPressed('profile_${profile.id}', true),
       onTapUp: (_) => _setPressed('profile_${profile.id}', false),
@@ -662,214 +658,102 @@ class _KundliInputScreenState extends State<KundliInputScreen>
         _showProfileSelectedFeedback(profile.name);
       },
       child: AnimatedScale(
-        scale: _isPressed('profile_${profile.id}') ? 0.96 : 1.0,
+        scale: _isPressed('profile_${profile.id}') ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
         curve: Curves.easeOutCubic,
         child: Container(
-          width: 160,
-          margin: EdgeInsets.only(right: 10, left: index == 0 ? 0 : 0),
+          width: 156,
+          margin: const EdgeInsets.only(right: 12),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                gradientColors[0].withOpacity(0.12),
-                gradientColors[1].withOpacity(0.06),
-              ],
-            ),
+            color: _surfaceColor,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(
               color: isPrimary
-                  ? _accentPrimary.withOpacity(0.4)
-                  : gradientColors[0].withOpacity(0.2),
+                  ? _accentPrimary.withOpacity(0.5)
+                  : _borderColor.withOpacity(0.6),
               width: isPrimary ? 1.0 : 0.5,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: gradientColors[0].withOpacity(0.08),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
-          child: Stack(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Background decoration
-              Positioned(
-                right: -8,
-                top: -8,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        gradientColors[0].withOpacity(0.15),
-                        Colors.transparent,
-                      ],
+              // Top row with avatar and name
+              Row(
+                children: [
+                  // Monogram avatar
+                  Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: _accentSecondary.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        profile.name.isNotEmpty 
+                            ? profile.name[0].toUpperCase() 
+                            : '?',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: _accentSecondary,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      profile.name,
+                      style: GoogleFonts.dmSans(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: _textPrimary,
+                        letterSpacing: -0.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (isPrimary)
+                    Icon(
+                      Icons.star_rounded,
+                      size: 14,
+                      color: _accentPrimary,
+                    ),
+                ],
               ),
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Top row with avatar and primary badge
-                    Row(
-                      children: [
-                        Container(
-                          width: 28,
-                          height: 28,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: gradientColors,
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Center(
-                            child: Text(
-                              profile.name.isNotEmpty 
-                                  ? profile.name[0].toUpperCase() 
-                                  : '?',
-                              style: GoogleFonts.dmSans(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            profile.name,
-                            style: GoogleFonts.dmSans(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: _textPrimary,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (isPrimary)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 5,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _accentPrimary.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Icon(
-                              Icons.star_rounded,
-                              size: 10,
-                              color: _accentPrimary,
-                            ),
-                          ),
-                      ],
+              // Bottom info
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$formattedDate · $formattedTime',
+                    style: GoogleFonts.dmSans(
+                      fontSize: 10,
+                      color: _textSecondary,
+                      fontWeight: FontWeight.w500,
                     ),
-                    // Bottom info
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today_rounded,
-                              size: 9,
-                              color: _textMuted,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              formattedDate,
-                              style: GoogleFonts.dmSans(
-                                fontSize: 10,
-                                color: _textMuted,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              formattedTime,
-                              style: GoogleFonts.dmSans(
-                                fontSize: 10,
-                                color: _textMuted.withOpacity(0.8),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.place_rounded,
-                              size: 9,
-                              color: _textMuted,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                profile.birthPlace,
-                                style: GoogleFonts.dmSans(
-                                  fontSize: 10,
-                                  color: _textMuted.withOpacity(0.8),
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    profile.birthPlace,
+                    style: GoogleFonts.dmSans(
+                      fontSize: 10,
+                      color: _textMuted,
                     ),
-                  ],
-                ),
-              ),
-              // Tap indicator
-              Positioned(
-                right: 8,
-                bottom: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: _surfaceColor.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(6),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  child: Icon(
-                    Icons.arrow_forward_rounded,
-                    size: 10,
-                    color: gradientColors[0],
-                  ),
-                ),
+                ],
               ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  List<Color> _getProfileGradient(int index) {
-    final gradients = [
-      [const Color(0xFFA78BFA), const Color(0xFF818CF8)], // Purple
-      [const Color(0xFF6EE7B7), const Color(0xFF34D399)], // Emerald
-      [const Color(0xFFFBBF24), const Color(0xFFF59E0B)], // Amber
-      [const Color(0xFF60A5FA), const Color(0xFF3B82F6)], // Blue
-      [const Color(0xFFF472B6), const Color(0xFFEC4899)], // Pink
-      [const Color(0xFF4ADE80), const Color(0xFF22C55E)], // Green
-      [const Color(0xFFFB923C), const Color(0xFFF97316)], // Orange
-      [const Color(0xFF38BDF8), const Color(0xFF0EA5E9)], // Sky
-    ];
-    return gradients[index % gradients.length];
   }
 
   void _fillFromProfile(KundaliData profile) {
@@ -1993,6 +1877,12 @@ class _LocationSheetState extends State<_LocationSheet>
   final _focusNode = FocusNode();
   late AnimationController _animController;
   String _searchQuery = '';
+  
+  // Geocoding search state
+  List<Map<String, dynamic>> _searchResults = [];
+  bool _isSearching = false;
+  String? _errorMessage;
+  Timer? _debounceTimer;
 
   static const _bgSecondary = Color(0xFF131020);
   static const _surfaceColor = Color(0xFF1A1625);
@@ -2014,15 +1904,154 @@ class _LocationSheetState extends State<_LocationSheet>
     {'name': 'Surat, India', 'lat': 21.1702, 'lng': 72.8311},
   ];
 
-  List<Map<String, dynamic>> get _filteredCities {
-    if (_searchQuery.isEmpty) return _cities;
-    return _cities
-        .where(
-          (c) => (c['name'] as String).toLowerCase().contains(
-            _searchQuery.toLowerCase(),
-          ),
-        )
-        .toList();
+  /// Returns the list of locations to display:
+  /// - Popular cities when search is empty or less than 3 chars
+  /// - Search results when available
+  /// - Empty list when searching or no results
+  List<Map<String, dynamic>> get _displayedLocations {
+    // Show popular cities if search query is too short
+    if (_searchQuery.length < 3) {
+      // Filter popular cities locally if user typed 1-2 chars
+      if (_searchQuery.isEmpty) return _cities;
+      return _cities
+          .where(
+            (c) => (c['name'] as String).toLowerCase().contains(
+              _searchQuery.toLowerCase(),
+            ),
+          )
+          .toList();
+    }
+    
+    // Show search results if available
+    if (_searchResults.isNotEmpty) return _searchResults;
+    
+    // Return empty list (loading or no results states handled in UI)
+    return [];
+  }
+
+  /// Debounced search handler - waits 500ms before triggering search
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+      _errorMessage = null;
+    });
+
+    // Cancel any existing timer
+    _debounceTimer?.cancel();
+
+    // Clear search results if query is too short
+    if (query.length < 3) {
+      setState(() {
+        _searchResults = [];
+        _isSearching = false;
+      });
+      return;
+    }
+
+    // Start debounce timer
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      _performSearch(query);
+    });
+  }
+
+  /// Performs geocoding search and formats results
+  Future<void> _performSearch(String query) async {
+    if (!mounted) return;
+
+    setState(() {
+      _isSearching = true;
+      _errorMessage = null;
+    });
+
+    try {
+      // Get coordinates from address query
+      final locations = await locationFromAddress(query);
+
+      if (!mounted) return;
+
+      if (locations.isEmpty) {
+        setState(() {
+          _searchResults = [];
+          _isSearching = false;
+          _errorMessage = 'No locations found for "$query"';
+        });
+        return;
+      }
+
+      // Limit to 10 results
+      final limitedLocations = locations.take(10).toList();
+
+      // Get placemark details for each location
+      final List<Map<String, dynamic>> results = [];
+      
+      for (final location in limitedLocations) {
+        try {
+          final placemarks = await placemarkFromCoordinates(
+            location.latitude,
+            location.longitude,
+          );
+
+          if (placemarks.isNotEmpty) {
+            final placemark = placemarks.first;
+            
+            // Format as "City, Country" or fallback to available info
+            final city = placemark.locality ?? 
+                         placemark.subAdministrativeArea ?? 
+                         placemark.administrativeArea ?? 
+                         '';
+            final country = placemark.country ?? '';
+            
+            String name;
+            if (city.isNotEmpty && country.isNotEmpty) {
+              name = '$city, $country';
+            } else if (city.isNotEmpty) {
+              name = city;
+            } else if (country.isNotEmpty) {
+              name = country;
+            } else {
+              // Fallback to original query with coordinates
+              name = '$query (${location.latitude.toStringAsFixed(2)}°, ${location.longitude.toStringAsFixed(2)}°)';
+            }
+
+            // Avoid duplicate entries
+            if (!results.any((r) => r['name'] == name)) {
+              results.add({
+                'name': name,
+                'lat': location.latitude,
+                'lng': location.longitude,
+              });
+            }
+          }
+        } catch (e) {
+          // If placemark lookup fails for this location, add with coordinates
+          results.add({
+            'name': '$query (${location.latitude.toStringAsFixed(2)}°, ${location.longitude.toStringAsFixed(2)}°)',
+            'lat': location.latitude,
+            'lng': location.longitude,
+          });
+        }
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _searchResults = results;
+        _isSearching = false;
+        if (results.isEmpty) {
+          _errorMessage = 'No locations found for "$query"';
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _searchResults = [];
+        _isSearching = false;
+        _errorMessage = e.toString().contains('No address')
+            ? 'No locations found for "$query"'
+            : 'Unable to search. Check your connection.';
+      });
+    }
   }
 
   @override
@@ -2041,6 +2070,7 @@ class _LocationSheetState extends State<_LocationSheet>
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _controller.dispose();
     _focusNode.dispose();
     _animController.dispose();
@@ -2127,14 +2157,32 @@ class _LocationSheetState extends State<_LocationSheet>
                               horizontal: 12,
                             ),
                           ),
-                          onChanged: (v) => setState(() => _searchQuery = v),
+                          onChanged: _onSearchChanged,
                         ),
                       ),
-                      if (_searchQuery.isNotEmpty)
+                      if (_isSearching)
+                        const Padding(
+                          padding: EdgeInsets.only(right: 12),
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: _successColor,
+                            ),
+                          ),
+                        )
+                      else if (_searchQuery.isNotEmpty)
                         GestureDetector(
                           onTap: () {
                             _controller.clear();
-                            setState(() => _searchQuery = '');
+                            _debounceTimer?.cancel();
+                            setState(() {
+                              _searchQuery = '';
+                              _searchResults = [];
+                              _isSearching = false;
+                              _errorMessage = null;
+                            });
                           },
                           child: Padding(
                             padding: const EdgeInsets.only(right: 12),
@@ -2155,7 +2203,7 @@ class _LocationSheetState extends State<_LocationSheet>
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    _searchQuery.isEmpty ? 'Popular Cities' : 'Results',
+                    _getSectionLabel(),
                     style: GoogleFonts.dmSans(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -2165,35 +2213,123 @@ class _LocationSheetState extends State<_LocationSheet>
                   ),
                 ),
               ),
-              // City list
+              // City list / Loading / Error states
               Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: _filteredCities.length,
-                  itemBuilder: (_, index) {
-                    final city = _filteredCities[index];
-                    final isSelected = widget.current == city['name'];
-
-                    return TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0.0, end: 1.0),
-                      duration: Duration(milliseconds: 200 + (index * 40)),
-                      curve: Curves.easeOutCubic,
-                      builder: (context, value, child) {
-                        return Transform.translate(
-                          offset: Offset(0, 8 * (1 - value)),
-                          child: Opacity(opacity: value, child: child),
-                        );
-                      },
-                      child: _buildCityTile(city, isSelected),
-                    );
-                  },
-                ),
+                child: _buildLocationsList(),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  /// Returns the section label based on current state
+  String _getSectionLabel() {
+    if (_searchQuery.length < 3) {
+      return 'Popular Cities';
+    }
+    if (_isSearching) {
+      return 'Searching...';
+    }
+    if (_errorMessage != null) {
+      return 'No Results';
+    }
+    if (_searchResults.isNotEmpty) {
+      return 'Results (${_searchResults.length})';
+    }
+    return 'Results';
+  }
+
+  /// Builds the locations list with loading and error states
+  Widget _buildLocationsList() {
+    final locations = _displayedLocations;
+
+    // Show loading indicator when searching
+    if (_isSearching && _searchQuery.length >= 3) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(
+              width: 32,
+              height: 32,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: _successColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Searching worldwide...',
+              style: GoogleFonts.dmSans(
+                fontSize: 13,
+                color: _textMuted,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Show error or no results message
+    if (_errorMessage != null && _searchQuery.length >= 3) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.location_off_outlined,
+                size: 40,
+                color: _textMuted.withOpacity(0.5),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                _errorMessage!,
+                style: GoogleFonts.dmSans(
+                  fontSize: 13,
+                  color: _textMuted,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Try a different search term',
+                style: GoogleFonts.dmSans(
+                  fontSize: 11,
+                  color: _textMuted.withOpacity(0.7),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Show the locations list
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      physics: const BouncingScrollPhysics(),
+      itemCount: locations.length,
+      itemBuilder: (_, index) {
+        final city = locations[index];
+        final isSelected = widget.current == city['name'];
+
+        return TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.0, end: 1.0),
+          duration: Duration(milliseconds: 200 + (index * 40)),
+          curve: Curves.easeOutCubic,
+          builder: (context, value, child) {
+            return Transform.translate(
+              offset: Offset(0, 8 * (1 - value)),
+              child: Opacity(opacity: value, child: child),
+            );
+          },
+          child: _buildCityTile(city, isSelected),
+        );
+      },
     );
   }
 

@@ -47,3 +47,8 @@ Generate and display detailed Vedic birth charts (Kundli/Kundali) with planetary
 
 
 
+
+
+
+
+

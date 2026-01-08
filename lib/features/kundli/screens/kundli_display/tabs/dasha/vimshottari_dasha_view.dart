@@ -1,151 +1,242 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
 import '../../shared/constants.dart';
-import 'dasha_shared_widgets.dart';
+import 'dasha_shared_widgets.dart' hide getPlanetImagePath;
 
-/// Vimshottari Dasha View - Shows the 120-year Vimshottari Dasha with drill-down
-class VimshottariDashaView extends StatelessWidget {
+// ═══════════════════════════════════════════════════════════════════════════
+// NAVIGATION SECTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+const _sections = [
+  DashaNavSection(id: 'current', label: 'Current', color: DashaColors.emerald),
+  DashaNavSection(id: 'birth', label: 'Birth', color: DashaColors.amber),
+  DashaNavSection(id: 'timeline', label: 'Timeline', color: DashaColors.vimshottari),
+];
+
+/// Vimshottari Dasha View - Premium 120-year Dasha with drill-down
+class VimshottariDashaView extends StatefulWidget {
   final KundaliData kundaliData;
 
   const VimshottariDashaView({super.key, required this.kundaliData});
 
   @override
+  State<VimshottariDashaView> createState() => _VimshottariDashaViewState();
+}
+
+class _VimshottariDashaViewState extends State<VimshottariDashaView> {
+  late final ScrollController _scrollController;
+  final Map<String, GlobalKey> _sectionKeys = {};
+  final Map<String, GlobalKey<DashaAnimatedSectionWrapperState>> _animatedKeys = {};
+  int _activeIndex = 0;
+  bool _isScrolling = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+
+    for (final section in _sections) {
+      _sectionKeys[section.id] = GlobalKey();
+      _animatedKeys[section.id] = GlobalKey<DashaAnimatedSectionWrapperState>();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isScrolling) return;
+
+    final viewportHeight = _scrollController.position.viewportDimension;
+    final triggerPoint = viewportHeight * 0.3;
+
+    int newActiveIndex = 0;
+
+    for (int i = 0; i < _sections.length; i++) {
+      final key = _sectionKeys[_sections[i].id];
+      if (key?.currentContext != null) {
+        final box = key!.currentContext!.findRenderObject() as RenderBox?;
+        if (box != null) {
+          final position = box.localToGlobal(Offset.zero);
+          if (position.dy <= triggerPoint + 100) {
+            newActiveIndex = i;
+          }
+        }
+      }
+    }
+
+    if (newActiveIndex != _activeIndex) {
+      setState(() => _activeIndex = newActiveIndex);
+    }
+  }
+
+  Future<void> _scrollToSection(int index) async {
+    final section = _sections[index];
+    final key = _sectionKeys[section.id];
+
+    if (key?.currentContext == null) return;
+
+    HapticFeedback.lightImpact();
+
+    setState(() {
+      _isScrolling = true;
+      _activeIndex = index;
+    });
+
+    await Scrollable.ensureVisible(
+      key!.currentContext!,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutCubic,
+      alignment: 0.08,
+    );
+
+    _animatedKeys[section.id]?.currentState?.triggerHighlight();
+
+    setState(() => _isScrolling = false);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final dasha = kundaliData.dashaInfo;
+    final dasha = widget.kundaliData.dashaInfo;
     final now = DateTime.now();
-    
-    // Calculate dynamic remaining years based on current date
     final dynamicRemainingYears = _calculateDynamicRemainingYears(dasha, now);
-    
-    // Get current index in sequence
     final currentIndex = dasha.sequence.indexWhere((p) => p.planet == dasha.currentMahadasha);
     final completedPeriods = currentIndex >= 0 ? currentIndex : 0;
-    
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Hero Section
-          _VimshottariHeroCard(
-            dasha: dasha,
-            dynamicRemainingYears: dynamicRemainingYears,
-            now: now,
-            completedPeriods: completedPeriods,
-          ),
-          
-          const SizedBox(height: 20),
-          
-          // Current Periods Section
-          DashaSectionHeader(
-            icon: Icons.timeline_rounded,
-            title: 'Active Periods',
-            subtitle: 'Currently running Dasha levels',
-            color: const Color(0xFF6EE7B7),
-          ),
-          const SizedBox(height: 12),
-          
-          // Current Mahadasha & Antardasha
-          Row(
+
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: _CompactPeriodCard(
-                  label: 'Mahadasha',
-                  planet: dasha.currentMahadasha,
-                  remainingYears: dynamicRemainingYears,
-                  progress: _calculateProgress(dasha, now),
-                  isPrimary: true,
+              // Hero Section
+              _VimshottariHeroCard(
+                dasha: dasha,
+                dynamicRemainingYears: dynamicRemainingYears,
+                now: now,
+                completedPeriods: completedPeriods,
+              ),
+
+              const SizedBox(height: DashaDesignTokens.space24),
+
+              // Current Periods Section
+              DashaAnimatedSectionWrapper(
+                key: _animatedKeys['current'],
+                sectionKey: _sectionKeys['current']!,
+                accentColor: DashaColors.emerald,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DashaAnimatedSectionHeader(
+                      title: 'Active Periods',
+                      accentColor: DashaColors.emerald,
+                      icon: Icons.timeline_rounded,
+                    ),
+                    const SizedBox(height: DashaDesignTokens.space12),
+                    DashaAnimatedCardWrapper(
+                      delay: 50,
+                      child: _CurrentPeriodsCard(
+                        dasha: dasha,
+                        dynamicRemainingYears: dynamicRemainingYears,
+                        now: now,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 10),
-              if (dasha.currentAntardasha != null || dasha.currentAntardashaDetail != null)
-                Expanded(
-                  child: _CompactPeriodCard(
-                    label: 'Antardasha',
-                    planet: dasha.currentAntardashaDetail?.planet ?? dasha.currentAntardasha ?? '',
-                    remainingYears: _getAntardashaRemaining(dasha, now),
-                    progress: _getAntardashaProgress(dasha, now),
-                    isPrimary: false,
+
+              const SizedBox(height: DashaDesignTokens.space24),
+
+              // Birth Configuration
+              if (dasha.balanceYearsAtBirth != null || dasha.birthNakshatraLord != null)
+                DashaAnimatedSectionWrapper(
+                  key: _animatedKeys['birth'],
+                  sectionKey: _sectionKeys['birth']!,
+                  accentColor: DashaColors.amber,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      DashaAnimatedSectionHeader(
+                        title: 'Birth Configuration',
+                        accentColor: DashaColors.amber,
+                        icon: Icons.child_care_rounded,
+                      ),
+                      const SizedBox(height: DashaDesignTokens.space12),
+                      DashaAnimatedCardWrapper(
+                        delay: 50,
+                        child: _BirthConfigCard(
+                          dasha: dasha,
+                          birthDateTime: widget.kundaliData.birthDateTime,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+
+              if (dasha.balanceYearsAtBirth != null || dasha.birthNakshatraLord != null)
+                const SizedBox(height: DashaDesignTokens.space24),
+
+              // Life Timeline
+              DashaAnimatedSectionWrapper(
+                key: _animatedKeys['timeline'],
+                sectionKey: _sectionKeys['timeline']!,
+                accentColor: DashaColors.vimshottari,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DashaAnimatedSectionHeader(
+                      title: 'Life Timeline',
+                      accentColor: DashaColors.vimshottari,
+                      icon: Icons.view_timeline_rounded,
+                    ),
+                    const SizedBox(height: DashaDesignTokens.space12),
+                    DashaAnimatedCardWrapper(
+                      delay: 50,
+                      child: _TimelineProgressBar(
+                        sequence: dasha.sequence,
+                        currentPlanet: dasha.currentMahadasha,
+                      ),
+                    ),
+                    const SizedBox(height: DashaDesignTokens.space16),
+                    ..._buildDashaSequence(dasha, now),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: DashaDesignTokens.space16),
+
+              const DashaInfoFooter(
+                text: 'Vimshottari Dasha is a 120-year cycle based on Moon\'s nakshatra at birth. Tap any period to see sub-periods.',
+              ),
             ],
           ),
-          
-          const SizedBox(height: 24),
-          
-          // Birth Configuration
-          if (dasha.balanceYearsAtBirth != null || dasha.birthNakshatraLord != null) ...[
-            DashaSectionHeader(
-              icon: Icons.child_care_rounded,
-              title: 'Birth Configuration',
-              subtitle: 'Starting point of your Dasha cycle',
-              color: const Color(0xFFFBBF24),
-            ),
-            const SizedBox(height: 12),
-            _BirthConfigCard(dasha: dasha, birthDateTime: kundaliData.birthDateTime),
-            const SizedBox(height: 24),
-          ],
-          
-          // Life Timeline
-          DashaSectionHeader(
-            icon: Icons.view_timeline_rounded,
-            title: 'Life Timeline',
-            subtitle: '120-year Vimshottari cycle • Tap any period to explore',
-            color: DashaTypeColors.vimshottariPrimary,
+        ),
+
+        // Floating Navigation
+        Positioned(
+          left: 16,
+          right: 16,
+          bottom: MediaQuery.of(context).padding.bottom + 16,
+          child: DashaFloatingNavBar(
+            sections: _sections,
+            activeIndex: _activeIndex,
+            onTap: _scrollToSection,
           ),
-          const SizedBox(height: 12),
-          
-          // Timeline bar
-          _TimelineProgressBar(
-            sequence: dasha.sequence,
-            currentPlanet: dasha.currentMahadasha,
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Dasha sequence with dates
-          ..._buildDashaSequenceWithDates(context, dasha, now),
-          
-          const SizedBox(height: 16),
-          
-          // Info footer
-          const DashaInfoFooter(
-            text: 'Vimshottari Dasha is a 120-year cycle based on Moon\'s nakshatra at birth. Tap any period to see sub-periods (Antardasha, Pratyantara, etc.)',
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
-  
-  double _calculateProgress(DashaInfo dasha, DateTime now) {
-    final totalYears = _getMahadashaDuration(dasha.currentMahadasha).toDouble();
-    final remainingYears = _calculateDynamicRemainingYears(dasha, now);
-    final elapsedYears = totalYears - remainingYears;
-    return (elapsedYears / totalYears).clamp(0.0, 1.0);
-  }
-  
-  double _getAntardashaRemaining(DashaInfo dasha, DateTime now) {
-    final detail = dasha.currentAntardashaDetail;
-    if (detail != null) {
-      final daysRemaining = detail.endDate.difference(now).inDays;
-      return daysRemaining > 0 ? daysRemaining / 365.25 : 0;
-    }
-    return dasha.antardashaRemainingYears ?? 0;
-  }
-  
-  double _getAntardashaProgress(DashaInfo dasha, DateTime now) {
-    final detail = dasha.currentAntardashaDetail;
-    if (detail != null) {
-      final remaining = _getAntardashaRemaining(dasha, now);
-      final elapsed = detail.durationYears - remaining;
-      return (elapsed / detail.durationYears).clamp(0.0, 1.0);
-    }
-    return 0.5;
-  }
-  
+
   double _calculateDynamicRemainingYears(DashaInfo dasha, DateTime now) {
     if (dasha.mahadashaEndDate != null) {
       final daysRemaining = dasha.mahadashaEndDate!.difference(now).inDays;
@@ -156,51 +247,53 @@ class VimshottariDashaView extends StatelessWidget {
     }
     return dasha.remainingYears;
   }
-  
-  List<Widget> _buildDashaSequenceWithDates(BuildContext context, DashaInfo dasha, DateTime now) {
+
+  List<Widget> _buildDashaSequence(DashaInfo dasha, DateTime now) {
     final widgets = <Widget>[];
-    
+
     if (dasha.mahadashaSequence != null && dasha.mahadashaSequence!.isNotEmpty) {
       for (var i = 0; i < dasha.mahadashaSequence!.length; i++) {
         final periodDetail = dasha.mahadashaSequence![i];
         final isCurrent = periodDetail.planet == dasha.currentMahadasha;
         final isPast = periodDetail.endDate.isBefore(now);
-        final isFuture = periodDetail.startDate.isAfter(now);
-        
-        widgets.add(_DashaPeriodItem(
-          periodDetail: periodDetail,
-          index: i,
-          isCurrent: isCurrent,
-          isPast: isPast,
-          isFuture: isFuture,
-          dasha: dasha,
+
+        widgets.add(DashaAnimatedCardWrapper(
+          delay: 100 + (i * 30),
+          child: _DashaPeriodItem(
+            periodDetail: periodDetail,
+            index: i,
+            isCurrent: isCurrent,
+            isPast: isPast,
+            dasha: dasha,
+          ),
         ));
       }
     } else {
       DateTime currentStart = dasha.startDate;
-      
+
       for (var i = 0; i < dasha.sequence.length; i++) {
         final period = dasha.sequence[i];
         final endDate = currentStart.add(Duration(days: (period.years * 365.25).round()));
         final isCurrent = period.planet == dasha.currentMahadasha;
         final isPast = endDate.isBefore(now);
-        final isFuture = currentStart.isAfter(now);
-        
-        widgets.add(_DashaPeriodItemFallback(
-          period: period,
-          index: i,
-          isCurrent: isCurrent,
-          isPast: isPast,
-          isFuture: isFuture,
-          startDate: currentStart,
-          endDate: endDate,
-          dasha: dasha,
+
+        widgets.add(DashaAnimatedCardWrapper(
+          delay: 100 + (i * 30),
+          child: _DashaPeriodItemFallback(
+            period: period,
+            index: i,
+            isCurrent: isCurrent,
+            isPast: isPast,
+            startDate: currentStart,
+            endDate: endDate,
+            dasha: dasha,
+          ),
         ));
-        
+
         currentStart = endDate;
       }
     }
-    
+
     return widgets;
   }
 }
@@ -220,8 +313,10 @@ int _getMahadashaDuration(String planet) {
   return durations[planet] ?? 10;
 }
 
-// ============ Vimshottari Hero Card ============
-class _VimshottariHeroCard extends StatelessWidget {
+// ═══════════════════════════════════════════════════════════════════════════
+// HERO CARD - Refined Premium Design
+// ═══════════════════════════════════════════════════════════════════════════
+class _VimshottariHeroCard extends StatefulWidget {
   final DashaInfo dasha;
   final double dynamicRemainingYears;
   final DateTime now;
@@ -235,242 +330,563 @@ class _VimshottariHeroCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final totalYears = _getMahadashaDuration(dasha.currentMahadasha);
-    final elapsedYears = totalYears - dynamicRemainingYears;
+  State<_VimshottariHeroCard> createState() => _VimshottariHeroCardState();
+}
+
+class _VimshottariHeroCardState extends State<_VimshottariHeroCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
+  late Animation<double> _progressAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+    
+    final totalYears = _getMahadashaDuration(widget.dasha.currentMahadasha);
+    final elapsedYears = totalYears - widget.dynamicRemainingYears;
     final progressPercent = (elapsedYears / totalYears).clamp(0.0, 1.0);
-    final planetColor = getPlanetColor(dasha.currentMahadasha);
+    
+    _progressAnim = Tween<double>(begin: 0, end: progressPercent).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
+    );
+    
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _animController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final totalYears = _getMahadashaDuration(widget.dasha.currentMahadasha);
+    final elapsedYears = totalYears - widget.dynamicRemainingYears;
+    final progressPercent = (elapsedYears / totalYears).clamp(0.0, 1.0);
+    final planetColor = getPlanetColor(widget.dasha.currentMahadasha);
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            planetColor.withOpacity(0.15),
-            planetColor.withOpacity(0.05),
-            KundliDisplayColors.surfaceColor.withOpacity(0.4),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
+        color: const Color(0xFF141218),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: planetColor.withOpacity(0.25),
+          color: const Color(0xFF262432),
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: planetColor.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Planet symbol
-              Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  color: planetColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: planetColor.withOpacity(0.3),
-                    width: 1.5,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    getPlanetSymbol(dasha.currentMahadasha),
-                    style: TextStyle(
-                      fontSize: 36,
-                      color: planetColor,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF6EE7B7).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF6EE7B7),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'ACTIVE NOW',
-                            style: GoogleFonts.dmMono(
-                              fontSize: 8,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF6EE7B7),
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${dasha.currentMahadasha} Mahadasha',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: KundliDisplayColors.textPrimary,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _getPlanetDescription(dasha.currentMahadasha),
-                      style: GoogleFonts.dmSans(
-                        fontSize: 11,
-                        color: KundliDisplayColors.textMuted,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          // Header with planet image and title
+          _buildHeader(planetColor),
           
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           
-          // Progress section
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: KundliDisplayColors.surfaceColor.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Progress',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: KundliDisplayColors.textMuted,
-                      ),
-                    ),
-                    Text(
-                      '${(progressPercent * 100).toStringAsFixed(1)}%',
-                      style: GoogleFonts.dmMono(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: planetColor,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                DashaProgressBar(progress: progressPercent, color: planetColor),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    DashaHeroStatItem(
-                      icon: Icons.hourglass_bottom_rounded,
-                      label: 'Remaining',
-                      value: formatDuration(dynamicRemainingYears),
-                      color: planetColor,
-                    ),
-                    Container(
-                      width: 1,
-                      height: 28,
-                      color: KundliDisplayColors.borderColor.withOpacity(0.3),
-                    ),
-                    DashaHeroStatItem(
-                      icon: Icons.timer_outlined,
-                      label: 'Duration',
-                      value: '$totalYears years',
-                      color: KundliDisplayColors.textMuted,
-                    ),
-                    Container(
-                      width: 1,
-                      height: 28,
-                      color: KundliDisplayColors.borderColor.withOpacity(0.3),
-                    ),
-                    DashaHeroStatItem(
-                      icon: Icons.check_circle_outline_rounded,
-                      label: 'Completed',
-                      value: '$completedPeriods/9',
-                      color: const Color(0xFF6EE7B7),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          // Progress Section
+          _buildProgressSection(progressPercent, planetColor, totalYears),
           
-          // Dates row
-          if (dasha.mahadashaStartDate != null || dasha.mahadashaEndDate != null) ...[
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                if (dasha.mahadashaStartDate != null)
-                  Expanded(
-                    child: DashaDateBadge(
-                      label: 'Started',
-                      date: dasha.mahadashaStartDate!,
-                      icon: Icons.play_circle_outline_rounded,
-                    ),
-                  ),
-                const SizedBox(width: 10),
-                if (dasha.mahadashaEndDate != null)
-                  Expanded(
-                    child: DashaDateBadge(
-                      label: 'Ends',
-                      date: dasha.mahadashaEndDate!,
-                      icon: Icons.stop_circle_outlined,
-                    ),
-                  ),
-              ],
-            ),
-          ],
+          const SizedBox(height: 16),
+          
+          // Timeline dates
+          if (widget.dasha.mahadashaStartDate != null && 
+              widget.dasha.mahadashaEndDate != null)
+            _buildTimeline(),
         ],
       ),
     );
   }
-  
+
+  Widget _buildHeader(Color planetColor) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Planet image
+        Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: planetColor.withOpacity(0.2),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Image.asset(
+              getPlanetImagePath(widget.dasha.currentMahadasha),
+              width: 52,
+              height: 52,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Active badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A3A2A),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF4ADE80),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF4ADE80).withOpacity(0.5),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      'ACTIVE',
+                      style: GoogleFonts.inter(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF4ADE80),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '${widget.dasha.currentMahadasha} Mahadasha',
+                style: GoogleFonts.instrumentSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                _getPlanetDescription(widget.dasha.currentMahadasha),
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xFF8B8798),
+                  height: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgressSection(double progress, Color color, int totalYears) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A181F),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF2A2838),
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        children: [
+          // Progress bar with label
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Journey Progress',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF9490A0),
+                ),
+              ),
+              AnimatedBuilder(
+                animation: _progressAnim,
+                builder: (context, _) {
+                  return Text(
+                    '${(_progressAnim.value * 100).toStringAsFixed(1)}%',
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: color,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          
+          // Animated progress bar
+          AnimatedBuilder(
+            animation: _progressAnim,
+            builder: (context, _) {
+              return _RefinedProgressBar(
+                progress: _progressAnim.value,
+                color: color,
+              );
+            },
+          ),
+          
+          const SizedBox(height: 12),
+          
+          // Stats row
+          Row(
+            children: [
+              _StatChip(
+                icon: Icons.hourglass_top_rounded,
+                value: formatDuration(widget.dynamicRemainingYears),
+                label: 'Remaining',
+                iconColor: color,
+              ),
+              _buildDivider(),
+              _StatChip(
+                icon: Icons.schedule_rounded,
+                value: '$totalYears yrs',
+                label: 'Duration',
+                iconColor: const Color(0xFF7C7889),
+              ),
+              _buildDivider(),
+              _StatChip(
+                icon: Icons.check_circle_rounded,
+                value: '${widget.completedPeriods}/9',
+                label: 'Cycles',
+                iconColor: const Color(0xFF4ADE80),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Container(
+      width: 1,
+      height: 28,
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      color: const Color(0xFF2A2838),
+    );
+  }
+
+  Widget _buildTimeline() {
+    return Row(
+      children: [
+        Expanded(
+          child: _TimelineItem(
+            label: 'Started',
+            date: widget.dasha.mahadashaStartDate!,
+            alignment: CrossAxisAlignment.start,
+          ),
+        ),
+        // Timeline connector
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: SizedBox(
+            width: 40,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  height: 1,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xFF4ADE80).withOpacity(0.5),
+                        const Color(0xFF4ADE80).withOpacity(0.1),
+                      ],
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4ADE80),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4ADE80).withOpacity(0.4),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Expanded(
+          child: _TimelineItem(
+            label: 'Ends',
+            date: widget.dasha.mahadashaEndDate!,
+            alignment: CrossAxisAlignment.end,
+          ),
+        ),
+      ],
+    );
+  }
+
   String _getPlanetDescription(String planet) {
     const descriptions = {
-      'Sun': 'Period of self-expression, authority, and leadership',
-      'Moon': 'Period of emotions, mind, and nurturing energies',
-      'Mars': 'Period of action, courage, and determination',
-      'Mercury': 'Period of intellect, communication, and learning',
-      'Jupiter': 'Period of wisdom, expansion, and good fortune',
-      'Venus': 'Period of love, beauty, and material comforts',
-      'Saturn': 'Period of discipline, karma, and life lessons',
-      'Rahu': 'Period of worldly desires and unconventional paths',
-      'Ketu': 'Period of spirituality and past-life influences',
+      'Sun': 'Period of authority and leadership',
+      'Moon': 'Period of emotions and intuition',
+      'Mars': 'Period of action and courage',
+      'Mercury': 'Period of intellect and learning',
+      'Jupiter': 'Period of wisdom and fortune',
+      'Venus': 'Period of love and prosperity',
+      'Saturn': 'Period of discipline and karma',
+      'Rahu': 'Period of worldly desires',
+      'Ketu': 'Period of spiritual growth',
     };
     return descriptions[planet] ?? 'Planetary period of influence';
   }
 }
 
-// ============ Compact Period Card ============
+// Refined Progress Bar Component
+class _RefinedProgressBar extends StatelessWidget {
+  final double progress;
+  final Color color;
+
+  const _RefinedProgressBar({
+    required this.progress,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 6,
+      decoration: BoxDecoration(
+        color: const Color(0xFF262432),
+        borderRadius: BorderRadius.circular(3),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth * progress.clamp(0.0, 1.0);
+          return Stack(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: width,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(3),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withOpacity(0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+              // Highlight
+              if (width > 8)
+                Positioned(
+                  left: 4,
+                  top: 1.5,
+                  child: Container(
+                    width: width * 0.4,
+                    height: 1.5,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// Stat Chip Component
+class _StatChip extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+  final Color iconColor;
+
+  const _StatChip({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: iconColor),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              height: 1.1,
+              letterSpacing: -0.5,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 9,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xFF7C7889),
+              letterSpacing: -0.2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Timeline Item Component
+class _TimelineItem extends StatelessWidget {
+  final String label;
+  final DateTime date;
+  final CrossAxisAlignment alignment;
+
+  const _TimelineItem({
+    required this.label,
+    required this.date,
+    required this.alignment,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: alignment,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF6E6A7A),
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          formatDate(date),
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFFB8B5C2),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CURRENT PERIODS CARD
+// ═══════════════════════════════════════════════════════════════════════════
+class _CurrentPeriodsCard extends StatelessWidget {
+  final DashaInfo dasha;
+  final double dynamicRemainingYears;
+  final DateTime now;
+
+  const _CurrentPeriodsCard({
+    required this.dasha,
+    required this.dynamicRemainingYears,
+    required this.now,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _CompactPeriodCard(
+            label: 'Mahadasha',
+            planet: dasha.currentMahadasha,
+            remainingYears: dynamicRemainingYears,
+            progress: _calculateProgress(),
+            isPrimary: true,
+          ),
+        ),
+        const SizedBox(width: 10),
+        if (dasha.currentAntardasha != null || dasha.currentAntardashaDetail != null)
+          Expanded(
+            child: _CompactPeriodCard(
+              label: 'Antardasha',
+              planet: dasha.currentAntardashaDetail?.planet ?? dasha.currentAntardasha ?? '',
+              remainingYears: _getAntardashaRemaining(),
+              progress: _getAntardashaProgress(),
+              isPrimary: false,
+            ),
+          ),
+      ],
+    );
+  }
+
+  double _calculateProgress() {
+    final totalYears = _getMahadashaDuration(dasha.currentMahadasha).toDouble();
+    final elapsedYears = totalYears - dynamicRemainingYears;
+    return (elapsedYears / totalYears).clamp(0.0, 1.0);
+  }
+
+  double _getAntardashaRemaining() {
+    final detail = dasha.currentAntardashaDetail;
+    if (detail != null) {
+      final daysRemaining = detail.endDate.difference(now).inDays;
+      return daysRemaining > 0 ? daysRemaining / 365.25 : 0;
+    }
+    return dasha.antardashaRemainingYears ?? 0;
+  }
+
+  double _getAntardashaProgress() {
+    final detail = dasha.currentAntardashaDetail;
+    if (detail != null) {
+      final remaining = _getAntardashaRemaining();
+      final elapsed = detail.durationYears - remaining;
+      return (elapsed / detail.durationYears).clamp(0.0, 1.0);
+    }
+    return 0.5;
+  }
+}
+
 class _CompactPeriodCard extends StatelessWidget {
   final String label;
   final String planet;
@@ -489,35 +905,19 @@ class _CompactPeriodCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = getPlanetColor(planet);
-    
-    return Container(
+
+    return DashaPremiumCard(
+      accentColor: color,
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(isPrimary ? 0.08 : 0.04),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(isPrimary ? 0.2 : 0.1),
-          width: 0.5,
-        ),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Center(
-                  child: Text(
-                    getPlanetSymbol(planet),
-                    style: TextStyle(fontSize: 14, color: color),
-                  ),
-                ),
+              PremiumPlanetImage(
+                planet: planet,
+                size: 28,
+                showShadow: false,
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -526,17 +926,17 @@ class _CompactPeriodCard extends StatelessWidget {
                   children: [
                     Text(
                       label,
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.inter(
                         fontSize: 9,
-                        color: KundliDisplayColors.textMuted,
+                        color: DashaColors.textTertiary,
                       ),
                     ),
                     Text(
                       planet,
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: KundliDisplayColors.textPrimary,
+                        color: DashaColors.textPrimary,
                       ),
                     ),
                   ],
@@ -550,16 +950,16 @@ class _CompactPeriodCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 3,
-              backgroundColor: KundliDisplayColors.borderColor.withOpacity(0.2),
+              backgroundColor: DashaColors.border.withOpacity(0.2),
               valueColor: AlwaysStoppedAnimation(color.withOpacity(0.7)),
             ),
           ),
           const SizedBox(height: 6),
           Text(
             '${formatDuration(remainingYears)} left',
-            style: GoogleFonts.dmMono(
+            style: GoogleFonts.jetBrainsMono(
               fontSize: 9,
-              color: KundliDisplayColors.textMuted,
+              color: DashaColors.textTertiary,
             ),
           ),
         ],
@@ -568,7 +968,9 @@ class _CompactPeriodCard extends StatelessWidget {
   }
 }
 
-// ============ Birth Config Card ============
+// ═══════════════════════════════════════════════════════════════════════════
+// BIRTH CONFIG CARD
+// ═══════════════════════════════════════════════════════════════════════════
 class _BirthConfigCard extends StatelessWidget {
   final DashaInfo dasha;
   final DateTime birthDateTime;
@@ -577,16 +979,7 @@ class _BirthConfigCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: KundliDisplayColors.borderColor.withOpacity(0.4),
-          width: 0.5,
-        ),
-      ),
+    return DashaPremiumCard(
       child: Row(
         children: [
           if (dasha.birthNakshatraLord != null) ...[
@@ -603,7 +996,7 @@ class _BirthConfigCard extends StatelessWidget {
             Container(
               width: 1,
               height: 36,
-              color: KundliDisplayColors.borderColor.withOpacity(0.3),
+              color: DashaColors.border.withOpacity(0.3),
             ),
           if (dasha.balanceYearsAtBirth != null) ...[
             Expanded(
@@ -611,7 +1004,7 @@ class _BirthConfigCard extends StatelessWidget {
                 icon: Icons.hourglass_top_rounded,
                 label: 'Balance at Birth',
                 value: formatDuration(dasha.balanceYearsAtBirth!),
-                color: const Color(0xFFFBBF24),
+                color: DashaColors.amber,
               ),
             ),
           ],
@@ -646,14 +1039,14 @@ class _ConfigItem extends StatelessWidget {
           children: [
             Text(
               label,
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.inter(
                 fontSize: 9,
-                color: KundliDisplayColors.textMuted,
+                color: DashaColors.textTertiary,
               ),
             ),
             Text(
               value,
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.inter(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: color,
@@ -666,7 +1059,9 @@ class _ConfigItem extends StatelessWidget {
   }
 }
 
-// ============ Timeline Progress Bar ============
+// ═══════════════════════════════════════════════════════════════════════════
+// TIMELINE PROGRESS BAR
+// ═══════════════════════════════════════════════════════════════════════════
 class _TimelineProgressBar extends StatelessWidget {
   final List<DashaPeriod> sequence;
   final String currentPlanet;
@@ -679,63 +1074,155 @@ class _TimelineProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
       decoration: BoxDecoration(
-        color: KundliDisplayColors.surfaceColor.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(10),
+        color: const Color(0xFF141218),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: const Color(0xFF262432),
+          width: 1,
+        ),
       ),
-      child: Row(
-        children: sequence.asMap().entries.map((entry) {
-          final period = entry.value;
-          final isCurrent = period.planet == currentPlanet;
-          final isPast = entry.key < sequence.indexWhere((p) => p.planet == currentPlanet);
-          final color = getPlanetColor(period.planet);
-          
-          return Expanded(
-            flex: period.years,
-            child: Tooltip(
-              message: '${period.planet}: ${period.years} years',
-              child: Container(
-                height: 24,
-                margin: const EdgeInsets.symmetric(horizontal: 1),
-                decoration: BoxDecoration(
-                  color: isCurrent
-                      ? color
-                      : isPast
-                          ? color.withOpacity(0.4)
-                          : color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(4),
-                  border: isCurrent
-                      ? Border.all(color: Colors.white.withOpacity(0.5), width: 1)
-                      : null,
-                ),
-                child: Center(
-                  child: Text(
-                    getPlanetSymbol(period.planet),
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: isCurrent || isPast
-                          ? Colors.white
-                          : color,
-                    ),
-                  ),
-                ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          children: sequence.asMap().entries.map((entry) {
+            final period = entry.value;
+            final isCurrent = period.planet == currentPlanet;
+            final currentIndex = sequence.indexWhere((p) => p.planet == currentPlanet);
+            final isPast = entry.key < currentIndex;
+            final color = getPlanetColor(period.planet);
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: entry.key == 0 ? 0 : 6,
+                right: entry.key == sequence.length - 1 ? 0 : 6,
               ),
-            ),
-          );
-        }).toList(),
+              child: _TimelinePlanetItem(
+                planet: period.planet,
+                years: period.years,
+                color: color,
+                isCurrent: isCurrent,
+                isPast: isPast,
+              ),
+            );
+          }).toList(),
+        ),
       ),
     );
   }
 }
 
-// ============ Period Item ============
+// Individual planet item in timeline
+class _TimelinePlanetItem extends StatelessWidget {
+  final String planet;
+  final int years;
+  final Color color;
+  final bool isCurrent;
+  final bool isPast;
+
+  const _TimelinePlanetItem({
+    required this.planet,
+    required this.years,
+    required this.color,
+    required this.isCurrent,
+    required this.isPast,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final opacity = isPast && !isCurrent ? 0.4 : 1.0;
+    
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Planet image container
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: isCurrent
+                ? Border.all(color: color.withOpacity(0.6), width: 2)
+                : Border.all(color: const Color(0xFF2A2838), width: 1),
+            boxShadow: isCurrent
+                ? [
+                    BoxShadow(
+                      color: color.withOpacity(0.3),
+                      blurRadius: 12,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                : null,
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(9),
+            child: Image.asset(
+              getPlanetImagePath(planet),
+              width: 38,
+              height: 38,
+              fit: BoxFit.cover,
+              opacity: AlwaysStoppedAnimation(opacity),
+              errorBuilder: (_, __, ___) => Container(
+                color: color.withOpacity(0.15),
+                child: Center(
+                  child: Text(
+                    getPlanetSymbol(planet),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: color.withOpacity(opacity),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        // Planet name
+        Text(
+          _getShortPlanetName(planet),
+          style: GoogleFonts.inter(
+            fontSize: 8,
+            fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w500,
+            color: isCurrent 
+                ? color 
+                : (isPast 
+                    ? const Color(0xFF5A5868) 
+                    : const Color(0xFF8B8798)),
+            letterSpacing: -0.2,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _getShortPlanetName(String planet) {
+    // Return short 3-letter abbreviations for compact display
+    const names = {
+      'Sun': 'SUN',
+      'Moon': 'MON',
+      'Mars': 'MAR',
+      'Mercury': 'MER',
+      'Jupiter': 'JUP',
+      'Venus': 'VEN',
+      'Saturn': 'SAT',
+      'Rahu': 'RAH',
+      'Ketu': 'KET',
+    };
+    return names[planet] ?? planet.substring(0, 3).toUpperCase();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PERIOD ITEMS
+// ═══════════════════════════════════════════════════════════════════════════
 class _DashaPeriodItem extends StatelessWidget {
   final DashaPeriodDetail periodDetail;
   final int index;
   final bool isCurrent;
   final bool isPast;
-  final bool isFuture;
   final DashaInfo dasha;
 
   const _DashaPeriodItem({
@@ -743,167 +1230,98 @@ class _DashaPeriodItem extends StatelessWidget {
     required this.index,
     required this.isCurrent,
     required this.isPast,
-    required this.isFuture,
     required this.dasha,
   });
 
   @override
   Widget build(BuildContext context) {
     final planetColor = getPlanetColor(periodDetail.planet);
-    
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 200 + (index * 25)),
-      curve: Curves.easeOutCubic,
-      builder: (context, value, child) {
-        return Transform.translate(
-          offset: Offset(0, 6 * (1 - value)),
-          child: Opacity(opacity: value, child: child),
-        );
-      },
-      child: GestureDetector(
-        onTap: () => _showPeriodSheet(context, periodDetail),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(
+
+    return GestureDetector(
+      onTap: () => _showPeriodSheet(context, periodDetail),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isCurrent
+              ? planetColor.withOpacity(0.08)
+              : DashaColors.surface,
+          borderRadius: BorderRadius.circular(DashaDesignTokens.radiusMd),
+          border: Border.all(
             color: isCurrent
-                ? planetColor.withOpacity(0.08)
-                : isPast
-                    ? KundliDisplayColors.surfaceColor.withOpacity(0.2)
-                    : KundliDisplayColors.surfaceColor.withOpacity(0.35),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: isCurrent
-                  ? planetColor.withOpacity(0.35)
-                  : KundliDisplayColors.borderColor.withOpacity(isPast ? 0.15 : 0.3),
-              width: isCurrent ? 1.5 : 0.5,
-            ),
-            boxShadow: isCurrent
-                ? [
-                    BoxShadow(
-                      color: planetColor.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                : null,
+                ? planetColor.withOpacity(0.3)
+                : DashaColors.border.withOpacity(isPast ? 0.15 : 0.3),
+            width: isCurrent ? 1.5 : 0.5,
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: isCurrent
-                          ? [planetColor.withOpacity(0.25), planetColor.withOpacity(0.1)]
-                          : [planetColor.withOpacity(isPast ? 0.06 : 0.12), planetColor.withOpacity(isPast ? 0.03 : 0.06)],
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: planetColor.withOpacity(isCurrent ? 0.4 : 0.15),
-                      width: 1,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      getPlanetSymbol(periodDetail.planet),
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: isPast ? planetColor.withOpacity(0.5) : planetColor,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            periodDetail.planet,
-                            style: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
-                              color: isPast
-                                  ? KundliDisplayColors.textMuted
-                                  : KundliDisplayColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          if (isCurrent) const ActiveNowBadge(),
-                          if (isPast && !isCurrent)
-                            Icon(
-                              Icons.check_circle_rounded,
-                              size: 14,
-                              color: KundliDisplayColors.textMuted.withOpacity(0.4),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.date_range_rounded,
-                            size: 11,
-                            color: KundliDisplayColors.textMuted.withOpacity(isPast ? 0.4 : 0.6),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${formatDateShort(periodDetail.startDate)} → ${formatDateShort(periodDetail.endDate)}',
-                            style: GoogleFonts.dmMono(
-                              fontSize: 10,
-                              color: isPast
-                                  ? KundliDisplayColors.textMuted.withOpacity(0.4)
-                                  : KundliDisplayColors.textMuted,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: planetColor.withOpacity(isPast ? 0.05 : 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
+        ),
+        child: Row(
+          children: [
+            PremiumPlanetImage(
+              planet: periodDetail.planet,
+              size: 40,
+              isActive: isCurrent,
+              opacity: isPast ? 0.5 : 1.0,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
                       Text(
-                        '${periodDetail.durationYears.round()}',
-                        style: GoogleFonts.dmMono(
+                        periodDetail.planet,
+                        style: GoogleFonts.inter(
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isPast ? KundliDisplayColors.textMuted.withOpacity(0.5) : planetColor,
+                          fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
+                          color: isPast
+                              ? DashaColors.textTertiary
+                              : DashaColors.textPrimary,
                         ),
                       ),
-                      Text(
-                        'years',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 8,
-                          color: KundliDisplayColors.textMuted.withOpacity(0.6),
+                      const SizedBox(width: 8),
+                      if (isCurrent) const ActiveNowBadge(fontSize: 7),
+                      if (isPast && !isCurrent)
+                        Icon(
+                          Icons.check_circle_rounded,
+                          size: 14,
+                          color: DashaColors.textTertiary.withOpacity(0.4),
                         ),
-                      ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 8),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 14,
-                  color: KundliDisplayColors.textMuted.withOpacity(isPast ? 0.2 : 0.4),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    '${formatDateShort(periodDetail.startDate)} → ${formatDateShort(periodDetail.endDate)}',
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 10,
+                      color: DashaColors.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: planetColor.withOpacity(isPast ? 0.05 : 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${periodDetail.durationYears.round()}y',
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isPast ? DashaColors.textTertiary : planetColor,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: DashaColors.textTertiary.withOpacity(0.4),
+            ),
+          ],
         ),
       ),
     );
@@ -914,13 +1332,11 @@ class _DashaPeriodItem extends StatelessWidget {
   }
 }
 
-// ============ Period Item Fallback ============
 class _DashaPeriodItemFallback extends StatelessWidget {
   final DashaPeriod period;
   final int index;
   final bool isCurrent;
   final bool isPast;
-  final bool isFuture;
   final DateTime startDate;
   final DateTime endDate;
   final DashaInfo dasha;
@@ -930,7 +1346,6 @@ class _DashaPeriodItemFallback extends StatelessWidget {
     required this.index,
     required this.isCurrent,
     required this.isPast,
-    required this.isFuture,
     required this.startDate,
     required this.endDate,
     required this.dasha,
@@ -939,119 +1354,94 @@ class _DashaPeriodItemFallback extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final planetColor = getPlanetColor(period.planet);
-    
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 200 + (index * 25)),
-      curve: Curves.easeOutCubic,
-      builder: (context, value, child) {
-        return Transform.translate(
-          offset: Offset(0, 6 * (1 - value)),
-          child: Opacity(opacity: value, child: child),
-        );
-      },
-      child: GestureDetector(
-        onTap: () => _showDetailsFallback(context),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
+
+    return GestureDetector(
+      onTap: () => _showDetailsFallback(context),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isCurrent
+              ? planetColor.withOpacity(0.08)
+              : DashaColors.surface,
+          borderRadius: BorderRadius.circular(DashaDesignTokens.radiusMd),
+          border: Border.all(
             color: isCurrent
-                ? planetColor.withOpacity(0.08)
-                : isPast
-                    ? KundliDisplayColors.surfaceColor.withOpacity(0.2)
-                    : KundliDisplayColors.surfaceColor.withOpacity(0.35),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: isCurrent
-                  ? planetColor.withOpacity(0.35)
-                  : KundliDisplayColors.borderColor.withOpacity(isPast ? 0.15 : 0.3),
-              width: isCurrent ? 1.5 : 0.5,
+                ? planetColor.withOpacity(0.3)
+                : DashaColors.border.withOpacity(isPast ? 0.15 : 0.3),
+            width: isCurrent ? 1.5 : 0.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            PremiumPlanetImage(
+              planet: period.planet,
+              size: 40,
+              isActive: isCurrent,
+              opacity: isPast ? 0.5 : 1.0,
             ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: planetColor.withOpacity(isCurrent ? 0.2 : 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Center(
-                  child: Text(
-                    getPlanetSymbol(period.planet),
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: isPast ? planetColor.withOpacity(0.5) : planetColor,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          period.planet,
-                          style: GoogleFonts.dmSans(
-                            fontSize: 14,
-                            fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
-                            color: isPast
-                                ? KundliDisplayColors.textMuted
-                                : KundliDisplayColors.textPrimary,
-                          ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        period.planet,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
+                          color: isPast
+                              ? DashaColors.textTertiary
+                              : DashaColors.textPrimary,
                         ),
-                        if (isCurrent) ...[
-                          const SizedBox(width: 8),
-                          const ActiveNowBadge(),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${formatDateShort(startDate)} → ${formatDateShort(endDate)}',
-                      style: GoogleFonts.dmMono(
-                        fontSize: 10,
-                        color: KundliDisplayColors.textMuted,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: planetColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '${period.years}y',
-                  style: GoogleFonts.dmMono(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: planetColor,
+                      if (isCurrent) ...[
+                        const SizedBox(width: 8),
+                        const ActiveNowBadge(fontSize: 7),
+                      ],
+                    ],
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${formatDateShort(startDate)} → ${formatDateShort(endDate)}',
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 10,
+                      color: DashaColors.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: planetColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${period.years}y',
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: planetColor,
                 ),
               ),
-              const SizedBox(width: 8),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 14,
-                color: KundliDisplayColors.textMuted.withOpacity(0.4),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: DashaColors.textTertiary.withOpacity(0.4),
+            ),
+          ],
         ),
       ),
     );
   }
 
   void _showDetailsFallback(BuildContext context) {
-    // Create DashaPeriodDetail on the fly
     final subPeriods = KundaliCalculationService.calculateSubDashas(
       parentPath: period.planet,
       parentPlanet: period.planet,
@@ -1060,7 +1450,7 @@ class _DashaPeriodItemFallback extends StatelessWidget {
       level: DashaLevel.antardasha,
       maxDepth: 1,
     );
-    
+
     final periodDetail = DashaPeriodDetail(
       planet: period.planet,
       fullPath: period.planet,
@@ -1070,26 +1460,28 @@ class _DashaPeriodItemFallback extends StatelessWidget {
       level: DashaLevel.mahadasha,
       subPeriods: subPeriods,
     );
-    
+
     showVimshottariPeriodSheet(context, periodDetail, []);
   }
 }
 
-// ============ Vimshottari Period Bottom Sheet ============
+// ═══════════════════════════════════════════════════════════════════════════
+// BOTTOM SHEET
+// ═══════════════════════════════════════════════════════════════════════════
 void showVimshottariPeriodSheet(
   BuildContext context,
   DashaPeriodDetail period,
   List<String> breadcrumbs,
 ) {
   final levelColors = {
-    DashaLevel.mahadasha: DashaTypeColors.mahadasha,
-    DashaLevel.antardasha: DashaTypeColors.antardasha,
-    DashaLevel.pratyantara: DashaTypeColors.pratyantara,
-    DashaLevel.sookshma: DashaTypeColors.sookshma,
-    DashaLevel.prana: DashaTypeColors.prana,
+    DashaLevel.mahadasha: DashaColors.mahadasha,
+    DashaLevel.antardasha: DashaColors.antardasha,
+    DashaLevel.pratyantara: DashaColors.pratyantara,
+    DashaLevel.sookshma: DashaColors.sookshma,
+    DashaLevel.prana: DashaColors.prana,
   };
 
-  final levelColor = levelColors[period.level] ?? KundliDisplayColors.accentSecondary;
+  final levelColor = levelColors[period.level] ?? DashaColors.violet;
   final newBreadcrumbs = [...breadcrumbs, period.planet];
   final now = DateTime.now();
   final isCurrentPeriod = period.containsDate(now);
@@ -1108,7 +1500,7 @@ void showVimshottariPeriodSheet(
       maxChildSize: 0.92,
       builder: (context, scrollController) => Container(
         decoration: BoxDecoration(
-          color: KundliDisplayColors.bgSecondary,
+          color: DashaColors.bgSecondary,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           border: Border.all(color: levelColor.withOpacity(0.3), width: 1),
         ),
@@ -1119,7 +1511,7 @@ void showVimshottariPeriodSheet(
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: KundliDisplayColors.borderColor,
+                color: DashaColors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -1136,19 +1528,19 @@ void showVimshottariPeriodSheet(
                   children: [
                     Text(
                       '${_getLevelDisplayName(nextLevel)} Periods',
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: KundliDisplayColors.textSecondary,
+                        color: DashaColors.textSecondary,
                       ),
                     ),
                     const SizedBox(width: 8),
                     if (hasSubPeriods)
                       Text(
                         '(${period.subPeriods!.length})',
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.inter(
                           fontSize: 11,
-                          color: KundliDisplayColors.textMuted,
+                          color: DashaColors.textTertiary,
                         ),
                       ),
                   ],
@@ -1164,7 +1556,7 @@ void showVimshottariPeriodSheet(
                       itemBuilder: (context, index) {
                         final subPeriod = period.subPeriods![index];
                         final isSubCurrent = subPeriod.containsDate(now);
-                        final subLevelColor = levelColors[subPeriod.level] ?? KundliDisplayColors.textMuted;
+                        final subLevelColor = levelColors[subPeriod.level] ?? DashaColors.textTertiary;
                         final canDrillDeeperSub = _getNextDashaLevel(subPeriod.level) != null;
 
                         return _SubPeriodItem(
@@ -1183,14 +1575,14 @@ void showVimshottariPeriodSheet(
                           Icon(
                             Icons.hourglass_empty_rounded,
                             size: 48,
-                            color: KundliDisplayColors.textMuted.withOpacity(0.3),
+                            color: DashaColors.textTertiary.withOpacity(0.3),
                           ),
                           const SizedBox(height: 12),
                           Text(
                             'Loading sub-periods...',
-                            style: GoogleFonts.dmSans(
+                            style: GoogleFonts.inter(
                               fontSize: 13,
-                              color: KundliDisplayColors.textMuted,
+                              color: DashaColors.textTertiary,
                             ),
                           ),
                         ],
@@ -1265,16 +1657,16 @@ class _VimshottariPeriodHeader extends StatelessWidget {
                     child: Icon(
                       Icons.arrow_back_ios_rounded,
                       size: 14,
-                      color: KundliDisplayColors.textMuted,
+                      color: DashaColors.textTertiary,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       breadcrumbs.join(' → '),
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.inter(
                         fontSize: 11,
-                        color: KundliDisplayColors.textMuted,
+                        color: DashaColors.textTertiary,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1282,23 +1674,13 @@ class _VimshottariPeriodHeader extends StatelessWidget {
                 ],
               ),
             ),
-          Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: levelColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: levelColor.withOpacity(0.3), width: 1),
+            Row(
+              children: [
+                PremiumPlanetImage(
+                  planet: period.planet,
+                  size: 48,
+                  isActive: isCurrentPeriod,
                 ),
-                child: Center(
-                  child: Text(
-                    getPlanetSymbol(period.planet),
-                    style: TextStyle(fontSize: 22, color: levelColor),
-                  ),
-                ),
-              ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -1314,7 +1696,7 @@ class _VimshottariPeriodHeader extends StatelessWidget {
                           ),
                           child: Text(
                             period.levelName,
-                            style: GoogleFonts.dmSans(
+                            style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                               color: levelColor,
@@ -1330,10 +1712,10 @@ class _VimshottariPeriodHeader extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '${period.planet} ${period.levelName}',
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: KundliDisplayColors.textPrimary,
+                        color: DashaColors.textPrimary,
                       ),
                     ),
                   ],
@@ -1342,23 +1724,19 @@ class _VimshottariPeriodHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
-          Container(
+          DashaPremiumCard(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: KundliDisplayColors.surfaceColor.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(10),
-            ),
             child: Row(
               children: [
                 _DateColumn(label: 'Start', date: period.startDate),
-                Container(width: 1, height: 28, color: KundliDisplayColors.borderColor),
+                Container(width: 1, height: 28, color: DashaColors.border),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 12),
                     child: _DateColumn(label: 'End', date: period.endDate),
                   ),
                 ),
-                Container(width: 1, height: 28, color: KundliDisplayColors.borderColor),
+                Container(width: 1, height: 28, color: DashaColors.border),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 12),
@@ -1367,14 +1745,14 @@ class _VimshottariPeriodHeader extends StatelessWidget {
                       children: [
                         Text(
                           'Duration',
-                          style: GoogleFonts.dmSans(
+                          style: GoogleFonts.inter(
                             fontSize: 9,
-                            color: KundliDisplayColors.textMuted,
+                            color: DashaColors.textTertiary,
                           ),
                         ),
                         Text(
                           formatDuration(period.durationYears),
-                          style: GoogleFonts.dmMono(
+                          style: GoogleFonts.jetBrainsMono(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             color: levelColor,
@@ -1407,17 +1785,17 @@ class _DateColumn extends StatelessWidget {
         children: [
           Text(
             label,
-            style: GoogleFonts.dmSans(
+            style: GoogleFonts.inter(
               fontSize: 9,
-              color: KundliDisplayColors.textMuted,
+              color: DashaColors.textTertiary,
             ),
           ),
           Text(
             formatDate(date),
-            style: GoogleFonts.dmMono(
+            style: GoogleFonts.jetBrainsMono(
               fontSize: 11,
               fontWeight: FontWeight.w500,
-              color: KundliDisplayColors.textSecondary,
+              color: DashaColors.textSecondary,
             ),
           ),
         ],
@@ -1457,33 +1835,22 @@ class _SubPeriodItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSubCurrent
               ? subLevelColor.withOpacity(0.1)
-              : KundliDisplayColors.surfaceColor.withOpacity(0.4),
+              : DashaColors.surface,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isSubCurrent
                 ? subLevelColor.withOpacity(0.3)
-                : KundliDisplayColors.borderColor.withOpacity(0.3),
+                : DashaColors.border.withOpacity(0.3),
             width: 0.5,
           ),
         ),
         child: Row(
           children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: getPlanetColor(subPeriod.planet).withOpacity(0.12),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Text(
-                  getPlanetSymbol(subPeriod.planet),
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: getPlanetColor(subPeriod.planet),
-                  ),
-                ),
-              ),
+            PremiumPlanetImage(
+              planet: subPeriod.planet,
+              size: 32,
+              isActive: isSubCurrent,
+              showShadow: false,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -1494,10 +1861,10 @@ class _SubPeriodItem extends StatelessWidget {
                     children: [
                       Text(
                         subPeriod.planet,
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: isSubCurrent ? FontWeight.w600 : FontWeight.w500,
-                          color: KundliDisplayColors.textPrimary,
+                          color: DashaColors.textPrimary,
                         ),
                       ),
                       if (isSubCurrent) ...[
@@ -1509,9 +1876,9 @@ class _SubPeriodItem extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     '${formatDateShort(subPeriod.startDate)} - ${formatDateShort(subPeriod.endDate)}',
-                    style: GoogleFonts.dmMono(
+                    style: GoogleFonts.jetBrainsMono(
                       fontSize: 9,
-                      color: KundliDisplayColors.textMuted,
+                      color: DashaColors.textTertiary,
                     ),
                   ),
                 ],
@@ -1519,10 +1886,10 @@ class _SubPeriodItem extends StatelessWidget {
             ),
             Text(
               formatDuration(subPeriod.durationYears),
-              style: GoogleFonts.dmMono(
+              style: GoogleFonts.jetBrainsMono(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
-                color: KundliDisplayColors.textMuted,
+                color: DashaColors.textTertiary,
               ),
             ),
             if (canDrillDeeperSub) ...[
@@ -1530,7 +1897,7 @@ class _SubPeriodItem extends StatelessWidget {
               Icon(
                 Icons.chevron_right_rounded,
                 size: 16,
-                color: KundliDisplayColors.textMuted.withOpacity(0.5),
+                color: DashaColors.textTertiary.withOpacity(0.5),
               ),
             ],
           ],

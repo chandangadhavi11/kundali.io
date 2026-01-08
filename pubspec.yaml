@@ -91,6 +91,13 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/zodiac/
+    - assets/images/planets/
+    - assets/images/gemstones/
+    - assets/images/elements/fire.png
+    - assets/images/elements/water.png
+    - assets/images/elements/earth.png
+    - assets/images/elements/air.png
     - assets/icons/
     - assets/data/
 

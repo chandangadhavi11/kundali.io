@@ -1,129 +1,239 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
-import '../../shared/constants.dart';
+import '../../shared/constants.dart' show getPlanetColor;
 import 'dasha_shared_widgets.dart';
 
-/// Yogini Dasha View - Shows the 36-year Yogini Dasha with 8 divine Yoginis
-class YoginiDashaView extends StatelessWidget {
+// ═══════════════════════════════════════════════════════════════════════════
+// NAVIGATION SECTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+const _sections = [
+  DashaNavSection(id: 'current', label: 'Current', color: DashaColors.emerald),
+  DashaNavSection(id: 'yoginis', label: 'Yoginis', color: DashaColors.yogini),
+  DashaNavSection(id: 'timeline', label: 'Timeline', color: DashaColors.rose),
+];
+
+/// Yogini Dasha View - Premium 36-year cycle with 8 divine Yoginis
+class YoginiDashaView extends StatefulWidget {
   final KundaliData kundaliData;
 
   const YoginiDashaView({super.key, required this.kundaliData});
 
   @override
+  State<YoginiDashaView> createState() => _YoginiDashaViewState();
+}
+
+class _YoginiDashaViewState extends State<YoginiDashaView> {
+  late final ScrollController _scrollController;
+  final Map<String, GlobalKey> _sectionKeys = {};
+  final Map<String, GlobalKey<DashaAnimatedSectionWrapperState>> _animatedKeys = {};
+  int _activeIndex = 0;
+  bool _isScrolling = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+
+    for (final section in _sections) {
+      _sectionKeys[section.id] = GlobalKey();
+      _animatedKeys[section.id] = GlobalKey<DashaAnimatedSectionWrapperState>();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isScrolling) return;
+
+    final viewportHeight = _scrollController.position.viewportDimension;
+    final triggerPoint = viewportHeight * 0.3;
+
+    int newActiveIndex = 0;
+
+    for (int i = 0; i < _sections.length; i++) {
+      final key = _sectionKeys[_sections[i].id];
+      if (key?.currentContext != null) {
+        final box = key!.currentContext!.findRenderObject() as RenderBox?;
+        if (box != null) {
+          final position = box.localToGlobal(Offset.zero);
+          if (position.dy <= triggerPoint + 100) {
+            newActiveIndex = i;
+          }
+        }
+      }
+    }
+
+    if (newActiveIndex != _activeIndex) {
+      setState(() => _activeIndex = newActiveIndex);
+    }
+  }
+
+  Future<void> _scrollToSection(int index) async {
+    final section = _sections[index];
+    final key = _sectionKeys[section.id];
+
+    if (key?.currentContext == null) return;
+
+    HapticFeedback.lightImpact();
+
+    setState(() {
+      _isScrolling = true;
+      _activeIndex = index;
+    });
+
+    await Scrollable.ensureVisible(
+      key!.currentContext!,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutCubic,
+      alignment: 0.08,
+    );
+
+    _animatedKeys[section.id]?.currentState?.triggerHighlight();
+
+    setState(() => _isScrolling = false);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final yogini = kundaliData.yoginiDashaInfo;
-    
+    final yogini = widget.kundaliData.yoginiDashaInfo;
+
     if (yogini == null) {
       return _buildNoDataView();
     }
-    
+
     final now = DateTime.now();
     final dynamicRemainingYears = _calculateDynamicRemainingYears(yogini, now);
-    
-    // Get current index in sequence
     final currentIndex = yogini.sequence.indexWhere((p) => p.yogini == yogini.currentYogini);
     final completedPeriods = currentIndex >= 0 ? currentIndex : 0;
-    
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Hero Section
-          _YoginiHeroCard(
-            yogini: yogini,
-            dynamicRemainingYears: dynamicRemainingYears,
-            now: now,
-            completedPeriods: completedPeriods,
-          ),
-          
-          const SizedBox(height: 20),
-          
-          // Current Periods Section
-          DashaSectionHeader(
-            icon: Icons.timeline_rounded,
-            title: 'Active Yogini Periods',
-            subtitle: 'Currently running Yogini phases',
-            color: DashaTypeColors.yoginiPrimary,
-          ),
-          const SizedBox(height: 12),
-          
-          // Current Yogini & Antardasha
-          Row(
+
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: _CompactYoginiCard(
-                  label: 'Mahadasha',
-                  yogini: yogini.currentYogini,
-                  remainingYears: dynamicRemainingYears,
-                  progress: _calculateProgress(yogini, now),
-                  isPrimary: true,
+              // Hero Section
+              _YoginiHeroCard(
+                yogini: yogini,
+                dynamicRemainingYears: dynamicRemainingYears,
+                now: now,
+                completedPeriods: completedPeriods,
+              ),
+
+              const SizedBox(height: DashaDesignTokens.space24),
+
+              // Current Periods Section
+              DashaAnimatedSectionWrapper(
+                key: _animatedKeys['current'],
+                sectionKey: _sectionKeys['current']!,
+                accentColor: DashaColors.emerald,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DashaAnimatedSectionHeader(
+                      title: 'Active Yogini Periods',
+                      accentColor: DashaColors.emerald,
+                      icon: Icons.timeline_rounded,
+                    ),
+                    const SizedBox(height: DashaDesignTokens.space12),
+                    DashaAnimatedCardWrapper(
+                      delay: 50,
+                      child: _CurrentPeriodsCard(
+                        yogini: yogini,
+                        dynamicRemainingYears: dynamicRemainingYears,
+                        now: now,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 10),
-              if (yogini.currentAntardasha != null)
-                Expanded(
-                  child: _CompactYoginiCard(
-                    label: 'Antardasha',
-                    yogini: yogini.currentAntardasha!,
-                    remainingYears: yogini.antardashaRemainingYears ?? 0,
-                    progress: 0.5, // Approximate
-                    isPrimary: false,
-                  ),
+
+              const SizedBox(height: DashaDesignTokens.space24),
+
+              // Yogini Wheel Visualization
+              DashaAnimatedSectionWrapper(
+                key: _animatedKeys['yoginis'],
+                sectionKey: _sectionKeys['yoginis']!,
+                accentColor: DashaColors.yogini,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DashaAnimatedSectionHeader(
+                      title: 'The 8 Divine Yoginis',
+                      accentColor: DashaColors.yogini,
+                      icon: Icons.donut_large_rounded,
+                    ),
+                    const SizedBox(height: DashaDesignTokens.space12),
+                    DashaAnimatedCardWrapper(
+                      delay: 50,
+                      child: _YoginiWheelCard(currentYogini: yogini.currentYogini),
+                    ),
+                  ],
                 ),
+              ),
+
+              const SizedBox(height: DashaDesignTokens.space24),
+
+              // Life Timeline
+              DashaAnimatedSectionWrapper(
+                key: _animatedKeys['timeline'],
+                sectionKey: _sectionKeys['timeline']!,
+                accentColor: DashaColors.rose,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DashaAnimatedSectionHeader(
+                      title: 'Yogini Timeline',
+                      accentColor: DashaColors.rose,
+                      icon: Icons.view_timeline_rounded,
+                    ),
+                    const SizedBox(height: DashaDesignTokens.space12),
+                    DashaAnimatedCardWrapper(
+                      delay: 50,
+                      child: _YoginiTimelineBar(currentYogini: yogini.currentYogini),
+                    ),
+                    const SizedBox(height: DashaDesignTokens.space16),
+                    ..._buildYoginiSequence(yogini, now),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: DashaDesignTokens.space16),
+
+              const DashaInfoFooter(
+                text: 'Yogini Dasha is a 36-year cycle based on 8 divine Yoginis representing cosmic feminine energies.',
+              ),
             ],
           ),
-          
-          const SizedBox(height: 24),
-          
-          // Yogini Wheel Visualization
-          DashaSectionHeader(
-            icon: Icons.donut_large_rounded,
-            title: 'The 8 Divine Yoginis',
-            subtitle: '36-year cosmic cycle of feminine energy',
-            color: DashaTypeColors.yoginiSecondary,
+        ),
+
+        // Floating Navigation
+        Positioned(
+          left: 16,
+          right: 16,
+          bottom: MediaQuery.of(context).padding.bottom + 16,
+          child: DashaFloatingNavBar(
+            sections: _sections,
+            activeIndex: _activeIndex,
+            onTap: _scrollToSection,
           ),
-          const SizedBox(height: 12),
-          
-          _YoginiWheelCard(
-            currentYogini: yogini.currentYogini,
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Life Timeline
-          DashaSectionHeader(
-            icon: Icons.view_timeline_rounded,
-            title: 'Yogini Timeline',
-            subtitle: '36-year cycle • Tap any period to explore',
-            color: DashaTypeColors.yoginiPrimary,
-          ),
-          const SizedBox(height: 12),
-          
-          // Timeline bar
-          _YoginiTimelineBar(
-            currentYogini: yogini.currentYogini,
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Yogini sequence with dates
-          ..._buildYoginiSequenceWithDates(context, yogini, now),
-          
-          const SizedBox(height: 16),
-          
-          // Info footer
-          const DashaInfoFooter(
-            text: 'Yogini Dasha is a 36-year cycle based on 8 divine Yoginis representing cosmic feminine energies. Each Yogini governs specific life areas and brings unique influences.',
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
-  
+
   Widget _buildNoDataView() {
     return Center(
       child: Padding(
@@ -135,30 +245,30 @@ class YoginiDashaView extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: DashaTypeColors.yoginiPrimary.withOpacity(0.1),
+                color: DashaColors.yogini.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(
                 Icons.hourglass_empty_rounded,
                 size: 40,
-                color: DashaTypeColors.yoginiPrimary.withOpacity(0.5),
+                color: DashaColors.yogini.withOpacity(0.5),
               ),
             ),
             const SizedBox(height: 20),
             Text(
               'Yogini Dasha Unavailable',
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: KundliDisplayColors.textPrimary,
+                color: DashaColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Unable to calculate Yogini Dasha for this chart. Please ensure Moon position data is available.',
-              style: GoogleFonts.dmSans(
+              'Unable to calculate Yogini Dasha for this chart.',
+              style: GoogleFonts.inter(
                 fontSize: 13,
-                color: KundliDisplayColors.textMuted,
+                color: DashaColors.textTertiary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -167,14 +277,7 @@ class YoginiDashaView extends StatelessWidget {
       ),
     );
   }
-  
-  double _calculateProgress(YoginiDashaInfo yogini, DateTime now) {
-    final totalYears = yogini.currentYogini.years.toDouble();
-    final remainingYears = _calculateDynamicRemainingYears(yogini, now);
-    final elapsedYears = totalYears - remainingYears;
-    return (elapsedYears / totalYears).clamp(0.0, 1.0);
-  }
-  
+
   double _calculateDynamicRemainingYears(YoginiDashaInfo yogini, DateTime now) {
     if (yogini.yoginiEndDate != null) {
       final daysRemaining = yogini.yoginiEndDate!.difference(now).inDays;
@@ -185,52 +288,76 @@ class YoginiDashaView extends StatelessWidget {
     }
     return yogini.remainingYears;
   }
-  
-  List<Widget> _buildYoginiSequenceWithDates(BuildContext context, YoginiDashaInfo yogini, DateTime now) {
+
+  List<Widget> _buildYoginiSequence(YoginiDashaInfo yogini, DateTime now) {
     final widgets = <Widget>[];
-    
+
     if (yogini.yoginiSequence != null && yogini.yoginiSequence!.isNotEmpty) {
       for (var i = 0; i < yogini.yoginiSequence!.length && i < 8; i++) {
         final periodDetail = yogini.yoginiSequence![i];
         final isCurrent = periodDetail.yogini == yogini.currentYogini;
         final isPast = periodDetail.endDate.isBefore(now);
-        
-        widgets.add(_YoginiPeriodItem(
-          periodDetail: periodDetail,
-          index: i,
-          isCurrent: isCurrent,
-          isPast: isPast,
+
+        widgets.add(DashaAnimatedCardWrapper(
+          delay: 100 + (i * 30),
+          child: _YoginiPeriodItem(
+            periodDetail: periodDetail,
+            index: i,
+            isCurrent: isCurrent,
+            isPast: isPast,
+          ),
         ));
       }
     } else {
-      // Fallback: Build from sequence
       DateTime currentStart = yogini.startDate;
-      
+
       for (var i = 0; i < yogini.sequence.length; i++) {
         final period = yogini.sequence[i];
         final endDate = currentStart.add(Duration(days: (period.years * 365.25).round()));
         final isCurrent = period.yogini == yogini.currentYogini;
         final isPast = endDate.isBefore(now);
-        
-        widgets.add(_YoginiPeriodItemFallback(
-          period: period,
-          index: i,
-          isCurrent: isCurrent,
-          isPast: isPast,
-          startDate: currentStart,
-          endDate: endDate,
+
+        widgets.add(DashaAnimatedCardWrapper(
+          delay: 100 + (i * 30),
+          child: _YoginiPeriodItemFallback(
+            period: period,
+            index: i,
+            isCurrent: isCurrent,
+            isPast: isPast,
+            startDate: currentStart,
+            endDate: endDate,
+          ),
         ));
-        
+
         currentStart = endDate;
       }
     }
-    
+
     return widgets;
   }
 }
 
-// ============ Yogini Hero Card ============
-class _YoginiHeroCard extends StatelessWidget {
+// ═══════════════════════════════════════════════════════════════════════════
+// YOGINI COLOR HELPER
+// ═══════════════════════════════════════════════════════════════════════════
+Color _getYoginiColor(Yogini yogini) {
+  const colors = {
+    Yogini.mangala: DashaColors.emerald,
+    Yogini.pingala: DashaColors.gold,
+    Yogini.dhanya: DashaColors.amber,
+    Yogini.bhramari: DashaColors.coral,
+    Yogini.bhadrika: DashaColors.teal,
+    Yogini.ulka: Color(0xFF9CA3AF),
+    Yogini.siddha: DashaColors.rose,
+    Yogini.sankata: DashaColors.purple,
+  };
+  return colors[yogini] ?? DashaColors.yogini;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HERO CARD - Refined Premium Design
+// ═══════════════════════════════════════════════════════════════════════════
+class _YoginiHeroCard extends StatefulWidget {
   final YoginiDashaInfo yogini;
   final double dynamicRemainingYears;
   final DateTime now;
@@ -244,218 +371,410 @@ class _YoginiHeroCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final totalYears = yogini.currentYogini.years;
-    final elapsedYears = totalYears - dynamicRemainingYears;
+  State<_YoginiHeroCard> createState() => _YoginiHeroCardState();
+}
+
+class _YoginiHeroCardState extends State<_YoginiHeroCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
+  late Animation<double> _progressAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+    
+    final totalYears = widget.yogini.currentYogini.years;
+    final elapsedYears = totalYears - widget.dynamicRemainingYears;
     final progressPercent = (elapsedYears / totalYears).clamp(0.0, 1.0);
-    final yoginiColor = _getYoginiColor(yogini.currentYogini);
+    
+    _progressAnim = Tween<double>(begin: 0, end: progressPercent).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
+    );
+    
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _animController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final totalYears = widget.yogini.currentYogini.years;
+    final elapsedYears = totalYears - widget.dynamicRemainingYears;
+    final progressPercent = (elapsedYears / totalYears).clamp(0.0, 1.0);
+    final yoginiColor = _getYoginiColor(widget.yogini.currentYogini);
+    final planetColor = getPlanetColor(widget.yogini.currentYogini.planet);
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            yoginiColor.withOpacity(0.15),
-            DashaTypeColors.yoginiPrimary.withOpacity(0.05),
-            KundliDisplayColors.surfaceColor.withOpacity(0.4),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
+        color: const Color(0xFF141218),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: yoginiColor.withOpacity(0.25),
+          color: const Color(0xFF262432),
           width: 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: yoginiColor.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          // Header with yogini symbol and title
+          _buildHeader(yoginiColor, planetColor),
+          
+          const SizedBox(height: 18),
+          
+          // Progress Section
+          _buildProgressSection(progressPercent, yoginiColor, totalYears),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(Color yoginiColor, Color planetColor) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Yogini symbol container
+        Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            color: yoginiColor.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: yoginiColor.withOpacity(0.25),
+              width: 1,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              widget.yogini.currentYogini.symbol,
+              style: TextStyle(
+                fontSize: 22,
+                color: yoginiColor,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Yogini symbol
+              // Active badge
               Container(
-                width: 72,
-                height: 72,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      yoginiColor.withOpacity(0.25),
-                      yoginiColor.withOpacity(0.1),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(
-                    color: yoginiColor.withOpacity(0.3),
-                    width: 1.5,
-                  ),
+                  color: const Color(0xFF1A3A2A),
+                  borderRadius: BorderRadius.circular(6),
                 ),
-                child: Center(
-                  child: Text(
-                    yogini.currentYogini.symbol,
-                    style: TextStyle(
-                      fontSize: 32,
-                      color: yoginiColor,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      width: 5,
+                      height: 5,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6EE7B7).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF6EE7B7),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'ACTIVE NOW',
-                            style: GoogleFonts.dmMono(
-                              fontSize: 8,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF6EE7B7),
-                              letterSpacing: 0.5,
-                            ),
+                        color: const Color(0xFF4ADE80),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF4ADE80).withOpacity(0.5),
+                            blurRadius: 4,
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(width: 5),
                     Text(
-                      '${yogini.currentYogini.displayName} Dasha',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: KundliDisplayColors.textPrimary,
-                        letterSpacing: -0.5,
+                      'ACTIVE',
+                      style: GoogleFonts.inter(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF4ADE80),
+                        letterSpacing: 0.5,
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      yogini.currentYogini.nature,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 11,
-                        color: KundliDisplayColors.textMuted,
-                        height: 1.3,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.public_rounded,
-                          size: 12,
-                          color: yoginiColor.withOpacity(0.7),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Ruled by ${yogini.currentYogini.planet}',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 10,
-                            color: yoginiColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 6),
+              Text(
+                '${widget.yogini.currentYogini.displayName} Dasha',
+                style: GoogleFonts.instrumentSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: 4),
+              // Nature and ruling planet
+              Row(
+                children: [
+                  Text(
+                    widget.yogini.currentYogini.nature,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF8B8798),
+                    ),
+                  ),
+                  Container(
+                    width: 3,
+                    height: 3,
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF4A4858),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Container(
+                    width: 14,
+                    height: 14,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      boxShadow: [
+                        BoxShadow(
+                          color: planetColor.withOpacity(0.3),
+                          blurRadius: 6,
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.asset(
+                        getPlanetImagePath(widget.yogini.currentYogini.planet),
+                        width: 14,
+                        height: 14,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    widget.yogini.currentYogini.planet,
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: planetColor,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProgressSection(double progress, Color color, int totalYears) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A181F),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF2A2838),
+          width: 0.5,
+        ),
+      ),
+      child: Column(
+        children: [
+          // Progress bar with label
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Journey Progress',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF9490A0),
+                ),
+              ),
+              AnimatedBuilder(
+                animation: _progressAnim,
+                builder: (context, _) {
+                  return Text(
+                    '${(_progressAnim.value * 100).toStringAsFixed(1)}%',
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: color,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
           
-          const SizedBox(height: 20),
+          // Animated progress bar
+          AnimatedBuilder(
+            animation: _progressAnim,
+            builder: (context, _) {
+              return _RefinedYoginiProgressBar(
+                progress: _progressAnim.value,
+                color: color,
+              );
+            },
+          ),
           
-          // Progress section
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: KundliDisplayColors.surfaceColor.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(12),
+          const SizedBox(height: 12),
+          
+          // Stats row
+          Row(
+            children: [
+              _YoginiStatChip(
+                icon: Icons.hourglass_top_rounded,
+                value: formatDuration(widget.dynamicRemainingYears),
+                label: 'Remaining',
+                iconColor: color,
+              ),
+              _buildDivider(),
+              _YoginiStatChip(
+                icon: Icons.schedule_rounded,
+                value: '$totalYears yrs',
+                label: 'Duration',
+                iconColor: const Color(0xFF7C7889),
+              ),
+              _buildDivider(),
+              _YoginiStatChip(
+                icon: Icons.check_circle_rounded,
+                value: '${widget.completedPeriods}/8',
+                label: 'Cycles',
+                iconColor: const Color(0xFF4ADE80),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDivider() {
+    return Container(
+      width: 1,
+      height: 28,
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      color: const Color(0xFF2A2838),
+    );
+  }
+}
+
+// Refined Progress Bar for Yogini
+class _RefinedYoginiProgressBar extends StatelessWidget {
+  final double progress;
+  final Color color;
+
+  const _RefinedYoginiProgressBar({
+    required this.progress,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 6,
+      decoration: BoxDecoration(
+        color: const Color(0xFF262432),
+        borderRadius: BorderRadius.circular(3),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth * progress.clamp(0.0, 1.0);
+          return Stack(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                width: width,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(3),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withOpacity(0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+              if (width > 8)
+                Positioned(
+                  left: 4,
+                  top: 1.5,
+                  child: Container(
+                    width: width * 0.4,
+                    height: 1.5,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// Stat Chip for Yogini
+class _YoginiStatChip extends StatelessWidget {
+  final IconData icon;
+  final String value;
+  final String label;
+  final Color iconColor;
+
+  const _YoginiStatChip({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: iconColor),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              height: 1.1,
+              letterSpacing: -0.5,
             ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Progress',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: KundliDisplayColors.textMuted,
-                      ),
-                    ),
-                    Text(
-                      '${(progressPercent * 100).toStringAsFixed(1)}%',
-                      style: GoogleFonts.dmMono(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: yoginiColor,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                DashaProgressBar(progress: progressPercent, color: yoginiColor),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    DashaHeroStatItem(
-                      icon: Icons.hourglass_bottom_rounded,
-                      label: 'Remaining',
-                      value: formatDuration(dynamicRemainingYears),
-                      color: yoginiColor,
-                    ),
-                    Container(
-                      width: 1,
-                      height: 28,
-                      color: KundliDisplayColors.borderColor.withOpacity(0.3),
-                    ),
-                    DashaHeroStatItem(
-                      icon: Icons.timer_outlined,
-                      label: 'Duration',
-                      value: '$totalYears years',
-                      color: KundliDisplayColors.textMuted,
-                    ),
-                    Container(
-                      width: 1,
-                      height: 28,
-                      color: KundliDisplayColors.borderColor.withOpacity(0.3),
-                    ),
-                    DashaHeroStatItem(
-                      icon: Icons.check_circle_outline_rounded,
-                      label: 'Completed',
-                      value: '$completedPeriods/8',
-                      color: const Color(0xFF6EE7B7),
-                    ),
-                  ],
-                ),
-              ],
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 9,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xFF7C7889),
+              letterSpacing: -0.2,
             ),
           ),
         ],
@@ -464,7 +783,55 @@ class _YoginiHeroCard extends StatelessWidget {
   }
 }
 
-// ============ Compact Yogini Card ============
+// ═══════════════════════════════════════════════════════════════════════════
+// CURRENT PERIODS CARD
+// ═══════════════════════════════════════════════════════════════════════════
+class _CurrentPeriodsCard extends StatelessWidget {
+  final YoginiDashaInfo yogini;
+  final double dynamicRemainingYears;
+  final DateTime now;
+
+  const _CurrentPeriodsCard({
+    required this.yogini,
+    required this.dynamicRemainingYears,
+    required this.now,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _CompactYoginiCard(
+            label: 'Mahadasha',
+            yogini: yogini.currentYogini,
+            remainingYears: dynamicRemainingYears,
+            progress: _calculateProgress(),
+            isPrimary: true,
+          ),
+        ),
+        const SizedBox(width: 10),
+        if (yogini.currentAntardasha != null)
+          Expanded(
+            child: _CompactYoginiCard(
+              label: 'Antardasha',
+              yogini: yogini.currentAntardasha!,
+              remainingYears: yogini.antardashaRemainingYears ?? 0,
+              progress: 0.5,
+              isPrimary: false,
+            ),
+          ),
+      ],
+    );
+  }
+
+  double _calculateProgress() {
+    final totalYears = yogini.currentYogini.years.toDouble();
+    final elapsedYears = totalYears - dynamicRemainingYears;
+    return (elapsedYears / totalYears).clamp(0.0, 1.0);
+  }
+}
+
 class _CompactYoginiCard extends StatelessWidget {
   final String label;
   final Yogini yogini;
@@ -483,17 +850,10 @@ class _CompactYoginiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _getYoginiColor(yogini);
-    
-    return Container(
+
+    return DashaPremiumCard(
+      accentColor: color,
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(isPrimary ? 0.08 : 0.04),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(isPrimary ? 0.2 : 0.1),
-          width: 0.5,
-        ),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -520,17 +880,17 @@ class _CompactYoginiCard extends StatelessWidget {
                   children: [
                     Text(
                       label,
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.inter(
                         fontSize: 9,
-                        color: KundliDisplayColors.textMuted,
+                        color: DashaColors.textTertiary,
                       ),
                     ),
                     Text(
                       yogini.displayName,
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: KundliDisplayColors.textPrimary,
+                        color: DashaColors.textPrimary,
                       ),
                     ),
                   ],
@@ -544,16 +904,16 @@ class _CompactYoginiCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 3,
-              backgroundColor: KundliDisplayColors.borderColor.withOpacity(0.2),
+              backgroundColor: DashaColors.border.withOpacity(0.2),
               valueColor: AlwaysStoppedAnimation(color.withOpacity(0.7)),
             ),
           ),
           const SizedBox(height: 6),
           Text(
             '${formatDuration(remainingYears)} left',
-            style: GoogleFonts.dmMono(
+            style: GoogleFonts.jetBrainsMono(
               fontSize: 9,
-              color: KundliDisplayColors.textMuted,
+              color: DashaColors.textTertiary,
             ),
           ),
         ],
@@ -562,7 +922,9 @@ class _CompactYoginiCard extends StatelessWidget {
   }
 }
 
-// ============ Yogini Wheel Card ============
+// ═══════════════════════════════════════════════════════════════════════════
+// YOGINI WHEEL CARD
+// ═══════════════════════════════════════════════════════════════════════════
 class _YoginiWheelCard extends StatelessWidget {
   final Yogini currentYogini;
 
@@ -570,150 +932,75 @@ class _YoginiWheelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: KundliDisplayColors.borderColor.withOpacity(0.4),
-          width: 0.5,
-        ),
-      ),
-      child: Column(
-        children: [
-          // Grid of 8 Yoginis
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: Yogini.values.map((yogini) {
-              final isCurrent = yogini == currentYogini;
-              final color = _getYoginiColor(yogini);
-              
-              return Container(
-                width: (MediaQuery.of(context).size.width - 80) / 4,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: isCurrent
-                      ? color.withOpacity(0.15)
-                      : KundliDisplayColors.surfaceColor.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isCurrent
-                        ? color.withOpacity(0.4)
-                        : KundliDisplayColors.borderColor.withOpacity(0.3),
-                    width: isCurrent ? 1.5 : 0.5,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      yogini.symbol,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: isCurrent ? color : color.withOpacity(0.6),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      yogini.displayName,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 10,
-                        fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w500,
-                        color: isCurrent
-                            ? KundliDisplayColors.textPrimary
-                            : KundliDisplayColors.textMuted,
-                      ),
-                    ),
-                    Text(
-                      '${yogini.years}y',
-                      style: GoogleFonts.dmMono(
-                        fontSize: 9,
-                        color: isCurrent ? color : KundliDisplayColors.textMuted,
-                      ),
-                    ),
-                    if (isCurrent) ...[
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF6EE7B7).withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          'NOW',
-                          style: GoogleFonts.dmMono(
-                            fontSize: 7,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF6EE7B7),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ============ Yogini Timeline Bar ============
-class _YoginiTimelineBar extends StatelessWidget {
-  final Yogini currentYogini;
-
-  const _YoginiTimelineBar({required this.currentYogini});
-
-  @override
-  Widget build(BuildContext context) {
-    final currentIndex = Yogini.values.indexOf(currentYogini);
-    
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
-      decoration: BoxDecoration(
-        color: KundliDisplayColors.surfaceColor.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: Yogini.values.asMap().entries.map((entry) {
-          final yogini = entry.value;
+    return DashaPremiumCard(
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: Yogini.values.map((yogini) {
           final isCurrent = yogini == currentYogini;
-          final isPast = entry.key < currentIndex;
           final color = _getYoginiColor(yogini);
-          
-          return Expanded(
-            flex: yogini.years,
-            child: Tooltip(
-              message: '${yogini.displayName}: ${yogini.years} years',
-              child: Container(
-                height: 24,
-                margin: const EdgeInsets.symmetric(horizontal: 1),
-                decoration: BoxDecoration(
-                  color: isCurrent
-                      ? color
-                      : isPast
-                          ? color.withOpacity(0.4)
-                          : color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(4),
-                  border: isCurrent
-                      ? Border.all(color: Colors.white.withOpacity(0.5), width: 1)
-                      : null,
-                ),
-                child: Center(
-                  child: Text(
-                    yogini.symbol,
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: isCurrent || isPast
-                          ? Colors.white
-                          : color,
-                    ),
+
+          return Container(
+            width: (MediaQuery.of(context).size.width - 80) / 4,
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: isCurrent
+                  ? color.withOpacity(0.15)
+                  : DashaColors.surfaceElevated,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isCurrent
+                    ? color.withOpacity(0.4)
+                    : DashaColors.border.withOpacity(0.3),
+                width: isCurrent ? 1.5 : 0.5,
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  yogini.symbol,
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: isCurrent ? color : color.withOpacity(0.6),
                   ),
                 ),
-              ),
+                const SizedBox(height: 4),
+                Text(
+                  yogini.displayName,
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w500,
+                    color: isCurrent
+                        ? DashaColors.textPrimary
+                        : DashaColors.textTertiary,
+                  ),
+                ),
+                Text(
+                  '${yogini.years}y',
+                  style: GoogleFonts.jetBrainsMono(
+                    fontSize: 9,
+                    color: isCurrent ? color : DashaColors.textTertiary,
+                  ),
+                ),
+                if (isCurrent) ...[
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: DashaColors.emerald.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'NOW',
+                      style: GoogleFonts.jetBrainsMono(
+                        fontSize: 7,
+                        fontWeight: FontWeight.w700,
+                        color: DashaColors.emerald,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
           );
         }).toList(),
@@ -722,7 +1009,148 @@ class _YoginiTimelineBar extends StatelessWidget {
   }
 }
 
-// ============ Yogini Period Item ============
+// ═══════════════════════════════════════════════════════════════════════════
+// YOGINI TIMELINE BAR
+// ═══════════════════════════════════════════════════════════════════════════
+class _YoginiTimelineBar extends StatelessWidget {
+  final Yogini currentYogini;
+
+  const _YoginiTimelineBar({required this.currentYogini});
+
+  @override
+  Widget build(BuildContext context) {
+    final currentIndex = Yogini.values.indexOf(currentYogini);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF141218),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: const Color(0xFF262432),
+          width: 1,
+        ),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        child: Row(
+          children: Yogini.values.asMap().entries.map((entry) {
+            final yogini = entry.value;
+            final isCurrent = yogini == currentYogini;
+            final isPast = entry.key < currentIndex;
+            final color = _getYoginiColor(yogini);
+
+            return Padding(
+              padding: EdgeInsets.only(
+                left: entry.key == 0 ? 0 : 8,
+                right: entry.key == Yogini.values.length - 1 ? 0 : 8,
+              ),
+              child: _YoginiTimelineItem(
+                yogini: yogini,
+                color: color,
+                isCurrent: isCurrent,
+                isPast: isPast,
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+// Individual yogini item in timeline
+class _YoginiTimelineItem extends StatelessWidget {
+  final Yogini yogini;
+  final Color color;
+  final bool isCurrent;
+  final bool isPast;
+
+  const _YoginiTimelineItem({
+    required this.yogini,
+    required this.color,
+    required this.isCurrent,
+    required this.isPast,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final opacity = isPast && !isCurrent ? 0.5 : 1.0;
+    
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Yogini symbol container
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color: isCurrent 
+                ? color.withOpacity(0.2)
+                : color.withOpacity(isPast ? 0.08 : 0.12),
+            borderRadius: BorderRadius.circular(10),
+            border: isCurrent
+                ? Border.all(color: color.withOpacity(0.6), width: 2)
+                : Border.all(color: color.withOpacity(0.2), width: 1),
+            boxShadow: isCurrent
+                ? [
+                    BoxShadow(
+                      color: color.withOpacity(0.3),
+                      blurRadius: 12,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                : null,
+          ),
+          child: Center(
+            child: Text(
+              yogini.symbol,
+              style: TextStyle(
+                fontSize: 16,
+                color: color.withOpacity(opacity),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        // Yogini name
+        Text(
+          _getShortYoginiName(yogini),
+          style: GoogleFonts.inter(
+            fontSize: 8,
+            fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w500,
+            color: isCurrent 
+                ? color 
+                : (isPast 
+                    ? const Color(0xFF5A5868) 
+                    : const Color(0xFF8B8798)),
+            letterSpacing: -0.2,
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _getShortYoginiName(Yogini yogini) {
+    // Return short 3-letter abbreviations for compact display
+    const names = {
+      Yogini.mangala: 'MAN',
+      Yogini.pingala: 'PIN',
+      Yogini.dhanya: 'DHA',
+      Yogini.bhramari: 'BHR',
+      Yogini.bhadrika: 'BHA',
+      Yogini.ulka: 'ULK',
+      Yogini.siddha: 'SID',
+      Yogini.sankata: 'SAN',
+    };
+    return names[yogini] ?? yogini.displayName.substring(0, 3).toUpperCase();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PERIOD ITEMS
+// ═══════════════════════════════════════════════════════════════════════════
 class _YoginiPeriodItem extends StatelessWidget {
   final YoginiPeriodDetail periodDetail;
   final int index;
@@ -739,159 +1167,121 @@ class _YoginiPeriodItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final yoginiColor = _getYoginiColor(periodDetail.yogini);
-    
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 200 + (index * 25)),
-      curve: Curves.easeOutCubic,
-      builder: (context, value, child) {
-        return Transform.translate(
-          offset: Offset(0, 6 * (1 - value)),
-          child: Opacity(opacity: value, child: child),
-        );
-      },
-      child: GestureDetector(
-        onTap: () => _showYoginiPeriodSheet(context, periodDetail),
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(
+
+    return GestureDetector(
+      onTap: () => _showYoginiPeriodSheet(context, periodDetail),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isCurrent
+              ? yoginiColor.withOpacity(0.08)
+              : DashaColors.surface,
+          borderRadius: BorderRadius.circular(DashaDesignTokens.radiusMd),
+          border: Border.all(
             color: isCurrent
-                ? yoginiColor.withOpacity(0.08)
-                : isPast
-                    ? KundliDisplayColors.surfaceColor.withOpacity(0.2)
-                    : KundliDisplayColors.surfaceColor.withOpacity(0.35),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: isCurrent
-                  ? yoginiColor.withOpacity(0.35)
-                  : KundliDisplayColors.borderColor.withOpacity(isPast ? 0.15 : 0.3),
-              width: isCurrent ? 1.5 : 0.5,
-            ),
+                ? yoginiColor.withOpacity(0.3)
+                : DashaColors.border.withOpacity(isPast ? 0.15 : 0.3),
+            width: isCurrent ? 1.5 : 0.5,
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: isCurrent
-                          ? [yoginiColor.withOpacity(0.25), yoginiColor.withOpacity(0.1)]
-                          : [yoginiColor.withOpacity(isPast ? 0.06 : 0.12), yoginiColor.withOpacity(isPast ? 0.03 : 0.06)],
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: yoginiColor.withOpacity(isCurrent ? 0.4 : 0.15),
-                      width: 1,
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      periodDetail.yogini.symbol,
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: isPast ? yoginiColor.withOpacity(0.5) : yoginiColor,
-                      ),
-                    ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: yoginiColor.withOpacity(isCurrent ? 0.2 : 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: Text(
+                  periodDetail.yogini.symbol,
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: isPast ? yoginiColor.withOpacity(0.5) : yoginiColor,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                            periodDetail.yogini.displayName,
-                            style: GoogleFonts.dmSans(
-                              fontSize: 14,
-                              fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
-                              color: isPast
-                                  ? KundliDisplayColors.textMuted
-                                  : KundliDisplayColors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          if (isCurrent) const ActiveNowBadge(),
-                          if (isPast && !isCurrent)
-                            Icon(
-                              Icons.check_circle_rounded,
-                              size: 14,
-                              color: KundliDisplayColors.textMuted.withOpacity(0.4),
-                            ),
-                        ],
+                      Text(
+                        periodDetail.yogini.displayName,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
+                          color: isPast
+                              ? DashaColors.textTertiary
+                              : DashaColors.textPrimary,
+                        ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(width: 8),
+                      if (isCurrent) const ActiveNowBadge(fontSize: 7),
+                      if (isPast && !isCurrent)
+                        Icon(
+                          Icons.check_circle_rounded,
+                          size: 14,
+                          color: DashaColors.textTertiary.withOpacity(0.4),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      PremiumPlanetImage(
+                        planet: periodDetail.yogini.planet,
+                        size: 12,
+                        showShadow: false,
+                      ),
+                      const SizedBox(width: 4),
                       Text(
                         'Ruled by ${periodDetail.yogini.planet}',
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.inter(
                           fontSize: 10,
-                          color: yoginiColor.withOpacity(0.8),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.date_range_rounded,
-                            size: 11,
-                            color: KundliDisplayColors.textMuted.withOpacity(isPast ? 0.4 : 0.6),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${formatDateShort(periodDetail.startDate)} → ${formatDateShort(periodDetail.endDate)}',
-                            style: GoogleFonts.dmMono(
-                              fontSize: 10,
-                              color: isPast
-                                  ? KundliDisplayColors.textMuted.withOpacity(0.4)
-                                  : KundliDisplayColors.textMuted,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: yoginiColor.withOpacity(isPast ? 0.05 : 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        '${periodDetail.durationYears.round()}',
-                        style: GoogleFonts.dmMono(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isPast ? KundliDisplayColors.textMuted.withOpacity(0.5) : yoginiColor,
-                        ),
-                      ),
-                      Text(
-                        'years',
-                        style: GoogleFonts.dmSans(
-                          fontSize: 8,
-                          color: KundliDisplayColors.textMuted.withOpacity(0.6),
+                          color: getPlanetColor(periodDetail.yogini.planet).withOpacity(0.8),
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 8),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 14,
-                  color: KundliDisplayColors.textMuted.withOpacity(isPast ? 0.2 : 0.4),
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  Text(
+                    '${formatDateShort(periodDetail.startDate)} → ${formatDateShort(periodDetail.endDate)}',
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 10,
+                      color: DashaColors.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: yoginiColor.withOpacity(isPast ? 0.05 : 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${periodDetail.durationYears.round()}y',
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isPast ? DashaColors.textTertiary : yoginiColor,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 18,
+              color: DashaColors.textTertiary.withOpacity(0.4),
+            ),
+          ],
         ),
       ),
     );
@@ -902,7 +1292,6 @@ class _YoginiPeriodItem extends StatelessWidget {
   }
 }
 
-// ============ Yogini Period Item Fallback ============
 class _YoginiPeriodItemFallback extends StatelessWidget {
   final YoginiPeriod period;
   final int index;
@@ -923,124 +1312,113 @@ class _YoginiPeriodItemFallback extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final yoginiColor = _getYoginiColor(period.yogini);
-    
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: 1.0),
-      duration: Duration(milliseconds: 200 + (index * 25)),
-      curve: Curves.easeOutCubic,
-      builder: (context, value, child) {
-        return Transform.translate(
-          offset: Offset(0, 6 * (1 - value)),
-          child: Opacity(opacity: value, child: child),
-        );
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: isCurrent
+            ? yoginiColor.withOpacity(0.08)
+            : DashaColors.surface,
+        borderRadius: BorderRadius.circular(DashaDesignTokens.radiusMd),
+        border: Border.all(
           color: isCurrent
-              ? yoginiColor.withOpacity(0.08)
-              : isPast
-                  ? KundliDisplayColors.surfaceColor.withOpacity(0.2)
-                  : KundliDisplayColors.surfaceColor.withOpacity(0.35),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isCurrent
-                ? yoginiColor.withOpacity(0.35)
-                : KundliDisplayColors.borderColor.withOpacity(isPast ? 0.15 : 0.3),
-            width: isCurrent ? 1.5 : 0.5,
-          ),
+              ? yoginiColor.withOpacity(0.3)
+              : DashaColors.border.withOpacity(isPast ? 0.15 : 0.3),
+          width: isCurrent ? 1.5 : 0.5,
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: yoginiColor.withOpacity(isCurrent ? 0.2 : 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Center(
-                child: Text(
-                  period.yogini.symbol,
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: isPast ? yoginiColor.withOpacity(0.5) : yoginiColor,
-                  ),
-                ),
-              ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: yoginiColor.withOpacity(isCurrent ? 0.2 : 0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        period.yogini.displayName,
-                        style: GoogleFonts.dmSans(
-                          fontSize: 14,
-                          fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
-                          color: isPast
-                              ? KundliDisplayColors.textMuted
-                              : KundliDisplayColors.textPrimary,
-                        ),
-                      ),
-                      if (isCurrent) ...[
-                        const SizedBox(width: 8),
-                        const ActiveNowBadge(),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${formatDateShort(startDate)} → ${formatDateShort(endDate)}',
-                    style: GoogleFonts.dmMono(
-                      fontSize: 10,
-                      color: KundliDisplayColors.textMuted,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: yoginiColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
+            child: Center(
               child: Text(
-                '${period.years}y',
-                style: GoogleFonts.dmMono(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: yoginiColor,
+                period.yogini.symbol,
+                style: TextStyle(
+                  fontSize: 18,
+                  color: isPast ? yoginiColor.withOpacity(0.5) : yoginiColor,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      period.yogini.displayName,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
+                        color: isPast
+                            ? DashaColors.textTertiary
+                            : DashaColors.textPrimary,
+                      ),
+                    ),
+                    if (isCurrent) ...[
+                      const SizedBox(width: 8),
+                      const ActiveNowBadge(fontSize: 7),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${formatDateShort(startDate)} → ${formatDateShort(endDate)}',
+                  style: GoogleFonts.jetBrainsMono(
+                    fontSize: 10,
+                    color: DashaColors.textTertiary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: yoginiColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '${period.years}y',
+              style: GoogleFonts.jetBrainsMono(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: yoginiColor,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-// ============ Yogini Period Bottom Sheet ============
+// ═══════════════════════════════════════════════════════════════════════════
+// BOTTOM SHEET
+// ═══════════════════════════════════════════════════════════════════════════
 void showYoginiPeriodBottomSheet(
   BuildContext context,
   YoginiPeriodDetail period,
   List<String> breadcrumbs,
 ) {
   final levelColors = {
-    YoginiLevel.mahadasha: DashaTypeColors.mahadasha,
-    YoginiLevel.antardasha: DashaTypeColors.antardasha,
-    YoginiLevel.pratyantara: DashaTypeColors.pratyantara,
-    YoginiLevel.sookshma: DashaTypeColors.sookshma,
-    YoginiLevel.prana: DashaTypeColors.prana,
+    YoginiLevel.mahadasha: DashaColors.mahadasha,
+    YoginiLevel.antardasha: DashaColors.antardasha,
+    YoginiLevel.pratyantara: DashaColors.pratyantara,
+    YoginiLevel.sookshma: DashaColors.sookshma,
+    YoginiLevel.prana: DashaColors.prana,
   };
 
-  final levelColor = levelColors[period.level] ?? DashaTypeColors.yoginiPrimary;
+  final levelColor = levelColors[period.level] ?? DashaColors.yogini;
   final yoginiColor = _getYoginiColor(period.yogini);
   final newBreadcrumbs = [...breadcrumbs, period.yogini.displayName];
   final now = DateTime.now();
@@ -1058,7 +1436,7 @@ void showYoginiPeriodBottomSheet(
       maxChildSize: 0.92,
       builder: (context, scrollController) => Container(
         decoration: BoxDecoration(
-          color: KundliDisplayColors.bgSecondary,
+          color: DashaColors.bgSecondary,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           border: Border.all(color: yoginiColor.withOpacity(0.3), width: 1),
         ),
@@ -1069,7 +1447,7 @@ void showYoginiPeriodBottomSheet(
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: KundliDisplayColors.borderColor,
+                color: DashaColors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -1088,16 +1466,16 @@ void showYoginiPeriodBottomSheet(
                             child: Icon(
                               Icons.arrow_back_ios_rounded,
                               size: 14,
-                              color: KundliDisplayColors.textMuted,
+                              color: DashaColors.textTertiary,
                             ),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               breadcrumbs.join(' → '),
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.inter(
                                 fontSize: 11,
-                                color: KundliDisplayColors.textMuted,
+                                color: DashaColors.textTertiary,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1137,7 +1515,7 @@ void showYoginiPeriodBottomSheet(
                                   ),
                                   child: Text(
                                     period.levelName,
-                                    style: GoogleFonts.dmSans(
+                                    style: GoogleFonts.inter(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w600,
                                       color: levelColor,
@@ -1153,10 +1531,10 @@ void showYoginiPeriodBottomSheet(
                             const SizedBox(height: 4),
                             Text(
                               '${period.yogini.displayName} ${period.levelName}',
-                              style: GoogleFonts.dmSans(
+                              style: GoogleFonts.inter(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
-                                color: KundliDisplayColors.textPrimary,
+                                color: DashaColors.textPrimary,
                               ),
                             ),
                           ],
@@ -1165,45 +1543,41 @@ void showYoginiPeriodBottomSheet(
                     ],
                   ),
                   const SizedBox(height: 14),
-                  Container(
+                  DashaPremiumCard(
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: KundliDisplayColors.surfaceColor.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
                     child: Row(
                       children: [
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Start', style: GoogleFonts.dmSans(fontSize: 9, color: KundliDisplayColors.textMuted)),
-                              Text(formatDate(period.startDate), style: GoogleFonts.dmMono(fontSize: 11, fontWeight: FontWeight.w500, color: KundliDisplayColors.textSecondary)),
+                              Text('Start', style: GoogleFonts.inter(fontSize: 9, color: DashaColors.textTertiary)),
+                              Text(formatDate(period.startDate), style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.w500, color: DashaColors.textSecondary)),
                             ],
                           ),
                         ),
-                        Container(width: 1, height: 28, color: KundliDisplayColors.borderColor),
+                        Container(width: 1, height: 28, color: DashaColors.border),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.only(left: 12),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('End', style: GoogleFonts.dmSans(fontSize: 9, color: KundliDisplayColors.textMuted)),
-                                Text(formatDate(period.endDate), style: GoogleFonts.dmMono(fontSize: 11, fontWeight: FontWeight.w500, color: KundliDisplayColors.textSecondary)),
+                                Text('End', style: GoogleFonts.inter(fontSize: 9, color: DashaColors.textTertiary)),
+                                Text(formatDate(period.endDate), style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.w500, color: DashaColors.textSecondary)),
                               ],
                             ),
                           ),
                         ),
-                        Container(width: 1, height: 28, color: KundliDisplayColors.borderColor),
+                        Container(width: 1, height: 28, color: DashaColors.border),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.only(left: 12),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Duration', style: GoogleFonts.dmSans(fontSize: 9, color: KundliDisplayColors.textMuted)),
-                                Text(formatDuration(period.durationYears), style: GoogleFonts.dmMono(fontSize: 11, fontWeight: FontWeight.w600, color: yoginiColor)),
+                                Text('Duration', style: GoogleFonts.inter(fontSize: 9, color: DashaColors.textTertiary)),
+                                Text(formatDuration(period.durationYears), style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.w600, color: yoginiColor)),
                               ],
                             ),
                           ),
@@ -1221,10 +1595,10 @@ void showYoginiPeriodBottomSheet(
                   children: [
                     Text(
                       'Sub-Periods (${period.subPeriods!.length})',
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: KundliDisplayColors.textSecondary,
+                        color: DashaColors.textSecondary,
                       ),
                     ),
                   ],
@@ -1255,12 +1629,12 @@ void showYoginiPeriodBottomSheet(
                             decoration: BoxDecoration(
                               color: isSubCurrent
                                   ? subColor.withOpacity(0.1)
-                                  : KundliDisplayColors.surfaceColor.withOpacity(0.4),
+                                  : DashaColors.surface,
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                 color: isSubCurrent
                                     ? subColor.withOpacity(0.3)
-                                    : KundliDisplayColors.borderColor.withOpacity(0.3),
+                                    : DashaColors.border.withOpacity(0.3),
                                 width: 0.5,
                               ),
                             ),
@@ -1289,10 +1663,10 @@ void showYoginiPeriodBottomSheet(
                                         children: [
                                           Text(
                                             subPeriod.yogini.displayName,
-                                            style: GoogleFonts.dmSans(
+                                            style: GoogleFonts.inter(
                                               fontSize: 13,
                                               fontWeight: isSubCurrent ? FontWeight.w600 : FontWeight.w500,
-                                              color: KundliDisplayColors.textPrimary,
+                                              color: DashaColors.textPrimary,
                                             ),
                                           ),
                                           if (isSubCurrent) ...[
@@ -1304,9 +1678,9 @@ void showYoginiPeriodBottomSheet(
                                       const SizedBox(height: 2),
                                       Text(
                                         '${formatDateShort(subPeriod.startDate)} - ${formatDateShort(subPeriod.endDate)}',
-                                        style: GoogleFonts.dmMono(
+                                        style: GoogleFonts.jetBrainsMono(
                                           fontSize: 9,
-                                          color: KundliDisplayColors.textMuted,
+                                          color: DashaColors.textTertiary,
                                         ),
                                       ),
                                     ],
@@ -1314,17 +1688,17 @@ void showYoginiPeriodBottomSheet(
                                 ),
                                 Text(
                                   formatDuration(subPeriod.durationYears),
-                                  style: GoogleFonts.dmMono(
+                                  style: GoogleFonts.jetBrainsMono(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w500,
-                                    color: KundliDisplayColors.textMuted,
+                                    color: DashaColors.textTertiary,
                                   ),
                                 ),
                                 const SizedBox(width: 4),
                                 Icon(
                                   Icons.chevron_right_rounded,
                                   size: 16,
-                                  color: KundliDisplayColors.textMuted.withOpacity(0.5),
+                                  color: DashaColors.textTertiary.withOpacity(0.5),
                                 ),
                               ],
                             ),
@@ -1335,9 +1709,9 @@ void showYoginiPeriodBottomSheet(
                   : Center(
                       child: Text(
                         'No sub-periods available',
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.inter(
                           fontSize: 13,
-                          color: KundliDisplayColors.textMuted,
+                          color: DashaColors.textTertiary,
                         ),
                       ),
                     ),
@@ -1387,19 +1761,3 @@ YoginiLevel? _getNextYoginiLevel(YoginiLevel current) {
       return null;
   }
 }
-
-// ============ Helper Functions ============
-Color _getYoginiColor(Yogini yogini) {
-  const colors = {
-    Yogini.mangala: Color(0xFF6EE7B7), // Moon - Green
-    Yogini.pingala: Color(0xFFD4AF37), // Sun - Gold
-    Yogini.dhanya: Color(0xFFFBBF24), // Jupiter - Yellow
-    Yogini.bhramari: Color(0xFFF87171), // Mars - Red
-    Yogini.bhadrika: Color(0xFF34D399), // Mercury - Teal
-    Yogini.ulka: Color(0xFF9CA3AF), // Saturn - Gray
-    Yogini.siddha: Color(0xFFF472B6), // Venus - Pink
-    Yogini.sankata: Color(0xFFA78BFA), // Rahu - Purple
-  };
-  return colors[yogini] ?? DashaTypeColors.yoginiPrimary;
-}
-

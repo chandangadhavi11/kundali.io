@@ -1,163 +1,306 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
 import '../../shared/constants.dart';
-import 'dasha_shared_widgets.dart';
+import 'dasha_shared_widgets.dart' hide getPlanetImagePath;
 
-/// Mahadasha Phala View - Shows interpretations and predictions for current Mahadasha
-class MahadashaPhalaView extends StatelessWidget {
+// ═══════════════════════════════════════════════════════════════════════════
+// NAVIGATION SECTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+const _sections = [
+  DashaNavSection(id: 'theme', label: 'Theme', color: DashaColors.phala),
+  DashaNavSection(id: 'effects', label: 'Effects', color: DashaColors.amber),
+  DashaNavSection(id: 'life', label: 'Life Areas', color: DashaColors.sky),
+  DashaNavSection(id: 'remedies', label: 'Remedies', color: DashaColors.yogini),
+];
+
+/// Mahadasha Phala View - Premium interpretations and predictions
+class MahadashaPhalaView extends StatefulWidget {
   final KundaliData kundaliData;
 
   const MahadashaPhalaView({super.key, required this.kundaliData});
 
-  // Amber/Orange theme for Mahadasha Phala
-  static const _phalaAccent = Color(0xFFFF9500);
-  static const _phalaSecondary = Color(0xFFFFB84D);
+  @override
+  State<MahadashaPhalaView> createState() => _MahadashaPhalaViewState();
+}
+
+class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
+  late final ScrollController _scrollController;
+  final Map<String, GlobalKey> _sectionKeys = {};
+  final Map<String, GlobalKey<DashaAnimatedSectionWrapperState>> _animatedKeys = {};
+  int _activeIndex = 0;
+  bool _isScrolling = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+
+    for (final section in _sections) {
+      _sectionKeys[section.id] = GlobalKey();
+      _animatedKeys[section.id] = GlobalKey<DashaAnimatedSectionWrapperState>();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isScrolling) return;
+
+    final viewportHeight = _scrollController.position.viewportDimension;
+    final triggerPoint = viewportHeight * 0.3;
+
+    int newActiveIndex = 0;
+
+    for (int i = 0; i < _sections.length; i++) {
+      final key = _sectionKeys[_sections[i].id];
+      if (key?.currentContext != null) {
+        final box = key!.currentContext!.findRenderObject() as RenderBox?;
+        if (box != null) {
+          final position = box.localToGlobal(Offset.zero);
+          if (position.dy <= triggerPoint + 100) {
+            newActiveIndex = i;
+          }
+        }
+      }
+    }
+
+    if (newActiveIndex != _activeIndex) {
+      setState(() => _activeIndex = newActiveIndex);
+    }
+  }
+
+  Future<void> _scrollToSection(int index) async {
+    final section = _sections[index];
+    final key = _sectionKeys[section.id];
+
+    if (key?.currentContext == null) return;
+
+    HapticFeedback.lightImpact();
+
+    setState(() {
+      _isScrolling = true;
+      _activeIndex = index;
+    });
+
+    await Scrollable.ensureVisible(
+      key!.currentContext!,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutCubic,
+      alignment: 0.08,
+    );
+
+    _animatedKeys[section.id]?.currentState?.triggerHighlight();
+
+    setState(() => _isScrolling = false);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final dasha = kundaliData.dashaInfo;
+    final dasha = widget.kundaliData.dashaInfo;
     final interpretation = MahadashaInterpretations.getInterpretation(dasha.currentMahadasha);
-    
+
     if (interpretation == null) {
       return _buildNoDataView();
     }
-    
+
     final now = DateTime.now();
     final dynamicRemainingYears = _calculateDynamicRemainingYears(dasha, now);
     final planetColor = getPlanetColor(dasha.currentMahadasha);
-    
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Hero Section
-          _PhalaHeroCard(
-            dasha: dasha,
-            interpretation: interpretation,
-            dynamicRemainingYears: dynamicRemainingYears,
-            now: now,
-          ),
-          
-          const SizedBox(height: 20),
-          
-          // Overall Theme
-          _ThemeCard(
-            theme: interpretation.overallTheme,
-            planetColor: planetColor,
-          ),
-          
-          const SizedBox(height: 20),
-          
-          // Key Effects Section
-          DashaSectionHeader(
-            icon: Icons.auto_awesome_rounded,
-            title: 'Key Effects',
-            subtitle: 'Primary influences during this period',
-            color: _phalaAccent,
-          ),
-          const SizedBox(height: 12),
-          
-          _KeyEffectsCard(effects: interpretation.keyEffects, color: planetColor),
-          
-          const SizedBox(height: 20),
-          
-          // Life Areas Section
-          DashaSectionHeader(
-            icon: Icons.dashboard_rounded,
-            title: 'Life Areas',
-            subtitle: 'Impact on different aspects of life',
-            color: const Color(0xFF60A5FA),
-          ),
-          const SizedBox(height: 12),
-          
-          _LifeAreasCard(lifeAreas: interpretation.lifeAreas),
-          
-          const SizedBox(height: 20),
-          
-          // Current Antardasha Section
-          if (dasha.currentAntardasha != null) ...[
-            DashaSectionHeader(
-              icon: Icons.layers_rounded,
-              title: 'Current Antardasha',
-              subtitle: '${dasha.currentAntardasha} sub-period influence',
-              color: DashaTypeColors.antardasha,
-            ),
-            const SizedBox(height: 12),
-            _AntardashaCard(
-              mahadasha: dasha.currentMahadasha,
-              antardasha: dasha.currentAntardasha!,
-              remainingYears: dasha.antardashaRemainingYears,
-            ),
-            const SizedBox(height: 20),
-          ],
-          
-          // Favorable & Challenges
-          DashaSectionHeader(
-            icon: Icons.balance_rounded,
-            title: 'Strengths & Challenges',
-            subtitle: 'What works and what to watch',
-            color: const Color(0xFF6EE7B7),
-          ),
-          const SizedBox(height: 12),
-          
-          Row(
+
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: _AspectCard(
-                  title: 'Favorable',
-                  items: interpretation.favorableAspects,
-                  color: const Color(0xFF6EE7B7),
-                  icon: Icons.check_circle_outline_rounded,
+              // Hero Section
+              _PhalaHeroCard(
+                dasha: dasha,
+                interpretation: interpretation,
+                dynamicRemainingYears: dynamicRemainingYears,
+                now: now,
+              ),
+
+              const SizedBox(height: DashaDesignTokens.space24),
+
+              // Theme Section
+              DashaAnimatedSectionWrapper(
+                key: _animatedKeys['theme'],
+                sectionKey: _sectionKeys['theme']!,
+                accentColor: DashaColors.phala,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DashaAnimatedSectionHeader(
+                      title: 'Overall Theme',
+                      accentColor: DashaColors.phala,
+                      icon: Icons.format_quote_rounded,
+                    ),
+                    const SizedBox(height: DashaDesignTokens.space12),
+                    DashaAnimatedCardWrapper(
+                      delay: 50,
+                      child: _ThemeCard(
+                        theme: interpretation.overallTheme,
+                        planetColor: planetColor,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _AspectCard(
-                  title: 'Challenges',
-                  items: interpretation.challenges,
-                  color: const Color(0xFFF87171),
-                  icon: Icons.warning_amber_rounded,
+
+              const SizedBox(height: DashaDesignTokens.space24),
+
+              // Key Effects Section
+              DashaAnimatedSectionWrapper(
+                key: _animatedKeys['effects'],
+                sectionKey: _sectionKeys['effects']!,
+                accentColor: DashaColors.amber,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DashaAnimatedSectionHeader(
+                      title: 'Key Effects',
+                      accentColor: DashaColors.amber,
+                      icon: Icons.auto_awesome_rounded,
+                    ),
+                    const SizedBox(height: DashaDesignTokens.space12),
+                    DashaAnimatedCardWrapper(
+                      delay: 50,
+                      child: _KeyEffectsCard(effects: interpretation.keyEffects, color: planetColor),
+                    ),
+                    const SizedBox(height: DashaDesignTokens.space16),
+                    // Current Antardasha
+                    if (dasha.currentAntardasha != null)
+                      DashaAnimatedCardWrapper(
+                        delay: 100,
+                        child: _AntardashaCard(
+                          mahadasha: dasha.currentMahadasha,
+                          antardasha: dasha.currentAntardasha!,
+                          remainingYears: dasha.antardashaRemainingYears,
+                        ),
+                      ),
+                    const SizedBox(height: DashaDesignTokens.space16),
+                    // Strengths & Challenges
+                    DashaAnimatedCardWrapper(
+                      delay: 150,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _AspectCard(
+                              title: 'Favorable',
+                              items: interpretation.favorableAspects,
+                              color: DashaColors.emerald,
+                              icon: Icons.check_circle_outline_rounded,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _AspectCard(
+                              title: 'Challenges',
+                              items: interpretation.challenges,
+                              color: DashaColors.coral,
+                              icon: Icons.warning_amber_rounded,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
+              ),
+
+              const SizedBox(height: DashaDesignTokens.space24),
+
+              // Life Areas Section
+              DashaAnimatedSectionWrapper(
+                key: _animatedKeys['life'],
+                sectionKey: _sectionKeys['life']!,
+                accentColor: DashaColors.sky,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DashaAnimatedSectionHeader(
+                      title: 'Life Areas',
+                      accentColor: DashaColors.sky,
+                      icon: Icons.dashboard_rounded,
+                    ),
+                    const SizedBox(height: DashaDesignTokens.space12),
+                    DashaAnimatedCardWrapper(
+                      delay: 50,
+                      child: _LifeAreasCard(lifeAreas: interpretation.lifeAreas),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: DashaDesignTokens.space24),
+
+              // Remedies Section
+              DashaAnimatedSectionWrapper(
+                key: _animatedKeys['remedies'],
+                sectionKey: _sectionKeys['remedies']!,
+                accentColor: DashaColors.yogini,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    DashaAnimatedSectionHeader(
+                      title: 'Remedies & Recommendations',
+                      accentColor: DashaColors.yogini,
+                      icon: Icons.healing_rounded,
+                    ),
+                    const SizedBox(height: DashaDesignTokens.space12),
+                    DashaAnimatedCardWrapper(
+                      delay: 50,
+                      child: _RemediesCard(
+                        remedies: interpretation.remedies,
+                        gemstone: interpretation.gemstone,
+                        mantra: interpretation.mantra,
+                        deity: interpretation.deity,
+                        color: interpretation.color,
+                        dayOfWeek: interpretation.dayOfWeek,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: DashaDesignTokens.space16),
+
+              const DashaInfoFooter(
+                text: 'Mahadasha Phala provides general predictions. Consult an astrologer for personalized guidance.',
               ),
             ],
           ),
-          
-          const SizedBox(height: 20),
-          
-          // Remedies Section
-          DashaSectionHeader(
-            icon: Icons.healing_rounded,
-            title: 'Remedies & Recommendations',
-            subtitle: 'Ways to enhance positive effects',
-            color: DashaTypeColors.yoginiPrimary,
+        ),
+
+        // Floating Navigation
+        Positioned(
+          left: 16,
+          right: 16,
+          bottom: MediaQuery.of(context).padding.bottom + 16,
+          child: DashaFloatingNavBar(
+            sections: _sections,
+            activeIndex: _activeIndex,
+            onTap: _scrollToSection,
           ),
-          const SizedBox(height: 12),
-          
-          _RemediesCard(
-            remedies: interpretation.remedies,
-            gemstone: interpretation.gemstone,
-            mantra: interpretation.mantra,
-            deity: interpretation.deity,
-            color: interpretation.color,
-            dayOfWeek: interpretation.dayOfWeek,
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Info footer
-          const DashaInfoFooter(
-            text: 'Mahadasha Phala provides general predictions based on Vedic astrology. Results vary based on individual chart, current transits, and personal karma. Consult an astrologer for personalized guidance.',
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
-  
+
   Widget _buildNoDataView() {
     return Center(
       child: Padding(
@@ -169,30 +312,30 @@ class MahadashaPhalaView extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: _phalaAccent.withOpacity(0.1),
+                color: DashaColors.phala.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(
                 Icons.hourglass_empty_rounded,
                 size: 40,
-                color: _phalaAccent.withOpacity(0.5),
+                color: DashaColors.phala.withOpacity(0.5),
               ),
             ),
             const SizedBox(height: 20),
             Text(
               'Interpretation Unavailable',
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: KundliDisplayColors.textPrimary,
+                color: DashaColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Unable to load Mahadasha interpretation. Please try again.',
-              style: GoogleFonts.dmSans(
+              'Unable to load Mahadasha interpretation.',
+              style: GoogleFonts.inter(
                 fontSize: 13,
-                color: KundliDisplayColors.textMuted,
+                color: DashaColors.textTertiary,
               ),
               textAlign: TextAlign.center,
             ),
@@ -201,7 +344,7 @@ class MahadashaPhalaView extends StatelessWidget {
       ),
     );
   }
-  
+
   double _calculateDynamicRemainingYears(DashaInfo dasha, DateTime now) {
     if (dasha.mahadashaEndDate != null) {
       final daysRemaining = dasha.mahadashaEndDate!.difference(now).inDays;
@@ -214,8 +357,10 @@ class MahadashaPhalaView extends StatelessWidget {
   }
 }
 
-// ============ Hero Card ============
-class _PhalaHeroCard extends StatelessWidget {
+// ═══════════════════════════════════════════════════════════════════════════
+// HERO CARD
+// ═══════════════════════════════════════════════════════════════════════════
+class _PhalaHeroCard extends StatefulWidget {
   final DashaInfo dasha;
   final MahadashaPhalaData interpretation;
   final double dynamicRemainingYears;
@@ -229,231 +374,246 @@ class _PhalaHeroCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final planetColor = getPlanetColor(dasha.currentMahadasha);
+  State<_PhalaHeroCard> createState() => _PhalaHeroCardState();
+}
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            planetColor.withOpacity(0.15),
-            const Color(0xFFFF9500).withOpacity(0.08),
-            KundliDisplayColors.surfaceColor.withOpacity(0.4),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: planetColor.withOpacity(0.25),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: planetColor.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+class _PhalaHeroCardState extends State<_PhalaHeroCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
+  late Animation<double> _fadeAnim;
+  late Animation<Offset> _slideAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    
+    _fadeAnim = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOut),
+    );
+    
+    _slideAnim = Tween<Offset>(
+      begin: const Offset(0, 0.05),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic));
+    
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) _animController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final planetColor = getPlanetColor(widget.dasha.currentMahadasha);
+
+    return FadeTransition(
+      opacity: _fadeAnim,
+      child: SlideTransition(
+        position: _slideAnim,
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: const Color(0xFF141218),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFF262432),
+              width: 1,
+            ),
           ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Planet symbol with prediction badge
-              Stack(
+              // Header with planet and title
+              _buildHeader(planetColor),
+              
+              const SizedBox(height: 16),
+              
+              // Info chips row
+              _buildInfoChips(planetColor),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(Color planetColor) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Planet image
+        Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: planetColor.withOpacity(0.2),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Image.asset(
+              getPlanetImagePath(widget.dasha.currentMahadasha),
+              width: 52,
+              height: 52,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Phala badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: DashaColors.phala.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'PHALA',
+                  style: GoogleFonts.inter(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    color: DashaColors.phala,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '${widget.dasha.currentMahadasha} Mahadasha',
+                style: GoogleFonts.instrumentSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: 4),
+              // Deity & Gemstone row
+              Row(
                 children: [
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          planetColor.withOpacity(0.25),
-                          planetColor.withOpacity(0.1),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(
-                        color: planetColor.withOpacity(0.3),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Center(
-                      child: Text(
-                        getPlanetSymbol(dasha.currentMahadasha),
-                        style: TextStyle(
-                          fontSize: 32,
-                          color: planetColor,
-                        ),
-                      ),
+                  Icon(
+                    Icons.temple_hindu_rounded,
+                    size: 11,
+                    color: const Color(0xFF7C7889),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    widget.interpretation.deity,
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF8B8798),
                     ),
                   ),
-                  Positioned(
-                    right: -2,
-                    bottom: -2,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFF9500),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFFF9500).withOpacity(0.4),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.auto_awesome_rounded,
-                        size: 14,
-                        color: Colors.white,
-                      ),
+                  const SizedBox(width: 10),
+                  Icon(
+                    Icons.diamond_outlined,
+                    size: 11,
+                    color: planetColor.withOpacity(0.8),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    widget.interpretation.gemstone.split(' ').first,
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: planetColor,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFF9500).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.insights_rounded,
-                            size: 12,
-                            color: Color(0xFFFF9500),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'PREDICTIONS',
-                            style: GoogleFonts.dmMono(
-                              fontSize: 8,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFFFF9500),
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${dasha.currentMahadasha} Mahadasha Phala',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: KundliDisplayColors.textPrimary,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.person_pin_rounded,
-                          size: 12,
-                          color: KundliDisplayColors.textMuted,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Deity: ${interpretation.deity}',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 10,
-                            color: KundliDisplayColors.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.diamond_outlined,
-                          size: 12,
-                          color: planetColor.withOpacity(0.7),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          interpretation.gemstone,
-                          style: GoogleFonts.dmSans(
-                            fontSize: 10,
-                            color: planetColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
-          
-          const SizedBox(height: 16),
-          
-          // Time info
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: KundliDisplayColors.surfaceColor.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _TimeInfo(
-                    icon: Icons.hourglass_bottom_rounded,
-                    label: 'Time Remaining',
-                    value: formatDuration(dynamicRemainingYears),
-                    color: planetColor,
-                  ),
-                ),
-                Container(
-                  width: 1,
-                  height: 36,
-                  color: KundliDisplayColors.borderColor.withOpacity(0.3),
-                ),
-                Expanded(
-                  child: _TimeInfo(
-                    icon: Icons.calendar_today_rounded,
-                    label: 'Auspicious Day',
-                    value: _getDayName(interpretation.dayOfWeek),
-                    color: const Color(0xFFFF9500),
-                  ),
-                ),
-                Container(
-                  width: 1,
-                  height: 36,
-                  color: KundliDisplayColors.borderColor.withOpacity(0.3),
-                ),
-                Expanded(
-                  child: _TimeInfo(
-                    icon: Icons.palette_outlined,
-                    label: 'Lucky Color',
-                    value: interpretation.color.split(',').first,
-                    color: planetColor,
-                  ),
-                ),
-              ],
-            ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoChips(Color planetColor) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A181F),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF2A2838),
+          width: 0.5,
+        ),
+      ),
+      child: Row(
+        children: [
+          _PhalaInfoChip(
+            icon: Icons.hourglass_top_rounded,
+            value: formatDuration(widget.dynamicRemainingYears),
+            label: 'Remaining',
+            iconColor: planetColor,
+          ),
+          _buildDivider(),
+          _PhalaInfoChip(
+            icon: Icons.calendar_today_rounded,
+            value: _getDayName(widget.interpretation.dayOfWeek),
+            label: 'Day',
+            iconColor: DashaColors.phala,
+          ),
+          _buildDivider(),
+          _PhalaInfoChip(
+            icon: Icons.palette_rounded,
+            value: widget.interpretation.color.split(',').first.trim(),
+            label: 'Color',
+            iconColor: _getColorFromName(widget.interpretation.color),
           ),
         ],
       ),
     );
+  }
+
+  Widget _buildDivider() {
+    return Container(
+      width: 1,
+      height: 28,
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      color: const Color(0xFF2A2838),
+    );
+  }
+
+  Color _getColorFromName(String colorName) {
+    final name = colorName.toLowerCase().split(',').first.trim();
+    final colorMap = {
+      'red': const Color(0xFFEF4444),
+      'orange': const Color(0xFFF97316),
+      'yellow': const Color(0xFFEAB308),
+      'gold': const Color(0xFFD4AF37),
+      'green': const Color(0xFF22C55E),
+      'blue': const Color(0xFF3B82F6),
+      'white': const Color(0xFFF5F5F5),
+      'grey': const Color(0xFF9CA3AF),
+      'gray': const Color(0xFF9CA3AF),
+      'brown': const Color(0xFF92400E),
+      'black': const Color(0xFF6B7280),
+      'purple': const Color(0xFFA855F7),
+      'pink': const Color(0xFFEC4899),
+      'saffron': const Color(0xFFFF9933),
+    };
+    return colorMap[name] ?? DashaColors.phala;
   }
 
   String _getDayName(int dayOfWeek) {
@@ -462,49 +622,59 @@ class _PhalaHeroCard extends StatelessWidget {
   }
 }
 
-class _TimeInfo extends StatelessWidget {
+class _PhalaInfoChip extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
-  final Color color;
+  final Color iconColor;
 
-  const _TimeInfo({
+  const _PhalaInfoChip({
     required this.icon,
     required this.label,
     required this.value,
-    required this.color,
+    required this.iconColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, size: 16, color: color.withOpacity(0.7)),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: GoogleFonts.dmSans(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            color: KundliDisplayColors.textPrimary,
+    return Expanded(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: iconColor),
+          const SizedBox(height: 3),
+          Text(
+            value,
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              height: 1.1,
+              letterSpacing: -0.3,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          textAlign: TextAlign.center,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        Text(
-          label,
-          style: GoogleFonts.dmSans(
-            fontSize: 8,
-            color: KundliDisplayColors.textMuted,
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 9,
+              fontWeight: FontWeight.w400,
+              color: const Color(0xFF7C7889),
+              letterSpacing: -0.2,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-// ============ Theme Card ============
+// ═══════════════════════════════════════════════════════════════════════════
+// THEME CARD
+// ═══════════════════════════════════════════════════════════════════════════
 class _ThemeCard extends StatelessWidget {
   final String theme;
   final Color planetColor;
@@ -513,23 +683,8 @@ class _ThemeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            planetColor.withOpacity(0.08),
-            KundliDisplayColors.surfaceColor.withOpacity(0.4),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: planetColor.withOpacity(0.15),
-          width: 0.5,
-        ),
-      ),
+    return DashaPremiumCard(
+      accentColor: planetColor,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -550,10 +705,10 @@ class _ThemeCard extends StatelessWidget {
           Expanded(
             child: Text(
               theme,
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.inter(
                 fontSize: 13,
                 height: 1.5,
-                color: KundliDisplayColors.textSecondary,
+                color: DashaColors.textSecondary,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -564,7 +719,9 @@ class _ThemeCard extends StatelessWidget {
   }
 }
 
-// ============ Key Effects Card ============
+// ═══════════════════════════════════════════════════════════════════════════
+// KEY EFFECTS CARD
+// ═══════════════════════════════════════════════════════════════════════════
 class _KeyEffectsCard extends StatelessWidget {
   final List<String> effects;
   final Color color;
@@ -573,16 +730,7 @@ class _KeyEffectsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: KundliDisplayColors.borderColor.withOpacity(0.4),
-          width: 0.5,
-        ),
-      ),
+    return DashaPremiumCard(
       child: Column(
         children: effects.asMap().entries.map((entry) {
           final index = entry.key;
@@ -602,7 +750,7 @@ class _KeyEffectsCard extends StatelessWidget {
                   child: Center(
                     child: Text(
                       '${index + 1}',
-                      style: GoogleFonts.dmMono(
+                      style: GoogleFonts.jetBrainsMono(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: color,
@@ -614,9 +762,9 @@ class _KeyEffectsCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     effect,
-                    style: GoogleFonts.dmSans(
+                    style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: KundliDisplayColors.textSecondary,
+                      color: DashaColors.textSecondary,
                       height: 1.4,
                     ),
                   ),
@@ -630,7 +778,9 @@ class _KeyEffectsCard extends StatelessWidget {
   }
 }
 
-// ============ Life Areas Card ============
+// ═══════════════════════════════════════════════════════════════════════════
+// LIFE AREAS CARD
+// ═══════════════════════════════════════════════════════════════════════════
 class _LifeAreasCard extends StatelessWidget {
   final Map<String, String> lifeAreas;
 
@@ -645,11 +795,11 @@ class _LifeAreasCard extends StatelessWidget {
   };
 
   static const _areaColors = {
-    'Career': Color(0xFF60A5FA),
-    'Health': Color(0xFFF87171),
-    'Relationships': Color(0xFFF472B6),
-    'Finance': Color(0xFF6EE7B7),
-    'Spirituality': Color(0xFFA78BFA),
+    'Career': DashaColors.sky,
+    'Health': DashaColors.coral,
+    'Relationships': DashaColors.rose,
+    'Finance': DashaColors.emerald,
+    'Spirituality': DashaColors.yogini,
   };
 
   @override
@@ -659,15 +809,15 @@ class _LifeAreasCard extends StatelessWidget {
         final area = entry.key;
         final description = entry.value;
         final icon = _areaIcons[area] ?? Icons.star_outline_rounded;
-        final color = _areaColors[area] ?? KundliDisplayColors.accentSecondary;
-        
+        final color = _areaColors[area] ?? DashaColors.violet;
+
         return Container(
           margin: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(
-            color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
+            color: DashaColors.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: KundliDisplayColors.borderColor.withOpacity(0.3),
+              color: DashaColors.border.withOpacity(0.3),
               width: 0.5,
             ),
           ),
@@ -687,20 +837,20 @@ class _LifeAreasCard extends StatelessWidget {
               ),
               title: Text(
                 area,
-                style: GoogleFonts.dmSans(
+                style: GoogleFonts.inter(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: KundliDisplayColors.textPrimary,
+                  color: DashaColors.textPrimary,
                 ),
               ),
-              iconColor: KundliDisplayColors.textMuted,
-              collapsedIconColor: KundliDisplayColors.textMuted,
+              iconColor: DashaColors.textTertiary,
+              collapsedIconColor: DashaColors.textTertiary,
               children: [
                 Text(
                   description,
-                  style: GoogleFonts.dmSans(
+                  style: GoogleFonts.inter(
                     fontSize: 12,
-                    color: KundliDisplayColors.textSecondary,
+                    color: DashaColors.textSecondary,
                     height: 1.5,
                   ),
                 ),
@@ -713,7 +863,9 @@ class _LifeAreasCard extends StatelessWidget {
   }
 }
 
-// ============ Antardasha Card ============
+// ═══════════════════════════════════════════════════════════════════════════
+// ANTARDASHA CARD
+// ═══════════════════════════════════════════════════════════════════════════
 class _AntardashaCard extends StatelessWidget {
   final String mahadasha;
   final String antardasha;
@@ -731,41 +883,18 @@ class _AntardashaCard extends StatelessWidget {
     final effect = MahadashaInterpretations.getAntardashaEffect(mahadasha, antardasha);
     final antarData = MahadashaInterpretations.getInterpretation(antardasha);
 
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            antarColor.withOpacity(0.1),
-            KundliDisplayColors.surfaceColor.withOpacity(0.4),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: antarColor.withOpacity(0.2),
-          width: 0.5,
-        ),
-      ),
+    return DashaPremiumCard(
+      accentColor: antarColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: antarColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text(
-                    getPlanetSymbol(antardasha),
-                    style: TextStyle(fontSize: 18, color: antarColor),
-                  ),
-                ),
+              PremiumPlanetImage(
+                planet: antardasha,
+                size: 40,
+                isActive: true,
+                showShadow: true,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -774,16 +903,16 @@ class _AntardashaCard extends StatelessWidget {
                   children: [
                     Text(
                       '$antardasha Antardasha',
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: KundliDisplayColors.textPrimary,
+                        color: DashaColors.textPrimary,
                       ),
                     ),
                     if (remainingYears != null)
                       Text(
                         '${formatDuration(remainingYears!)} remaining',
-                        style: GoogleFonts.dmMono(
+                        style: GoogleFonts.jetBrainsMono(
                           fontSize: 10,
                           color: antarColor,
                         ),
@@ -798,14 +927,14 @@ class _AntardashaCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: KundliDisplayColors.surfaceColor.withOpacity(0.5),
+              color: DashaColors.surfaceElevated,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
               effect,
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.inter(
                 fontSize: 11,
-                color: KundliDisplayColors.textSecondary,
+                color: DashaColors.textSecondary,
                 height: 1.4,
               ),
             ),
@@ -869,7 +998,7 @@ class _MiniInfo extends StatelessWidget {
           children: [
             Text(
               value,
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: color,
@@ -879,9 +1008,9 @@ class _MiniInfo extends StatelessWidget {
             ),
             Text(
               label,
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.inter(
                 fontSize: 8,
-                color: KundliDisplayColors.textMuted,
+                color: DashaColors.textTertiary,
               ),
             ),
           ],
@@ -891,7 +1020,9 @@ class _MiniInfo extends StatelessWidget {
   }
 }
 
-// ============ Aspect Card ============
+// ═══════════════════════════════════════════════════════════════════════════
+// ASPECT CARD
+// ═══════════════════════════════════════════════════════════════════════════
 class _AspectCard extends StatelessWidget {
   final String title;
   final List<String> items;
@@ -907,16 +1038,9 @@ class _AspectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return DashaPremiumCard(
+      accentColor: color,
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.15),
-          width: 0.5,
-        ),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -926,7 +1050,7 @@ class _AspectCard extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 title,
-                style: GoogleFonts.dmSans(
+                style: GoogleFonts.inter(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: color,
@@ -936,40 +1060,42 @@ class _AspectCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           ...items.take(5).map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 4,
-                  height: 4,
-                  margin: const EdgeInsets.only(top: 5),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.6),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    item,
-                    style: GoogleFonts.dmSans(
-                      fontSize: 10,
-                      color: KundliDisplayColors.textSecondary,
-                      height: 1.3,
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 4,
+                      margin: const EdgeInsets.only(top: 5),
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.6),
+                        shape: BoxShape.circle,
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        item,
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          color: DashaColors.textSecondary,
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )),
+              )),
         ],
       ),
     );
   }
 }
 
-// ============ Remedies Card ============
+// ═══════════════════════════════════════════════════════════════════════════
+// REMEDIES CARD
+// ═══════════════════════════════════════════════════════════════════════════
 class _RemediesCard extends StatelessWidget {
   final List<String> remedies;
   final String gemstone;
@@ -989,23 +1115,8 @@ class _RemediesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            DashaTypeColors.yoginiPrimary.withOpacity(0.08),
-            KundliDisplayColors.surfaceColor.withOpacity(0.4),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: DashaTypeColors.yoginiPrimary.withOpacity(0.15),
-          width: 0.5,
-        ),
-      ),
+    return DashaPremiumCard(
+      accentColor: DashaColors.yogini,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1025,15 +1136,15 @@ class _RemediesCard extends StatelessWidget {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Mantra
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: KundliDisplayColors.surfaceColor.withOpacity(0.5),
+              color: DashaColors.surfaceElevated,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
@@ -1044,15 +1155,15 @@ class _RemediesCard extends StatelessWidget {
                     Icon(
                       Icons.record_voice_over_outlined,
                       size: 12,
-                      color: DashaTypeColors.yoginiPrimary,
+                      color: DashaColors.yogini,
                     ),
                     const SizedBox(width: 6),
                     Text(
                       'Mantra',
-                      style: GoogleFonts.dmSans(
+                      style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
-                        color: DashaTypeColors.yoginiPrimary,
+                        color: DashaColors.yogini,
                       ),
                     ),
                   ],
@@ -1062,50 +1173,50 @@ class _RemediesCard extends StatelessWidget {
                   mantra,
                   style: GoogleFonts.notoSansDevanagari(
                     fontSize: 11,
-                    color: KundliDisplayColors.textPrimary,
+                    color: DashaColors.textPrimary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 12),
-          
+
           // Remedies List
           Text(
             'Suggested Practices',
-            style: GoogleFonts.dmSans(
+            style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: KundliDisplayColors.textSecondary,
+              color: DashaColors.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
           ...remedies.map((remedy) => Padding(
-            padding: const EdgeInsets.only(bottom: 6),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  Icons.check_circle_outline_rounded,
-                  size: 14,
-                  color: DashaTypeColors.yoginiPrimary.withOpacity(0.7),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    remedy,
-                    style: GoogleFonts.dmSans(
-                      fontSize: 11,
-                      color: KundliDisplayColors.textSecondary,
-                      height: 1.3,
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.check_circle_outline_rounded,
+                      size: 14,
+                      color: DashaColors.yogini.withOpacity(0.7),
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        remedy,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: DashaColors.textSecondary,
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )),
+              )),
         ],
       ),
     );
@@ -1129,12 +1240,12 @@ class _RemedyInfo extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: KundliDisplayColors.surfaceColor.withOpacity(0.5),
+          color: DashaColors.surfaceElevated,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 16, color: DashaTypeColors.yoginiPrimary),
+            Icon(icon, size: 16, color: DashaColors.yogini),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
@@ -1142,17 +1253,17 @@ class _RemedyInfo extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: GoogleFonts.dmSans(
+                    style: GoogleFonts.inter(
                       fontSize: 9,
-                      color: KundliDisplayColors.textMuted,
+                      color: DashaColors.textTertiary,
                     ),
                   ),
                   Text(
                     value,
-                    style: GoogleFonts.dmSans(
+                    style: GoogleFonts.inter(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: KundliDisplayColors.textPrimary,
+                      color: DashaColors.textPrimary,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -1166,4 +1277,3 @@ class _RemedyInfo extends StatelessWidget {
     );
   }
 }
-

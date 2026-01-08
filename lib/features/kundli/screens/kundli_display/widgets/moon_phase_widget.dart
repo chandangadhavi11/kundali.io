@@ -23,15 +23,17 @@ class MoonPhaseWidget extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFBBF24).withOpacity(0.3),
+            color: const Color(0xFFFBBF24).withOpacity(0.25),
             blurRadius: 12,
-            spreadRadius: 2,
+            spreadRadius: 1,
           ),
         ],
       ),
-      child: CustomPaint(
-        size: Size(size, size),
-        painter: _MoonPhasePainter(tithiNumber: tithiNumber, paksha: paksha),
+      child: ClipOval(
+        child: CustomPaint(
+          size: Size(size, size),
+          painter: _MoonPhasePainter(tithiNumber: tithiNumber, paksha: paksha),
+        ),
       ),
     );
   }
@@ -47,206 +49,246 @@ class _MoonPhasePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2 - 1;
+    final radius = size.width / 2;
 
-    // Calculate phase (0.0 to 1.0 representing the lunar cycle)
-    // Shukla Paksha: Tithi 1 = just after new moon, Tithi 15 = full moon
-    // Krishna Paksha: Tithi 1 = just after full moon, Tithi 15 = new moon
-    bool isWaxing = paksha == 'Shukla';
+    // Determine if waxing (Shukla) or waning (Krishna)
+    final bool isWaxing = paksha.toLowerCase() == 'shukla';
 
-    // Phase: 0 = new moon, 0.5 = full moon, 1 = new moon again
-    double phase;
+    // Calculate illumination fraction (0 to 1)
+    // Tithi 1 = just started, Tithi 15 = end of paksha
+    // Shukla: 1 = thin crescent, 15 = full moon
+    // Krishna: 1 = almost full, 15 = new moon
+    double illumination;
     if (isWaxing) {
-      // Shukla: tithi 1 → phase ~0, tithi 15 → phase 0.5 (full moon)
-      phase = (tithiNumber - 1) / 30.0;
+      // Waxing: tithi 1 ≈ 0%, tithi 15 = 100%
+      illumination = tithiNumber / 15.0;
     } else {
-      // Krishna: tithi 1 → phase ~0.5 (just past full), tithi 15 → phase ~1 (new moon)
-      phase = 0.5 + (tithiNumber - 1) / 30.0;
+      // Waning: tithi 1 ≈ 100%, tithi 15 ≈ 0%
+      illumination = 1.0 - (tithiNumber / 15.0);
     }
 
-    // Draw dark moon background (the shadow side)
-    final darkPaint =
-        Paint()
-          ..color = const Color(0xFF1A1425)
-          ..style = PaintingStyle.fill;
-    canvas.drawCircle(center, radius, darkPaint);
+    // Clamp illumination
+    illumination = illumination.clamp(0.0, 1.0);
 
-    // Draw subtle craters on dark side
-    _drawCraters(canvas, center, radius, 0.3);
+    // Draw the dark moon base (shadow)
+    _drawDarkMoon(canvas, center, radius);
 
     // Draw the illuminated portion
-    _drawIlluminatedMoon(canvas, center, radius, phase);
-
-    // Add rim light
-    final rimPaint =
-        Paint()
-          ..color = Colors.white.withOpacity(0.2)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 0.5;
-    canvas.drawCircle(center, radius, rimPaint);
-  }
-
-  void _drawCraters(
-    Canvas canvas,
-    Offset center,
-    double radius,
-    double opacity,
-  ) {
-    final random = math.Random(42);
-    final craterPaint =
-        Paint()
-          ..color = const Color(0xFF0D0A12).withOpacity(opacity)
-          ..style = PaintingStyle.fill;
-
-    for (int i = 0; i < 5; i++) {
-      final angle = random.nextDouble() * 2 * math.pi;
-      final dist = random.nextDouble() * radius * 0.65;
-      final r = radius * (0.08 + random.nextDouble() * 0.12);
-
-      canvas.drawCircle(
-        Offset(
-          center.dx + math.cos(angle) * dist,
-          center.dy + math.sin(angle) * dist,
-        ),
-        r,
-        craterPaint,
-      );
+    if (illumination > 0.02) {
+      _drawIlluminatedPortion(canvas, center, radius, illumination, isWaxing);
     }
+
+    // Add subtle rim highlight
+    final rimPaint = Paint()
+      ..color = Colors.white.withOpacity(0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+    canvas.drawCircle(center, radius - 0.4, rimPaint);
   }
 
-  void _drawIlluminatedMoon(
+  void _drawDarkMoon(Canvas canvas, Offset center, double radius) {
+    // Dark moon surface
+    final darkGradient = Paint()
+      ..shader = RadialGradient(
+        center: const Alignment(-0.3, -0.3),
+        radius: 1.2,
+        colors: const [
+          Color(0xFF2A2438), // Slightly lighter center
+          Color(0xFF1A1425), // Dark purple-gray
+          Color(0xFF0F0B14), // Very dark edge
+        ],
+        stops: const [0.0, 0.5, 1.0],
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
+
+    canvas.drawCircle(center, radius, darkGradient);
+
+    // Draw subtle craters on dark surface
+    _drawCraters(canvas, center, radius, 0.25, isDark: true);
+  }
+
+  void _drawIlluminatedPortion(
     Canvas canvas,
     Offset center,
     double radius,
-    double phase,
+    double illumination,
+    bool isWaxing,
   ) {
-    // Illumination: 0 at new moon, 1 at full moon, 0 at new moon again
-    // phase 0 or 1 = new moon (0% illumination)
-    // phase 0.5 = full moon (100% illumination)
-    final illumination = (1 - (2 * (phase - 0.5)).abs());
-
-    if (illumination < 0.02) return; // New moon - nothing to draw
-
-    // Determine which side is lit
-    // phase < 0.5 = waxing (right side lit)
-    // phase > 0.5 = waning (left side lit)
-    final bool rightSideLit = phase < 0.5;
-
-    // Moon gradient for 3D look
-    final moonPaint =
-        Paint()
-          ..shader = RadialGradient(
-            center: Alignment(rightSideLit ? 0.3 : -0.3, -0.25),
-            radius: 0.9,
-            colors: const [
-              Color(0xFFFFFCF0), // Bright center
-              Color(0xFFF5E8C8), // Moon yellow
-              Color(0xFFE8D5A0), // Edge
-            ],
-            stops: const [0.0, 0.6, 1.0],
-          ).createShader(Rect.fromCircle(center: center, radius: radius));
-
-    canvas.save();
-
-    // Clip to moon circle
-    canvas.clipPath(
-      Path()..addOval(Rect.fromCircle(center: center, radius: radius)),
-    );
-
-    // Full moon case
-    if (illumination > 0.98) {
-      canvas.drawCircle(center, radius, moonPaint);
-      _drawCraters(canvas, center, radius, 0.15);
-      canvas.restore();
+    // Full moon - just fill the whole circle
+    if (illumination >= 0.98) {
+      _drawFullMoon(canvas, center, radius);
       return;
     }
 
-    // Create the illuminated shape using the terminator curve
+    // Create clipping path for the illuminated portion
+    final clipPath = _createMoonPhasePath(center, radius, illumination, isWaxing);
+
+    canvas.save();
+    canvas.clipPath(clipPath);
+
+    // Draw the lit moon surface
+    _drawFullMoon(canvas, center, radius);
+
+    canvas.restore();
+  }
+
+  void _drawFullMoon(Canvas canvas, Offset center, double radius) {
+    // Lit moon gradient - warm moonlight color
+    final moonGradient = Paint()
+      ..shader = RadialGradient(
+        center: const Alignment(-0.25, -0.3),
+        radius: 1.0,
+        colors: const [
+          Color(0xFFFFFEF8), // Bright white-yellow center
+          Color(0xFFF8F0D8), // Warm cream
+          Color(0xFFE8DCC0), // Slightly darker edge
+        ],
+        stops: const [0.0, 0.6, 1.0],
+      ).createShader(Rect.fromCircle(center: center, radius: radius));
+
+    canvas.drawCircle(center, radius, moonGradient);
+
+    // Draw craters on lit surface
+    _drawCraters(canvas, center, radius, 0.12, isDark: false);
+  }
+
+  Path _createMoonPhasePath(
+    Offset center,
+    double radius,
+    double illumination,
+    bool isWaxing,
+  ) {
     final path = Path();
 
-    // The terminator is an ellipse. Its x-scale determines the phase appearance.
-    // terminatorScale: -1 = crescent (shadow bulges into lit side)
-    //                   0 = half moon (straight line terminator)
-    //                  +1 = gibbous (lit side bulges into shadow)
-    //
-    // For waxing: illumination 0→0.5 = crescent→half, 0.5→1 = half→gibbous→full
-    // For waning: same but mirrored
+    // For waxing moon: right side is lit first
+    // For waning moon: left side remains lit
 
-    final double terminatorScale;
-    if (illumination <= 0.5) {
-      // Crescent phase: terminator curves inward (negative scale)
-      terminatorScale = -(1 - illumination * 2);
-    } else {
-      // Gibbous phase: terminator curves outward (positive scale)
-      terminatorScale = (illumination - 0.5) * 2;
-    }
+    // The terminator position: 0 = no light, 0.5 = half moon, 1 = full moon
+    // We use an ellipse whose width varies with illumination
 
-    // Build the path
-    if (rightSideLit) {
-      // Right side lit (waxing)
-      // Draw right semicircle (the lit outer edge)
+    if (isWaxing) {
+      // Waxing: light comes from the right
+      // Draw right semicircle (always lit edge)
       path.moveTo(center.dx, center.dy - radius);
       path.arcTo(
         Rect.fromCircle(center: center, radius: radius),
-        -math.pi / 2,
-        math.pi,
+        -math.pi / 2, // Start at top
+        math.pi, // Sweep clockwise to bottom
         false,
       );
 
-      // Draw terminator curve back to top
-      // This is an ellipse with width = radius * terminatorScale
-      if (terminatorScale.abs() < 0.01) {
-        // Half moon - straight line
-        path.lineTo(center.dx, center.dy - radius);
-      } else {
+      // Draw terminator curve from bottom to top
+      if (illumination <= 0.5) {
+        // Crescent phase: terminator curves INTO the lit area (concave from lit side)
+        // Scale goes from 1 (new moon) to 0 (half moon)
+        final terminatorWidth = radius * (1.0 - illumination * 2);
         path.arcTo(
           Rect.fromCenter(
             center: center,
-            width: (radius * terminatorScale).abs() * 2,
+            width: terminatorWidth * 2,
             height: radius * 2,
           ),
-          math.pi / 2,
-          terminatorScale > 0 ? math.pi : -math.pi,
+          math.pi / 2, // Start at bottom
+          math.pi, // Curve through left side back to top
+          false,
+        );
+      } else {
+        // Gibbous phase: terminator curves AWAY from lit area (convex from lit side)
+        // Scale goes from 0 (half moon) to 1 (full moon)
+        final terminatorWidth = radius * ((illumination - 0.5) * 2);
+        path.arcTo(
+          Rect.fromCenter(
+            center: center,
+            width: terminatorWidth * 2,
+            height: radius * 2,
+          ),
+          math.pi / 2, // Start at bottom
+          -math.pi, // Curve through right side back to top (opposite direction)
           false,
         );
       }
     } else {
-      // Left side lit (waning)
-      // Draw left semicircle (the lit outer edge)
+      // Waning: light remains on the left
+      // Draw left semicircle (always lit edge)
       path.moveTo(center.dx, center.dy - radius);
       path.arcTo(
         Rect.fromCircle(center: center, radius: radius),
-        -math.pi / 2,
-        -math.pi,
+        -math.pi / 2, // Start at top
+        -math.pi, // Sweep counter-clockwise to bottom
         false,
       );
 
-      // Draw terminator curve back to top
-      if (terminatorScale.abs() < 0.01) {
-        // Half moon - straight line
-        path.lineTo(center.dx, center.dy - radius);
-      } else {
+      // Draw terminator curve from bottom to top
+      if (illumination <= 0.5) {
+        // Crescent phase
+        final terminatorWidth = radius * (1.0 - illumination * 2);
         path.arcTo(
           Rect.fromCenter(
             center: center,
-            width: (radius * terminatorScale).abs() * 2,
+            width: terminatorWidth * 2,
             height: radius * 2,
           ),
-          math.pi / 2,
-          terminatorScale > 0 ? -math.pi : math.pi,
+          math.pi / 2, // Start at bottom
+          -math.pi, // Curve through right side back to top
+          false,
+        );
+      } else {
+        // Gibbous phase
+        final terminatorWidth = radius * ((illumination - 0.5) * 2);
+        path.arcTo(
+          Rect.fromCenter(
+            center: center,
+            width: terminatorWidth * 2,
+            height: radius * 2,
+          ),
+          math.pi / 2, // Start at bottom
+          math.pi, // Curve through left side back to top
           false,
         );
       }
     }
 
     path.close();
-    canvas.drawPath(path, moonPaint);
+    return path;
+  }
 
-    // Draw craters on lit portion
-    canvas.clipPath(path);
-    _drawCraters(canvas, center, radius, 0.12);
+  void _drawCraters(
+    Canvas canvas,
+    Offset center,
+    double radius,
+    double opacity, {
+    required bool isDark,
+  }) {
+    final craterColor = isDark
+        ? const Color(0xFF0A0710).withOpacity(opacity)
+        : const Color(0xFFD0C4A8).withOpacity(opacity);
 
-    canvas.restore();
+    final craterPaint = Paint()
+      ..color = craterColor
+      ..style = PaintingStyle.fill;
+
+    // Predefined crater positions for natural look
+    final craters = [
+      {'angle': 0.3, 'dist': 0.4, 'size': 0.12},
+      {'angle': 1.8, 'dist': 0.55, 'size': 0.08},
+      {'angle': 2.5, 'dist': 0.3, 'size': 0.15},
+      {'angle': 4.2, 'dist': 0.6, 'size': 0.1},
+      {'angle': 5.5, 'dist': 0.35, 'size': 0.09},
+    ];
+
+    for (final crater in craters) {
+      final angle = crater['angle']!;
+      final dist = crater['dist']! * radius;
+      final craterRadius = crater['size']! * radius;
+
+      canvas.drawCircle(
+        Offset(
+          center.dx + math.cos(angle) * dist,
+          center.dy + math.sin(angle) * dist,
+        ),
+        craterRadius,
+        craterPaint,
+      );
+    }
   }
 
   @override
@@ -255,4 +297,3 @@ class _MoonPhasePainter extends CustomPainter {
         oldDelegate.paksha != paksha;
   }
 }
-

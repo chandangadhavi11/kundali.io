@@ -890,6 +890,428 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
     );
   }
 
+  void _showChartTypesInfoSheet(BuildContext context) {
+    HapticFeedback.lightImpact();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) => Container(
+          decoration: BoxDecoration(
+            color: _bgSecondary,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            border: Border.all(
+              color: _accentSecondary.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              // Handle & Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: _borderColor,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                _accentSecondary.withOpacity(0.2),
+                                _accentSecondary.withOpacity(0.08),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.auto_awesome_rounded,
+                            size: 22,
+                            color: _accentSecondary,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Chart Types Guide',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: _textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Understanding Vedic astrology charts',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 12,
+                                  color: _textMuted,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: _surfaceColor.withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(
+                              Icons.close_rounded,
+                              size: 18,
+                              color: _textMuted,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+              // Chart types list
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                  children: [
+                    _buildChartCategorySection(
+                      title: 'Primary Charts',
+                      description: 'The main birth charts for overall life analysis',
+                      charts: [
+                        _ChartTypeInfo(
+                          type: KundaliType.lagna,
+                          icon: Icons.north_east_rounded,
+                          color: const Color(0xFFA78BFA),
+                          meaning: 'The foundation of Vedic astrology. Shows your overall life path, personality, physical body, and general tendencies based on the rising sign at birth.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.chandra,
+                          icon: Icons.nightlight_round,
+                          color: const Color(0xFF6EE7B7),
+                          meaning: 'Moon chart reveals your emotional nature, mind, mental patterns, and psychological tendencies. Essential for understanding inner feelings and reactions.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.surya,
+                          icon: Icons.wb_sunny_rounded,
+                          color: _accentPrimary,
+                          meaning: 'Sun chart shows your soul purpose, ego, vitality, father, authority figures, and career in government or leadership roles.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.bhavaChalit,
+                          icon: Icons.swap_horiz_rounded,
+                          color: const Color(0xFF60A5FA),
+                          meaning: 'Uses exact house cusps to show where planets actually influence. More accurate for predicting which house matters each planet truly affects.',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    _buildChartCategorySection(
+                      title: 'Divisional Charts (Vargas)',
+                      description: 'Specialized charts for specific life areas',
+                      charts: [
+                        _ChartTypeInfo(
+                          type: KundaliType.navamsa,
+                          icon: Icons.favorite_rounded,
+                          color: const Color(0xFFF472B6),
+                          meaning: 'D9 - The most important divisional chart. Reveals marriage quality, spouse nature, dharma (life purpose), and the strength of planets. Shows the soul\'s deeper journey.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.dasamsa,
+                          icon: Icons.work_rounded,
+                          color: const Color(0xFF60A5FA),
+                          meaning: 'D10 - Career and profession chart. Shows professional success, status in society, recognition, and the type of work that brings fulfillment.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.saptamsa,
+                          icon: Icons.child_care_rounded,
+                          color: const Color(0xFFFBBF24),
+                          meaning: 'D7 - Children and progeny chart. Indicates fertility, number of children, relationship with children, and creative output.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.dwadasamsa,
+                          icon: Icons.people_rounded,
+                          color: const Color(0xFF34D399),
+                          meaning: 'D12 - Parents chart. Shows relationship with parents, ancestral karma, and family lineage influences.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.trimshamsa,
+                          icon: Icons.warning_amber_rounded,
+                          color: const Color(0xFFF87171),
+                          meaning: 'D30 - Misfortunes chart. Reveals potential challenges, health issues, accidents, and areas requiring caution.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.hora,
+                          icon: Icons.attach_money_rounded,
+                          color: const Color(0xFFFFD700),
+                          meaning: 'D2 - Wealth chart. Shows financial potential, earning capacity, and accumulation of material resources.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.drekkana,
+                          icon: Icons.fitness_center_rounded,
+                          color: const Color(0xFFFF6B6B),
+                          meaning: 'D3 - Siblings and courage chart. Reveals relationship with siblings, personal courage, and communication abilities.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.chaturthamsa,
+                          icon: Icons.home_rounded,
+                          color: const Color(0xFF4ECDC4),
+                          meaning: 'D4 - Property and fortune chart. Shows real estate luck, vehicles, fixed assets, and overall material fortune.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.shodasamsa,
+                          icon: Icons.directions_car_rounded,
+                          color: const Color(0xFF9B59B6),
+                          meaning: 'D16 - Vehicles and comforts chart. Indicates conveyances, luxuries, and physical pleasures.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.vimsamsa,
+                          icon: Icons.self_improvement_rounded,
+                          color: const Color(0xFF00CED1),
+                          meaning: 'D20 - Spiritual progress chart. Shows religious inclinations, meditation abilities, and spiritual evolution.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.chaturvimsamsa,
+                          icon: Icons.school_rounded,
+                          color: const Color(0xFFE91E63),
+                          meaning: 'D24 - Education chart. Reveals academic abilities, learning capacity, and success in studies.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.bhamsa,
+                          icon: Icons.stars_rounded,
+                          color: const Color(0xFF8E44AD),
+                          meaning: 'D27 - Strength chart (Nakshatramsa). Shows inherent strengths, weaknesses, and physical vitality.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.khavedamsa,
+                          icon: Icons.auto_awesome_rounded,
+                          color: const Color(0xFF27AE60),
+                          meaning: 'D40 - Auspicious effects chart. Indicates overall luck and positive karmic influences.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.akshavedamsa,
+                          icon: Icons.balance_rounded,
+                          color: const Color(0xFF3498DB),
+                          meaning: 'D45 - General indications chart. Provides additional confirmation for predictions.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.shashtiamsa,
+                          icon: Icons.history_rounded,
+                          color: const Color(0xFFE74C3C),
+                          meaning: 'D60 - Past life karma chart. The most subtle chart showing deep karmic patterns from previous lives.',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    _buildChartCategorySection(
+                      title: 'Special Charts',
+                      description: 'Unique analytical methods',
+                      charts: [
+                        _ChartTypeInfo(
+                          type: KundaliType.sudarshan,
+                          icon: Icons.blur_circular_rounded,
+                          color: const Color(0xFFFF9800),
+                          meaning: 'Triple chart view combining Lagna, Moon, and Sun charts. Provides a holistic view of all three perspectives together.',
+                        ),
+                        _ChartTypeInfo(
+                          type: KundaliType.ashtakavarga,
+                          icon: Icons.grid_4x4_rounded,
+                          color: const Color(0xFF795548),
+                          meaning: 'Point-based strength analysis. Calculates bindus (points) for each planet to determine favorable transits and house strengths.',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Info tip at bottom
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: _surfaceColor.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _accentPrimary.withOpacity(0.2),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.lightbulb_outline_rounded,
+                            size: 18,
+                            color: _accentPrimary,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Tap on any chart type in the selector to switch views and explore different aspects of your Kundali.',
+                              style: GoogleFonts.dmSans(
+                                fontSize: 11,
+                                color: _textSecondary,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChartCategorySection({
+    required String title,
+    required String description,
+    required List<_ChartTypeInfo> charts,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 4,
+              height: 18,
+              decoration: BoxDecoration(
+                color: _accentPrimary,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              title,
+              style: GoogleFonts.dmSans(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: _textPrimary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(left: 14),
+          child: Text(
+            description,
+            style: GoogleFonts.dmSans(
+              fontSize: 11,
+              color: _textMuted,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        ...charts.map((info) => _buildChartTypeInfoCard(info)),
+      ],
+    );
+  }
+
+  Widget _buildChartTypeInfoCard(_ChartTypeInfo info) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: _surfaceColor.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: info.color.withOpacity(0.2),
+          width: 0.5,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: info.color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              info.icon,
+              size: 20,
+              color: info.color,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      info.type.displayName,
+                      style: GoogleFonts.dmSans(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: _textPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: info.color.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        info.type.shortName,
+                        style: GoogleFonts.dmMono(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          color: info.color,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  info.meaning,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 11,
+                    color: _textSecondary,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPickerOption({
     required IconData icon,
     required String label,
@@ -1744,7 +2166,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
           ),
         ),
         const SizedBox(height: 14),
-        // Section label
+        // Section label with info CTA
         Row(
           children: [
             Icon(
@@ -1759,6 +2181,40 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
                 color: _textMuted,
+              ),
+            ),
+            const Spacer(),
+            GestureDetector(
+              onTap: () => _showChartTypesInfoSheet(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: _accentSecondary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: _accentSecondary.withOpacity(0.2),
+                    width: 0.5,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.info_outline_rounded,
+                      size: 12,
+                      color: _accentSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Learn More',
+                      style: GoogleFonts.dmSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: _accentSecondary,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -4064,4 +4520,19 @@ class _CustomTimePickerState extends State<_CustomTimePicker> {
       ),
     );
   }
+}
+
+/// Helper class for chart type information display
+class _ChartTypeInfo {
+  final KundaliType type;
+  final IconData icon;
+  final Color color;
+  final String meaning;
+
+  const _ChartTypeInfo({
+    required this.type,
+    required this.icon,
+    required this.color,
+    required this.meaning,
+  });
 }

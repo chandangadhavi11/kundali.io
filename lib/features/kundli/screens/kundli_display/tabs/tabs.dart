@@ -8,3 +8,6 @@ export 'panchang_tab.dart';
 export 'dasha_tab.dart';
 export 'details_tab.dart';
 
+// Shared components
+export '../shared/floating_nav_bar.dart';
+

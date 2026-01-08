@@ -1,125 +1,894 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
-import '../shared/constants.dart';
+import '../shared/floating_nav_bar.dart';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSIGHT DATA MODEL - For interactive explanations
+// ═══════════════════════════════════════════════════════════════════════════
+class InsightData {
+  final String title;
+  final String value;
+  final String description;
+  final String significance;
+  final List<String> keyPoints;
+  final Color accentColor;
+  final IconData icon;
+  final String? imagePath;
+
+  const InsightData({
+    required this.title,
+    required this.value,
+    required this.description,
+    required this.significance,
+    required this.keyPoints,
+    required this.accentColor,
+    required this.icon,
+    this.imagePath,
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DESIGN SYSTEM TOKENS
+// ═══════════════════════════════════════════════════════════════════════════
+class _DesignTokens {
+  _DesignTokens._();
+
+  // Spacing scale
+  static const double space4 = 4;
+  static const double space12 = 12;
+  static const double space24 = 24;
+
+  // Border radius
+  static const double radiusSm = 8;
+  static const double radiusMd = 12;
+  static const double radiusLg = 16;
+  static const double radiusXl = 20;
+}
+
+class _Colors {
+  _Colors._();
+
+  // Surfaces
+  static const Color surface = Color(0xFF16141F);
+
+  // Borders
+  static const Color border = Color(0xFF2A2838);
+
+  // Text
+  static const Color textPrimary = Color(0xFFF5F4F8);
+  static const Color textSecondary = Color(0xFFA09CAC);
+  static const Color textTertiary = Color(0xFF6E6A7A);
+
+  // Accent colors
+  static const Color violet = Color(0xFF9580FF);
+  static const Color emerald = Color(0xFF4ADE80);
+  static const Color rose = Color(0xFFF472B6);
+  static const Color sky = Color(0xFF38BDF8);
+  static const Color amber = Color(0xFFFBBF24);
+  static const Color coral = Color(0xFFF87171);
+  static const Color cyan = Color(0xFF22D3EE);
+  static const Color teal = Color(0xFF2DD4BF);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSIGHT BOTTOM SHEET
+// ═══════════════════════════════════════════════════════════════════════════
+void _showInsightSheet(BuildContext context, InsightData insight) {
+  HapticFeedback.mediumImpact();
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    barrierColor: Colors.black.withOpacity(0.6),
+    builder: (context) => _InsightBottomSheet(insight: insight),
+  );
+}
+
+class _InsightBottomSheet extends StatefulWidget {
+  final InsightData insight;
+
+  const _InsightBottomSheet({required this.insight});
+
+  @override
+  State<_InsightBottomSheet> createState() => _InsightBottomSheetState();
+}
+
+class _InsightBottomSheetState extends State<_InsightBottomSheet>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _slideAnimation;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+
+    _slideAnimation = Tween<double>(
+      begin: 0.3,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
+      ),
+    );
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final insight = widget.insight;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _slideAnimation.value * 100),
+          child: Opacity(opacity: _fadeAnimation.value, child: child),
+        );
+      },
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.75,
+        ),
+        decoration: BoxDecoration(
+          color: _Colors.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border(
+            top: BorderSide(
+              color: insight.accentColor.withOpacity(0.3),
+              width: 1,
+            ),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: insight.accentColor.withOpacity(0.15),
+              blurRadius: 40,
+              spreadRadius: -10,
+              offset: const Offset(0, -10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: insight.accentColor.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            // Content
+            Flexible(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(20, 20, 20, bottomPadding + 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Row(
+                      children: [
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                insight.accentColor.withOpacity(0.2),
+                                insight.accentColor.withOpacity(0.05),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: insight.accentColor.withOpacity(0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: Icon(
+                            insight.icon,
+                            size: 28,
+                            color: insight.accentColor,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                insight.title.toUpperCase(),
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 1.2,
+                                  color: insight.accentColor,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                insight.value,
+                                style: GoogleFonts.inter(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w700,
+                                  color: _Colors.textPrimary,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Divider
+                    Container(
+                      height: 1,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            insight.accentColor.withOpacity(0.3),
+                            insight.accentColor.withOpacity(0.05),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Description
+                    Text(
+                      'What This Means',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                        color: _Colors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      insight.description,
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                        color: _Colors.textPrimary,
+                        height: 1.6,
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Significance card
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: insight.accentColor.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: insight.accentColor.withOpacity(0.15),
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: insight.accentColor.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.auto_awesome_rounded,
+                              size: 16,
+                              color: insight.accentColor,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Significance',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: insight.accentColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  insight.significance,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                    color: _Colors.textPrimary,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Key points
+                    if (insight.keyPoints.isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      Text(
+                        'Key Points',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                          color: _Colors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ...insight.keyPoints.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final point = entry.value;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(top: 6),
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: insight.accentColor.withOpacity(
+                                    1.0 - (index * 0.12),
+                                  ),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  point,
+                                  style: GoogleFonts.inter(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                    color: _Colors.textSecondary,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSIGHT GENERATORS
+// ═══════════════════════════════════════════════════════════════════════════
+InsightData _getTransitOverviewInsight(
+  int favorableCount,
+  int challengingCount,
+  String moonSign,
+) {
+  final balance = favorableCount - challengingCount;
+  final balanceStatus = balance >= 3
+      ? 'Very Favorable'
+      : balance >= 1
+          ? 'Favorable'
+          : balance >= -1
+              ? 'Mixed'
+              : 'Challenging';
+  final color = balance >= 3
+      ? _Colors.emerald
+      : balance >= 0
+          ? _Colors.sky
+          : balance >= -2
+              ? _Colors.amber
+              : _Colors.coral;
+
+  return InsightData(
+    title: 'Transit Overview',
+    value: balanceStatus,
+    description:
+        'Planetary transits (Gochar) are the current positions of planets in the sky relative to your birth chart. They trigger events and influence your life based on their relationship with your natal planets, especially the Moon sign (Janma Rashi).',
+    significance:
+        'Currently, $favorableCount planets are in favorable positions and $challengingCount are challenging. Your Janma Rashi is $moonSign, which is the reference point for all transit calculations in Vedic astrology.',
+    keyPoints: [
+      'Favorable Transits: $favorableCount planets',
+      'Challenging Transits: $challengingCount planets',
+      'Overall Balance: $balanceStatus',
+      'Janma Rashi (Moon Sign): $moonSign',
+      'Favorable houses from Moon: 3, 6, 10, 11',
+      'Transits are temporary influences that trigger natal potential',
+    ],
+    accentColor: color,
+    icon: Icons.sync_alt_rounded,
+  );
+}
+
+InsightData _getGocharInsight(String moonSign) {
+  return InsightData(
+    title: 'Gochar (गोचर)',
+    value: 'Transit System',
+    description:
+        'Gochar is the Vedic system of planetary transits calculated from the Moon sign. Unlike Western astrology which uses the Sun sign, Vedic astrology emphasizes the Moon as the seat of the mind and emotions, making it the primary reference for transit predictions.',
+    significance:
+        'Your transits are calculated from $moonSign, your Janma Rashi. Planets transiting the 3rd, 6th, 10th, and 11th houses from Moon are generally favorable, while the 1st, 2nd, 4th, 5th, 7th, 8th, 9th, and 12th require careful attention.',
+    keyPoints: [
+      'Reference Point: $moonSign (Janma Rashi)',
+      'Favorable Houses: 3, 6, 10, 11',
+      'Challenging Houses: 1, 4, 5, 7, 8, 12',
+      'Neutral Houses: 2, 9',
+      'Each planet has specific favorable/unfavorable houses',
+      'Slow planets (Saturn, Jupiter, Rahu/Ketu) have longer effects',
+    ],
+    accentColor: _Colors.rose,
+    icon: Icons.radar_rounded,
+  );
+}
+
+InsightData _getTransitPlanetInsight(TransitData transit) {
+  final planetColor = _getPlanetColor(transit.planet);
+  final isSlow = ['Saturn', 'Jupiter', 'Rahu', 'Ketu'].contains(transit.planet);
+
+  return InsightData(
+    title: 'Transit',
+    value: '${transit.planet} in House ${transit.transitHouse}',
+    description:
+        '${transit.planet} is currently transiting ${transit.currentSign} at ${transit.currentDegree.toStringAsFixed(1)}°, which is the ${transit.transitHouse}${_getOrdinalSuffix(transit.transitHouse)} house from your Moon sign. ${transit.isFavorable ? "This is a favorable position." : "This position requires attention."}',
+    significance: transit.effects.isNotEmpty
+        ? transit.effects
+        : '${transit.planet} in the ${transit.transitHouse}${_getOrdinalSuffix(transit.transitHouse)} house ${transit.isFavorable ? "supports growth and positive developments" : "may bring challenges that require patience and careful handling"}.',
+    keyPoints: [
+      'Planet: ${transit.planet}',
+      'Current Sign: ${transit.currentSign}',
+      'Degree: ${transit.currentDegree.toStringAsFixed(1)}°',
+      'House from Moon: ${transit.transitHouse}',
+      'Status: ${transit.isFavorable ? "Favorable ✓" : "Challenging ⚠"}',
+      if (transit.aspectToNatal != 'None') 'Aspect to Natal: ${transit.aspectToNatal}',
+      if (isSlow) 'Major Transit: ${transit.planet} moves slowly, effects last ${transit.planet == "Saturn" ? "~2.5 years" : transit.planet == "Jupiter" ? "~1 year" : "~1.5 years"} per sign',
+    ],
+    accentColor: planetColor,
+    icon: Icons.explore_rounded,
+  );
+}
+
+InsightData _getGocharHouseInsight(int house, List<String> planets, bool isFavorable, bool isMoonHouse) {
+  final houseDescriptions = {
+    1: 'Self, personality, health, new beginnings',
+    2: 'Wealth, family, speech, accumulated resources',
+    3: 'Courage, siblings, communication, short journeys',
+    4: 'Home, mother, comfort, emotional well-being, property',
+    5: 'Intelligence, children, creativity, romance, speculation',
+    6: 'Enemies, diseases, debts, daily work, service',
+    7: 'Marriage, partnerships, business relationships',
+    8: 'Longevity, transformation, inheritance, hidden matters',
+    9: 'Fortune, higher learning, spirituality, father, long journeys',
+    10: 'Career, reputation, authority, public standing',
+    11: 'Gains, income, friends, fulfillment of desires',
+    12: 'Losses, expenses, foreign lands, liberation, isolation',
+  };
+
+  final color = isMoonHouse ? _Colors.violet : isFavorable ? _Colors.emerald : _Colors.amber;
+
+  return InsightData(
+    title: 'Gochar House',
+    value: 'House ${house}${isMoonHouse ? " (Moon)" : ""}',
+    description:
+        'House $house represents ${houseDescriptions[house] ?? "various life matters"}. ${isMoonHouse ? "This is your Janma Rashi house where the Moon was at birth." : isFavorable ? "This is generally a favorable house for transits." : "Transits through this house require attention."}',
+    significance: planets.isEmpty
+        ? 'No planets are currently transiting this house.'
+        : 'Currently ${planets.join(", ")} ${planets.length == 1 ? "is" : "are"} transiting this house, ${isFavorable ? "supporting" : "influencing"} matters related to ${houseDescriptions[house]?.split(",").first ?? "this house"}.',
+    keyPoints: [
+      'House Number: $house',
+      'Significations: ${houseDescriptions[house] ?? "Various life matters"}',
+      if (isMoonHouse) 'Type: Janma Rashi (Moon Sign House)',
+      'Transit Quality: ${isFavorable ? "Favorable ★" : "Requires Attention"}',
+      'Current Planets: ${planets.isEmpty ? "None" : planets.join(", ")}',
+    ],
+    accentColor: color,
+    icon: Icons.home_work_rounded,
+  );
+}
+
+InsightData _getSadeSatiInsight(Map<String, dynamic> info) {
+  final phase = info['phaseNumber'] ?? 0;
+  final phaseNames = ['', 'Rising (1st Phase)', 'Peak (2nd Phase)', 'Setting (3rd Phase)'];
+
+  return InsightData(
+    title: 'Sade Sati (साढ़े साती)',
+    value: phase > 0 ? phaseNames[phase] : 'Not Active',
+    description:
+        'Sade Sati is Saturn\'s 7.5-year transit cycle over three signs: the 12th, 1st, and 2nd from your Moon sign. Each sign takes approximately 2.5 years. This period is often associated with challenges, delays, and karmic lessons, but also brings maturity and spiritual growth.',
+    significance: phase > 0
+        ? '${info['description'] ?? "You are currently in the ${phaseNames[phase]} of Sade Sati."} Saturn is transiting ${info['saturnSign']} at ${(info['saturnDegree'] as double?)?.toStringAsFixed(1) ?? ""}°.'
+        : 'Saturn is not currently transiting the 12th, 1st, or 2nd house from your Moon sign (${info['moonSign']}). Sade Sati is not active.',
+    keyPoints: [
+      'Duration: 7.5 years total (~2.5 years per phase)',
+      'Phase 1 (Rising): Saturn in 12th from Moon - expenses, travel, mental stress',
+      'Phase 2 (Peak): Saturn over Moon - most intense, health/emotional challenges',
+      'Phase 3 (Setting): Saturn in 2nd from Moon - family, finances, speech',
+      if (phase > 0) 'Current Phase: ${phaseNames[phase]}',
+      if (phase > 0) 'Saturn in: ${info['saturnSign']}',
+      'Remedies: Saturn mantras, charity on Saturdays, patience',
+    ],
+    accentColor: _Colors.coral,
+    icon: Icons.hourglass_bottom_rounded,
+  );
+}
+
+InsightData _getCurrentSkyInsight() {
+  return InsightData(
+    title: 'Current Sky',
+    value: 'Live Planetary Positions',
+    description:
+        'These are the real-time positions of planets in the zodiac right now. The "Current" column shows where each planet is today, while "Natal" shows where it was at your birth. When these align or form aspects, significant transits occur.',
+    significance:
+        'Comparing current positions to your natal chart reveals active transits. Pay special attention to slow-moving planets (Saturn, Jupiter, Rahu, Ketu) as their transits have longer-lasting effects.',
+    keyPoints: [
+      'Sun/Moon: Quick transits, daily/monthly influences',
+      'Mercury/Venus/Mars: Medium-speed, weeks to months',
+      'Jupiter: ~1 year per sign, major life themes',
+      'Saturn: ~2.5 years per sign, karmic lessons',
+      'Rahu/Ketu: ~1.5 years per sign, destiny points',
+      'Retrograde (℞): Planet appears to move backward, intensified effects',
+      'Sign Change (↔): Planet entering new sign, shift in energy',
+    ],
+    accentColor: _Colors.violet,
+    icon: Icons.nights_stay_rounded,
+  );
+}
+
+String _getOrdinalSuffix(int number) {
+  if (number >= 11 && number <= 13) return 'th';
+  switch (number % 10) {
+    case 1:
+      return 'st';
+    case 2:
+      return 'nd';
+    case 3:
+      return 'rd';
+    default:
+      return 'th';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NAVIGATION SECTION DATA
+// ═══════════════════════════════════════════════════════════════════════════
+const _sections = [
+  NavSection(id: 'overview', label: 'Overview', color: _Colors.cyan),
+  NavSection(id: 'sky', label: 'Sky', color: _Colors.violet),
+  NavSection(id: 'gochar', label: 'Gochar', color: _Colors.rose),
+  NavSection(id: 'effects', label: 'Effects', color: _Colors.emerald),
+  NavSection(id: 'sadesati', label: 'Sade Sati', color: _Colors.coral),
+];
 
 /// Transit Tab - Shows current planetary transits (Gochar)
 /// Premium, elegant UI with clear visual hierarchy
-class TransitTab extends StatelessWidget {
+class TransitTab extends StatefulWidget {
   final KundaliData kundaliData;
 
   const TransitTab({super.key, required this.kundaliData});
 
   @override
+  State<TransitTab> createState() => _TransitTabState();
+}
+
+class _TransitTabState extends State<TransitTab> {
+  late final ScrollController _scrollController;
+  final Map<String, GlobalKey> _sectionKeys = {};
+  final Map<String, GlobalKey<_AnimatedSectionWrapperState>> _animatedKeys = {};
+  int _activeIndex = 0;
+  bool _isScrolling = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+
+    for (final section in _sections) {
+      _sectionKeys[section.id] = GlobalKey();
+      _animatedKeys[section.id] = GlobalKey<_AnimatedSectionWrapperState>();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isScrolling) return;
+
+    final viewportHeight = _scrollController.position.viewportDimension;
+    final triggerPoint = viewportHeight * 0.3;
+
+    int newActiveIndex = 0;
+
+    for (int i = 0; i < _sections.length; i++) {
+      final key = _sectionKeys[_sections[i].id];
+      if (key?.currentContext != null) {
+        final box = key!.currentContext!.findRenderObject() as RenderBox?;
+        if (box != null) {
+          final position = box.localToGlobal(Offset.zero);
+          if (position.dy <= triggerPoint + 100) {
+            newActiveIndex = i;
+          }
+        }
+      }
+    }
+
+    if (newActiveIndex != _activeIndex) {
+      setState(() => _activeIndex = newActiveIndex);
+    }
+  }
+
+  Future<void> _scrollToSection(int index) async {
+    final section = _sections[index];
+    final key = _sectionKeys[section.id];
+
+    if (key?.currentContext == null) return;
+
+    HapticFeedback.lightImpact();
+
+    setState(() {
+      _isScrolling = true;
+      _activeIndex = index;
+    });
+
+    await Scrollable.ensureVisible(
+      key!.currentContext!,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutCubic,
+      alignment: 0.08,
+    );
+
+    _animatedKeys[section.id]?.currentState?.triggerHighlight();
+
+    setState(() => _isScrolling = false);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
 
-    // Get real-time planetary positions using Swiss Ephemeris
+    // Get real-time planetary positions
     final currentPositions = _getCurrentTransitPositions();
 
-    // Calculate transit effects from Moon sign (Vedic Gochar)
+    // Calculate transit effects from Moon sign
     final transits = KundaliCalculationService.calculateTransits(
-      kundaliData.planetPositions,
+      widget.kundaliData.planetPositions,
       currentPositions,
-      kundaliData.moonSign,
+      widget.kundaliData.moonSign,
     );
 
     // Calculate Sade Sati status
-    final sadeSatiInfo = _calculateSadeSati(currentPositions, kundaliData.moonSign);
+    final sadeSatiInfo = _calculateSadeSati(currentPositions, widget.kundaliData.moonSign);
 
     // Calculate transit house from Moon
-    final transitHouses = _calculateTransitHousesFromMoon(currentPositions, kundaliData.moonSign);
+    final transitHouses = _calculateTransitHousesFromMoon(currentPositions, widget.kundaliData.moonSign);
 
     // Count favorable vs unfavorable transits
     final favorableCount = transits.values.where((t) => t.isFavorable).length;
     final challengingCount = transits.values.length - favorableCount;
 
-    return SingleChildScrollView(
+    return Stack(
+      children: [
+        SingleChildScrollView(
+          controller: _scrollController,
       physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ═══════════════════════════════════════════════════════════════
-          // HERO TRANSIT CARD
+              // OVERVIEW SECTION
           // ═══════════════════════════════════════════════════════════════
-          _TransitHeroCard(
+              _AnimatedSectionWrapper(
+                key: _animatedKeys['overview'],
+                sectionKey: _sectionKeys['overview']!,
+                accentColor: _Colors.cyan,
+                child: _AnimatedCardWrapper(
+                  child: _TransitHeroCard(
             now: now,
-            moonSign: kundaliData.moonSign,
+                    moonSign: widget.kundaliData.moonSign,
             favorableCount: favorableCount,
             challengingCount: challengingCount,
             sadeSatiInfo: sadeSatiInfo,
+                  ),
+                ),
           ),
 
-          const SizedBox(height: 24),
+              const SizedBox(height: _DesignTokens.space24),
 
           // ═══════════════════════════════════════════════════════════════
           // CURRENT SKY POSITIONS
           // ═══════════════════════════════════════════════════════════════
-          _SectionLabel(
+              _AnimatedSectionWrapper(
+                key: _animatedKeys['sky'],
+                sectionKey: _sectionKeys['sky']!,
+                accentColor: _Colors.violet,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _AnimatedSectionHeader(
             title: 'Current Sky Positions',
             subtitle: 'Real-time planetary positions',
-            icon: Icons.public_rounded,
-            color: const Color(0xFF22D3EE),
+                      accentColor: _Colors.violet,
             trailing: _LiveIndicator(),
           ),
-          const SizedBox(height: 12),
-          _CurrentPositionsCard(
+                    const SizedBox(height: _DesignTokens.space12),
+                    _AnimatedCardWrapper(
+                      delay: 50,
+                      child: _CurrentPositionsCard(
             positions: currentPositions,
-            natalPositions: kundaliData.planetPositions,
-          ),
+                        natalPositions: widget.kundaliData.planetPositions,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
-          const SizedBox(height: 24),
+              const SizedBox(height: _DesignTokens.space24),
 
           // ═══════════════════════════════════════════════════════════════
           // GOCHAR GRID
           // ═══════════════════════════════════════════════════════════════
-          _SectionLabel(
+              _AnimatedSectionWrapper(
+                key: _animatedKeys['gochar'],
+                sectionKey: _sectionKeys['gochar']!,
+                accentColor: _Colors.rose,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _AnimatedSectionHeader(
             title: 'Gochar (गोचर)',
-            subtitle: 'Transit from ${kundaliData.moonSign} (Janma Rashi)',
-            icon: Icons.home_rounded,
-            color: const Color(0xFFA78BFA),
-          ),
-          const SizedBox(height: 12),
-          _GocharLegend(),
-          const SizedBox(height: 12),
-          _GocharGrid(transitHouses: transitHouses, moonSign: kundaliData.moonSign),
+                      subtitle: 'Transit from ${widget.kundaliData.moonSign} (Janma Rashi)',
+                      accentColor: _Colors.rose,
+                    ),
+                    const SizedBox(height: _DesignTokens.space12),
+                    _AnimatedCardWrapper(
+                      delay: 50,
+                      child: _GocharLegend(moonSign: widget.kundaliData.moonSign),
+                    ),
+                    const SizedBox(height: _DesignTokens.space12),
+                    _AnimatedCardWrapper(
+                      delay: 100,
+                      child: _GocharGrid(
+                        transitHouses: transitHouses,
+                        moonSign: widget.kundaliData.moonSign,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
-          const SizedBox(height: 24),
+              const SizedBox(height: _DesignTokens.space24),
 
           // ═══════════════════════════════════════════════════════════════
           // TRANSIT EFFECTS
           // ═══════════════════════════════════════════════════════════════
-          _SectionLabel(
+              _AnimatedSectionWrapper(
+                key: _animatedKeys['effects'],
+                sectionKey: _sectionKeys['effects']!,
+                accentColor: _Colors.emerald,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _AnimatedSectionHeader(
             title: 'Transit Effects',
             subtitle: 'Impact analysis on your chart',
-            icon: Icons.trending_up_rounded,
-            color: const Color(0xFF6EE7B7),
-          ),
-          const SizedBox(height: 12),
-          ...transits.entries.map((entry) => _PremiumTransitCard(
-                transit: entry.value,
-                natalPosition: kundaliData.planetPositions[entry.key],
-              )),
+                      accentColor: _Colors.emerald,
+                    ),
+                    const SizedBox(height: _DesignTokens.space12),
+                    ...transits.entries.toList().asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final transitEntry = entry.value;
+                      return _AnimatedCardWrapper(
+                        delay: 50 + (index * 30),
+                        child: _PremiumTransitCard(
+                          transit: transitEntry.value,
+                          natalPosition: widget.kundaliData.planetPositions[transitEntry.key],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
 
           // ═══════════════════════════════════════════════════════════════
           // SADE SATI (if active)
           // ═══════════════════════════════════════════════════════════════
+              _AnimatedSectionWrapper(
+                key: _animatedKeys['sadesati'],
+                sectionKey: _sectionKeys['sadesati']!,
+                accentColor: _Colors.coral,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
           if (sadeSatiInfo['isActive'] == true) ...[
-            const SizedBox(height: 24),
-            _SectionLabel(
+                      const SizedBox(height: _DesignTokens.space24),
+                      _AnimatedSectionHeader(
               title: 'Sade Sati (साढ़े साती)',
               subtitle: 'Saturn\'s 7.5 year transit cycle',
-              icon: Icons.warning_amber_rounded,
-              color: const Color(0xFFF87171),
-            ),
-            const SizedBox(height: 12),
-            _SadeSatiCard(sadeSatiInfo: sadeSatiInfo),
+                        accentColor: _Colors.coral,
+                      ),
+                      const SizedBox(height: _DesignTokens.space12),
+                      _AnimatedCardWrapper(
+                        delay: 50,
+                        child: _SadeSatiCard(sadeSatiInfo: sadeSatiInfo),
+                      ),
+                    ] else ...[
+                      const SizedBox(height: _DesignTokens.space24),
+                      _AnimatedCardWrapper(
+                        child: _SadeSatiInactiveCard(moonSign: widget.kundaliData.moonSign),
+                      ),
           ],
         ],
       ),
+              ),
+            ],
+          ),
+        ),
+
+        // Floating bottom navigation
+        Positioned(
+          left: 16,
+          right: 16,
+          bottom: MediaQuery.of(context).padding.bottom + 16,
+          child: FloatingNavBar(
+            sections: _sections,
+            activeIndex: _activeIndex,
+            onTap: _scrollToSection,
+          ),
+        ),
+      ],
     );
   }
 
@@ -128,14 +897,14 @@ class TransitTab extends StatelessWidget {
       final now = DateTime.now();
       final result = KundaliCalculationService.calculateAll(
         birthDateTime: now,
-        latitude: kundaliData.latitude,
-        longitude: kundaliData.longitude,
-        timezone: kundaliData.timezone,
+        latitude: widget.kundaliData.latitude,
+        longitude: widget.kundaliData.longitude,
+        timezone: widget.kundaliData.timezone,
       );
       return result.planetPositions;
     } catch (e) {
       debugPrint('Transit calculation error: $e');
-      return kundaliData.planetPositions;
+      return widget.kundaliData.planetPositions;
     }
   }
 
@@ -219,77 +988,315 @@ class TransitTab extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SECTION LABEL
+// ANIMATED SECTION WRAPPER
 // ═══════════════════════════════════════════════════════════════════════════
-class _SectionLabel extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final Color color;
-  final Widget? trailing;
+class _AnimatedSectionWrapper extends StatefulWidget {
+  final GlobalKey sectionKey;
+  final Color accentColor;
+  final Widget child;
 
-  const _SectionLabel({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.color,
-    this.trailing,
+  const _AnimatedSectionWrapper({
+    super.key,
+    required this.sectionKey,
+    required this.accentColor,
+    required this.child,
   });
 
   @override
+  State<_AnimatedSectionWrapper> createState() => _AnimatedSectionWrapperState();
+}
+
+class _AnimatedSectionWrapperState extends State<_AnimatedSectionWrapper> {
+  bool _isHighlighted = false;
+
+  void triggerHighlight() {
+    HapticFeedback.lightImpact();
+    setState(() => _isHighlighted = true);
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) setState(() => _isHighlighted = false);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, size: 16, color: color),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: GoogleFonts.dmSans(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: KundliDisplayColors.textPrimary,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.dmSans(
-                    fontSize: 10,
-                    color: KundliDisplayColors.textMuted,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (trailing != null) trailing!,
-        ],
-      ),
+    return _SectionAnimationProvider(
+      isHighlighted: _isHighlighted,
+      accentColor: widget.accentColor,
+      child: Container(key: widget.sectionKey, child: widget.child),
     );
   }
 }
 
+class _SectionAnimationProvider extends InheritedWidget {
+  final bool isHighlighted;
+  final Color accentColor;
+
+  const _SectionAnimationProvider({
+    required this.isHighlighted,
+    required this.accentColor,
+    required super.child,
+  });
+
+  static _SectionAnimationProvider? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_SectionAnimationProvider>();
+  }
+
+  @override
+  bool updateShouldNotify(_SectionAnimationProvider oldWidget) {
+    return isHighlighted != oldWidget.isHighlighted;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ANIMATED SECTION HEADER
+// ═══════════════════════════════════════════════════════════════════════════
+class _AnimatedSectionHeader extends StatefulWidget {
+  final String title;
+  final String? subtitle;
+  final Color accentColor;
+  final Widget? trailing;
+
+  const _AnimatedSectionHeader({
+    required this.title,
+    this.subtitle,
+    required this.accentColor,
+    this.trailing,
+  });
+
+  @override
+  State<_AnimatedSectionHeader> createState() => _AnimatedSectionHeaderState();
+}
+
+class _AnimatedSectionHeaderState extends State<_AnimatedSectionHeader>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _underlineAnimation;
+  late Animation<double> _textPulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+
+    _underlineAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.0, 0.7, curve: Curves.easeOutCubic),
+    );
+
+    _textPulseAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 30,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 70,
+      ),
+    ]).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final provider = _SectionAnimationProvider.of(context);
+    if (provider?.isHighlighted == true) {
+      _controller.forward(from: 0);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final textPulse = _textPulseAnimation.value;
+        final underlineWidth = _underlineAnimation.value;
+
+        final textColor = Color.lerp(
+          _Colors.textTertiary,
+          widget.accentColor,
+          textPulse * 0.8,
+        )!;
+
+    return Padding(
+          padding: const EdgeInsets.only(left: _DesignTokens.space4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                      widget.title.toUpperCase(),
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                        letterSpacing: 1.0,
+                        color: textColor,
+                  ),
+                ),
+                    if (widget.subtitle != null) ...[
+                      const SizedBox(height: 2),
+                Text(
+                        widget.subtitle!,
+                        style: GoogleFonts.inter(
+                    fontSize: 10,
+                          color: _Colors.textTertiary,
+                  ),
+                ),
+              ],
+                    const SizedBox(height: 4),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final maxWidth = math.min(constraints.maxWidth * 0.3, 40.0);
+                        return Container(
+                          height: 2,
+                          width: maxWidth * underlineWidth,
+                          decoration: BoxDecoration(
+                            color: widget.accentColor.withOpacity(0.6 + textPulse * 0.4),
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              if (widget.trailing != null) widget.trailing!,
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ANIMATED CARD WRAPPER
+// ═══════════════════════════════════════════════════════════════════════════
+class _AnimatedCardWrapper extends StatefulWidget {
+  final Widget child;
+  final int delay;
+
+  const _AnimatedCardWrapper({required this.child, this.delay = 0});
+
+  @override
+  State<_AnimatedCardWrapper> createState() => _AnimatedCardWrapperState();
+}
+
+class _AnimatedCardWrapperState extends State<_AnimatedCardWrapper>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _shadowAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 1.025).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 35,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.025, end: 1.0).chain(CurveTween(curve: Curves.elasticOut)),
+        weight: 65,
+      ),
+    ]).animate(_controller);
+
+    _shadowAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 30,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 70,
+      ),
+    ]).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final provider = _SectionAnimationProvider.of(context);
+    if (provider?.isHighlighted == true) {
+      Future.delayed(Duration(milliseconds: widget.delay), () {
+        if (mounted) _controller.forward(from: 0);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = _SectionAnimationProvider.of(context);
+    final accentColor = provider?.accentColor ?? _Colors.violet;
+
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final scale = _scaleAnimation.value;
+        final shadow = _shadowAnimation.value;
+
+        return Transform.scale(
+          scale: scale,
+          child: Container(
+            decoration: shadow > 0.01
+                ? BoxDecoration(
+                    borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
+                    boxShadow: [
+                      BoxShadow(
+                        color: accentColor.withOpacity(shadow * 0.2),
+                        blurRadius: 16 * shadow,
+                        spreadRadius: -4,
+                        offset: Offset(0, 4 * shadow),
+                      ),
+                    ],
+                  )
+                : null,
+            child: child,
+          ),
+        );
+      },
+      child: widget.child,
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LIVE INDICATOR
+// ═══════════════════════════════════════════════════════════════════════════
 class _LiveIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF6EE7B7).withOpacity(0.12),
+        color: _Colors.emerald.withOpacity(0.12),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(
-          color: const Color(0xFF6EE7B7).withOpacity(0.3),
+          color: _Colors.emerald.withOpacity(0.3),
           width: 0.5,
         ),
       ),
@@ -300,17 +1307,17 @@ class _LiveIndicator extends StatelessWidget {
             width: 6,
             height: 6,
             decoration: const BoxDecoration(
-              color: Color(0xFF6EE7B7),
+              color: _Colors.emerald,
               shape: BoxShape.circle,
             ),
           ),
           const SizedBox(width: 4),
           Text(
             'LIVE',
-            style: GoogleFonts.dmMono(
+            style: GoogleFonts.jetBrainsMono(
               fontSize: 8,
               fontWeight: FontWeight.w700,
-              color: const Color(0xFF6EE7B7),
+              color: _Colors.emerald,
             ),
           ),
         ],
@@ -320,9 +1327,9 @@ class _LiveIndicator extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// TRANSIT HERO CARD
+// TRANSIT HERO CARD - Interactive
 // ═══════════════════════════════════════════════════════════════════════════
-class _TransitHeroCard extends StatelessWidget {
+class _TransitHeroCard extends StatefulWidget {
   final DateTime now;
   final String moonSign;
   final int favorableCount;
@@ -338,215 +1345,39 @@ class _TransitHeroCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final dateStr = DateFormat('dd MMM yyyy').format(now);
-    final timeStr = DateFormat('HH:mm').format(now);
-    final overallBalance = favorableCount - challengingCount;
-    final balanceStatus = _getBalanceStatus(overallBalance);
+  State<_TransitHeroCard> createState() => _TransitHeroCardState();
+}
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            _getBalanceColor(overallBalance).withOpacity(0.15),
-            const Color(0xFF22D3EE).withOpacity(0.06),
-            KundliDisplayColors.surfaceColor.withOpacity(0.4),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: _getBalanceColor(overallBalance).withOpacity(0.25),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: _getBalanceColor(overallBalance).withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Top row
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Balance gauge
-              _BalanceGauge(
-                balance: overallBalance,
-                favorable: favorableCount,
-                challenging: challengingCount,
-              ),
-              const SizedBox(width: 20),
-              // Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: _getBalanceColor(overallBalance).withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            balanceStatus.toUpperCase(),
-                            style: GoogleFonts.dmMono(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w600,
-                              color: _getBalanceColor(overallBalance),
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Transit Overview',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: KundliDisplayColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    // Favorable/Challenging chips
-                    Row(
-                      children: [
-                        _StatBadge(
-                          icon: Icons.thumb_up_rounded,
-                          value: favorableCount,
-                          label: 'Favorable',
-                          color: const Color(0xFF4ADE80),
-                        ),
-                        const SizedBox(width: 10),
-                        _StatBadge(
-                          icon: Icons.thumb_down_rounded,
-                          value: challengingCount,
-                          label: 'Challenging',
-                          color: const Color(0xFFF87171),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+class _TransitHeroCardState extends State<_TransitHeroCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  bool _isPressed = false;
 
-          const SizedBox(height: 16),
-
-          // Date/Time & Moon Sign row
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: KundliDisplayColors.surfaceColor.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                _InfoChip(
-                  icon: Icons.calendar_today_rounded,
-                  value: dateStr,
-                  color: KundliDisplayColors.textMuted,
-                ),
-                _VerticalDivider(),
-                _InfoChip(
-                  icon: Icons.access_time_rounded,
-                  value: timeStr,
-                  color: KundliDisplayColors.textMuted,
-                ),
-                _VerticalDivider(),
-                Expanded(
-                  child: _InfoChip(
-                    icon: Icons.nightlight_round,
-                    value: moonSign,
-                    label: 'Janma Rashi',
-                    color: const Color(0xFF6EE7B7),
-                    isHighlighted: true,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Sade Sati warning
-          if (sadeSatiInfo['isActive'] == true) ...[
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFFF87171).withOpacity(0.12),
-                    const Color(0xFFF87171).withOpacity(0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: const Color(0xFFF87171).withOpacity(0.25),
-                  width: 0.5,
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF87171).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.warning_amber_rounded,
-                      size: 16,
-                      color: Color(0xFFF87171),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Sade Sati Active',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFFF87171),
-                          ),
-                        ),
-                        Text(
-                          '${sadeSatiInfo['phase']}',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 10,
-                            color: KundliDisplayColors.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  _SadeSatiPhaseIndicator(phase: sadeSatiInfo['phaseNumber'] ?? 0),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
     );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.98,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Color _getBalanceColor(int balance) {
-    if (balance >= 3) return const Color(0xFF4ADE80);
-    if (balance >= 0) return const Color(0xFF60A5FA);
-    if (balance >= -2) return const Color(0xFFFBBF24);
-    return const Color(0xFFF87171);
+    if (balance >= 3) return _Colors.emerald;
+    if (balance >= 0) return _Colors.sky;
+    if (balance >= -2) return _Colors.amber;
+    return _Colors.coral;
   }
 
   String _getBalanceStatus(int balance) {
@@ -556,70 +1387,469 @@ class _TransitHeroCard extends StatelessWidget {
     if (balance >= -3) return 'Challenging';
     return 'Difficult';
   }
-}
 
-class _BalanceGauge extends StatelessWidget {
-  final int balance;
-  final int favorable;
-  final int challenging;
+  void _onTapDown(TapDownDetails details) {
+    setState(() => _isPressed = true);
+    _controller.forward();
+    HapticFeedback.selectionClick();
+  }
 
-  const _BalanceGauge({
-    required this.balance,
-    required this.favorable,
-    required this.challenging,
-  });
+  void _onTapUp(TapUpDetails details) {
+    setState(() => _isPressed = false);
+    _controller.reverse();
+    _showInsightSheet(
+      context,
+      _getTransitOverviewInsight(
+        widget.favorableCount,
+        widget.challengingCount,
+        widget.moonSign,
+      ),
+    );
+  }
+
+  void _onTapCancel() {
+    setState(() => _isPressed = false);
+    _controller.reverse();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final color = balance >= 0
-        ? const Color(0xFF4ADE80)
-        : const Color(0xFFF87171);
+    final dateStr = DateFormat('dd MMM yyyy').format(widget.now);
+    final timeStr = DateFormat('HH:mm').format(widget.now);
+    final overallBalance = widget.favorableCount - widget.challengingCount;
+    final balanceStatus = _getBalanceStatus(overallBalance);
+    final balanceColor = _getBalanceColor(overallBalance);
 
-    return Container(
-      width: 80,
-      height: 80,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: RadialGradient(
-          colors: [
-            color.withOpacity(0.2),
-            color.withOpacity(0.05),
-          ],
-        ),
-        border: Border.all(
-          color: color.withOpacity(0.4),
-          width: 3,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            balance >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-            size: 24,
-            color: color,
-          ),
-          Text(
-            balance >= 0 ? '+$balance' : '$balance',
-            style: GoogleFonts.dmSans(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: color,
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: child,
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: const Color(0xFF141218),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFF262432),
+              width: 1,
             ),
           ),
-        ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header row with gauge and info
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Compact balance gauge
+                  _CompactBalanceGauge(
+                    balance: overallBalance,
+                    color: balanceColor,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Status badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: balanceColor.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            balanceStatus.toUpperCase(),
+                            style: GoogleFonts.inter(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w600,
+                              color: balanceColor,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Transit Overview',
+                          style: GoogleFonts.instrumentSans(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // Favorable/Challenging counts
+                        Row(
+                          children: [
+                            _TransitStatBadge(
+                              icon: Icons.thumb_up_rounded,
+                              value: widget.favorableCount,
+                              label: 'Favorable',
+                              color: _Colors.emerald,
+                            ),
+                            const SizedBox(width: 14),
+                            _TransitStatBadge(
+                              icon: Icons.thumb_down_rounded,
+                              value: widget.challengingCount,
+                              label: 'Challenging',
+                              color: _Colors.coral,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Info icon
+                  Icon(
+                    Icons.info_outline_rounded,
+                    size: 18,
+                    color: const Color(0xFF6E6A7A),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 14),
+
+              // Date/Time & Moon Sign row
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1A181F),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFF2A2838),
+                    width: 0.5,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    // Date
+                    Icon(
+                      Icons.calendar_today_rounded,
+                      size: 13,
+                      color: const Color(0xFF7C7889),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      dateStr,
+                      style: GoogleFonts.jetBrainsMono(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFFB8B5C2),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    // Time
+                    Icon(
+                      Icons.access_time_rounded,
+                      size: 13,
+                      color: const Color(0xFF7C7889),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      timeStr,
+                      style: GoogleFonts.jetBrainsMono(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFFB8B5C2),
+                      ),
+                    ),
+                    const Spacer(),
+                    // Moon Sign
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'Janma Rashi',
+                          style: GoogleFonts.inter(
+                            fontSize: 8,
+                            fontWeight: FontWeight.w400,
+                            color: const Color(0xFF7C7889),
+                          ),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.nightlight_round,
+                              size: 12,
+                              color: _Colors.emerald,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              widget.moonSign,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: _Colors.emerald,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+            // Sade Sati warning - Interactive
+            if (widget.sadeSatiInfo['isActive'] == true) ...[
+              const SizedBox(height: 12),
+              _InteractiveSadeSatiBanner(sadeSatiInfo: widget.sadeSatiInfo),
+            ],
+          ],
+        ),
+      ),
+    ),
+  );
+}
+}
+
+class _InteractiveSadeSatiBanner extends StatefulWidget {
+  final Map<String, dynamic> sadeSatiInfo;
+
+  const _InteractiveSadeSatiBanner({required this.sadeSatiInfo});
+
+  @override
+  State<_InteractiveSadeSatiBanner> createState() =>
+      _InteractiveSadeSatiBannerState();
+}
+
+class _InteractiveSadeSatiBannerState extends State<_InteractiveSadeSatiBanner> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+        _showInsightSheet(context, _getSadeSatiInsight(widget.sadeSatiInfo));
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              _Colors.coral.withOpacity(_isPressed ? 0.2 : 0.12),
+              _Colors.coral.withOpacity(_isPressed ? 0.1 : 0.05),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(_DesignTokens.radiusMd),
+          border: Border.all(
+            color: _Colors.coral.withOpacity(_isPressed ? 0.4 : 0.25),
+            width: _isPressed ? 1 : 0.5,
+          ),
+          boxShadow: _isPressed
+              ? [
+                  BoxShadow(
+                    color: _Colors.coral.withOpacity(0.15),
+                    blurRadius: 10,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: _Colors.coral.withOpacity(_isPressed ? 0.25 : 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.warning_amber_rounded,
+                size: 16,
+                color: _Colors.coral,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Sade Sati Active',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: _Colors.coral,
+                        ),
+                      ),
+                      const Spacer(),
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 150),
+                        opacity: _isPressed ? 1.0 : 0.5,
+                        child: Text(
+                          'Tap for details',
+                          style: GoogleFonts.inter(
+                            fontSize: 8,
+                            color: _Colors.coral,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    '${widget.sadeSatiInfo['phase']}',
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      color: _Colors.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            _SadeSatiPhaseIndicator(
+              phase: widget.sadeSatiInfo['phaseNumber'] ?? 0,
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _StatBadge extends StatelessWidget {
+// ═══════════════════════════════════════════════════════════════════════════
+// COMPACT BALANCE GAUGE - Refined circular gauge
+// ═══════════════════════════════════════════════════════════════════════════
+class _CompactBalanceGauge extends StatefulWidget {
+  final int balance;
+  final Color color;
+
+  const _CompactBalanceGauge({
+    required this.balance,
+    required this.color,
+  });
+
+  @override
+  State<_CompactBalanceGauge> createState() => _CompactBalanceGaugeState();
+}
+
+class _CompactBalanceGaugeState extends State<_CompactBalanceGauge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
+  late Animation<double> _progressAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      duration: const Duration(milliseconds: 1000),
+      vsync: this,
+    );
+    
+    // Normalize balance to 0-1 range (balance ranges from -12 to +12)
+    final normalizedValue = ((widget.balance + 12) / 24).clamp(0.0, 1.0);
+    
+    _progressAnim = Tween<double>(begin: 0, end: normalizedValue).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
+    );
+    
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) _animController.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 64,
+      height: 64,
+      child: AnimatedBuilder(
+        animation: _progressAnim,
+        builder: (context, child) {
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              // Background circle
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: widget.color.withOpacity(0.15),
+                    width: 4,
+                  ),
+                ),
+              ),
+              // Progress arc
+              SizedBox(
+                width: 64,
+                height: 64,
+                child: CircularProgressIndicator(
+                  value: _progressAnim.value,
+                  strokeWidth: 4,
+                  backgroundColor: Colors.transparent,
+                  valueColor: AlwaysStoppedAnimation<Color>(widget.color),
+                  strokeCap: StrokeCap.round,
+                ),
+              ),
+              // Center content
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    widget.balance >= 0
+                        ? Icons.trending_up_rounded
+                        : Icons.trending_down_rounded,
+                    size: 14,
+                    color: widget.color,
+                  ),
+                  Text(
+                    widget.balance >= 0 ? '+${widget.balance}' : '${widget.balance}',
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: widget.color,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TRANSIT STAT BADGE - Compact favorable/challenging indicator
+// ═══════════════════════════════════════════════════════════════════════════
+class _TransitStatBadge extends StatelessWidget {
   final IconData icon;
   final int value;
   final String label;
   final Color color;
 
-  const _StatBadge({
+  const _TransitStatBadge({
     required this.icon,
     required this.value,
     required this.label,
@@ -631,31 +1861,219 @@ class _StatBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withOpacity(0.12),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 6),
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 5),
           Text(
             '$value',
-            style: GoogleFonts.dmSans(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
               color: color,
             ),
           ),
           const SizedBox(width: 4),
           Text(
             label,
-            style: GoogleFonts.dmSans(
-              fontSize: 9,
-              color: KundliDisplayColors.textMuted,
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w400,
+              color: color.withOpacity(0.8),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _InteractiveBalanceGauge extends StatefulWidget {
+  final int balance;
+  final int favorable;
+  final int challenging;
+
+  const _InteractiveBalanceGauge({
+    required this.balance,
+    required this.favorable,
+    required this.challenging,
+  });
+
+  @override
+  State<_InteractiveBalanceGauge> createState() =>
+      _InteractiveBalanceGaugeState();
+}
+
+class _InteractiveBalanceGaugeState extends State<_InteractiveBalanceGauge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = widget.balance >= 0 ? _Colors.emerald : _Colors.coral;
+
+    return AnimatedBuilder(
+      animation: _pulseAnimation,
+      builder: (context, child) {
+        return Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [
+                color.withOpacity(0.25 * _pulseAnimation.value),
+                color.withOpacity(0.05),
+              ],
+            ),
+            border: Border.all(
+              color: color.withOpacity(0.4 + 0.1 * _pulseAnimation.value),
+              width: 3,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.15 * _pulseAnimation.value),
+                blurRadius: 16,
+                spreadRadius: -4,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                widget.balance >= 0
+                    ? Icons.trending_up_rounded
+                    : Icons.trending_down_rounded,
+                size: 24,
+                color: color,
+              ),
+              Text(
+                widget.balance >= 0 ? '+${widget.balance}' : '${widget.balance}',
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _InteractiveStatBadge extends StatefulWidget {
+  final IconData icon;
+  final int value;
+  final String label;
+  final Color color;
+
+  const _InteractiveStatBadge({
+    required this.icon,
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  State<_InteractiveStatBadge> createState() => _InteractiveStatBadgeState();
+}
+
+class _InteractiveStatBadgeState extends State<_InteractiveStatBadge> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+        _showInsightSheet(
+          context,
+          InsightData(
+            title: '${widget.label} Transits',
+            value: '${widget.value} Planets',
+            description: widget.label == 'Favorable'
+                ? 'These planets are currently transiting houses that are generally supportive from your Moon sign. Favorable transits bring opportunities, success, and positive energy.'
+                : 'These planets are currently in positions that may bring challenges or require extra attention. Challenging transits offer growth opportunities through overcoming obstacles.',
+            significance:
+                'You have ${widget.value} ${widget.label.toLowerCase()} planetary transits currently active.',
+            keyPoints: [
+              'Count: ${widget.value} planets',
+              'Type: ${widget.label}',
+              widget.label == 'Favorable'
+                  ? 'Houses 3, 6, 10, 11 are generally favorable'
+                  : 'Other houses require more attention',
+              'Transits are calculated from your Moon sign (Janma Rashi)',
+            ],
+            accentColor: widget.color,
+            icon: widget.icon,
+          ),
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: widget.color.withOpacity(_isPressed ? 0.2 : 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color:
+                _isPressed ? widget.color.withOpacity(0.4) : Colors.transparent,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(widget.icon, size: 14, color: widget.color),
+            const SizedBox(width: 6),
+            Text(
+              '${widget.value}',
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: widget.color,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              widget.label,
+              style: GoogleFonts.inter(
+                fontSize: 9,
+                color: _Colors.textTertiary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -690,17 +2108,17 @@ class _InfoChip extends StatelessWidget {
             if (label != null)
               Text(
                 label!,
-                style: GoogleFonts.dmSans(
+                style: GoogleFonts.inter(
                   fontSize: 8,
-                  color: KundliDisplayColors.textMuted.withOpacity(0.7),
+                  color: _Colors.textTertiary.withOpacity(0.7),
                 ),
               ),
             Text(
               value,
-              style: GoogleFonts.dmSans(
+              style: GoogleFonts.inter(
                 fontSize: isHighlighted ? 12 : 11,
                 fontWeight: isHighlighted ? FontWeight.w600 : FontWeight.w500,
-                color: isHighlighted ? color : KundliDisplayColors.textSecondary,
+                color: isHighlighted ? color : _Colors.textSecondary,
               ),
             ),
           ],
@@ -717,7 +2135,7 @@ class _VerticalDivider extends StatelessWidget {
       width: 1,
       height: 24,
       margin: const EdgeInsets.symmetric(horizontal: 12),
-      color: KundliDisplayColors.borderColor.withOpacity(0.3),
+      color: _Colors.border.withOpacity(0.3),
     );
   }
 }
@@ -738,9 +2156,7 @@ class _SadeSatiPhaseIndicator extends StatelessWidget {
           height: 10,
           margin: const EdgeInsets.only(left: 4),
           decoration: BoxDecoration(
-            color: isActive
-                ? const Color(0xFFF87171)
-                : const Color(0xFFF87171).withOpacity(0.2),
+            color: isActive ? _Colors.coral : _Colors.coral.withOpacity(0.2),
             shape: BoxShape.circle,
           ),
         );
@@ -750,9 +2166,9 @@ class _SadeSatiPhaseIndicator extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CURRENT POSITIONS CARD
+// CURRENT POSITIONS CARD - Interactive
 // ═══════════════════════════════════════════════════════════════════════════
-class _CurrentPositionsCard extends StatelessWidget {
+class _CurrentPositionsCard extends StatefulWidget {
   final Map<String, PlanetPosition> positions;
   final Map<String, PlanetPosition> natalPositions;
 
@@ -762,155 +2178,111 @@ class _CurrentPositionsCard extends StatelessWidget {
   });
 
   @override
+  State<_CurrentPositionsCard> createState() => _CurrentPositionsCardState();
+}
+
+class _CurrentPositionsCardState extends State<_CurrentPositionsCard> {
+  bool _headerPressed = false;
+
+  @override
   Widget build(BuildContext context) {
-    final vedicPlanets = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu', 'Ketu'];
+    final vedicPlanets = [
+      'Sun',
+      'Moon',
+      'Mars',
+      'Mercury',
+      'Jupiter',
+      'Venus',
+      'Saturn',
+      'Rahu',
+      'Ketu',
+    ];
 
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(16),
+        color: _Colors.surface.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
         border: Border.all(
-          color: KundliDisplayColors.borderColor.withOpacity(0.3),
+          color: _Colors.border.withOpacity(0.3),
           width: 0.5,
         ),
       ),
       child: Column(
         children: [
-          // Header
-          Row(
-            children: [
-              Text(
-                'Planet',
-                style: GoogleFonts.dmSans(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: KundliDisplayColors.textMuted,
-                ),
+          // Header - Interactive
+          GestureDetector(
+            onTapDown: (_) => setState(() => _headerPressed = true),
+            onTapUp: (_) {
+              setState(() => _headerPressed = false);
+              HapticFeedback.selectionClick();
+              _showInsightSheet(context, _getCurrentSkyInsight());
+            },
+            onTapCancel: () => setState(() => _headerPressed = false),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                color: _headerPressed
+                    ? _Colors.violet.withOpacity(0.1)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
               ),
-              const Spacer(),
-              Text(
-                'Current',
-                style: GoogleFonts.dmSans(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: KundliDisplayColors.textMuted,
-                ),
-              ),
-              const SizedBox(width: 40),
-              Text(
-                'Natal',
-                style: GoogleFonts.dmSans(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: KundliDisplayColors.textMuted,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Divider(color: KundliDisplayColors.borderColor.withOpacity(0.2), height: 1),
-          const SizedBox(height: 8),
-          // Planets
-          ...vedicPlanets.map((planet) {
-            final pos = positions[planet];
-            final natalPos = natalPositions[planet];
-            if (pos == null) return const SizedBox();
-
-            final signChanged = natalPos != null && natalPos.sign != pos.sign;
-            final planetColor = getPlanetColor(planet);
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
               child: Row(
                 children: [
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: planetColor.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    child: Center(
-                      child: Text(
-                        getPlanetSymbol(planet),
-                        style: TextStyle(fontSize: 13, color: planetColor),
-                      ),
+                  Text(
+                    'Planet',
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: _Colors.textTertiary,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  SizedBox(
-                    width: 50,
-                    child: Text(
-                      planet,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: KundliDisplayColors.textPrimary,
-                      ),
+                  const SizedBox(width: 4),
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 150),
+                    opacity: _headerPressed ? 1.0 : 0.5,
+                    child: Icon(
+                      Icons.info_outline_rounded,
+                      size: 12,
+                      color: _Colors.violet,
                     ),
                   ),
                   const Spacer(),
-                  // Current position
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: signChanged
-                          ? const Color(0xFFFBBF24).withOpacity(0.1)
-                          : KundliDisplayColors.surfaceColor.withOpacity(0.6),
-                      borderRadius: BorderRadius.circular(6),
-                      border: signChanged
-                          ? Border.all(color: const Color(0xFFFBBF24).withOpacity(0.3), width: 0.5)
-                          : null,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '${pos.sign.substring(0, 3)} ${pos.signDegree.toStringAsFixed(1)}°',
-                          style: GoogleFonts.dmMono(
-                            fontSize: 10,
-                            color: KundliDisplayColors.textPrimary,
-                          ),
-                        ),
-                        if (pos.isRetrograde) ...[
-                          const SizedBox(width: 4),
-                          Text(
-                            '℞',
-                            style: GoogleFonts.dmMono(
-                              fontSize: 10,
-                              color: const Color(0xFFF87171),
-                            ),
-                          ),
-                        ],
-                        if (signChanged) ...[
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.swap_horiz_rounded,
-                            size: 12,
-                            color: const Color(0xFFFBBF24),
-                          ),
-                        ],
-                      ],
+                  Text(
+                    'Current',
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: _Colors.textTertiary,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  // Natal position
-                  SizedBox(
-                    width: 70,
-                    child: natalPos != null
-                        ? Text(
-                            '${natalPos.sign.substring(0, 3)} ${natalPos.signDegree.toStringAsFixed(1)}°',
-                            style: GoogleFonts.dmMono(
-                              fontSize: 10,
-                              color: KundliDisplayColors.textMuted,
-                            ),
-                            textAlign: TextAlign.right,
-                          )
-                        : const SizedBox(),
+                  const SizedBox(width: 40),
+                  Text(
+                    'Natal',
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: _Colors.textTertiary,
+                    ),
                   ),
                 ],
               ),
+            ),
+          ),
+          Divider(color: _Colors.border.withOpacity(0.2), height: 1),
+          const SizedBox(height: 8),
+          // Planets - Interactive rows
+          ...vedicPlanets.map((planet) {
+            final pos = widget.positions[planet];
+            final natalPos = widget.natalPositions[planet];
+            if (pos == null) return const SizedBox();
+
+            return _InteractiveSkyPlanetRow(
+              planet: planet,
+              currentPos: pos,
+              natalPos: natalPos,
             );
           }),
         ],
@@ -919,60 +2291,303 @@ class _CurrentPositionsCard extends StatelessWidget {
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// GOCHAR LEGEND
-// ═══════════════════════════════════════════════════════════════════════════
-class _GocharLegend extends StatelessWidget {
+class _InteractiveSkyPlanetRow extends StatefulWidget {
+  final String planet;
+  final PlanetPosition currentPos;
+  final PlanetPosition? natalPos;
+
+  const _InteractiveSkyPlanetRow({
+    required this.planet,
+    required this.currentPos,
+    this.natalPos,
+  });
+
+  @override
+  State<_InteractiveSkyPlanetRow> createState() =>
+      _InteractiveSkyPlanetRowState();
+}
+
+class _InteractiveSkyPlanetRowState extends State<_InteractiveSkyPlanetRow> {
+  bool _isPressed = false;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: KundliDisplayColors.surfaceColor.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.info_outline_rounded,
-            size: 14,
-            color: KundliDisplayColors.textMuted,
+    final signChanged =
+        widget.natalPos != null && widget.natalPos!.sign != widget.currentPos.sign;
+    final planetColor = _getPlanetColor(widget.planet);
+    final isSlow =
+        ['Saturn', 'Jupiter', 'Rahu', 'Ketu'].contains(widget.planet);
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+        _showInsightSheet(
+          context,
+          InsightData(
+            title: 'Current Position',
+            value: widget.planet,
+            description:
+                '${widget.planet} is currently at ${widget.currentPos.signDegree.toStringAsFixed(1)}° in ${widget.currentPos.sign}${widget.currentPos.isRetrograde ? " (Retrograde)" : ""}. ${widget.natalPos != null ? "At your birth, ${widget.planet} was at ${widget.natalPos!.signDegree.toStringAsFixed(1)}° in ${widget.natalPos!.sign}." : ""}',
+            significance: signChanged
+                ? '${widget.planet} has moved to a different sign since your birth. ${signChanged ? "This indicates the planet is in a new area of your chart." : ""}'
+                : '${widget.planet} is ${widget.currentPos.sign == widget.natalPos?.sign ? "in the same sign as at birth" : "currently transiting"}.${isSlow ? " As a slow-moving planet, its transits have longer-lasting effects." : ""}',
+            keyPoints: [
+              'Planet: ${widget.planet}',
+              'Current: ${widget.currentPos.sign} ${widget.currentPos.signDegree.toStringAsFixed(1)}°',
+              if (widget.natalPos != null)
+                'Natal: ${widget.natalPos!.sign} ${widget.natalPos!.signDegree.toStringAsFixed(1)}°',
+              if (widget.currentPos.isRetrograde) 'Status: Retrograde ℞',
+              if (signChanged) 'Sign Changed: Yes',
+              if (isSlow)
+                'Transit Speed: Slow (${widget.planet == "Saturn" ? "~2.5 yrs" : widget.planet == "Jupiter" ? "~1 yr" : "~1.5 yrs"}/sign)',
+            ],
+            accentColor: planetColor,
+            icon: Icons.public_rounded,
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Favorable: 3, 6, 10, 11 from Moon • Other houses vary by planet',
-              style: GoogleFonts.dmSans(
-                fontSize: 9,
-                color: KundliDisplayColors.textMuted,
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        margin: const EdgeInsets.only(bottom: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        decoration: BoxDecoration(
+          color: _isPressed ? planetColor.withOpacity(0.08) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: _isPressed ? planetColor.withOpacity(0.3) : Colors.transparent,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: planetColor.withOpacity(_isPressed ? 0.2 : 0.12),
+                borderRadius: BorderRadius.circular(7),
+                boxShadow: _isPressed
+                    ? [
+                        BoxShadow(
+                          color: planetColor.withOpacity(0.25),
+                          blurRadius: 8,
+                          spreadRadius: -2,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Center(
+                child: Text(
+                  _getPlanetSymbol(widget.planet),
+                  style: TextStyle(fontSize: 13, color: planetColor),
+                ),
               ),
             ),
-          ),
-          Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(
-              color: const Color(0xFF4ADE80).withOpacity(0.3),
-              borderRadius: BorderRadius.circular(3),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: 50,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.planet,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: _Colors.textPrimary,
+                    ),
+                  ),
+                  if (isSlow)
+                    Text(
+                      'Major',
+                      style: GoogleFonts.inter(
+                        fontSize: 7,
+                        color: _Colors.sky,
+                      ),
+                    ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            '= Good',
-            style: GoogleFonts.dmSans(
-              fontSize: 8,
-              color: KundliDisplayColors.textMuted,
+            const Spacer(),
+            // Current position
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: signChanged
+                    ? _Colors.amber.withOpacity(0.1)
+                    : _Colors.surface.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(6),
+                border: signChanged
+                    ? Border.all(
+                        color: _Colors.amber.withOpacity(0.3),
+                        width: 0.5,
+                      )
+                    : null,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${widget.currentPos.sign.substring(0, 3)} ${widget.currentPos.signDegree.toStringAsFixed(1)}°',
+                    style: GoogleFonts.jetBrainsMono(
+                      fontSize: 10,
+                      color: _Colors.textPrimary,
+                    ),
+                  ),
+                  if (widget.currentPos.isRetrograde) ...[
+                    const SizedBox(width: 4),
+                    Text(
+                      '℞',
+                      style: GoogleFonts.jetBrainsMono(
+                        fontSize: 10,
+                        color: _Colors.coral,
+                      ),
+                    ),
+                  ],
+                  if (signChanged) ...[
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.swap_horiz_rounded,
+                      size: 12,
+                      color: _Colors.amber,
+                    ),
+                  ],
+                ],
+              ),
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+            // Natal position
+            SizedBox(
+              width: 70,
+              child: widget.natalPos != null
+                  ? Text(
+                      '${widget.natalPos!.sign.substring(0, 3)} ${widget.natalPos!.signDegree.toStringAsFixed(1)}°',
+                      style: GoogleFonts.jetBrainsMono(
+                        fontSize: 10,
+                        color: _Colors.textTertiary,
+                      ),
+                      textAlign: TextAlign.right,
+                    )
+                  : const SizedBox(),
+            ),
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 150),
+              opacity: _isPressed ? 1.0 : 0.3,
+              child: Icon(
+                Icons.chevron_right_rounded,
+                size: 14,
+                color: planetColor,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// GOCHAR GRID
+// GOCHAR COMPONENTS
 // ═══════════════════════════════════════════════════════════════════════════
+class _GocharLegend extends StatefulWidget {
+  final String moonSign;
+
+  const _GocharLegend({required this.moonSign});
+
+  @override
+  State<_GocharLegend> createState() => _GocharLegendState();
+}
+
+class _GocharLegendState extends State<_GocharLegend> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+        _showInsightSheet(context, _getGocharInsight(widget.moonSign));
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: _isPressed
+              ? _Colors.rose.withOpacity(0.1)
+              : _Colors.surface.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(_DesignTokens.radiusSm),
+          border: Border.all(
+            color: _isPressed ? _Colors.rose.withOpacity(0.3) : Colors.transparent,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: _Colors.rose.withOpacity(_isPressed ? 0.2 : 0.1),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Icon(
+                Icons.info_outline_rounded,
+                size: 12,
+                color: _Colors.rose,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Tap for detailed explanation',
+                    style: GoogleFonts.inter(
+                      fontSize: 8,
+                      color: _Colors.rose.withOpacity(0.7),
+                    ),
+                  ),
+                  Text(
+                    'Favorable: 3, 6, 10, 11 from Moon • ☽ = Janma Rashi',
+                    style: GoogleFonts.inter(
+                      fontSize: 9,
+                      color: _Colors.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: _Colors.emerald.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '★ Good',
+              style: GoogleFonts.inter(
+                fontSize: 8,
+                color: _Colors.textTertiary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _GocharGrid extends StatelessWidget {
   final Map<String, int> transitHouses;
   final String moonSign;
@@ -992,10 +2607,10 @@ class _GocharGrid extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(16),
+        color: _Colors.surface.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
         border: Border.all(
-          color: KundliDisplayColors.borderColor.withOpacity(0.3),
+          color: _Colors.border.withOpacity(0.3),
           width: 0.5,
         ),
       ),
@@ -1006,11 +2621,11 @@ class _GocharGrid extends StatelessWidget {
             children: List.generate(
                 6,
                 (i) => Expanded(
-                      child: _GocharCell(
+                      child: _InteractiveGocharCell(
                         house: i + 1,
                         planets: houseGroups[i + 1] ?? [],
                         isFavorable: _isFavorableHouse(i + 1),
-                        isFirst: i == 0,
+                        isMoonHouse: i == 0,
                       ),
                     )),
           ),
@@ -1020,11 +2635,11 @@ class _GocharGrid extends StatelessWidget {
             children: List.generate(
                 6,
                 (i) => Expanded(
-                      child: _GocharCell(
+                      child: _InteractiveGocharCell(
                         house: i + 7,
                         planets: houseGroups[i + 7] ?? [],
                         isFavorable: _isFavorableHouse(i + 7),
-                        isFirst: false,
+                        isMoonHouse: false,
                       ),
                     )),
           ),
@@ -1038,100 +2653,150 @@ class _GocharGrid extends StatelessWidget {
   }
 }
 
-class _GocharCell extends StatelessWidget {
+class _InteractiveGocharCell extends StatefulWidget {
   final int house;
   final List<String> planets;
   final bool isFavorable;
-  final bool isFirst;
+  final bool isMoonHouse;
 
-  const _GocharCell({
+  const _InteractiveGocharCell({
     required this.house,
     required this.planets,
     required this.isFavorable,
-    required this.isFirst,
+    required this.isMoonHouse,
   });
 
   @override
+  State<_InteractiveGocharCell> createState() => _InteractiveGocharCellState();
+}
+
+class _InteractiveGocharCellState extends State<_InteractiveGocharCell> {
+  bool _isPressed = false;
+
+  @override
   Widget build(BuildContext context) {
-    final bgColor = isFirst
-        ? KundliDisplayColors.accentPrimary.withOpacity(0.1)
-        : isFavorable
-            ? const Color(0xFF4ADE80).withOpacity(0.08)
-            : KundliDisplayColors.borderColor.withOpacity(0.08);
+    final bgColor = widget.isMoonHouse
+        ? _Colors.violet.withOpacity(_isPressed ? 0.2 : 0.1)
+        : widget.isFavorable
+            ? _Colors.emerald.withOpacity(_isPressed ? 0.15 : 0.08)
+            : _Colors.border.withOpacity(_isPressed ? 0.15 : 0.08);
 
-    final borderColor = isFirst
-        ? KundliDisplayColors.accentPrimary.withOpacity(0.3)
-        : isFavorable
-            ? const Color(0xFF4ADE80).withOpacity(0.2)
-            : KundliDisplayColors.borderColor.withOpacity(0.15);
+    final borderColor = widget.isMoonHouse
+        ? _Colors.violet.withOpacity(_isPressed ? 0.5 : 0.3)
+        : widget.isFavorable
+            ? _Colors.emerald.withOpacity(_isPressed ? 0.4 : 0.2)
+            : _Colors.border.withOpacity(_isPressed ? 0.3 : 0.15);
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 2),
-      padding: const EdgeInsets.all(6),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor, width: 0.5),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'H$house',
-                style: GoogleFonts.dmMono(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w600,
-                  color: isFirst
-                      ? KundliDisplayColors.accentPrimary
-                      : isFavorable
-                          ? const Color(0xFF4ADE80)
-                          : KundliDisplayColors.textMuted,
-                ),
-              ),
-              if (isFirst) ...[
-                const SizedBox(width: 2),
-                Text('☽', style: TextStyle(fontSize: 8, color: KundliDisplayColors.accentPrimary)),
-              ] else if (isFavorable) ...[
-                const SizedBox(width: 2),
-                Icon(Icons.star_rounded, size: 8, color: const Color(0xFF4ADE80)),
-              ],
-            ],
+    final accentColor = widget.isMoonHouse
+        ? _Colors.violet
+        : widget.isFavorable
+            ? _Colors.emerald
+            : _Colors.textTertiary;
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+        _showInsightSheet(
+          context,
+          _getGocharHouseInsight(
+            widget.house,
+            widget.planets,
+            widget.isFavorable,
+            widget.isMoonHouse,
           ),
-          const SizedBox(height: 4),
-          SizedBox(
-            height: 24,
-            child: planets.isEmpty
-                ? Text(
-                    '—',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 10,
-                      color: KundliDisplayColors.textMuted.withOpacity(0.3),
-                    ),
-                  )
-                : Wrap(
-                    spacing: 2,
-                    runSpacing: 2,
-                    alignment: WrapAlignment.center,
-                    children: planets
-                        .map((p) => Text(
-                              getPlanetSymbol(p),
-                              style: TextStyle(fontSize: 11, color: getPlanetColor(p)),
-                            ))
-                        .toList(),
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        margin: const EdgeInsets.symmetric(horizontal: 2),
+        padding: const EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: borderColor, width: _isPressed ? 1 : 0.5),
+          boxShadow: _isPressed
+              ? [
+                  BoxShadow(
+                    color: accentColor.withOpacity(0.2),
+                    blurRadius: 8,
+                    spreadRadius: -2,
                   ),
-          ),
-        ],
+                ]
+              : null,
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'H${widget.house}',
+                  style: GoogleFonts.jetBrainsMono(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w600,
+                    color: widget.isMoonHouse
+                        ? _Colors.violet
+                        : widget.isFavorable
+                            ? _Colors.emerald
+                            : _Colors.textTertiary,
+                  ),
+                ),
+                if (widget.isMoonHouse) ...[
+                  const SizedBox(width: 2),
+                  const Text(
+                    '☽',
+                    style: TextStyle(fontSize: 8, color: _Colors.violet),
+                  ),
+                ] else if (widget.isFavorable) ...[
+                  const SizedBox(width: 2),
+                  const Icon(
+                    Icons.star_rounded,
+                    size: 8,
+                    color: _Colors.emerald,
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 4),
+            SizedBox(
+              height: 24,
+              child: widget.planets.isEmpty
+                  ? Text(
+                      '—',
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        color: _Colors.textTertiary.withOpacity(0.3),
+                      ),
+                    )
+                  : Wrap(
+                      spacing: 2,
+                      runSpacing: 2,
+                      alignment: WrapAlignment.center,
+                      children: widget.planets
+                          .map((p) => Text(
+                                _getPlanetSymbol(p),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: _getPlanetColor(p),
+                                ),
+                              ))
+                          .toList(),
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PREMIUM TRANSIT CARD
+// PREMIUM TRANSIT CARD - Refined Minimal Design
 // ═══════════════════════════════════════════════════════════════════════════
-class _PremiumTransitCard extends StatelessWidget {
+class _PremiumTransitCard extends StatefulWidget {
   final TransitData transit;
   final PlanetPosition? natalPosition;
 
@@ -1141,233 +2806,650 @@ class _PremiumTransitCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final color = transit.isFavorable ? const Color(0xFF4ADE80) : const Color(0xFFF87171);
-    final planetColor = getPlanetColor(transit.planet);
-    final speedInfo = _getPlanetSpeedInfo(transit.planet);
-    final isSlowPlanet = speedInfo['isSlow'] == true;
+  State<_PremiumTransitCard> createState() => _PremiumTransitCardState();
+}
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: transit.isFavorable
-              ? color.withOpacity(0.3)
-              : KundliDisplayColors.borderColor.withOpacity(0.3),
-          width: transit.isFavorable ? 1 : 0.5,
-        ),
-        boxShadow: transit.isFavorable
-            ? [
-                BoxShadow(
-                  color: color.withOpacity(0.06),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : null,
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              children: [
-                // Header row
-                Row(
+class _PremiumTransitCardState extends State<_PremiumTransitCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 120),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.98,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  bool _isSlowPlanet(String planet) {
+    return ['Saturn', 'Jupiter', 'Rahu', 'Ketu'].contains(planet);
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    setState(() => _isPressed = true);
+    _controller.forward();
+    HapticFeedback.selectionClick();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    setState(() => _isPressed = false);
+    _controller.reverse();
+    _showInsightSheet(context, _getTransitPlanetInsight(widget.transit));
+  }
+
+  void _onTapCancel() {
+    setState(() => _isPressed = false);
+    _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isFavorable = widget.transit.isFavorable;
+    final statusColor = isFavorable ? _Colors.emerald : _Colors.coral;
+    final planetColor = _getPlanetColor(widget.transit.planet);
+    final isSlowPlanet = _isSlowPlanet(widget.transit.planet);
+
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: child,
+          );
+        },
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF141218),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isFavorable
+                  ? statusColor.withOpacity(0.25)
+                  : const Color(0xFF262432),
+              width: 1,
+            ),
+          ),
+          child: Column(
+            children: [
+              // Main content
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Planet symbol
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Container(
-                          width: 46,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                planetColor.withOpacity(0.2),
-                                planetColor.withOpacity(0.08),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: planetColor.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              getPlanetSymbol(transit.planet),
-                              style: TextStyle(fontSize: 20, color: planetColor),
-                            ),
+                    // Planet icon
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: planetColor.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: planetColor.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          _getPlanetSymbol(widget.transit.planet),
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: planetColor,
                           ),
                         ),
-                        // Slow planet badge
-                        if (isSlowPlanet)
-                          Positioned(
-                            right: -4,
-                            top: -4,
-                            child: Container(
-                              padding: const EdgeInsets.all(3),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF60A5FA),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Icon(
-                                Icons.hourglass_bottom,
-                                size: 10,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                      ],
+                      ),
                     ),
                     const SizedBox(width: 12),
+                    
                     // Planet info
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Planet name row
                           Row(
                             children: [
                               Text(
-                                transit.planet,
-                                style: GoogleFonts.dmSans(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  color: KundliDisplayColors.textPrimary,
+                                widget.transit.planet,
+                                style: GoogleFonts.instrumentSans(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                  letterSpacing: -0.3,
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              if (isSlowPlanet)
-                                Text(
-                                  '(Major)',
-                                  style: GoogleFonts.dmSans(
-                                    fontSize: 9,
-                                    color: const Color(0xFF60A5FA),
+                              if (isSlowPlanet) ...[
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 5,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: _Colors.sky.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: Text(
+                                    'MAJOR',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 7,
+                                      fontWeight: FontWeight.w600,
+                                      color: _Colors.sky,
+                                      letterSpacing: 0.3,
+                                    ),
                                   ),
                                 ),
+                              ],
                             ],
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 6),
+                          
+                          // Position chips
                           Row(
                             children: [
-                              _TransitInfoChip(
-                                icon: _getSignSymbol(transit.currentSign),
-                                text: '${transit.currentSign.substring(0, 3)} ${transit.currentDegree.toStringAsFixed(1)}°',
+                              // Sign & degree
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF1A181F),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: const Color(0xFF2A2838),
+                                    width: 0.5,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      _getSignSymbol(widget.transit.currentSign),
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: planetColor,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${widget.transit.currentSign.substring(0, 3)} ${widget.transit.currentDegree.toStringAsFixed(1)}°',
+                                      style: GoogleFonts.jetBrainsMono(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w500,
+                                        color: const Color(0xFFB8B5C2),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                               const SizedBox(width: 6),
-                              _TransitInfoChip(
-                                icon: '☽',
-                                text: 'H${transit.transitHouse}',
-                                color: transit.isFavorable ? color : null,
+                              
+                              // House
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isFavorable
+                                      ? statusColor.withOpacity(0.1)
+                                      : const Color(0xFF1A181F),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: isFavorable
+                                        ? statusColor.withOpacity(0.2)
+                                        : const Color(0xFF2A2838),
+                                    width: 0.5,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      '☽',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: isFavorable
+                                            ? statusColor
+                                            : const Color(0xFF7C7889),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'H${widget.transit.transitHouse}',
+                                      style: GoogleFonts.jetBrainsMono(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                        color: isFavorable
+                                            ? statusColor
+                                            : const Color(0xFFB8B5C2),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ],
                       ),
                     ),
-                    // Status badge
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: color.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Column(
-                        children: [
-                          Icon(
-                            transit.isFavorable ? Icons.thumb_up_rounded : Icons.thumb_down_rounded,
-                            size: 16,
-                            color: color,
+                    
+                    // Status indicator + info icon
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Icon(
+                          Icons.info_outline_rounded,
+                          size: 14,
+                          color: const Color(0xFF6E6A7A),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 8,
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            transit.isFavorable ? 'Good' : 'Alert',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w600,
-                              color: color,
-                            ),
+                          decoration: BoxDecoration(
+                            color: statusColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ],
-                      ),
+                          child: Column(
+                            children: [
+                              Icon(
+                                isFavorable
+                                    ? Icons.thumb_up_rounded
+                                    : Icons.thumb_down_rounded,
+                                size: 14,
+                                color: statusColor,
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                isFavorable ? 'Good' : 'Alert',
+                                style: GoogleFonts.inter(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w600,
+                                  color: statusColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-
-                // Aspect info
-                if (transit.aspectToNatal != 'None') ...[
-                  const SizedBox(height: 10),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
-                      borderRadius: BorderRadius.circular(8),
+              ),
+              
+              // Aspect row (if present)
+              if (widget.transit.aspectToNatal != 'None')
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A181F),
+                    border: Border(
+                      top: BorderSide(
+                        color: const Color(0xFF262432),
+                        width: 0.5,
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.link_rounded,
-                          size: 12,
-                          color: KundliDisplayColors.accentPrimary,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.link_rounded,
+                        size: 12,
+                        color: _Colors.violet.withOpacity(0.7),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Aspect: ${widget.transit.aspectToNatal}',
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFFA09CAC),
                         ),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Aspect: ${transit.aspectToNatal}',
-                          style: GoogleFonts.dmSans(
-                            fontSize: 10,
-                            color: KundliDisplayColors.textSecondary,
+                      ),
+                      const Spacer(),
+                      Text(
+                        'to Natal ${widget.transit.planet}',
+                        style: GoogleFonts.inter(
+                          fontSize: 9,
+                          color: const Color(0xFF7C7889),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              
+              // Effects/insight (if present)
+              if (widget.transit.effects.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.04),
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(
+                        widget.transit.aspectToNatal != 'None' ? 0 : 14,
+                      ),
+                      bottomRight: Radius.circular(
+                        widget.transit.aspectToNatal != 'None' ? 0 : 14,
+                      ),
+                    ),
+                    border: Border(
+                      top: BorderSide(
+                        color: const Color(0xFF262432),
+                        width: 0.5,
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Icon(
+                          Icons.lightbulb_outline_rounded,
+                          size: 12,
+                          color: statusColor.withOpacity(0.8),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          widget.transit.effects,
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: const Color(0xFFA09CAC),
+                            height: 1.4,
                           ),
                         ),
-                        if (natalPosition != null) ...[
-                          const Spacer(),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+  String _getSignSymbol(String sign) {
+    const symbols = {
+      'Aries': '♈',
+      'Taurus': '♉',
+      'Gemini': '♊',
+      'Cancer': '♋',
+      'Leo': '♌',
+      'Virgo': '♍',
+      'Libra': '♎',
+      'Scorpio': '♏',
+      'Sagittarius': '♐',
+      'Capricorn': '♑',
+      'Aquarius': '♒',
+      'Pisces': '♓',
+    };
+    return symbols[sign] ?? '?';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SADE SATI CARDS - Interactive
+// ═══════════════════════════════════════════════════════════════════════════
+class _SadeSatiCard extends StatefulWidget {
+  final Map<String, dynamic> sadeSatiInfo;
+
+  const _SadeSatiCard({required this.sadeSatiInfo});
+
+  @override
+  State<_SadeSatiCard> createState() => _SadeSatiCardState();
+}
+
+class _SadeSatiCardState extends State<_SadeSatiCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.98,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    setState(() => _isPressed = true);
+    _controller.forward();
+    HapticFeedback.selectionClick();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    setState(() => _isPressed = false);
+    _controller.reverse();
+    _showInsightSheet(context, _getSadeSatiInsight(widget.sadeSatiInfo));
+  }
+
+  void _onTapCancel() {
+    setState(() => _isPressed = false);
+    _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final phase = widget.sadeSatiInfo['phaseNumber'] ?? 0;
+
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    _Colors.coral.withOpacity(_isPressed ? 0.2 : 0.12),
+                    _Colors.amber.withOpacity(_isPressed ? 0.1 : 0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
+                border: Border.all(
+                  color: _Colors.coral.withOpacity(_isPressed ? 0.4 : 0.25),
+                  width: _isPressed ? 1.5 : 1,
+                ),
+                boxShadow: _isPressed
+                    ? [
+                        BoxShadow(
+                          color: _Colors.coral.withOpacity(0.2),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: child,
+            ),
+          );
+        },
+        child: Column(
+          children: [
+            Row(
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        _Colors.coral.withOpacity(_isPressed ? 0.3 : 0.2),
+                        _Colors.coral.withOpacity(_isPressed ? 0.15 : 0.08),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: _Colors.coral.withOpacity(_isPressed ? 0.5 : 0.3),
+                      width: 1,
+                    ),
+                    boxShadow: _isPressed
+                        ? [
+                            BoxShadow(
+                              color: _Colors.coral.withOpacity(0.3),
+                              blurRadius: 10,
+                              spreadRadius: -2,
+                            ),
+                          ]
+                        : null,
+                  ),
+                  child: Center(
+                    child: Text(
+                      _getPlanetSymbol('Saturn'),
+                      style: const TextStyle(fontSize: 24, color: _Colors.coral),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
                           Text(
-                            'to Natal ${transit.planet}',
-                            style: GoogleFonts.dmSans(
-                              fontSize: 9,
-                              color: KundliDisplayColors.textMuted,
+                            'Saturn\'s 7.5 Year Cycle',
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: _Colors.textPrimary,
+                            ),
+                          ),
+                          const Spacer(),
+                          AnimatedOpacity(
+                            duration: const Duration(milliseconds: 150),
+                            opacity: _isPressed ? 1.0 : 0.4,
+                            child: Icon(
+                              Icons.info_outline_rounded,
+                              size: 14,
+                              color: _Colors.coral,
                             ),
                           ),
                         ],
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.sadeSatiInfo['phase'] ?? '',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: _Colors.coral,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: _Colors.coral.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Saturn',
+                        style: GoogleFonts.inter(
+                          fontSize: 8,
+                          color: _Colors.textTertiary,
+                        ),
+                      ),
+                      Text(
+                        '${widget.sadeSatiInfo['saturnSign']}',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: _Colors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
-          ),
 
-          // Effects footer
-          if (transit.effects.isNotEmpty)
+            const SizedBox(height: 16),
+
+            _PhaseProgressBar(currentPhase: phase),
+
+            const SizedBox(height: 16),
+
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.05),
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(16),
-                  bottomRight: Radius.circular(16),
-                ),
+                color: _Colors.surface.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(_DesignTokens.radiusMd),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    Icons.lightbulb_outline_rounded,
-                    size: 14,
-                    color: color.withOpacity(0.7),
+                  const Icon(
+                    Icons.info_outline_rounded,
+                    size: 16,
+                    color: _Colors.textTertiary,
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      transit.effects,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 10,
-                        color: KundliDisplayColors.textSecondary,
+                      widget.sadeSatiInfo['description'] ?? '',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: _Colors.textSecondary,
                         height: 1.4,
                       ),
                     ),
@@ -1375,228 +3457,128 @@ class _PremiumTransitCard extends StatelessWidget {
                 ],
               ),
             ),
-        ],
-      ),
-    );
-  }
-
-  String _getSignSymbol(String sign) {
-    const symbols = {
-      'Aries': '♈', 'Taurus': '♉', 'Gemini': '♊', 'Cancer': '♋',
-      'Leo': '♌', 'Virgo': '♍', 'Libra': '♎', 'Scorpio': '♏',
-      'Sagittarius': '♐', 'Capricorn': '♑', 'Aquarius': '♒', 'Pisces': '♓',
-    };
-    return symbols[sign] ?? '?';
-  }
-
-  Map<String, dynamic> _getPlanetSpeedInfo(String planet) {
-    const slowPlanets = ['Saturn', 'Jupiter', 'Rahu', 'Ketu'];
-
-    if (slowPlanets.contains(planet)) {
-      return {
-        'isSlow': true,
-        'duration': planet == 'Saturn'
-            ? '~2.5 years/sign'
-            : planet == 'Jupiter'
-                ? '~1 year/sign'
-                : '~1.5 years/sign',
-      };
-    }
-
-    return {'isSlow': false};
-  }
-}
-
-class _TransitInfoChip extends StatelessWidget {
-  final String icon;
-  final String text;
-  final Color? color;
-
-  const _TransitInfoChip({
-    required this.icon,
-    required this.text,
-    this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final chipColor = color ?? KundliDisplayColors.textMuted;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: chipColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(icon, style: TextStyle(fontSize: 10, color: chipColor)),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: GoogleFonts.dmMono(
-              fontSize: 9,
-              fontWeight: FontWeight.w500,
-              color: chipColor,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SADE SATI CARD
-// ═══════════════════════════════════════════════════════════════════════════
-class _SadeSatiCard extends StatelessWidget {
-  final Map<String, dynamic> sadeSatiInfo;
-
-  const _SadeSatiCard({required this.sadeSatiInfo});
-
-  @override
-  Widget build(BuildContext context) {
-    final phase = sadeSatiInfo['phaseNumber'] ?? 0;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFFF87171).withOpacity(0.12),
-            const Color(0xFFFBBF24).withOpacity(0.05),
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFFF87171).withOpacity(0.25),
-          width: 1,
-        ),
       ),
-      child: Column(
-        children: [
-          // Header
-          Row(
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFFF87171).withOpacity(0.2),
-                      const Color(0xFFF87171).withOpacity(0.08),
+    );
+  }
+}
+
+class _SadeSatiInactiveCard extends StatefulWidget {
+  final String moonSign;
+
+  const _SadeSatiInactiveCard({required this.moonSign});
+
+  @override
+  State<_SadeSatiInactiveCard> createState() => _SadeSatiInactiveCardState();
+}
+
+class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+        _showInsightSheet(
+          context,
+          _getSadeSatiInsight({
+            'isActive': false,
+            'moonSign': widget.moonSign,
+          }),
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: _Colors.surface.withOpacity(_isPressed ? 0.6 : 0.4),
+          borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
+          border: Border.all(
+            color: _isPressed
+                ? _Colors.emerald.withOpacity(0.3)
+                : _Colors.border.withOpacity(0.3),
+            width: _isPressed ? 1 : 0.5,
+          ),
+          boxShadow: _isPressed
+              ? [
+                  BoxShadow(
+                    color: _Colors.emerald.withOpacity(0.1),
+                    blurRadius: 10,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: _Colors.emerald.withOpacity(_isPressed ? 0.2 : 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.check_circle_outline_rounded,
+                  size: 24,
+                  color: _Colors.emerald,
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Sade Sati Not Active',
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: _Colors.textPrimary,
+                        ),
+                      ),
+                      const Spacer(),
+                      AnimatedOpacity(
+                        duration: const Duration(milliseconds: 150),
+                        opacity: _isPressed ? 1.0 : 0.4,
+                        child: Icon(
+                          Icons.info_outline_rounded,
+                          size: 14,
+                          color: _Colors.emerald,
+                        ),
+                      ),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: const Color(0xFFF87171).withOpacity(0.3),
-                    width: 1,
+                  const SizedBox(height: 4),
+                  Text(
+                    'Tap to learn about Sade Sati cycle',
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      color: _Colors.emerald.withOpacity(0.7),
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: Text(
-                    getPlanetSymbol('Saturn'),
-                    style: const TextStyle(fontSize: 24, color: Color(0xFFF87171)),
+                  Text(
+                    'Saturn is not in 12th, 1st, or 2nd from ${widget.moonSign}',
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      color: _Colors.textTertiary,
+                    ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Saturn\'s 7.5 Year Cycle',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: KundliDisplayColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      sadeSatiInfo['phase'] ?? '',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFFF87171),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF87171).withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'Saturn',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 8,
-                        color: KundliDisplayColors.textMuted,
-                      ),
-                    ),
-                    Text(
-                      '${sadeSatiInfo['saturnSign']}',
-                      style: GoogleFonts.dmSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: KundliDisplayColors.textPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Phase indicator
-          _PhaseProgressBar(currentPhase: phase),
-
-          const SizedBox(height: 16),
-
-          // Description
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: KundliDisplayColors.surfaceColor.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(12),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  Icons.info_outline_rounded,
-                  size: 16,
-                  color: KundliDisplayColors.textMuted,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    sadeSatiInfo['description'] ?? '',
-                    style: GoogleFonts.dmSans(
-                      fontSize: 11,
-                      color: KundliDisplayColors.textSecondary,
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1618,7 +3600,7 @@ class _PhaseProgressBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: KundliDisplayColors.surfaceColor.withOpacity(0.4),
+        color: _Colors.surface.withOpacity(0.4),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -1634,22 +3616,22 @@ class _PhaseProgressBar extends StatelessWidget {
                     child: Container(
                       height: 2,
                       color: isPast || isActive
-                          ? const Color(0xFFF87171)
-                          : KundliDisplayColors.borderColor.withOpacity(0.3),
+                          ? _Colors.coral
+                          : _Colors.border.withOpacity(0.3),
                     ),
                   ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
                     color: isActive
-                        ? const Color(0xFFF87171).withOpacity(0.15)
+                        ? _Colors.coral.withOpacity(0.15)
                         : isPast
-                            ? const Color(0xFFF87171).withOpacity(0.08)
+                            ? _Colors.coral.withOpacity(0.08)
                             : Colors.transparent,
                     borderRadius: BorderRadius.circular(6),
                     border: isActive
                         ? Border.all(
-                            color: const Color(0xFFF87171).withOpacity(0.3),
+                            color: _Colors.coral.withOpacity(0.3),
                             width: 0.5,
                           )
                         : null,
@@ -1661,19 +3643,19 @@ class _PhaseProgressBar extends StatelessWidget {
                         height: 16,
                         decoration: BoxDecoration(
                           color: isActive || isPast
-                              ? const Color(0xFFF87171)
-                              : KundliDisplayColors.borderColor.withOpacity(0.3),
+                              ? _Colors.coral
+                              : _Colors.border.withOpacity(0.3),
                           shape: BoxShape.circle,
                         ),
                         child: Center(
                           child: Text(
                             '${i + 1}',
-                            style: GoogleFonts.dmMono(
+                            style: GoogleFonts.jetBrainsMono(
                               fontSize: 9,
                               fontWeight: FontWeight.w700,
                               color: isActive || isPast
                                   ? Colors.white
-                                  : KundliDisplayColors.textMuted,
+                                  : _Colors.textTertiary,
                             ),
                           ),
                         ),
@@ -1681,19 +3663,17 @@ class _PhaseProgressBar extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         phases[i].$1,
-                        style: GoogleFonts.dmSans(
+                        style: GoogleFonts.inter(
                           fontSize: 9,
                           fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                          color: isActive
-                              ? const Color(0xFFF87171)
-                              : KundliDisplayColors.textMuted,
+                          color: isActive ? _Colors.coral : _Colors.textTertiary,
                         ),
                       ),
                       Text(
                         phases[i].$2,
-                        style: GoogleFonts.dmMono(
+                        style: GoogleFonts.jetBrainsMono(
                           fontSize: 7,
-                          color: KundliDisplayColors.textMuted.withOpacity(0.7),
+                          color: _Colors.textTertiary.withOpacity(0.7),
                         ),
                       ),
                     ],
@@ -1704,8 +3684,8 @@ class _PhaseProgressBar extends StatelessWidget {
                     child: Container(
                       height: 2,
                       color: isPast
-                          ? const Color(0xFFF87171)
-                          : KundliDisplayColors.borderColor.withOpacity(0.3),
+                          ? _Colors.coral
+                          : _Colors.border.withOpacity(0.3),
                     ),
                   ),
               ],
@@ -1716,3 +3696,37 @@ class _PhaseProgressBar extends StatelessWidget {
     );
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+Color _getPlanetColor(String planet) {
+  const colors = {
+    'Sun': Color(0xFFFF9F43),
+    'Moon': Color(0xFFF5F5F5),
+    'Mars': Color(0xFFEE5A5A),
+    'Mercury': Color(0xFF26DE81),
+    'Jupiter': Color(0xFFFFD93D),
+    'Venus': Color(0xFFFF6B9D),
+    'Saturn': Color(0xFF5C7AEA),
+    'Rahu': Color(0xFF9C88FF),
+    'Ketu': Color(0xFFA29BFE),
+  };
+  return colors[planet] ?? _Colors.textSecondary;
+}
+
+String _getPlanetSymbol(String planet) {
+  const symbols = {
+    'Sun': '☉',
+    'Moon': '☽',
+    'Mars': '♂',
+    'Mercury': '☿',
+    'Jupiter': '♃',
+    'Venus': '♀',
+    'Saturn': '♄',
+    'Rahu': '☊',
+    'Ketu': '☋',
+  };
+  return symbols[planet] ?? '•';
+}
+

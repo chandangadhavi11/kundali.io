@@ -111,3 +111,67 @@ String getPlanetSymbol(String planet) {
   }
 }
 
+/// Get planet image path
+String getPlanetImagePath(String planet) {
+  return 'assets/images/planets/${planet.toLowerCase()}.png';
+}
+
+/// Get premium planet colors matching actual image visual palette
+Color getPlanetColorPremium(String planet) {
+  const colors = {
+    'sun': Color(0xFFFF9500),      // Intense fiery orange/yellow
+    'moon': Color(0xFF9BC4E2),     // Silvery blue, ethereal
+    'mars': Color(0xFFE84C30),     // Fiery red/orange
+    'mercury': Color(0xFF5CAD8A),  // Teal/green
+    'jupiter': Color(0xFFE8943A),  // Warm amber/orange
+    'venus': Color(0xFFF5A878),    // Soft peachy pink
+    'saturn': Color(0xFFD4943A),   // Golden orange
+    'rahu': Color(0xFF9B7BF7),     // Mystical purple
+    'ketu': Color(0xFF2DD4BF),     // Cyan/teal
+  };
+  return colors[planet.toLowerCase()] ?? const Color(0xFFA09CAC);
+}
+
+/// Get zodiac image path
+String getZodiacImagePath(String sign) {
+  return 'assets/images/zodiac/${sign.toLowerCase()}.png';
+}
+
+/// Get zodiac sign symbol
+String getSignSymbol(String sign) {
+  const symbols = {
+    'Aries': '♈',
+    'Taurus': '♉',
+    'Gemini': '♊',
+    'Cancer': '♋',
+    'Leo': '♌',
+    'Virgo': '♍',
+    'Libra': '♎',
+    'Scorpio': '♏',
+    'Sagittarius': '♐',
+    'Capricorn': '♑',
+    'Aquarius': '♒',
+    'Pisces': '♓',
+  };
+  return symbols[sign] ?? '?';
+}
+
+/// Get zodiac sign color based on visual palette from images
+Color getSignColor(String sign) {
+  const colors = {
+    'Aries': Color(0xFFD4A84B),      // Golden yellow
+    'Taurus': Color(0xFF4ECDC4),     // Cool blue/teal
+    'Gemini': Color(0xFFE85A6B),     // Deep red/coral
+    'Cancer': Color(0xFFB794F6),     // Lavender/violet
+    'Leo': Color(0xFFE07B4C),        // Burnt orange
+    'Virgo': Color(0xFFF5A6C4),      // Soft pink
+    'Libra': Color(0xFF6BCB77),      // Mint green
+    'Scorpio': Color(0xFFD9652B),    // Dark orange
+    'Sagittarius': Color(0xFFE040FB), // Magenta
+    'Capricorn': Color(0xFFB8956B),  // Earthy brown
+    'Aquarius': Color(0xFF40E0D0),   // Turquoise
+    'Pisces': Color(0xFF64B5F6),     // Ocean blue
+  };
+  return colors[sign] ?? const Color(0xFFA09CAC);
+}
+
