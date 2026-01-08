@@ -1241,22 +1241,55 @@ class _HouseDetailModal extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Compact planet badge
+          // Planet image with premium shadow
           Container(
-            width: 32,
-            height: 32,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Text(
-                symbol,
-                style: GoogleFonts.jetBrainsMono(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: color,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                // Soft ambient shadow
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15),
+                  blurRadius: 8,
+                  spreadRadius: -2,
+                  offset: const Offset(0, 3),
                 ),
+                // Color accent glow
+                BoxShadow(
+                  color: color.withOpacity(0.2),
+                  blurRadius: 10,
+                  spreadRadius: -3,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(
+                _getPlanetImagePath(planetName),
+                width: 36,
+                height: 36,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback to symbol if image fails
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Center(
+                      child: Text(
+                        symbol,
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: color,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -1362,6 +1395,10 @@ class _HouseDetailModal extends StatelessWidget {
   String _getPlanetSymbol(String planet) {
     if (planet.isEmpty) return '';
     return planet.length > 2 ? planet.substring(0, 2) : planet;
+  }
+
+  String _getPlanetImagePath(String planet) {
+    return 'assets/images/planets/${planet.toLowerCase()}.png';
   }
 
   Color _getPlanetColor(String planet) {

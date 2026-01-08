@@ -568,7 +568,7 @@ class _KundliInputScreenState extends State<KundliInputScreen>
             offset: const Offset(-20, 0), // Compensate for parent padding
             child: SizedBox(
               width: MediaQuery.of(context).size.width, // Full screen width
-              height: 88,
+              height: 96,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
