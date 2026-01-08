@@ -610,6 +610,26 @@ class KundaliCalculationService {
     return ((planetSignIndex - ascendantSignIndex + 12) % 12) + 1;
   }
 
+  /// Normalize longitude to 0-360 range
+  /// Handles negative values and values >= 360
+  static double _normalizeLongitude(double longitude) {
+    double normalized = longitude % 360;
+    if (normalized < 0) normalized += 360;
+    return normalized;
+  }
+
+  /// Get sign index (0-11) from longitude with proper normalization
+  static int _getSignIndex(double longitude) {
+    final normalized = _normalizeLongitude(longitude);
+    return (normalized / 30).floor() % 12;
+  }
+
+  /// Get degree within sign (0-30) from longitude with proper normalization
+  static double _getDegreeInSign(double longitude) {
+    final normalized = _normalizeLongitude(longitude);
+    return normalized % 30;
+  }
+
   /// Calculate ALL Kundali data in ONE call to Swiss Ephemeris
   /// This prevents redundant calculations that cause performance issues
   static UnifiedKundaliResult calculateAll({
@@ -1812,7 +1832,10 @@ class KundaliCalculationService {
     );
 
     // Get current periods at available levels
-    final currentPeriods = _getCurrentYoginiAtAllLevels(yoginiDetailSequence, now);
+    final currentPeriods = _getCurrentYoginiAtAllLevels(
+      yoginiDetailSequence,
+      now,
+    );
 
     return YoginiDashaInfo(
       currentYogini: currentYogini,
@@ -1864,15 +1887,17 @@ class KundaliCalculationService {
       );
     }
 
-    sequence.add(YoginiPeriodDetail(
-      yogini: firstYogini,
-      fullPath: firstYogini.displayName,
-      durationYears: firstDuration,
-      startDate: currentDate,
-      endDate: firstEndDate,
-      level: YoginiLevel.mahadasha,
-      subPeriods: firstSubPeriods,
-    ));
+    sequence.add(
+      YoginiPeriodDetail(
+        yogini: firstYogini,
+        fullPath: firstYogini.displayName,
+        durationYears: firstDuration,
+        startDate: currentDate,
+        endDate: firstEndDate,
+        level: YoginiLevel.mahadasha,
+        subPeriods: firstSubPeriods,
+      ),
+    );
 
     currentDate = firstEndDate;
 
@@ -1897,15 +1922,17 @@ class KundaliCalculationService {
           );
         }
 
-        sequence.add(YoginiPeriodDetail(
-          yogini: yogini,
-          fullPath: yogini.displayName,
-          durationYears: duration,
-          startDate: currentDate,
-          endDate: endDate,
-          level: YoginiLevel.mahadasha,
-          subPeriods: subPeriods,
-        ));
+        sequence.add(
+          YoginiPeriodDetail(
+            yogini: yogini,
+            fullPath: yogini.displayName,
+            durationYears: duration,
+            startDate: currentDate,
+            endDate: endDate,
+            level: YoginiLevel.mahadasha,
+            subPeriods: subPeriods,
+          ),
+        );
 
         currentDate = endDate;
 
@@ -1970,15 +1997,17 @@ class KundaliCalculationService {
         );
       }
 
-      subPeriods.add(YoginiPeriodDetail(
-        yogini: subYogini,
-        fullPath: fullPath,
-        durationYears: subDuration,
-        startDate: currentDate,
-        endDate: endDate,
-        level: level,
-        subPeriods: childSubPeriods,
-      ));
+      subPeriods.add(
+        YoginiPeriodDetail(
+          yogini: subYogini,
+          fullPath: fullPath,
+          durationYears: subDuration,
+          startDate: currentDate,
+          endDate: endDate,
+          level: level,
+          subPeriods: childSubPeriods,
+        ),
+      );
 
       currentDate = endDate;
     }
@@ -2056,8 +2085,18 @@ class KundaliCalculationService {
 
   /// Signs in order
   static const _signOrder = [
-    'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
-    'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces',
+    'Aries',
+    'Taurus',
+    'Gemini',
+    'Cancer',
+    'Leo',
+    'Virgo',
+    'Libra',
+    'Scorpio',
+    'Sagittarius',
+    'Capricorn',
+    'Aquarius',
+    'Pisces',
   ];
 
   /// Sign lords (traditional rulership)
@@ -2109,9 +2148,18 @@ class KundaliCalculationService {
     // Karakas are determined by degree within sign (highest to lowest)
     // Only use 7 planets: Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn
     // Rahu can be used as 8th karaka in some traditions
-    
-    final karakaPlanets = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn', 'Rahu'];
-    
+
+    final karakaPlanets = [
+      'Sun',
+      'Moon',
+      'Mars',
+      'Mercury',
+      'Jupiter',
+      'Venus',
+      'Saturn',
+      'Rahu',
+    ];
+
     // Get degree within sign for each planet
     final planetDegrees = <String, double>{};
     for (final planet in karakaPlanets) {
@@ -2123,33 +2171,49 @@ class KundaliCalculationService {
     }
 
     // Sort planets by degree (highest first)
-    final sortedPlanets = planetDegrees.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
+    final sortedPlanets =
+        planetDegrees.entries.toList()
+          ..sort((a, b) => b.value.compareTo(a.value));
 
     // Assign karakas (first 8 in descending degree order)
     String atmakaraka = sortedPlanets.length > 0 ? sortedPlanets[0].key : 'Sun';
-    double atmakarakaDegree = sortedPlanets.length > 0 ? sortedPlanets[0].value : 0;
-    
-    String amatyakaraka = sortedPlanets.length > 1 ? sortedPlanets[1].key : 'Moon';
-    double amatyakarakaDegree = sortedPlanets.length > 1 ? sortedPlanets[1].value : 0;
-    
-    String bhratrikaraka = sortedPlanets.length > 2 ? sortedPlanets[2].key : 'Mars';
-    double bhratrikarakaDegree = sortedPlanets.length > 2 ? sortedPlanets[2].value : 0;
-    
-    String matrikaraka = sortedPlanets.length > 3 ? sortedPlanets[3].key : 'Mercury';
-    double matrikarakaDegree = sortedPlanets.length > 3 ? sortedPlanets[3].value : 0;
-    
-    String pitrikaraka = sortedPlanets.length > 4 ? sortedPlanets[4].key : 'Jupiter';
-    double pitrikarakaDegree = sortedPlanets.length > 4 ? sortedPlanets[4].value : 0;
-    
-    String putrakaraka = sortedPlanets.length > 5 ? sortedPlanets[5].key : 'Venus';
-    double putrakarakaDegree = sortedPlanets.length > 5 ? sortedPlanets[5].value : 0;
-    
-    String gnatikaraka = sortedPlanets.length > 6 ? sortedPlanets[6].key : 'Saturn';
-    double gnatikarakaDegree = sortedPlanets.length > 6 ? sortedPlanets[6].value : 0;
-    
-    String darakaraka = sortedPlanets.length > 7 ? sortedPlanets[7].key : 'Rahu';
-    double darakarakaDegree = sortedPlanets.length > 7 ? sortedPlanets[7].value : 0;
+    double atmakarakaDegree =
+        sortedPlanets.length > 0 ? sortedPlanets[0].value : 0;
+
+    String amatyakaraka =
+        sortedPlanets.length > 1 ? sortedPlanets[1].key : 'Moon';
+    double amatyakarakaDegree =
+        sortedPlanets.length > 1 ? sortedPlanets[1].value : 0;
+
+    String bhratrikaraka =
+        sortedPlanets.length > 2 ? sortedPlanets[2].key : 'Mars';
+    double bhratrikarakaDegree =
+        sortedPlanets.length > 2 ? sortedPlanets[2].value : 0;
+
+    String matrikaraka =
+        sortedPlanets.length > 3 ? sortedPlanets[3].key : 'Mercury';
+    double matrikarakaDegree =
+        sortedPlanets.length > 3 ? sortedPlanets[3].value : 0;
+
+    String pitrikaraka =
+        sortedPlanets.length > 4 ? sortedPlanets[4].key : 'Jupiter';
+    double pitrikarakaDegree =
+        sortedPlanets.length > 4 ? sortedPlanets[4].value : 0;
+
+    String putrakaraka =
+        sortedPlanets.length > 5 ? sortedPlanets[5].key : 'Venus';
+    double putrakarakaDegree =
+        sortedPlanets.length > 5 ? sortedPlanets[5].value : 0;
+
+    String gnatikaraka =
+        sortedPlanets.length > 6 ? sortedPlanets[6].key : 'Saturn';
+    double gnatikarakaDegree =
+        sortedPlanets.length > 6 ? sortedPlanets[6].value : 0;
+
+    String darakaraka =
+        sortedPlanets.length > 7 ? sortedPlanets[7].key : 'Rahu';
+    double darakarakaDegree =
+        sortedPlanets.length > 7 ? sortedPlanets[7].value : 0;
 
     // Calculate Karakamsa (Atmakaraka's sign in Navamsa)
     String karakamsa = 'Aries';
@@ -2180,29 +2244,32 @@ class KundaliCalculationService {
 
   /// Calculate Char Dasha duration for a sign
   /// In Jaimini, duration depends on the position of the sign lord
-  static int _getCharDashaDuration(String sign, Map<String, PlanetPosition> planetPositions) {
+  static int _getCharDashaDuration(
+    String sign,
+    Map<String, PlanetPosition> planetPositions,
+  ) {
     final lord = _signLords[sign] ?? 'Sun';
     final lordPosition = planetPositions[lord];
-    
+
     if (lordPosition == null) return 9; // Default
-    
+
     // Count signs from the sign to where its lord is placed
     final signIndex = _signOrder.indexOf(sign);
     final lordSignIndex = _signOrder.indexOf(lordPosition.sign);
-    
+
     int distance = (lordSignIndex - signIndex + 12) % 12;
     if (distance == 0) distance = 12;
-    
+
     // Apply certain rules:
     // If lord is in own sign, take 12 or special calculation
     if (lordPosition.sign == sign) {
       return 12;
     }
-    
+
     // If lord is in exaltation, add 1 year
     // If lord is in debilitation, subtract 1 year
     // (Simplified for now)
-    
+
     return distance.clamp(1, 12);
   }
 
@@ -2215,20 +2282,20 @@ class KundaliCalculationService {
   ) {
     // Calculate Jaimini Karakas first
     final karakas = calculateJaiminiKarakas(planetPositions, navamsaChart);
-    
+
     // Determine starting sign (Lagna or 7th house based on tradition)
     final lagnaSign = ascendant.sign;
     final lagnaIndex = _signOrder.indexOf(lagnaSign);
-    
+
     // Determine direction based on odd/even sign
     final isClockwise = _isOddSign(lagnaSign);
-    
+
     // Build the Char Dasha sequence (12 signs)
     final charSequence = <CharaPeriod>[];
     final charDetailSequence = <CharaPeriodDetail>[];
-    
+
     var currentDate = birthDateTime;
-    
+
     for (int i = 0; i < 12; i++) {
       int signIndex;
       if (isClockwise) {
@@ -2236,14 +2303,14 @@ class KundaliCalculationService {
       } else {
         signIndex = (lagnaIndex - i + 12) % 12;
       }
-      
+
       final sign = _signOrder[signIndex];
       final duration = _getCharDashaDuration(sign, planetPositions);
-      
+
       charSequence.add(CharaPeriod(sign, duration));
-      
+
       final endDate = addDecimalYears(currentDate, duration.toDouble());
-      
+
       // Generate sub-periods (Antardashas)
       final subPeriods = _calculateCharSubPeriods(
         parentPath: sign,
@@ -2254,33 +2321,35 @@ class KundaliCalculationService {
         isClockwise: isClockwise,
         maxDepth: 2,
       );
-      
-      charDetailSequence.add(CharaPeriodDetail(
-        sign: sign,
-        fullPath: sign,
-        durationYears: duration.toDouble(),
-        startDate: currentDate,
-        endDate: endDate,
-        level: CharLevel.mahadasha,
-        subPeriods: subPeriods,
-        signLord: _signLords[sign],
-      ));
-      
+
+      charDetailSequence.add(
+        CharaPeriodDetail(
+          sign: sign,
+          fullPath: sign,
+          durationYears: duration.toDouble(),
+          startDate: currentDate,
+          endDate: endDate,
+          level: CharLevel.mahadasha,
+          subPeriods: subPeriods,
+          signLord: _signLords[sign],
+        ),
+      );
+
       currentDate = endDate;
     }
-    
+
     // Calculate current position
     final now = DateTime.now();
     final ageInYears = now.difference(birthDateTime).inDays / 365.25;
-    
+
     String currentSign = lagnaSign;
     double currentRemaining = 0;
     DateTime? signStartDate;
     DateTime? signEndDate;
-    
+
     double yearsElapsed = ageInYears;
     double yearsFromBirth = 0;
-    
+
     for (final period in charDetailSequence) {
       if (yearsElapsed < period.durationYears) {
         currentSign = period.sign;
@@ -2292,11 +2361,11 @@ class KundaliCalculationService {
       yearsElapsed -= period.durationYears;
       yearsFromBirth += period.durationYears;
     }
-    
+
     // Get current Antardasha
     String? currentAntardasha;
     double? antardashaRemainingYears;
-    
+
     for (final period in charDetailSequence) {
       if (period.sign == currentSign && period.subPeriods != null) {
         double antarElapsed = ageInYears - yearsFromBirth;
@@ -2311,10 +2380,10 @@ class KundaliCalculationService {
         break;
       }
     }
-    
+
     // Get current periods at all levels
     final currentPeriods = _getCurrentCharAtAllLevels(charDetailSequence, now);
-    
+
     return CharDashaInfo(
       currentSign: currentSign,
       remainingYears: currentRemaining,
@@ -2348,10 +2417,10 @@ class KundaliCalculationService {
   }) {
     final subPeriods = <CharaPeriodDetail>[];
     var currentDate = startDate;
-    
+
     // Find starting index
     int startIndex = _signOrder.indexOf(parentSign);
-    
+
     // Calculate all 12 sub-periods
     for (int i = 0; i < 12; i++) {
       int signIndex;
@@ -2360,14 +2429,14 @@ class KundaliCalculationService {
       } else {
         signIndex = (startIndex - i + 12) % 12;
       }
-      
+
       final subSign = _signOrder[signIndex];
-      
+
       // Duration formula: (parent duration) / 12
       final subDuration = parentDuration / 12.0;
       final endDate = addDecimalYears(currentDate, subDuration);
       final fullPath = '$parentPath-$subSign';
-      
+
       // Determine next level
       CharLevel? nextLevel;
       if (level == CharLevel.antardasha) {
@@ -2377,11 +2446,11 @@ class KundaliCalculationService {
       } else if (level == CharLevel.sookshma) {
         nextLevel = CharLevel.prana;
       }
-      
+
       // Recursively calculate sub-periods if within max depth
       final currentDepth = level.index;
       List<CharaPeriodDetail>? childSubPeriods;
-      
+
       if (nextLevel != null && currentDepth < maxDepth) {
         childSubPeriods = _calculateCharSubPeriods(
           parentPath: fullPath,
@@ -2393,21 +2462,23 @@ class KundaliCalculationService {
           maxDepth: maxDepth,
         );
       }
-      
-      subPeriods.add(CharaPeriodDetail(
-        sign: subSign,
-        fullPath: fullPath,
-        durationYears: subDuration,
-        startDate: currentDate,
-        endDate: endDate,
-        level: level,
-        subPeriods: childSubPeriods,
-        signLord: _signLords[subSign],
-      ));
-      
+
+      subPeriods.add(
+        CharaPeriodDetail(
+          sign: subSign,
+          fullPath: fullPath,
+          durationYears: subDuration,
+          startDate: currentDate,
+          endDate: endDate,
+          level: level,
+          subPeriods: childSubPeriods,
+          signLord: _signLords[subSign],
+        ),
+      );
+
       currentDate = endDate;
     }
-    
+
     return subPeriods;
   }
 
@@ -2417,7 +2488,7 @@ class KundaliCalculationService {
     DateTime date,
   ) {
     final result = <CharLevel, CharaPeriodDetail>{};
-    
+
     CharaPeriodDetail? findCurrentAtLevel(
       List<CharaPeriodDetail>? periods,
       CharLevel level,
@@ -2437,7 +2508,7 @@ class KundaliCalculationService {
       }
       return null;
     }
-    
+
     findCurrentAtLevel(sequence, CharLevel.mahadasha);
     return result;
   }
@@ -2464,10 +2535,10 @@ class KundaliCalculationService {
     int depth = 1,
   }) {
     if (depth <= 0) return [];
-    
+
     final nextLevel = _getNextCharLevel(parentPeriod.level);
     if (nextLevel == null) return [];
-    
+
     return _calculateCharSubPeriods(
       parentPath: parentPeriod.fullPath,
       parentSign: parentPeriod.sign,
@@ -2855,28 +2926,43 @@ class KundaliCalculationService {
   }
 
   /// Calculate Bhava Chalit chart (cusp-based)
+  /// Uses Bhava Madhya Paddhati (Equal House System)
+  ///
+  /// Key Rules:
+  /// - Ascendant longitude IS the Bhava Madhya (mid-point) of 1st house
+  /// - Each house extends 15° before and 15° after its mid-point
+  /// - Planets are placed based on their actual longitude relative to cusps
   static List<House> calculateBhavaChaliChart(
     Map<String, PlanetPosition> positions,
     double ascendantLongitude,
   ) {
-    // Bhava Chalit uses mid-point of houses
     final List<House> houses = [];
 
     for (int i = 0; i < 12; i++) {
-      final houseMidpoint = (ascendantLongitude + (i * 30) + 15) % 360;
-      final houseStart = (ascendantLongitude + (i * 30)) % 360;
-      final houseEnd = (ascendantLongitude + ((i + 1) * 30)) % 360;
+      // Bhava Madhya: Ascendant IS the midpoint of the 1st house
+      // Each subsequent house midpoint is 30° apart
+      final houseMidpoint = (ascendantLongitude + (i * 30)) % 360;
+
+      // Bhava Sandhi: House boundaries are 15° before and after mid-point
+      final houseStart = (ascendantLongitude + (i * 30) - 15 + 360) % 360;
+      final houseEnd = (ascendantLongitude + (i * 30) + 15) % 360;
+
+      // Sign of the house is based on where the mid-point falls
       final signIndex = (houseMidpoint / 30).floor() % 12;
 
       final planetsInHouse = <String>[];
       for (var planet in positions.values) {
         final planetLong = planet.longitude;
         bool inHouse;
+
+        // Handle zodiac wrap-around (e.g., when house spans 350° to 10°)
         if (houseEnd > houseStart) {
           inHouse = planetLong >= houseStart && planetLong < houseEnd;
         } else {
+          // House wraps around 0°/360°
           inHouse = planetLong >= houseStart || planetLong < houseEnd;
         }
+
         if (inHouse) {
           planetsInHouse.add(planet.planet);
         }
@@ -2895,6 +2981,249 @@ class KundaliCalculationService {
     return houses;
   }
 
+  /// Identify planets that shift houses in Bhava Chalit compared to Rashi chart
+  /// Returns a map of planet names to their Rashi and Bhava house numbers
+  static Map<String, Map<String, int>> getBhavaChaliShifts(
+    Map<String, PlanetPosition> positions,
+    List<House> rashiHouses,
+    List<House> bhavaChaliHouses,
+  ) {
+    final Map<String, Map<String, int>> shifts = {};
+
+    for (var planet in positions.values) {
+      // Find planet's Rashi house
+      int rashiHouse = 0;
+      for (var house in rashiHouses) {
+        if (house.planets.contains(planet.planet)) {
+          rashiHouse = house.number;
+          break;
+        }
+      }
+
+      // Find planet's Bhava Chalit house
+      int bhavaHouse = 0;
+      for (var house in bhavaChaliHouses) {
+        if (house.planets.contains(planet.planet)) {
+          bhavaHouse = house.number;
+          break;
+        }
+      }
+
+      // Record if there's a shift
+      if (rashiHouse != bhavaHouse && rashiHouse > 0 && bhavaHouse > 0) {
+        shifts[planet.planet] = {
+          'rashiHouse': rashiHouse,
+          'bhavaHouse': bhavaHouse,
+        };
+      }
+    }
+
+    return shifts;
+  }
+
+  // ============ SUDARSHAN CHAKRA ============
+
+  /// Calculate Sudarshan Chakra - Triple perspective chart
+  /// Combines Lagna (Ascendant), Chandra (Moon), and Surya (Sun) charts
+  /// Each chart shows houses counted from its respective reference point
+  ///
+  /// Returns a map containing:
+  /// - 'lagnaChart': Houses from Ascendant (outer ring)
+  /// - 'chandraChart': Houses from Moon sign (middle ring)
+  /// - 'suryaChart': Houses from Sun sign (inner ring)
+  /// - 'combinedAnalysis': Strength analysis across all three
+  static Map<String, dynamic> calculateSudarshanChakra(
+    Map<String, PlanetPosition> planetPositions,
+    List<House> houses,
+    String ascendantSign,
+  ) {
+    // Get Moon and Sun positions
+    final moonPosition = planetPositions['Moon'];
+    final sunPosition = planetPositions['Sun'];
+
+    if (moonPosition == null || sunPosition == null) {
+      return {
+        'lagnaChart': houses,
+        'chandraChart': houses,
+        'suryaChart': houses,
+        'error': 'Moon or Sun position not found',
+      };
+    }
+
+    final moonSign = moonPosition.sign;
+    final sunSign = sunPosition.sign;
+
+    // Get sign indices
+    final lagnaSignIndex = zodiacSigns.indexOf(ascendantSign);
+    final moonSignIndex = zodiacSigns.indexOf(moonSign);
+    final sunSignIndex = zodiacSigns.indexOf(sunSign);
+
+    // Generate Lagna-based houses (standard - already provided)
+    final lagnaHouses = houses;
+
+    // Generate Moon-based houses (Chandra Kundali)
+    final chandraHouses = _generateHousesFromSign(
+      planetPositions,
+      moonSignIndex,
+      'Chandra',
+    );
+
+    // Generate Sun-based houses (Surya Kundali)
+    final suryaHouses = _generateHousesFromSign(
+      planetPositions,
+      sunSignIndex,
+      'Surya',
+    );
+
+    // Calculate combined strength analysis
+    final combinedAnalysis = _analyzeSudarshanStrength(
+      planetPositions,
+      lagnaSignIndex,
+      moonSignIndex,
+      sunSignIndex,
+    );
+
+    return {
+      'lagnaChart': lagnaHouses,
+      'chandraChart': chandraHouses,
+      'suryaChart': suryaHouses,
+      'lagnaSign': ascendantSign,
+      'chandraSign': moonSign,
+      'suryaSign': sunSign,
+      'combinedAnalysis': combinedAnalysis,
+    };
+  }
+
+  /// Generate houses from a specific sign as the 1st house
+  static List<House> _generateHousesFromSign(
+    Map<String, PlanetPosition> planetPositions,
+    int firstHouseSignIndex,
+    String chartType,
+  ) {
+    final List<House> generatedHouses = [];
+
+    for (int i = 0; i < 12; i++) {
+      final signIndex = (firstHouseSignIndex + i) % 12;
+      final sign = zodiacSigns[signIndex];
+
+      // Find planets in this sign
+      final planetsInHouse = <String>[];
+      for (var planet in planetPositions.values) {
+        if (planet.sign == sign) {
+          planetsInHouse.add(planet.planet);
+        }
+      }
+
+      generatedHouses.add(
+        House(
+          number: i + 1,
+          sign: sign,
+          cuspDegree: signIndex * 30.0,
+          planets: planetsInHouse,
+        ),
+      );
+    }
+
+    return generatedHouses;
+  }
+
+  /// Analyze planet strength across all three perspectives
+  static Map<String, Map<String, dynamic>> _analyzeSudarshanStrength(
+    Map<String, PlanetPosition> planetPositions,
+    int lagnaSignIndex,
+    int moonSignIndex,
+    int sunSignIndex,
+  ) {
+    final analysis = <String, Map<String, dynamic>>{};
+
+    for (var entry in planetPositions.entries) {
+      final planetName = entry.key;
+      final planet = entry.value;
+      final planetSignIndex = zodiacSigns.indexOf(planet.sign);
+
+      // Calculate house position from each perspective
+      final lagnaHouse = ((planetSignIndex - lagnaSignIndex + 12) % 12) + 1;
+      final chandraHouse = ((planetSignIndex - moonSignIndex + 12) % 12) + 1;
+      final suryaHouse = ((planetSignIndex - sunSignIndex + 12) % 12) + 1;
+
+      // Determine strength in each chart
+      // Kendras (1,4,7,10) and Trikonas (1,5,9) are strong positions
+      final kendras = [1, 4, 7, 10];
+      final trikonas = [1, 5, 9];
+      final dusthanas = [6, 8, 12];
+
+      int strengthScore = 0;
+
+      // Lagna perspective
+      if (kendras.contains(lagnaHouse) || trikonas.contains(lagnaHouse)) {
+        strengthScore += 1;
+      }
+      if (dusthanas.contains(lagnaHouse)) {
+        strengthScore -= 1;
+      }
+
+      // Moon perspective
+      if (kendras.contains(chandraHouse) || trikonas.contains(chandraHouse)) {
+        strengthScore += 1;
+      }
+      if (dusthanas.contains(chandraHouse)) {
+        strengthScore -= 1;
+      }
+
+      // Sun perspective
+      if (kendras.contains(suryaHouse) || trikonas.contains(suryaHouse)) {
+        strengthScore += 1;
+      }
+      if (dusthanas.contains(suryaHouse)) {
+        strengthScore -= 1;
+      }
+
+      String overallStrength;
+      if (strengthScore >= 2) {
+        overallStrength = 'Strong';
+      } else if (strengthScore >= 0) {
+        overallStrength = 'Moderate';
+      } else {
+        overallStrength = 'Weak';
+      }
+
+      analysis[planetName] = {
+        'lagnaHouse': lagnaHouse,
+        'chandraHouse': chandraHouse,
+        'suryaHouse': suryaHouse,
+        'strengthScore': strengthScore,
+        'overallStrength': overallStrength,
+        'isKendraFromLagna': kendras.contains(lagnaHouse),
+        'isTrikonaFromLagna': trikonas.contains(lagnaHouse),
+        'isKendraFromMoon': kendras.contains(chandraHouse),
+        'isTrikonaFromMoon': trikonas.contains(chandraHouse),
+        'isKendraFromSun': kendras.contains(suryaHouse),
+        'isTrikonaFromSun': trikonas.contains(suryaHouse),
+      };
+    }
+
+    return analysis;
+  }
+
+  /// Get Sudarshan Chakra summary for quick analysis
+  static Map<String, String> getSudarshanSummary(
+    Map<String, dynamic> sudarshanData,
+  ) {
+    final analysis =
+        sudarshanData['combinedAnalysis'] as Map<String, Map<String, dynamic>>?;
+    if (analysis == null) return {};
+
+    final summary = <String, String>{};
+
+    for (var entry in analysis.entries) {
+      final planetData = entry.value;
+      summary[entry.key] =
+          '${planetData['overallStrength']} (L${planetData['lagnaHouse']}, M${planetData['chandraHouse']}, S${planetData['suryaHouse']})';
+    }
+
+    return summary;
+  }
+
   // ============ DIVISIONAL CHARTS ============
 
   /// Calculate Navamsa (D9) chart - Marriage and spiritual life
@@ -2907,9 +3236,12 @@ class KundaliCalculationService {
 
     for (var entry in birthChart.entries) {
       final planet = entry.value;
-      final signIndex = (planet.longitude / 30).floor();
-      final degreeInSign = planet.longitude % 30;
-      final navamsaIndex = (degreeInSign / navamsaSpan).floor();
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
+
+      // Calculate navamsa index (0-8), clamping to valid range
+      int navamsaIndex = (degreeInSign / navamsaSpan).floor();
+      if (navamsaIndex > 8) navamsaIndex = 8; // Safety clamp for edge cases
 
       // Determine starting sign based on element of birth sign
       int startSign;
@@ -2945,6 +3277,125 @@ class KundaliCalculationService {
     return navamsaChart;
   }
 
+  /// Check if a planet is Vargottama (same sign in D1 and D9)
+  /// Vargottama planets are considered very strong
+  static bool isVargottama(PlanetPosition d1Planet, PlanetPosition d9Planet) {
+    final d1SignIndex = (d1Planet.longitude / 30).floor() % 12;
+    final d9SignIndex = (d9Planet.longitude / 30).floor() % 12;
+    return d1SignIndex == d9SignIndex;
+  }
+
+  /// Get all Vargottama planets by comparing D1 and D9 charts
+  static List<String> getVargottamaPlanets(
+    Map<String, PlanetPosition> birthChart,
+    Map<String, PlanetPosition> navamsaChart,
+  ) {
+    final vargottamaPlanets = <String>[];
+    for (var entry in birthChart.entries) {
+      final d1Planet = entry.value;
+      final d9Planet = navamsaChart[entry.key];
+      if (d9Planet != null && isVargottama(d1Planet, d9Planet)) {
+        vargottamaPlanets.add(entry.key);
+      }
+    }
+    return vargottamaPlanets;
+  }
+
+  /// Check if a degree falls in Pushkara Navamsa
+  /// Pushkara Navamsas are auspicious degrees that bring good fortune
+  /// Returns the Pushkara Navamsa sign if applicable, null otherwise
+  static String? getPushkaraNavamsa(double longitude) {
+    // Pushkara Navamsa degrees for each sign (specific navamsa positions)
+    // These are the navamsa numbers (1-9) that are Pushkara for each sign
+    const pushkaraNavamsas = {
+      0: [
+        7,
+        9,
+      ], // Aries: 7th (20°-23°20') and 9th (26°40'-30°) navamsas → Libra, Sagittarius
+      1: [
+        3,
+        6,
+      ], // Taurus: 3rd (6°40'-10°) and 6th (16°40'-20°) navamsas → Pisces, Gemini
+      2: [
+        2,
+        5,
+      ], // Gemini: 2nd (3°20'-6°40') and 5th (13°20'-16°40') navamsas → Scorpio, Aquarius
+      3: [
+        4,
+        8,
+      ], // Cancer: 4th (10°-13°20') and 8th (23°20'-26°40') navamsas → Libra, Aquarius
+      4: [
+        6,
+        9,
+      ], // Leo: 6th (16°40'-20°) and 9th (26°40'-30°) navamsas → Capricorn, Pisces
+      5: [
+        1,
+        4,
+      ], // Virgo: 1st (0°-3°20') and 4th (10°-13°20') navamsas → Capricorn, Aries
+      6: [
+        2,
+        7,
+      ], // Libra: 2nd (3°20'-6°40') and 7th (20°-23°20') navamsas → Scorpio, Aries
+      7: [
+        3,
+        5,
+      ], // Scorpio: 3rd (6°40'-10°) and 5th (13°20'-16°40') navamsas → Capricorn, Pisces
+      8: [
+        4,
+        8,
+      ], // Sagittarius: 4th (10°-13°20') and 8th (23°20'-26°40') navamsas → Pisces, Cancer
+      9: [
+        1,
+        6,
+      ], // Capricorn: 1st (0°-3°20') and 6th (16°40'-20°) navamsas → Cancer, Sagittarius
+      10: [
+        3,
+        7,
+      ], // Aquarius: 3rd (6°40'-10°) and 7th (20°-23°20') navamsas → Capricorn, Taurus
+      11: [
+        2,
+        9,
+      ], // Pisces: 2nd (3°20'-6°40') and 9th (26°40'-30°) navamsas → Aries, Scorpio
+    };
+
+    final signIndex = (longitude / 30).floor() % 12;
+    final degreeInSign = longitude % 30;
+    const navamsaSpan = 30.0 / 9;
+    final navamsaNum = (degreeInSign / navamsaSpan).floor() + 1; // 1-9
+
+    final pushkaraList = pushkaraNavamsas[signIndex];
+    if (pushkaraList != null && pushkaraList.contains(navamsaNum)) {
+      // Calculate which sign this Pushkara Navamsa falls in
+      int startSign;
+      if (signIndex == 0 || signIndex == 4 || signIndex == 8) {
+        startSign = 0; // Fire → Aries
+      } else if (signIndex == 1 || signIndex == 5 || signIndex == 9) {
+        startSign = 9; // Earth → Capricorn
+      } else if (signIndex == 2 || signIndex == 6 || signIndex == 10) {
+        startSign = 6; // Air → Libra
+      } else {
+        startSign = 3; // Water → Cancer
+      }
+      final pushkaraSignIndex = (startSign + navamsaNum - 1) % 12;
+      return zodiacSigns[pushkaraSignIndex];
+    }
+    return null;
+  }
+
+  /// Get planets in Pushkara Navamsa positions
+  static Map<String, String> getPushkaraNavamsaPlanets(
+    Map<String, PlanetPosition> birthChart,
+  ) {
+    final pushkaraPlanets = <String, String>{};
+    for (var entry in birthChart.entries) {
+      final pushkaraSign = getPushkaraNavamsa(entry.value.longitude);
+      if (pushkaraSign != null) {
+        pushkaraPlanets[entry.key] = pushkaraSign;
+      }
+    }
+    return pushkaraPlanets;
+  }
+
   /// Calculate Hora (D2) chart - Wealth
   static Map<String, PlanetPosition> calculateHoraChart(
     Map<String, PlanetPosition> birthChart,
@@ -2954,8 +3405,8 @@ class KundaliCalculationService {
 
     for (var entry in birthChart.entries) {
       final planet = entry.value;
-      final signIndex = (planet.longitude / 30).floor();
-      final degreeInSign = planet.longitude % 30;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
 
       String horaSign;
       if (signIndex % 2 == 0) {
@@ -2989,8 +3440,8 @@ class KundaliCalculationService {
 
     for (var entry in birthChart.entries) {
       final planet = entry.value;
-      final signIndex = (planet.longitude / 30).floor();
-      final degreeInSign = planet.longitude % 30;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
 
       int newSignIndex;
       if (degreeInSign < 10) {
@@ -3021,18 +3472,90 @@ class KundaliCalculationService {
     return drekkanaChart;
   }
 
-  /// Calculate Chaturthamsa (D4) chart - Property, fortune
+  /// Calculate Chaturthamsa (D4) chart - Property, fortune, fixed assets
+  /// Rule: Odd signs use Kendra sequence (1st, 4th, 7th, 10th)
+  ///       Even signs use reverse Kendra sequence (1st, 10th, 7th, 4th)
   static Map<String, PlanetPosition> calculateChaturthamsaChart(
     Map<String, PlanetPosition> birthChart,
   ) {
-    return _calculateDivisionalChart(birthChart, 4);
+    final Map<String, PlanetPosition> chaturthamsaChart = {};
+    const chaturthamsaSpan = 30.0 / 4; // 7.5° (7°30') per chaturthamsa
+
+    // Kendra offsets for odd signs: 1st(+0), 4th(+3), 7th(+6), 10th(+9)
+    const oddSignOffsets = [0, 3, 6, 9];
+    // Kendra offsets for even signs: 1st(+0), 10th(+9), 7th(+6), 4th(+3)
+    const evenSignOffsets = [0, 9, 6, 3];
+
+    for (var entry in birthChart.entries) {
+      final planet = entry.value;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
+      final chaturthamsaIndex =
+          (degreeInSign / chaturthamsaSpan).floor(); // 0, 1, 2, or 3
+
+      // Determine Kendra offsets based on odd/even sign
+      final offsets = (signIndex % 2 == 0) ? oddSignOffsets : evenSignOffsets;
+
+      // Apply the appropriate Kendra offset
+      final newSignIndex = (signIndex + offsets[chaturthamsaIndex]) % 12;
+
+      // Calculate new degree in the D4 sign
+      final newDegree = (degreeInSign % chaturthamsaSpan) * 4;
+
+      chaturthamsaChart[entry.key] = PlanetPosition(
+        planet: planet.planet,
+        longitude: newSignIndex * 30 + newDegree,
+        sign: zodiacSigns[newSignIndex],
+        signDegree: newDegree,
+        nakshatra:
+            SwephService.getNakshatra(newSignIndex * 30 + newDegree).name,
+        house: planet.house,
+        isRetrograde: planet.isRetrograde,
+      );
+    }
+
+    return chaturthamsaChart;
   }
 
-  /// Calculate Saptamsa (D7) chart - Children
+  /// Calculate Saptamsa (D7) chart - Children, progeny, creative abilities
+  /// Rule: Odd signs count from same sign, Even signs count from 7th sign
   static Map<String, PlanetPosition> calculateSaptamsaChart(
     Map<String, PlanetPosition> birthChart,
   ) {
-    return _calculateDivisionalChart(birthChart, 7);
+    final Map<String, PlanetPosition> saptamsaChart = {};
+    const saptamsaSpan = 30.0 / 7; // 4°17'8.57" (4.2857°) per saptamsa
+
+    for (var entry in birthChart.entries) {
+      final planet = entry.value;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
+      final saptamsaIndex = (degreeInSign / saptamsaSpan).floor(); // 0 to 6
+
+      int newSignIndex;
+      if (signIndex % 2 == 0) {
+        // ODD signs (Aries=0, Gemini=2, Leo=4, etc.) - count from same sign
+        newSignIndex = (signIndex + saptamsaIndex) % 12;
+      } else {
+        // EVEN signs (Taurus=1, Cancer=3, Virgo=5, etc.) - count from 7th sign
+        newSignIndex = (signIndex + 6 + saptamsaIndex) % 12;
+      }
+
+      // Calculate new degree in the D7 sign
+      final newDegree = (degreeInSign % saptamsaSpan) * 7;
+
+      saptamsaChart[entry.key] = PlanetPosition(
+        planet: planet.planet,
+        longitude: newSignIndex * 30 + newDegree,
+        sign: zodiacSigns[newSignIndex],
+        signDegree: newDegree,
+        nakshatra:
+            SwephService.getNakshatra(newSignIndex * 30 + newDegree).name,
+        house: planet.house,
+        isRetrograde: planet.isRetrograde,
+      );
+    }
+
+    return saptamsaChart;
   }
 
   /// Calculate Dasamsa (D10) chart - Career
@@ -3045,8 +3568,8 @@ class KundaliCalculationService {
 
     for (var entry in birthChart.entries) {
       final planet = entry.value;
-      final signIndex = (planet.longitude / 30).floor();
-      final degreeInSign = planet.longitude % 30;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
       final dasamsaIndex = (degreeInSign / dasamsaSpan).floor();
 
       // Odd signs (0, 2, 4, 6, 8, 10) count from same sign
@@ -3085,60 +3608,660 @@ class KundaliCalculationService {
     return _calculateDivisionalChart(birthChart, 12);
   }
 
-  /// Calculate Shodasamsa (D16) chart - Vehicles, comforts
+  /// Calculate Shodasamsa (D16) chart - Vehicles, conveyances, comforts
+  /// Rule: Movable signs start from Aries, Fixed from Leo, Dual from Sagittarius
   static Map<String, PlanetPosition> calculateShodasamsaChart(
     Map<String, PlanetPosition> birthChart,
   ) {
-    return _calculateDivisionalChart(birthChart, 16);
+    final Map<String, PlanetPosition> shodasamsaChart = {};
+    const shodasamsaSpan = 30.0 / 16; // 1°52'30" (1.875°) per shodasamsa
+
+    for (var entry in birthChart.entries) {
+      final planet = entry.value;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
+      final shodasamsaIndex =
+          (degreeInSign / shodasamsaSpan).floor(); // 0 to 15
+
+      // Determine starting sign based on sign quality (modality)
+      int startSign;
+      if (signIndex == 0 ||
+          signIndex == 3 ||
+          signIndex == 6 ||
+          signIndex == 9) {
+        // Movable signs (Aries, Cancer, Libra, Capricorn) - start from Aries
+        startSign = 0;
+      } else if (signIndex == 1 ||
+          signIndex == 4 ||
+          signIndex == 7 ||
+          signIndex == 10) {
+        // Fixed signs (Taurus, Leo, Scorpio, Aquarius) - start from Leo
+        startSign = 4;
+      } else {
+        // Dual signs (Gemini, Virgo, Sagittarius, Pisces) - start from Sagittarius
+        startSign = 8;
+      }
+
+      // Calculate new sign: start + shodasamsa index
+      // Since we have 16 divisions but only 12 signs, we wrap around
+      final newSignIndex = (startSign + shodasamsaIndex) % 12;
+
+      // Calculate new degree in the D16 sign
+      final newDegree = (degreeInSign % shodasamsaSpan) * 16;
+
+      shodasamsaChart[entry.key] = PlanetPosition(
+        planet: planet.planet,
+        longitude: newSignIndex * 30 + newDegree,
+        sign: zodiacSigns[newSignIndex],
+        signDegree: newDegree,
+        nakshatra:
+            SwephService.getNakshatra(newSignIndex * 30 + newDegree).name,
+        house: planet.house,
+        isRetrograde: planet.isRetrograde,
+      );
+    }
+
+    return shodasamsaChart;
   }
 
-  /// Calculate Vimsamsa (D20) chart - Spiritual progress
+  /// Calculate Vimsamsa (D20) chart - Spiritual progress, Upasana
+  /// Rule: Movable signs start from Aries, Fixed from Sagittarius, Dual from Leo
   static Map<String, PlanetPosition> calculateVimsamsaChart(
     Map<String, PlanetPosition> birthChart,
   ) {
-    return _calculateDivisionalChart(birthChart, 20);
+    final Map<String, PlanetPosition> vimsamsaChart = {};
+    const vimsamsaSpan = 30.0 / 20; // 1°30' (1.5°) per vimsamsa
+
+    for (var entry in birthChart.entries) {
+      final planet = entry.value;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
+      final vimsamsaIndex = (degreeInSign / vimsamsaSpan).floor(); // 0 to 19
+
+      // Determine starting sign based on sign quality (modality)
+      // Note: D20 has DIFFERENT rules than D16
+      int startSign;
+      if (signIndex == 0 ||
+          signIndex == 3 ||
+          signIndex == 6 ||
+          signIndex == 9) {
+        // Movable signs (Aries, Cancer, Libra, Capricorn) - start from Aries
+        startSign = 0;
+      } else if (signIndex == 1 ||
+          signIndex == 4 ||
+          signIndex == 7 ||
+          signIndex == 10) {
+        // Fixed signs (Taurus, Leo, Scorpio, Aquarius) - start from Sagittarius
+        startSign = 8;
+      } else {
+        // Dual signs (Gemini, Virgo, Sagittarius, Pisces) - start from Leo
+        startSign = 4;
+      }
+
+      // Calculate new sign: start + vimsamsa index (wraps around 12 signs)
+      final newSignIndex = (startSign + vimsamsaIndex) % 12;
+
+      // Calculate new degree in the D20 sign
+      final newDegree = (degreeInSign % vimsamsaSpan) * 20;
+
+      vimsamsaChart[entry.key] = PlanetPosition(
+        planet: planet.planet,
+        longitude: newSignIndex * 30 + newDegree,
+        sign: zodiacSigns[newSignIndex],
+        signDegree: newDegree,
+        nakshatra:
+            SwephService.getNakshatra(newSignIndex * 30 + newDegree).name,
+        house: planet.house,
+        isRetrograde: planet.isRetrograde,
+      );
+    }
+
+    return vimsamsaChart;
   }
 
-  /// Calculate Chaturvimsamsa (D24) chart - Education
+  /// Calculate Chaturvimsamsa (D24) chart - Education, learning, knowledge
+  /// Also known as Siddhamsa
+  /// Rule: Odd signs start from Leo, Even signs start from Cancer
   static Map<String, PlanetPosition> calculateChaturvimsamsaChart(
     Map<String, PlanetPosition> birthChart,
   ) {
-    return _calculateDivisionalChart(birthChart, 24);
+    final Map<String, PlanetPosition> chaturvimsamsaChart = {};
+    const chaturvimsamsaSpan = 30.0 / 24; // 1°15' (1.25°) per division
+
+    for (var entry in birthChart.entries) {
+      final planet = entry.value;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
+      final chaturvimsamsaIndex =
+          (degreeInSign / chaturvimsamsaSpan).floor(); // 0 to 23
+
+      // Determine starting sign based on odd/even sign
+      int startSign;
+      if (signIndex % 2 == 0) {
+        // Odd signs (Aries=0, Gemini=2, Leo=4, etc.) - start from Leo
+        startSign = 4;
+      } else {
+        // Even signs (Taurus=1, Cancer=3, Virgo=5, etc.) - start from Cancer
+        startSign = 3;
+      }
+
+      // Calculate new sign: start + D24 index (wraps around 12 signs)
+      final newSignIndex = (startSign + chaturvimsamsaIndex) % 12;
+
+      // Calculate new degree in the D24 sign
+      final newDegree = (degreeInSign % chaturvimsamsaSpan) * 24;
+
+      chaturvimsamsaChart[entry.key] = PlanetPosition(
+        planet: planet.planet,
+        longitude: newSignIndex * 30 + newDegree,
+        sign: zodiacSigns[newSignIndex],
+        signDegree: newDegree,
+        nakshatra:
+            SwephService.getNakshatra(newSignIndex * 30 + newDegree).name,
+        house: planet.house,
+        isRetrograde: planet.isRetrograde,
+      );
+    }
+
+    return chaturvimsamsaChart;
   }
 
-  /// Calculate Bhamsa (D27) chart - Strength/weakness
+  /// Calculate Bhamsa (D27) chart - Strength/weakness, Nakshatramsa
+  /// Rule: Fire→Aries, Earth→Cancer, Air→Libra, Water→Capricorn
   static Map<String, PlanetPosition> calculateBhamsaChart(
     Map<String, PlanetPosition> birthChart,
   ) {
-    return _calculateDivisionalChart(birthChart, 27);
+    final Map<String, PlanetPosition> bhamsaChart = {};
+    const bhamsaSpan = 30.0 / 27; // 1°6'40" (1.111...°) per bhamsa
+
+    for (var entry in birthChart.entries) {
+      final planet = entry.value;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
+      final bhamsaIndex = (degreeInSign / bhamsaSpan).floor(); // 0 to 26
+
+      // Determine starting sign based on element
+      int startSign;
+      if (signIndex == 0 || signIndex == 4 || signIndex == 8) {
+        // Fire signs (Aries, Leo, Sagittarius) - start from Aries
+        startSign = 0;
+      } else if (signIndex == 1 || signIndex == 5 || signIndex == 9) {
+        // Earth signs (Taurus, Virgo, Capricorn) - start from Cancer
+        startSign = 3;
+      } else if (signIndex == 2 || signIndex == 6 || signIndex == 10) {
+        // Air signs (Gemini, Libra, Aquarius) - start from Libra
+        startSign = 6;
+      } else {
+        // Water signs (Cancer, Scorpio, Pisces) - start from Capricorn
+        startSign = 9;
+      }
+
+      // Calculate new sign: start + bhamsa index (wraps around 12 signs)
+      final newSignIndex = (startSign + bhamsaIndex) % 12;
+
+      // Calculate new degree in the D27 sign
+      final newDegree = (degreeInSign % bhamsaSpan) * 27;
+
+      bhamsaChart[entry.key] = PlanetPosition(
+        planet: planet.planet,
+        longitude: newSignIndex * 30 + newDegree,
+        sign: zodiacSigns[newSignIndex],
+        signDegree: newDegree,
+        nakshatra:
+            SwephService.getNakshatra(newSignIndex * 30 + newDegree).name,
+        house: planet.house,
+        isRetrograde: planet.isRetrograde,
+      );
+    }
+
+    return bhamsaChart;
   }
 
-  /// Calculate Trimshamsa (D30) chart - Misfortunes
+  /// Calculate Trimshamsa (D30) chart - Misfortunes, evils, afflictions
+  /// Uses UNEQUAL Parashari divisions (NOT 30 equal parts!)
+  /// Odd signs: Mars(5°)→Saturn(5°)→Jupiter(8°)→Mercury(7°)→Venus(5°)
+  /// Even signs: Venus(5°)→Mercury(7°)→Jupiter(8°)→Saturn(5°)→Mars(5°)
   static Map<String, PlanetPosition> calculateTrimshamsaChart(
     Map<String, PlanetPosition> birthChart,
   ) {
-    return _calculateDivisionalChart(birthChart, 30);
+    final Map<String, PlanetPosition> trimshamsaChart = {};
+
+    // D30 segments for ODD signs (Aries, Gemini, Leo, Libra, Sag, Aquarius)
+    // Lords: Mars(0-5°), Saturn(5-10°), Jupiter(10-18°), Mercury(18-25°), Venus(25-30°)
+    const oddSignD30 = [
+      {'end': 5.0, 'sign': 0, 'lord': 'Mars'}, // 0-5°: Aries (Mars)
+      {'end': 10.0, 'sign': 10, 'lord': 'Saturn'}, // 5-10°: Aquarius (Saturn)
+      {
+        'end': 18.0,
+        'sign': 8,
+        'lord': 'Jupiter',
+      }, // 10-18°: Sagittarius (Jupiter)
+      {'end': 25.0, 'sign': 2, 'lord': 'Mercury'}, // 18-25°: Gemini (Mercury)
+      {'end': 30.0, 'sign': 6, 'lord': 'Venus'}, // 25-30°: Libra (Venus)
+    ];
+
+    // D30 segments for EVEN signs (Taurus, Cancer, Virgo, Scorpio, Cap, Pisces)
+    // Lords: Venus(0-5°), Mercury(5-12°), Jupiter(12-20°), Saturn(20-25°), Mars(25-30°)
+    const evenSignD30 = [
+      {'end': 5.0, 'sign': 1, 'lord': 'Venus'}, // 0-5°: Taurus (Venus)
+      {'end': 12.0, 'sign': 5, 'lord': 'Mercury'}, // 5-12°: Virgo (Mercury)
+      {'end': 20.0, 'sign': 11, 'lord': 'Jupiter'}, // 12-20°: Pisces (Jupiter)
+      {'end': 25.0, 'sign': 9, 'lord': 'Saturn'}, // 20-25°: Capricorn (Saturn)
+      {'end': 30.0, 'sign': 7, 'lord': 'Mars'}, // 25-30°: Scorpio (Mars)
+    ];
+
+    for (var entry in birthChart.entries) {
+      final planet = entry.value;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
+
+      // Select the appropriate D30 mapping based on odd/even sign
+      final d30Map = (signIndex % 2 == 0) ? oddSignD30 : evenSignD30;
+
+      // Find which segment the planet falls into
+      int newSignIndex = 0;
+      double segmentStart = 0.0;
+      for (var segment in d30Map) {
+        final segmentEnd = (segment['end'] as num).toDouble();
+        if (degreeInSign < segmentEnd) {
+          newSignIndex = (segment['sign'] as num).toInt();
+          break;
+        }
+        segmentStart = segmentEnd;
+      }
+
+      // Calculate degree within the D30 sign (proportional mapping)
+      double segmentEnd = 30.0;
+      for (var segment in d30Map) {
+        final end = (segment['end'] as num).toDouble();
+        if (degreeInSign < end) {
+          segmentEnd = end;
+          break;
+        }
+      }
+      final segmentSpan = segmentEnd - segmentStart;
+      final degreeInSegment = degreeInSign - segmentStart;
+      final newDegree = (degreeInSegment / segmentSpan) * 30;
+
+      trimshamsaChart[entry.key] = PlanetPosition(
+        planet: planet.planet,
+        longitude: newSignIndex * 30 + newDegree,
+        sign: zodiacSigns[newSignIndex],
+        signDegree: newDegree,
+        nakshatra:
+            SwephService.getNakshatra(newSignIndex * 30 + newDegree).name,
+        house: planet.house,
+        isRetrograde: planet.isRetrograde,
+      );
+    }
+
+    return trimshamsaChart;
   }
 
-  /// Calculate Khavedamsa (D40) chart - Auspicious effects
+  /// Calculate Khavedamsa (D40) chart - Auspicious/inauspicious effects, matrilineal legacy
+  /// Rule: Odd signs start from Aries, Even signs start from Libra
   static Map<String, PlanetPosition> calculateKhavedamsaChart(
     Map<String, PlanetPosition> birthChart,
   ) {
-    return _calculateDivisionalChart(birthChart, 40);
+    final Map<String, PlanetPosition> khavedamsaChart = {};
+    const khavedamsaSpan = 30.0 / 40; // 0°45' (0.75°) per khavedamsa
+
+    for (var entry in birthChart.entries) {
+      final planet = entry.value;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
+      final khavedamsaIndex =
+          (degreeInSign / khavedamsaSpan).floor(); // 0 to 39
+
+      // Determine starting sign based on odd/even sign
+      int startSign;
+      if (signIndex % 2 == 0) {
+        // Odd signs (Aries=0, Gemini=2, Leo=4, etc.) - start from Aries
+        startSign = 0;
+      } else {
+        // Even signs (Taurus=1, Cancer=3, Virgo=5, etc.) - start from Libra
+        startSign = 6;
+      }
+
+      // Calculate new sign: start + D40 index (wraps around 12 signs)
+      final newSignIndex = (startSign + khavedamsaIndex) % 12;
+
+      // Calculate new degree in the D40 sign
+      final newDegree = (degreeInSign % khavedamsaSpan) * 40;
+
+      khavedamsaChart[entry.key] = PlanetPosition(
+        planet: planet.planet,
+        longitude: newSignIndex * 30 + newDegree,
+        sign: zodiacSigns[newSignIndex],
+        signDegree: newDegree,
+        nakshatra:
+            SwephService.getNakshatra(newSignIndex * 30 + newDegree).name,
+        house: planet.house,
+        isRetrograde: planet.isRetrograde,
+      );
+    }
+
+    return khavedamsaChart;
   }
 
-  /// Calculate Akshavedamsa (D45) chart - General indications
+  /// Calculate Akshavedamsa (D45) chart - General indications, patrilineal legacy
+  /// Rule: Movable→Aries, Fixed→Leo, Dual→Sagittarius (same as D16)
   static Map<String, PlanetPosition> calculateAkshavedamsaChart(
     Map<String, PlanetPosition> birthChart,
   ) {
-    return _calculateDivisionalChart(birthChart, 45);
+    final Map<String, PlanetPosition> akshavedamsaChart = {};
+    const akshavedamsaSpan = 30.0 / 45; // 0°40' (0.666...°) per akshavedamsa
+
+    for (var entry in birthChart.entries) {
+      final planet = entry.value;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
+      final akshavedamsaIndex =
+          (degreeInSign / akshavedamsaSpan).floor(); // 0 to 44
+
+      // Determine starting sign based on sign quality (modality)
+      int startSign;
+      if (signIndex == 0 ||
+          signIndex == 3 ||
+          signIndex == 6 ||
+          signIndex == 9) {
+        // Movable signs (Aries, Cancer, Libra, Capricorn) - start from Aries
+        startSign = 0;
+      } else if (signIndex == 1 ||
+          signIndex == 4 ||
+          signIndex == 7 ||
+          signIndex == 10) {
+        // Fixed signs (Taurus, Leo, Scorpio, Aquarius) - start from Leo
+        startSign = 4;
+      } else {
+        // Dual signs (Gemini, Virgo, Sagittarius, Pisces) - start from Sagittarius
+        startSign = 8;
+      }
+
+      // Calculate new sign: start + D45 index (wraps around 12 signs)
+      final newSignIndex = (startSign + akshavedamsaIndex) % 12;
+
+      // Calculate new degree in the D45 sign
+      final newDegree = (degreeInSign % akshavedamsaSpan) * 45;
+
+      akshavedamsaChart[entry.key] = PlanetPosition(
+        planet: planet.planet,
+        longitude: newSignIndex * 30 + newDegree,
+        sign: zodiacSigns[newSignIndex],
+        signDegree: newDegree,
+        nakshatra:
+            SwephService.getNakshatra(newSignIndex * 30 + newDegree).name,
+        house: planet.house,
+        isRetrograde: planet.isRetrograde,
+      );
+    }
+
+    return akshavedamsaChart;
   }
 
-  /// Calculate Shashtiamsa (D60) chart - Past life karma
+  /// Calculate Shashtiamsa (D60) chart - Past life karma, Sanchita karma
+  /// Rule: Odd signs start from Aries, Even signs start from Libra
+  /// Each division has a specific name and benefic/malefic nature
   static Map<String, PlanetPosition> calculateShashtiamsaChart(
     Map<String, PlanetPosition> birthChart,
   ) {
-    return _calculateDivisionalChart(birthChart, 60);
+    final Map<String, PlanetPosition> shashtiamsaChart = {};
+    const shashtiamsaSpan = 30.0 / 60; // 0°30' (0.5°) per shashtiamsa
+
+    // The 60 Shashtiamsa names with nature (B=Benefic, M=Malefic, N=Neutral)
+    const shashtiamsaNames = [
+      {'name': 'Ghora', 'nature': 'M'}, // 1
+      {'name': 'Rakshasa', 'nature': 'M'}, // 2
+      {'name': 'Deva', 'nature': 'B'}, // 3
+      {'name': 'Kubera', 'nature': 'B'}, // 4
+      {'name': 'Yaksha', 'nature': 'B'}, // 5
+      {'name': 'Kinnara', 'nature': 'B'}, // 6
+      {'name': 'Bhrashta', 'nature': 'M'}, // 7
+      {'name': 'Kulaghna', 'nature': 'M'}, // 8
+      {'name': 'Garala', 'nature': 'M'}, // 9
+      {'name': 'Vahni', 'nature': 'M'}, // 10
+      {'name': 'Maya', 'nature': 'N'}, // 11
+      {'name': 'Purishaka', 'nature': 'M'}, // 12
+      {'name': 'Apampathi', 'nature': 'B'}, // 13
+      {'name': 'Marut', 'nature': 'B'}, // 14
+      {'name': 'Kaala', 'nature': 'M'}, // 15
+      {'name': 'Sarpa', 'nature': 'M'}, // 16
+      {'name': 'Amrita', 'nature': 'B'}, // 17
+      {'name': 'Indu', 'nature': 'B'}, // 18
+      {'name': 'Mridu', 'nature': 'B'}, // 19
+      {'name': 'Komala', 'nature': 'B'}, // 20
+      {'name': 'Heramba', 'nature': 'N'}, // 21
+      {'name': 'Brahma', 'nature': 'B'}, // 22
+      {'name': 'Vishnu', 'nature': 'B'}, // 23
+      {'name': 'Maheshwara', 'nature': 'B'}, // 24
+      {'name': 'Deva', 'nature': 'B'}, // 25
+      {'name': 'Ardra', 'nature': 'M'}, // 26
+      {'name': 'Kalinasha', 'nature': 'M'}, // 27
+      {'name': 'Kshiteesa', 'nature': 'B'}, // 28
+      {'name': 'Kamalakara', 'nature': 'B'}, // 29
+      {'name': 'Gulika', 'nature': 'M'}, // 30
+      {'name': 'Mrityu', 'nature': 'M'}, // 31
+      {'name': 'Kaala', 'nature': 'M'}, // 32
+      {'name': 'Davagni', 'nature': 'M'}, // 33
+      {'name': 'Ghora', 'nature': 'M'}, // 34
+      {'name': 'Yama', 'nature': 'M'}, // 35
+      {'name': 'Kantaka', 'nature': 'M'}, // 36
+      {'name': 'Sudha', 'nature': 'B'}, // 37
+      {'name': 'Amrita', 'nature': 'B'}, // 38
+      {'name': 'Purnachandra', 'nature': 'B'}, // 39
+      {'name': 'Vishadagdha', 'nature': 'M'}, // 40
+      {'name': 'Kulanasha', 'nature': 'M'}, // 41
+      {'name': 'Vamshakshaya', 'nature': 'M'}, // 42
+      {'name': 'Utpata', 'nature': 'M'}, // 43
+      {'name': 'Kaala', 'nature': 'M'}, // 44
+      {'name': 'Saumya', 'nature': 'B'}, // 45
+      {'name': 'Komala', 'nature': 'B'}, // 46
+      {'name': 'Sheetala', 'nature': 'B'}, // 47
+      {'name': 'Karala', 'nature': 'M'}, // 48
+      {'name': 'Chandramukhi', 'nature': 'B'}, // 49
+      {'name': 'Praveena', 'nature': 'B'}, // 50
+      {'name': 'Kalagni', 'nature': 'M'}, // 51
+      {'name': 'Dandayudha', 'nature': 'M'}, // 52
+      {'name': 'Nirmala', 'nature': 'B'}, // 53
+      {'name': 'Saumya', 'nature': 'B'}, // 54
+      {'name': 'Kroora', 'nature': 'M'}, // 55
+      {'name': 'Atisheetala', 'nature': 'B'}, // 56
+      {'name': 'Amrita', 'nature': 'B'}, // 57
+      {'name': 'Payodhi', 'nature': 'B'}, // 58
+      {'name': 'Bhramana', 'nature': 'N'}, // 59
+      {'name': 'Chandrarekha', 'nature': 'B'}, // 60
+    ];
+
+    for (var entry in birthChart.entries) {
+      final planet = entry.value;
+      final signIndex = _getSignIndex(planet.longitude);
+      final degreeInSign = _getDegreeInSign(planet.longitude);
+      final shashtiamsaIndex =
+          (degreeInSign / shashtiamsaSpan).floor(); // 0 to 59
+
+      // Determine starting sign based on odd/even sign
+      int startSign;
+      if (signIndex % 2 == 0) {
+        // Odd signs (Aries=0, Gemini=2, Leo=4, etc.) - start from Aries
+        startSign = 0;
+      } else {
+        // Even signs (Taurus=1, Cancer=3, Virgo=5, etc.) - start from Libra
+        startSign = 6;
+      }
+
+      // Calculate new sign: start + D60 index (wraps around 12 signs)
+      final newSignIndex = (startSign + shashtiamsaIndex) % 12;
+
+      // Get the Shashtiamsa name and nature
+      final shashtiamsaInfo = shashtiamsaNames[shashtiamsaIndex];
+      final natureFull =
+          shashtiamsaInfo['nature'] == 'B'
+              ? 'Benefic'
+              : shashtiamsaInfo['nature'] == 'M'
+              ? 'Malefic'
+              : 'Neutral';
+
+      // Calculate new degree in the D60 sign
+      final newDegree = (degreeInSign % shashtiamsaSpan) * 60;
+
+      shashtiamsaChart[entry.key] = PlanetPosition(
+        planet: planet.planet,
+        longitude: newSignIndex * 30 + newDegree,
+        sign: zodiacSigns[newSignIndex],
+        signDegree: newDegree,
+        // Store Shashtiamsa name and nature in nakshatra field for reference
+        nakshatra: '${shashtiamsaInfo['name']} ($natureFull)',
+        house: planet.house,
+        isRetrograde: planet.isRetrograde,
+      );
+    }
+
+    return shashtiamsaChart;
+  }
+
+  /// Get Shashtiamsa details for a given longitude
+  /// Returns the name and nature of the Shashtiamsa
+  static Map<String, String> getShashtiamsaDetails(double longitude) {
+    const shashtiamsaSpan = 0.5; // 0°30'
+    final degreeInSign = longitude % 30;
+    final index = (degreeInSign / shashtiamsaSpan).floor();
+
+    const names = [
+      'Ghora',
+      'Rakshasa',
+      'Deva',
+      'Kubera',
+      'Yaksha',
+      'Kinnara',
+      'Bhrashta',
+      'Kulaghna',
+      'Garala',
+      'Vahni',
+      'Maya',
+      'Purishaka',
+      'Apampathi',
+      'Marut',
+      'Kaala',
+      'Sarpa',
+      'Amrita',
+      'Indu',
+      'Mridu',
+      'Komala',
+      'Heramba',
+      'Brahma',
+      'Vishnu',
+      'Maheshwara',
+      'Deva',
+      'Ardra',
+      'Kalinasha',
+      'Kshiteesa',
+      'Kamalakara',
+      'Gulika',
+      'Mrityu',
+      'Kaala',
+      'Davagni',
+      'Ghora',
+      'Yama',
+      'Kantaka',
+      'Sudha',
+      'Amrita',
+      'Purnachandra',
+      'Vishadagdha',
+      'Kulanasha',
+      'Vamshakshaya',
+      'Utpata',
+      'Kaala',
+      'Saumya',
+      'Komala',
+      'Sheetala',
+      'Karala',
+      'Chandramukhi',
+      'Praveena',
+      'Kalagni',
+      'Dandayudha',
+      'Nirmala',
+      'Saumya',
+      'Kroora',
+      'Atisheetala',
+      'Amrita',
+      'Payodhi',
+      'Bhramana',
+      'Chandrarekha',
+    ];
+
+    const natures = [
+      'M',
+      'M',
+      'B',
+      'B',
+      'B',
+      'B',
+      'M',
+      'M',
+      'M',
+      'M',
+      'N',
+      'M',
+      'B',
+      'B',
+      'M',
+      'M',
+      'B',
+      'B',
+      'B',
+      'B',
+      'N',
+      'B',
+      'B',
+      'B',
+      'B',
+      'M',
+      'M',
+      'B',
+      'B',
+      'M',
+      'M',
+      'M',
+      'M',
+      'M',
+      'M',
+      'M',
+      'B',
+      'B',
+      'B',
+      'M',
+      'M',
+      'M',
+      'M',
+      'M',
+      'B',
+      'B',
+      'B',
+      'M',
+      'B',
+      'B',
+      'M',
+      'M',
+      'B',
+      'B',
+      'M',
+      'B',
+      'B',
+      'B',
+      'N',
+      'B',
+    ];
+
+    return {
+      'name': names[index],
+      'nature':
+          natures[index] == 'B'
+              ? 'Benefic'
+              : natures[index] == 'M'
+              ? 'Malefic'
+              : 'Neutral',
+      'number': '${index + 1}',
+    };
   }
 
   /// Generic divisional chart calculation
@@ -3159,9 +4282,9 @@ class KundaliCalculationService {
 
     for (var entry in birthChart.entries) {
       final planet = entry.value;
-      final degreeInSign = planet.longitude % 30;
+      final degreeInSign = _getDegreeInSign(planet.longitude);
       final divisionIndex = (degreeInSign / divisionSpan).floor();
-      final signIndex = (planet.longitude / 30).floor();
+      final signIndex = _getSignIndex(planet.longitude);
 
       // Calculate new sign based on division
       int newSignIndex = (signIndex + divisionIndex) % 12;
@@ -3926,9 +5049,166 @@ class KundaliCalculationService {
     return 0.6 + (pos.signDegree / 30.0) * 0.4;
   }
 
-  /// Calculate Ashtakavarga
+  // ============ ASHTAKAVARGA SYSTEM ============
+
+  /// Parashari Ashtakavarga Bindu Tables
+  /// Each planet has specific houses (from each reference point) where it gives bindus
+  /// Format: {contributingPlanet: [houses where bindu is given]}
+  /// Houses are 1-indexed as per traditional notation
+
+  // Sun's Ashtakavarga - houses where each planet contributes bindu to Sun
+  static const _sunBinduTable = {
+    'Sun': [1, 2, 4, 7, 8, 9, 10, 11],
+    'Moon': [3, 6, 10, 11],
+    'Mars': [1, 2, 4, 7, 8, 9, 10, 11],
+    'Mercury': [3, 5, 6, 9, 10, 11, 12],
+    'Jupiter': [5, 6, 9, 11],
+    'Venus': [6, 7, 12],
+    'Saturn': [1, 2, 4, 7, 8, 9, 10, 11],
+    'Lagna': [3, 4, 6, 10, 11, 12],
+  };
+
+  // Moon's Ashtakavarga
+  static const _moonBinduTable = {
+    'Sun': [3, 6, 7, 8, 10, 11],
+    'Moon': [1, 3, 6, 7, 10, 11],
+    'Mars': [2, 3, 5, 6, 9, 10, 11],
+    'Mercury': [1, 3, 4, 5, 7, 8, 10, 11],
+    'Jupiter': [1, 4, 7, 8, 10, 11, 12],
+    'Venus': [3, 4, 5, 7, 9, 10, 11],
+    'Saturn': [3, 5, 6, 11],
+    'Lagna': [3, 6, 10, 11],
+  };
+
+  // Mars' Ashtakavarga
+  static const _marsBinduTable = {
+    'Sun': [3, 5, 6, 10, 11],
+    'Moon': [3, 6, 11],
+    'Mars': [1, 2, 4, 7, 8, 10, 11],
+    'Mercury': [3, 5, 6, 11],
+    'Jupiter': [6, 10, 11, 12],
+    'Venus': [6, 8, 11, 12],
+    'Saturn': [1, 4, 7, 8, 9, 10, 11],
+    'Lagna': [1, 3, 6, 10, 11],
+  };
+
+  // Mercury's Ashtakavarga
+  static const _mercuryBinduTable = {
+    'Sun': [5, 6, 9, 11, 12],
+    'Moon': [2, 4, 6, 8, 10, 11],
+    'Mars': [1, 2, 4, 7, 8, 9, 10, 11],
+    'Mercury': [1, 3, 5, 6, 9, 10, 11, 12],
+    'Jupiter': [6, 8, 11, 12],
+    'Venus': [1, 2, 3, 4, 5, 8, 9, 11],
+    'Saturn': [1, 2, 4, 7, 8, 9, 10, 11],
+    'Lagna': [1, 2, 4, 6, 8, 10, 11],
+  };
+
+  // Jupiter's Ashtakavarga
+  static const _jupiterBinduTable = {
+    'Sun': [1, 2, 3, 4, 7, 8, 9, 10, 11],
+    'Moon': [2, 5, 7, 9, 11],
+    'Mars': [1, 2, 4, 7, 8, 10, 11],
+    'Mercury': [1, 2, 4, 5, 6, 9, 10, 11],
+    'Jupiter': [1, 2, 3, 4, 7, 8, 10, 11],
+    'Venus': [2, 5, 6, 9, 10, 11],
+    'Saturn': [3, 5, 6, 12],
+    'Lagna': [1, 2, 4, 5, 6, 7, 9, 10, 11],
+  };
+
+  // Venus' Ashtakavarga
+  static const _venusBinduTable = {
+    'Sun': [8, 11, 12],
+    'Moon': [1, 2, 3, 4, 5, 8, 9, 11, 12],
+    'Mars': [3, 5, 6, 9, 11, 12],
+    'Mercury': [3, 5, 6, 9, 11],
+    'Jupiter': [5, 8, 9, 10, 11],
+    'Venus': [1, 2, 3, 4, 5, 8, 9, 10, 11],
+    'Saturn': [3, 4, 5, 8, 9, 10, 11],
+    'Lagna': [1, 2, 3, 4, 5, 8, 9, 11],
+  };
+
+  // Saturn's Ashtakavarga
+  static const _saturnBinduTable = {
+    'Sun': [1, 2, 4, 7, 8, 10, 11],
+    'Moon': [3, 6, 11],
+    'Mars': [3, 5, 6, 10, 11, 12],
+    'Mercury': [6, 8, 9, 10, 11, 12],
+    'Jupiter': [5, 6, 11, 12],
+    'Venus': [6, 11, 12],
+    'Saturn': [3, 5, 6, 11],
+    'Lagna': [1, 3, 4, 6, 10, 11],
+  };
+
+  /// Get the bindu table for a specific planet
+  static Map<String, List<int>> _getBinduTable(String planet) {
+    switch (planet) {
+      case 'Sun':
+        return _sunBinduTable;
+      case 'Moon':
+        return _moonBinduTable;
+      case 'Mars':
+        return _marsBinduTable;
+      case 'Mercury':
+        return _mercuryBinduTable;
+      case 'Jupiter':
+        return _jupiterBinduTable;
+      case 'Venus':
+        return _venusBinduTable;
+      case 'Saturn':
+        return _saturnBinduTable;
+      default:
+        return {};
+    }
+  }
+
+  /// Calculate Bhinnashtakavarga for a single planet
+  /// Returns a list of 12 integers representing bindus in each sign
+  static List<int> calculateBhinnashtakavarga(
+    String planet,
+    Map<String, PlanetPosition> positions,
+    int lagnaSignIndex,
+  ) {
+    final bindus = List<int>.filled(12, 0);
+    final binduTable = _getBinduTable(planet);
+
+    if (binduTable.isEmpty) return bindus;
+
+    // Get the planet's sign index
+    final planetPos = positions[planet];
+    if (planetPos == null) return bindus;
+
+    // For each contributing planet (including Lagna)
+    for (var contributor in binduTable.keys) {
+      int contributorSignIndex;
+
+      if (contributor == 'Lagna') {
+        contributorSignIndex = lagnaSignIndex;
+      } else {
+        final contribPos = positions[contributor];
+        if (contribPos == null) continue;
+        contributorSignIndex = zodiacSigns.indexOf(contribPos.sign);
+      }
+
+      // Get the houses where this contributor gives bindu to the planet
+      final binduHouses = binduTable[contributor] ?? [];
+
+      // For each bindu house, add a point to the corresponding sign
+      for (var house in binduHouses) {
+        // Calculate the sign index: contributor's sign + (house - 1)
+        final signIndex = (contributorSignIndex + house - 1) % 12;
+        bindus[signIndex] += 1;
+      }
+    }
+
+    return bindus;
+  }
+
+  /// Calculate complete Ashtakavarga for all 7 planets
+  /// Returns Bhinnashtakavarga for each planet
   static Map<String, List<int>> calculateAshtakavarga(
     Map<String, PlanetPosition> positions,
+    int lagnaSignIndex,
   ) {
     final Map<String, List<int>> ashtakavarga = {};
 
@@ -3941,14 +5221,17 @@ class KundaliCalculationService {
       'Venus',
       'Saturn',
     ]) {
-      // Simplified: random realistic values (actual calculation requires benefic/malefic contributions)
-      ashtakavarga[planet] = List.generate(12, (i) => 2 + (i % 5));
+      ashtakavarga[planet] = calculateBhinnashtakavarga(
+        planet,
+        positions,
+        lagnaSignIndex,
+      );
     }
 
     return ashtakavarga;
   }
 
-  /// Calculate Sarvashtakavarga (sum of all bindus)
+  /// Calculate Sarvashtakavarga (sum of all Bhinnashtakavarga bindus)
   static List<int> calculateSarvashtakavarga(
     Map<String, List<int>> ashtakavarga,
   ) {
@@ -3961,6 +5244,181 @@ class KundaliCalculationService {
     }
 
     return sarva;
+  }
+
+  /// Apply Trikona Shodhana (Triangular Reduction)
+  /// Reduces bindus in trikona houses (1-5-9) to the minimum value among them
+  static Map<String, List<int>> applyTrikonaShodhana(
+    Map<String, List<int>> ashtakavarga,
+  ) {
+    final reduced = <String, List<int>>{};
+
+    for (var entry in ashtakavarga.entries) {
+      final bindus = List<int>.from(entry.value);
+
+      // Process each trikona group (4 groups of 3 signs each)
+      for (int startSign = 0; startSign < 4; startSign++) {
+        final sign1 = startSign; // 1st trikona
+        final sign2 = (startSign + 4) % 12; // 5th from sign1
+        final sign3 = (startSign + 8) % 12; // 9th from sign1
+
+        // Find minimum in this trikona
+        final minValue = [
+          bindus[sign1],
+          bindus[sign2],
+          bindus[sign3],
+        ].reduce((a, b) => a < b ? a : b);
+
+        // Reduce each sign by the minimum (subtract minimum from each)
+        bindus[sign1] -= minValue;
+        bindus[sign2] -= minValue;
+        bindus[sign3] -= minValue;
+      }
+
+      reduced[entry.key] = bindus;
+    }
+
+    return reduced;
+  }
+
+  /// Apply Ekadhipatya Shodhana (Same Lord Reduction)
+  /// When two signs have the same lord, reduce bindus based on occupation
+  static Map<String, List<int>> applyEkadhipatyaShodhana(
+    Map<String, List<int>> ashtakavarga,
+    Map<String, PlanetPosition> positions,
+  ) {
+    // Sign pairs with same lord (excluding Sun and Moon which rule only one sign)
+    // Mars: Aries(0), Scorpio(7)
+    // Mercury: Gemini(2), Virgo(5)
+    // Jupiter: Sagittarius(8), Pisces(11)
+    // Venus: Taurus(1), Libra(6)
+    // Saturn: Capricorn(9), Aquarius(10)
+    const sameRulerPairs = [
+      [0, 7], // Mars: Aries-Scorpio
+      [2, 5], // Mercury: Gemini-Virgo
+      [8, 11], // Jupiter: Sagittarius-Pisces
+      [1, 6], // Venus: Taurus-Libra
+      [9, 10], // Saturn: Capricorn-Aquarius
+    ];
+
+    // Check which signs are occupied by planets
+    final occupiedSigns = <int>{};
+    for (var planet in positions.values) {
+      occupiedSigns.add(zodiacSigns.indexOf(planet.sign));
+    }
+
+    final reduced = <String, List<int>>{};
+
+    for (var entry in ashtakavarga.entries) {
+      final bindus = List<int>.from(entry.value);
+
+      for (var pair in sameRulerPairs) {
+        final sign1 = pair[0];
+        final sign2 = pair[1];
+
+        final sign1Occupied = occupiedSigns.contains(sign1);
+        final sign2Occupied = occupiedSigns.contains(sign2);
+
+        if (sign1Occupied && !sign2Occupied) {
+          // Reduce sign2 (unoccupied) bindus
+          final reduction =
+              bindus[sign1] < bindus[sign2] ? bindus[sign1] : bindus[sign2];
+          bindus[sign2] -= reduction;
+        } else if (sign2Occupied && !sign1Occupied) {
+          // Reduce sign1 (unoccupied) bindus
+          final reduction =
+              bindus[sign1] < bindus[sign2] ? bindus[sign1] : bindus[sign2];
+          bindus[sign1] -= reduction;
+        } else if (!sign1Occupied && !sign2Occupied) {
+          // Neither occupied - reduce both to minimum
+          final minValue =
+              bindus[sign1] < bindus[sign2] ? bindus[sign1] : bindus[sign2];
+          bindus[sign1] = minValue;
+          bindus[sign2] = minValue;
+        }
+        // If both occupied, no reduction
+      }
+
+      reduced[entry.key] = bindus;
+    }
+
+    return reduced;
+  }
+
+  /// Get Ashtakavarga-based transit strength
+  /// Returns the bindu count for a planet's transit through a sign
+  static int getTransitBinduStrength(
+    Map<String, List<int>> ashtakavarga,
+    String planet,
+    int transitSignIndex,
+  ) {
+    final planetBindus = ashtakavarga[planet];
+    if (planetBindus == null) return 0;
+    return planetBindus[transitSignIndex];
+  }
+
+  /// Interpret transit based on Ashtakavarga bindu count
+  static String interpretTransitStrength(int bindus) {
+    if (bindus >= 5) {
+      return 'Excellent';
+    } else if (bindus == 4) {
+      return 'Good';
+    } else if (bindus == 3) {
+      return 'Average';
+    } else if (bindus == 2) {
+      return 'Below Average';
+    } else if (bindus == 1) {
+      return 'Weak';
+    } else {
+      return 'Very Weak';
+    }
+  }
+
+  /// Get complete Ashtakavarga analysis
+  static Map<String, dynamic> getAshtakavargaAnalysis(
+    Map<String, PlanetPosition> positions,
+    int lagnaSignIndex,
+  ) {
+    // Calculate Bhinnashtakavarga
+    final bhinnashtakavarga = calculateAshtakavarga(positions, lagnaSignIndex);
+
+    // Calculate Sarvashtakavarga
+    final sarvashtakavarga = calculateSarvashtakavarga(bhinnashtakavarga);
+
+    // Apply reductions for Prastara Ashtakavarga
+    final afterTrikona = applyTrikonaShodhana(bhinnashtakavarga);
+    final afterEkadhipatya = applyEkadhipatyaShodhana(afterTrikona, positions);
+
+    // Calculate reduced Sarvashtakavarga
+    final reducedSarva = calculateSarvashtakavarga(afterEkadhipatya);
+
+    // Find strongest and weakest signs
+    int maxBindu = 0, minBindu = 56;
+    int strongestSign = 0, weakestSign = 0;
+
+    for (int i = 0; i < 12; i++) {
+      if (sarvashtakavarga[i] > maxBindu) {
+        maxBindu = sarvashtakavarga[i];
+        strongestSign = i;
+      }
+      if (sarvashtakavarga[i] < minBindu) {
+        minBindu = sarvashtakavarga[i];
+        weakestSign = i;
+      }
+    }
+
+    return {
+      'bhinnashtakavarga': bhinnashtakavarga,
+      'sarvashtakavarga': sarvashtakavarga,
+      'afterTrikonaShodhana': afterTrikona,
+      'afterEkadhipatyaShodhana': afterEkadhipatya,
+      'reducedSarvashtakavarga': reducedSarva,
+      'strongestSign': zodiacSigns[strongestSign],
+      'strongestSignBindus': maxBindu,
+      'weakestSign': zodiacSigns[weakestSign],
+      'weakestSignBindus': minBindu,
+      'totalBindus': sarvashtakavarga.reduce((a, b) => a + b),
+    };
   }
 
   /// Calculate transits
@@ -4881,7 +6339,7 @@ class YoginiDashaInfo {
   final double? antardashaRemainingYears;
   final DateTime? yoginiStartDate;
   final DateTime? yoginiEndDate;
-  
+
   // Enhanced fields
   final List<YoginiPeriodDetail>? yoginiSequence;
   final YoginiPeriodDetail? currentYoginiDetail;
@@ -5067,14 +6525,46 @@ class JaiminiKarakas {
 
   /// Get all karakas as a list of (karaka, planet, degree) tuples
   List<Map<String, dynamic>> get allKarakas => [
-    {'karaka': CharaKaraka.atmakaraka, 'planet': atmakaraka, 'degree': atmakarakaDegree},
-    {'karaka': CharaKaraka.amatyakaraka, 'planet': amatyakaraka, 'degree': amatyakarakaDegree},
-    {'karaka': CharaKaraka.bhratrikaraka, 'planet': bhratrikaraka, 'degree': bhratrikarakaDegree},
-    {'karaka': CharaKaraka.matrikaraka, 'planet': matrikaraka, 'degree': matrikarakaDegree},
-    {'karaka': CharaKaraka.pitrikaraka, 'planet': pitrikaraka, 'degree': pitrikarakaDegree},
-    {'karaka': CharaKaraka.putrakaraka, 'planet': putrakaraka, 'degree': putrakarakaDegree},
-    {'karaka': CharaKaraka.gnatikaraka, 'planet': gnatikaraka, 'degree': gnatrikarakaDegree},
-    {'karaka': CharaKaraka.darakaraka, 'planet': darakaraka, 'degree': darakarakaDegree},
+    {
+      'karaka': CharaKaraka.atmakaraka,
+      'planet': atmakaraka,
+      'degree': atmakarakaDegree,
+    },
+    {
+      'karaka': CharaKaraka.amatyakaraka,
+      'planet': amatyakaraka,
+      'degree': amatyakarakaDegree,
+    },
+    {
+      'karaka': CharaKaraka.bhratrikaraka,
+      'planet': bhratrikaraka,
+      'degree': bhratrikarakaDegree,
+    },
+    {
+      'karaka': CharaKaraka.matrikaraka,
+      'planet': matrikaraka,
+      'degree': matrikarakaDegree,
+    },
+    {
+      'karaka': CharaKaraka.pitrikaraka,
+      'planet': pitrikaraka,
+      'degree': pitrikarakaDegree,
+    },
+    {
+      'karaka': CharaKaraka.putrakaraka,
+      'planet': putrakaraka,
+      'degree': putrakarakaDegree,
+    },
+    {
+      'karaka': CharaKaraka.gnatikaraka,
+      'planet': gnatikaraka,
+      'degree': gnatrikarakaDegree,
+    },
+    {
+      'karaka': CharaKaraka.darakaraka,
+      'planet': darakaraka,
+      'degree': darakarakaDegree,
+    },
   ];
 }
 
@@ -5172,10 +6662,10 @@ class CharDashaInfo {
   final DateTime? signEndDate;
   final bool isClockwise; // Direction of Dasha progression
   final String startingSign; // First sign of the Dasha cycle
-  
+
   // Jaimini Karakas
   final JaiminiKarakas karakas;
-  
+
   // Enhanced fields
   final List<CharaPeriodDetail>? charSequence;
   final CharaPeriodDetail? currentSignDetail;
@@ -5226,7 +6716,8 @@ class MahadashaPhalaData {
   final String planet;
   final String overallTheme;
   final List<String> keyEffects;
-  final Map<String, String> lifeAreas; // Career, Health, Relationships, Finance, Spirituality
+  final Map<String, String>
+  lifeAreas; // Career, Health, Relationships, Finance, Spirituality
   final List<String> favorableAspects;
   final List<String> challenges;
   final List<String> remedies;
@@ -5257,7 +6748,8 @@ class MahadashaInterpretations {
   static const Map<String, MahadashaPhalaData> data = {
     'Sun': MahadashaPhalaData(
       planet: 'Sun',
-      overallTheme: 'A period of self-realization, authority, and recognition. The soul seeks to express its true nature and achieve prominence.',
+      overallTheme:
+          'A period of self-realization, authority, and recognition. The soul seeks to express its true nature and achieve prominence.',
       keyEffects: [
         'Rise in status and authority',
         'Government connections and favors',
@@ -5266,11 +6758,16 @@ class MahadashaInterpretations {
         'Leadership opportunities emerge',
       ],
       lifeAreas: {
-        'Career': 'Excellent for government jobs, politics, administration, and leadership roles. Recognition from superiors is likely.',
-        'Health': 'Focus on heart, eyes, and bones. Maintain good vitamin D levels and avoid excessive heat.',
-        'Relationships': 'Ego clashes possible in marriage. Good for gaining respect from elders and father figures.',
-        'Finance': 'Gains through government, authority figures, and gold-related investments. Avoid speculation.',
-        'Spirituality': 'Connection with divine masculine energy. Temple visits and sun worship are beneficial.',
+        'Career':
+            'Excellent for government jobs, politics, administration, and leadership roles. Recognition from superiors is likely.',
+        'Health':
+            'Focus on heart, eyes, and bones. Maintain good vitamin D levels and avoid excessive heat.',
+        'Relationships':
+            'Ego clashes possible in marriage. Good for gaining respect from elders and father figures.',
+        'Finance':
+            'Gains through government, authority figures, and gold-related investments. Avoid speculation.',
+        'Spirituality':
+            'Connection with divine masculine energy. Temple visits and sun worship are beneficial.',
       },
       favorableAspects: [
         'Recognition and fame',
@@ -5301,7 +6798,8 @@ class MahadashaInterpretations {
     ),
     'Moon': MahadashaPhalaData(
       planet: 'Moon',
-      overallTheme: 'A period of emotional growth, nurturing, and intuition. The mind seeks peace and maternal comfort.',
+      overallTheme:
+          'A period of emotional growth, nurturing, and intuition. The mind seeks peace and maternal comfort.',
       keyEffects: [
         'Emotional sensitivity increases',
         'Mother-related matters highlighted',
@@ -5310,11 +6808,16 @@ class MahadashaInterpretations {
         'Mental peace becomes priority',
       ],
       lifeAreas: {
-        'Career': 'Good for public-facing roles, hospitality, nursing, psychology, and water-related businesses.',
-        'Health': 'Mind and emotions need attention. Watch for water retention, cold, and mental stress.',
-        'Relationships': 'Deep emotional bonding. Mother becomes important. Marriage prospects for unmarried.',
-        'Finance': 'Gains through liquids, dairy, tourism, and public dealings. Variable income patterns.',
-        'Spirituality': 'Devotional practices flourish. Connection with divine feminine. Dreams become significant.',
+        'Career':
+            'Good for public-facing roles, hospitality, nursing, psychology, and water-related businesses.',
+        'Health':
+            'Mind and emotions need attention. Watch for water retention, cold, and mental stress.',
+        'Relationships':
+            'Deep emotional bonding. Mother becomes important. Marriage prospects for unmarried.',
+        'Finance':
+            'Gains through liquids, dairy, tourism, and public dealings. Variable income patterns.',
+        'Spirituality':
+            'Devotional practices flourish. Connection with divine feminine. Dreams become significant.',
       },
       favorableAspects: [
         'Emotional intelligence',
@@ -5345,7 +6848,8 @@ class MahadashaInterpretations {
     ),
     'Mars': MahadashaPhalaData(
       planet: 'Mars',
-      overallTheme: 'A period of action, courage, and determination. Energy and ambition drive all endeavors.',
+      overallTheme:
+          'A period of action, courage, and determination. Energy and ambition drive all endeavors.',
       keyEffects: [
         'Increased energy and drive',
         'Property and land matters',
@@ -5354,11 +6858,16 @@ class MahadashaInterpretations {
         'Physical strength emphasis',
       ],
       lifeAreas: {
-        'Career': 'Excellent for military, police, engineering, surgery, sports, and real estate.',
-        'Health': 'Watch for accidents, injuries, blood-related issues, and inflammation.',
-        'Relationships': 'Passion increases but so do conflicts. Manglik effects are prominent.',
-        'Finance': 'Gains through property, machinery, and technical work. Sudden gains and losses.',
-        'Spirituality': 'Tantra and powerful practices. Hanuman worship is highly beneficial.',
+        'Career':
+            'Excellent for military, police, engineering, surgery, sports, and real estate.',
+        'Health':
+            'Watch for accidents, injuries, blood-related issues, and inflammation.',
+        'Relationships':
+            'Passion increases but so do conflicts. Manglik effects are prominent.',
+        'Finance':
+            'Gains through property, machinery, and technical work. Sudden gains and losses.',
+        'Spirituality':
+            'Tantra and powerful practices. Hanuman worship is highly beneficial.',
       },
       favorableAspects: [
         'Courage and bravery',
@@ -5389,7 +6898,8 @@ class MahadashaInterpretations {
     ),
     'Mercury': MahadashaPhalaData(
       planet: 'Mercury',
-      overallTheme: 'A period of intellect, communication, and learning. The mind seeks knowledge and expression.',
+      overallTheme:
+          'A period of intellect, communication, and learning. The mind seeks knowledge and expression.',
       keyEffects: [
         'Intellectual growth and learning',
         'Business and trade opportunities',
@@ -5398,11 +6908,16 @@ class MahadashaInterpretations {
         'Youthful energy and adaptability',
       ],
       lifeAreas: {
-        'Career': 'Excellent for writing, accounting, teaching, trading, IT, and communication fields.',
-        'Health': 'Nervous system needs attention. Watch for skin issues and respiratory problems.',
-        'Relationships': 'Friendships flourish. Good for intellectual companionship. Siblings matter.',
-        'Finance': 'Gains through intellect, trade, and communication. Multiple income sources.',
-        'Spirituality': 'Jnana yoga and intellectual pursuit of truth. Study of scriptures beneficial.',
+        'Career':
+            'Excellent for writing, accounting, teaching, trading, IT, and communication fields.',
+        'Health':
+            'Nervous system needs attention. Watch for skin issues and respiratory problems.',
+        'Relationships':
+            'Friendships flourish. Good for intellectual companionship. Siblings matter.',
+        'Finance':
+            'Gains through intellect, trade, and communication. Multiple income sources.',
+        'Spirituality':
+            'Jnana yoga and intellectual pursuit of truth. Study of scriptures beneficial.',
       },
       favorableAspects: [
         'Sharp intellect',
@@ -5433,7 +6948,8 @@ class MahadashaInterpretations {
     ),
     'Jupiter': MahadashaPhalaData(
       planet: 'Jupiter',
-      overallTheme: 'A period of wisdom, expansion, and good fortune. Divine grace and blessings flow abundantly.',
+      overallTheme:
+          'A period of wisdom, expansion, and good fortune. Divine grace and blessings flow abundantly.',
       keyEffects: [
         'Wisdom and spiritual growth',
         'Children and family expansion',
@@ -5442,11 +6958,16 @@ class MahadashaInterpretations {
         'Religious and philosophical interests',
       ],
       lifeAreas: {
-        'Career': 'Excellent for teaching, law, finance, consulting, and religious professions.',
-        'Health': 'Generally good health. Watch for liver, obesity, and diabetes issues.',
-        'Relationships': 'Marriage prospects excellent. Children bring joy. Guru\'s blessings.',
-        'Finance': 'Wealth accumulation period. Gains through wisdom and ethical means.',
-        'Spirituality': 'Peak spiritual period. Pilgrimage, guru diksha, and religious ceremonies.',
+        'Career':
+            'Excellent for teaching, law, finance, consulting, and religious professions.',
+        'Health':
+            'Generally good health. Watch for liver, obesity, and diabetes issues.',
+        'Relationships':
+            'Marriage prospects excellent. Children bring joy. Guru\'s blessings.',
+        'Finance':
+            'Wealth accumulation period. Gains through wisdom and ethical means.',
+        'Spirituality':
+            'Peak spiritual period. Pilgrimage, guru diksha, and religious ceremonies.',
       },
       favorableAspects: [
         'Divine blessings',
@@ -5477,7 +6998,8 @@ class MahadashaInterpretations {
     ),
     'Venus': MahadashaPhalaData(
       planet: 'Venus',
-      overallTheme: 'A period of love, beauty, and material comforts. Life becomes more pleasurable and artistic.',
+      overallTheme:
+          'A period of love, beauty, and material comforts. Life becomes more pleasurable and artistic.',
       keyEffects: [
         'Love and romance flourish',
         'Material comforts increase',
@@ -5486,11 +7008,16 @@ class MahadashaInterpretations {
         'Luxury and refinement',
       ],
       lifeAreas: {
-        'Career': 'Excellent for arts, entertainment, fashion, hospitality, and luxury goods.',
-        'Health': 'Generally comfortable. Watch for reproductive issues and kidney problems.',
-        'Relationships': 'Best period for love and marriage. Spouse brings happiness. Social life blooms.',
-        'Finance': 'Gains through beauty, arts, and luxury. Vehicle and property acquisitions.',
-        'Spirituality': 'Bhakti yoga and devotional practices. Goddess worship is highly beneficial.',
+        'Career':
+            'Excellent for arts, entertainment, fashion, hospitality, and luxury goods.',
+        'Health':
+            'Generally comfortable. Watch for reproductive issues and kidney problems.',
+        'Relationships':
+            'Best period for love and marriage. Spouse brings happiness. Social life blooms.',
+        'Finance':
+            'Gains through beauty, arts, and luxury. Vehicle and property acquisitions.',
+        'Spirituality':
+            'Bhakti yoga and devotional practices. Goddess worship is highly beneficial.',
       },
       favorableAspects: [
         'Love and romance',
@@ -5521,7 +7048,8 @@ class MahadashaInterpretations {
     ),
     'Saturn': MahadashaPhalaData(
       planet: 'Saturn',
-      overallTheme: 'A period of discipline, karma, and life lessons. Hard work and patience are rewarded.',
+      overallTheme:
+          'A period of discipline, karma, and life lessons. Hard work and patience are rewarded.',
       keyEffects: [
         'Karmic lessons intensify',
         'Discipline and structure required',
@@ -5530,11 +7058,16 @@ class MahadashaInterpretations {
         'Elderly and servants important',
       ],
       lifeAreas: {
-        'Career': 'Progress through hard work. Good for law, agriculture, mining, and service sectors.',
-        'Health': 'Chronic issues may surface. Joint pain, dental problems, and depression possible.',
-        'Relationships': 'Tests in relationships. Late marriage or married life challenges.',
-        'Finance': 'Slow but steady gains. Real estate and long-term investments favored.',
-        'Spirituality': 'Karma yoga and selfless service. Meditation and austerity practices.',
+        'Career':
+            'Progress through hard work. Good for law, agriculture, mining, and service sectors.',
+        'Health':
+            'Chronic issues may surface. Joint pain, dental problems, and depression possible.',
+        'Relationships':
+            'Tests in relationships. Late marriage or married life challenges.',
+        'Finance':
+            'Slow but steady gains. Real estate and long-term investments favored.',
+        'Spirituality':
+            'Karma yoga and selfless service. Meditation and austerity practices.',
       },
       favorableAspects: [
         'Discipline and patience',
@@ -5565,7 +7098,8 @@ class MahadashaInterpretations {
     ),
     'Rahu': MahadashaPhalaData(
       planet: 'Rahu',
-      overallTheme: 'A period of worldly desires, unconventional paths, and sudden transformations. Material ambitions peak.',
+      overallTheme:
+          'A period of worldly desires, unconventional paths, and sudden transformations. Material ambitions peak.',
       keyEffects: [
         'Unconventional opportunities',
         'Foreign connections and travel',
@@ -5574,11 +7108,15 @@ class MahadashaInterpretations {
         'Obsessive desires emerge',
       ],
       lifeAreas: {
-        'Career': 'Success in foreign lands, technology, politics, and unconventional fields.',
-        'Health': 'Mysterious ailments possible. Mental confusion and addictions risk.',
-        'Relationships': 'Unconventional relationships. Foreign spouse possibility.',
+        'Career':
+            'Success in foreign lands, technology, politics, and unconventional fields.',
+        'Health':
+            'Mysterious ailments possible. Mental confusion and addictions risk.',
+        'Relationships':
+            'Unconventional relationships. Foreign spouse possibility.',
         'Finance': 'Sudden gains or losses. Speculation and risky ventures.',
-        'Spirituality': 'Interest in occult and tantra. Need for grounding practices.',
+        'Spirituality':
+            'Interest in occult and tantra. Need for grounding practices.',
       },
       favorableAspects: [
         'Worldly success',
@@ -5609,7 +7147,8 @@ class MahadashaInterpretations {
     ),
     'Ketu': MahadashaPhalaData(
       planet: 'Ketu',
-      overallTheme: 'A period of spirituality, liberation, and letting go. Past-life influences surface.',
+      overallTheme:
+          'A period of spirituality, liberation, and letting go. Past-life influences surface.',
       keyEffects: [
         'Spiritual awakening',
         'Detachment from material world',
@@ -5618,11 +7157,15 @@ class MahadashaInterpretations {
         'Unexpected changes',
       ],
       lifeAreas: {
-        'Career': 'Good for research, spirituality, healing, and metaphysical fields.',
+        'Career':
+            'Good for research, spirituality, healing, and metaphysical fields.',
         'Health': 'Mysterious ailments. Digestive and nervous system issues.',
-        'Relationships': 'Detachment and separation themes. Past-life connections.',
-        'Finance': 'Losses leading to liberation. Gains through spiritual work.',
-        'Spirituality': 'Peak period for moksha. Meditation and self-inquiry essential.',
+        'Relationships':
+            'Detachment and separation themes. Past-life connections.',
+        'Finance':
+            'Losses leading to liberation. Gains through spiritual work.',
+        'Spirituality':
+            'Peak period for moksha. Meditation and self-inquiry essential.',
       },
       favorableAspects: [
         'Spiritual liberation',

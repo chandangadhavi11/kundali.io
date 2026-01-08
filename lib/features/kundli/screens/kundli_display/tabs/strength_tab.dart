@@ -693,8 +693,12 @@ class _StrengthTabState extends State<StrengthTab> {
       widget.kundaliData.planetPositions,
     );
 
+    final lagnaSignIndex = KundaliCalculationService.zodiacSigns.indexOf(
+      widget.kundaliData.ascendant.sign,
+    );
     final ashtakavarga = KundaliCalculationService.calculateAshtakavarga(
       widget.kundaliData.planetPositions,
+      lagnaSignIndex,
     );
 
     final sav = KundaliCalculationService.calculateSarvashtakavarga(
