@@ -126,16 +126,16 @@ static const Color teal = Color(0xFF2DD4BF);     // Planets, status
 
 ### Color Usage Guidelines
 
-| Color   | Primary Use                        | Opacity Variants       |
-|---------|------------------------------------|-----------------------|
-| Violet  | Profile section, primary actions   | 0.08, 0.1, 0.15, 0.2 |
-| Rose    | Nakshatra, birth star elements     | 0.1, 0.12, 0.2       |
-| Emerald | Panchang, positive/exalted states  | 0.08, 0.1, 0.15      |
-| Sky     | Dasha periods, time-related        | 0.1, 0.15, 0.25      |
-| Coral   | Guna factors, debilitated states   | 0.08, 0.12, 0.15     |
-| Gold    | Lucky elements, premium features   | 0.1, 0.2, 0.3        |
-| Teal    | Planetary status, general info     | 0.08, 0.15, 0.2      |
-| Amber   | Retrograde, warnings               | 0.1, 0.15, 0.25      |
+| Color   | Primary Use                       | Opacity Variants     |
+| ------- | --------------------------------- | -------------------- |
+| Violet  | Profile section, primary actions  | 0.08, 0.1, 0.15, 0.2 |
+| Rose    | Nakshatra, birth star elements    | 0.1, 0.12, 0.2       |
+| Emerald | Panchang, positive/exalted states | 0.08, 0.1, 0.15      |
+| Sky     | Dasha periods, time-related       | 0.1, 0.15, 0.25      |
+| Coral   | Guna factors, debilitated states  | 0.08, 0.12, 0.15     |
+| Gold    | Lucky elements, premium features  | 0.1, 0.2, 0.3        |
+| Teal    | Planetary status, general info    | 0.08, 0.15, 0.2      |
+| Amber   | Retrograde, warnings              | 0.1, 0.15, 0.25      |
 
 ---
 
@@ -236,9 +236,9 @@ Text(
 ```dart
 class YourTab extends StatefulWidget {
   final KundaliData kundaliData;
-  
+
   const YourTab({super.key, required this.kundaliData});
-  
+
   @override
   State<YourTab> createState() => _YourTabState();
 }
@@ -255,7 +255,7 @@ class _YourTabState extends State<YourTab> {
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
-    
+
     // Initialize keys for each section
     for (final section in _sections) {
       _sectionKeys[section.id] = GlobalKey();
@@ -286,7 +286,7 @@ class _YourTabState extends State<YourTab> {
             ],
           ),
         ),
-        
+
         // Floating navigation bar
         Positioned(
           left: 16,
@@ -518,8 +518,8 @@ class _InteractiveWidgetState extends State<_InteractiveWidget>
               duration: const Duration(milliseconds: 100),
               decoration: BoxDecoration(
                 // Change color/border on press
-                color: _isPressed 
-                    ? accentColor.withOpacity(0.08) 
+                color: _isPressed
+                    ? accentColor.withOpacity(0.08)
                     : _Colors.bgSecondary,
                 border: Border.all(
                   color: _isPressed
@@ -588,7 +588,7 @@ void _showInsightSheet(BuildContext context, InsightData insight) {
 ```dart
 class _InsightBottomSheet extends StatefulWidget {
   final InsightData insight;
-  
+
   // Animations:
   // - Slide up from bottom (0.3 → 0.0 offset)
   // - Fade in (0.0 → 1.0 opacity)
@@ -720,9 +720,9 @@ _Card(
           _StatusChip(label: status, color: statusColor),
         ],
       ),
-      
+
       const SizedBox(height: _DesignTokens.space16),
-      
+
       // Details section
       Container(
         padding: const EdgeInsets.all(_DesignTokens.space12),
@@ -1306,13 +1306,13 @@ HapticFeedback.mediumImpact();
 
 ### 4. Animation Duration Guidelines
 
-| Interaction Type | Duration |
-|-----------------|----------|
-| Press feedback | 100ms |
+| Interaction Type  | Duration  |
+| ----------------- | --------- |
+| Press feedback    | 100ms     |
 | Container changes | 100-150ms |
-| Sheet entry | 400ms |
+| Sheet entry       | 400ms     |
 | Section highlight | 500-600ms |
-| Scroll to section | 400ms |
+| Scroll to section | 400ms     |
 
 ### 5. Image Shadow Patterns
 
@@ -1395,4 +1395,3 @@ import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import '../shared/floating_nav_bar.dart';
 // Add any additional services/models needed for your tab
 ```
-
