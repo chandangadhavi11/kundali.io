@@ -375,7 +375,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                                 height: 6,
                                 decoration: BoxDecoration(
                                   color: insight.accentColor.withOpacity(
-                                    1.0 - (index * 0.12),
+                                    (1.0 - (index * 0.08)).clamp(0.3, 1.0),
                                   ),
                                   shape: BoxShape.circle,
                                 ),
