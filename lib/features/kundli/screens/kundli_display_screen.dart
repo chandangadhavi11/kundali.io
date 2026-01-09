@@ -20,6 +20,7 @@ import 'kundli_display/tabs/transit_tab.dart';
 import 'kundli_display/tabs/panchang_tab.dart';
 import 'kundli_display/tabs/dasha_tab.dart';
 import 'kundli_display/tabs/details_tab.dart';
+import 'kundli_display/widgets/astro_alerts_section.dart';
 
 class KundliDisplayScreen extends StatefulWidget {
   final KundaliData? kundaliData;
@@ -633,6 +634,8 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Astro Alerts Section (conditional - only shows if alerts exist)
+          AstroAlertsSection(kundaliData: _kundaliData!),
           _buildChartCard(),
           const SizedBox(height: 12),
           _buildDateTimeNavigator(),
@@ -1903,7 +1906,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
             ],
           ),
           // Data mode indicator - shows if using real Swiss Ephemeris or sample data
-          _buildDataModeIndicator(),
+          // _buildDataModeIndicator(),
           const SizedBox(height: 12),
           AspectRatio(
             aspectRatio: 1,
@@ -2057,22 +2060,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: indicatorColor.withOpacity(0.4), width: 0.5),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: indicatorColor),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: GoogleFonts.dmMono(
-              fontSize: 9,
-              fontWeight: FontWeight.w600,
-              color: indicatorColor,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ],
-      ),
+      
     );
   }
 

@@ -1395,3 +1395,4 @@ import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import '../shared/floating_nav_bar.dart';
 // Add any additional services/models needed for your tab
 ```
+

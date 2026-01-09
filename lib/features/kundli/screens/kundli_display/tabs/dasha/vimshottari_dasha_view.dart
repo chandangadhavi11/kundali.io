@@ -1115,9 +1115,9 @@ class _ConfigItem extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// TIMELINE PROGRESS BAR
+// TIMELINE PROGRESS BAR - Auto-scrolls to current planet
 // ═══════════════════════════════════════════════════════════════════════════
-class _TimelineProgressBar extends StatelessWidget {
+class _TimelineProgressBar extends StatefulWidget {
   final List<DashaPeriod> sequence;
   final String currentPlanet;
 
@@ -1127,7 +1127,55 @@ class _TimelineProgressBar extends StatelessWidget {
   });
 
   @override
+  State<_TimelineProgressBar> createState() => _TimelineProgressBarState();
+}
+
+class _TimelineProgressBarState extends State<_TimelineProgressBar> {
+  late ScrollController _scrollController;
+  final double _itemWidth = 50.0; // 38px image + 12px padding
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    
+    // Scroll to current item after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentItem();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToCurrentItem() {
+    final currentIndex = widget.sequence.indexWhere((p) => p.planet == widget.currentPlanet);
+    if (currentIndex < 0) return;
+
+    // Calculate scroll offset to center the current item
+    final screenWidth = MediaQuery.of(context).size.width;
+    final containerPadding = 16 * 2 + 10 * 2; // outer padding + inner padding
+    final availableWidth = screenWidth - containerPadding;
+    
+    // Position to scroll to (center the item)
+    final targetOffset = (currentIndex * _itemWidth) - (availableWidth / 2) + (_itemWidth / 2);
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final clampedOffset = targetOffset.clamp(0.0, maxScroll);
+
+    _scrollController.animateTo(
+      clampedOffset,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final currentIndex = widget.sequence.indexWhere((p) => p.planet == widget.currentPlanet);
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
       decoration: BoxDecoration(
@@ -1139,20 +1187,20 @@ class _TimelineProgressBar extends StatelessWidget {
         ),
       ),
       child: SingleChildScrollView(
+        controller: _scrollController,
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         child: Row(
-          children: sequence.asMap().entries.map((entry) {
+          children: widget.sequence.asMap().entries.map((entry) {
             final period = entry.value;
-            final isCurrent = period.planet == currentPlanet;
-            final currentIndex = sequence.indexWhere((p) => p.planet == currentPlanet);
+            final isCurrent = period.planet == widget.currentPlanet;
             final isPast = entry.key < currentIndex;
             final color = getPlanetColor(period.planet);
 
             return Padding(
               padding: EdgeInsets.only(
                 left: entry.key == 0 ? 0 : 6,
-                right: entry.key == sequence.length - 1 ? 0 : 6,
+                right: entry.key == widget.sequence.length - 1 ? 0 : 6,
               ),
               child: _TimelinePlanetItem(
                 planet: period.planet,

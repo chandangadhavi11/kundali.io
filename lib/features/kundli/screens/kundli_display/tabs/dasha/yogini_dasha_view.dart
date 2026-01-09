@@ -1066,16 +1066,62 @@ class _YoginiWheelCard extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// YOGINI TIMELINE BAR
+// YOGINI TIMELINE BAR - Auto-scrolls to current yogini
 // ═══════════════════════════════════════════════════════════════════════════
-class _YoginiTimelineBar extends StatelessWidget {
+class _YoginiTimelineBar extends StatefulWidget {
   final Yogini currentYogini;
 
   const _YoginiTimelineBar({required this.currentYogini});
 
   @override
+  State<_YoginiTimelineBar> createState() => _YoginiTimelineBarState();
+}
+
+class _YoginiTimelineBarState extends State<_YoginiTimelineBar> {
+  late ScrollController _scrollController;
+  final double _itemWidth = 54.0; // 38px image + 16px padding
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    
+    // Scroll to current item after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentItem();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToCurrentItem() {
+    final currentIndex = Yogini.values.indexOf(widget.currentYogini);
+    if (currentIndex < 0) return;
+
+    // Calculate scroll offset to center the current item
+    final screenWidth = MediaQuery.of(context).size.width;
+    final containerPadding = 16 * 2 + 10 * 2; // outer padding + inner padding
+    final availableWidth = screenWidth - containerPadding;
+    
+    // Position to scroll to (center the item)
+    final targetOffset = (currentIndex * _itemWidth) - (availableWidth / 2) + (_itemWidth / 2);
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final clampedOffset = targetOffset.clamp(0.0, maxScroll);
+
+    _scrollController.animateTo(
+      clampedOffset,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final currentIndex = Yogini.values.indexOf(currentYogini);
+    final currentIndex = Yogini.values.indexOf(widget.currentYogini);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
@@ -1088,12 +1134,13 @@ class _YoginiTimelineBar extends StatelessWidget {
         ),
       ),
       child: SingleChildScrollView(
+        controller: _scrollController,
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         child: Row(
           children: Yogini.values.asMap().entries.map((entry) {
             final yogini = entry.value;
-            final isCurrent = yogini == currentYogini;
+            final isCurrent = yogini == widget.currentYogini;
             final isPast = entry.key < currentIndex;
             final color = _getYoginiColor(yogini);
 

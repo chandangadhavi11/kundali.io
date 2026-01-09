@@ -1366,17 +1366,68 @@ class _KarakaItem extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CHAR TIMELINE BAR
+// CHAR TIMELINE BAR - Auto-scrolls to current period
 // ═══════════════════════════════════════════════════════════════════════════
-class _CharTimelineBar extends StatelessWidget {
+class _CharTimelineBar extends StatefulWidget {
   final List<CharaPeriod> sequence;
   final String currentSign;
 
   const _CharTimelineBar({required this.sequence, required this.currentSign});
 
   @override
+  State<_CharTimelineBar> createState() => _CharTimelineBarState();
+}
+
+class _CharTimelineBarState extends State<_CharTimelineBar> {
+  late ScrollController _scrollController;
+  final double _itemWidth = 48.0; // 36px image + 12px padding
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+
+    // Scroll to current item after build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentItem();
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToCurrentItem() {
+    final currentIndex = widget.sequence.indexWhere(
+      (p) => p.sign == widget.currentSign,
+    );
+    if (currentIndex < 0) return;
+
+    // Calculate scroll offset to center the current item
+    final screenWidth = MediaQuery.of(context).size.width;
+    final containerPadding = 16 * 2 + 10 * 2; // outer padding + inner padding
+    final availableWidth = screenWidth - containerPadding;
+
+    // Position to scroll to (center the item)
+    final targetOffset =
+        (currentIndex * _itemWidth) - (availableWidth / 2) + (_itemWidth / 2);
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final clampedOffset = targetOffset.clamp(0.0, maxScroll);
+
+    _scrollController.animateTo(
+      clampedOffset,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final currentIndex = sequence.indexWhere((p) => p.sign == currentSign);
+    final currentIndex = widget.sequence.indexWhere(
+      (p) => p.sign == widget.currentSign,
+    );
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
@@ -1386,20 +1437,21 @@ class _CharTimelineBar extends StatelessWidget {
         border: Border.all(color: const Color(0xFF262432), width: 1),
       ),
       child: SingleChildScrollView(
+        controller: _scrollController,
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
         child: Row(
           children:
-              sequence.asMap().entries.map((entry) {
+              widget.sequence.asMap().entries.map((entry) {
                 final period = entry.value;
-                final isCurrent = period.sign == currentSign;
+                final isCurrent = period.sign == widget.currentSign;
                 final isPast = entry.key < currentIndex;
                 final color = getSignColor(period.sign);
 
                 return Padding(
                   padding: EdgeInsets.only(
                     left: entry.key == 0 ? 0 : 6,
-                    right: entry.key == sequence.length - 1 ? 0 : 6,
+                    right: entry.key == widget.sequence.length - 1 ? 0 : 6,
                   ),
                   child: _CharTimelineItem(
                     sign: period.sign,
