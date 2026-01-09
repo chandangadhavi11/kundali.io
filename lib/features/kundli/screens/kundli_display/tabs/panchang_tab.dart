@@ -1908,7 +1908,7 @@ String _getPhaseDescription(int tithi, String paksha) {
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PANCHANG ELEMENTS GRID - Interactive
+// PANCHANG ELEMENTS GRID - Elegant Minimal Design
 // ═══════════════════════════════════════════════════════════════════════════
 class _PanchangElementsGrid extends StatelessWidget {
   final PanchangData panchang;
@@ -1929,64 +1929,69 @@ class _PanchangElementsGrid extends StatelessWidget {
     final karanaColor =
         karanaType.contains('Bhadra') ? _Colors.coral : _Colors.violet;
 
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: _InteractivePanchangCard(
-                icon: Icons.brightness_2_rounded,
-                label: 'Tithi',
-                value: panchang.tithi,
-                subValue: 'Lord: $tithiLord',
-                color: _Colors.emerald,
-                insight: _getTithiInsight(panchang, tithiLord),
+    return Container(
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0D0B12),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _ElegantPanchangTile(
+                  symbol: '☽',
+                  label: 'Tithi',
+                  value: panchang.tithi,
+                  detail: tithiLord,
+                  detailPrefix: 'Lord',
+                  position: _TilePosition.topLeft,
+                  insight: _getTithiInsight(panchang, tithiLord),
+                ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _InteractivePanchangCard(
-                icon: Icons.star_rounded,
-                label: 'Nakshatra',
-                value: panchang.nakshatra,
-                subValue: 'Pada ${panchang.nakshatraPada}',
-                color: _Colors.amber,
-                insight: _getNakshatraInsight(panchang),
+              Expanded(
+                child: _ElegantPanchangTile(
+                  symbol: '✦',
+                  label: 'Nakshatra',
+                  value: panchang.nakshatra,
+                  detail: 'Pada ${panchang.nakshatraPada}',
+                  position: _TilePosition.topRight,
+                  insight: _getNakshatraInsight(panchang),
+                ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: _InteractivePanchangCard(
-                icon: Icons.link_rounded,
-                label: 'Yoga (${panchang.yogaNumber}/27)',
-                value: panchang.yoga,
-                subValue: yogaType,
-                color: yogaColor,
-                showIndicator: true,
-                indicatorColor: yogaColor,
-                insight: _getYogaInsight(panchang, yogaType),
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: _ElegantPanchangTile(
+                  symbol: '☯',
+                  label: 'Yoga',
+                  value: panchang.yoga,
+                  detail: yogaType,
+                  badge: '${panchang.yogaNumber}/27',
+                  badgeColor: yogaColor,
+                  position: _TilePosition.bottomLeft,
+                  insight: _getYogaInsight(panchang, yogaType),
+                ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _InteractivePanchangCard(
-                icon: Icons.hourglass_bottom_rounded,
-                label: 'Karana',
-                value: panchang.karana,
-                subValue: karanaType,
-                color: karanaColor,
-                showIndicator: karanaType.contains('Bhadra'),
-                indicatorColor: karanaColor,
-                insight: _getKaranaInsight(panchang, karanaType),
+              Expanded(
+                child: _ElegantPanchangTile(
+                  symbol: '⧗',
+                  label: 'Karana',
+                  value: panchang.karana,
+                  detail: karanaType,
+                  badgeColor: karanaColor,
+                  showWarning: karanaType.contains('Bhadra'),
+                  position: _TilePosition.bottomRight,
+                  insight: _getKaranaInsight(panchang, karanaType),
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -2002,172 +2007,179 @@ class _PanchangElementsGrid extends StatelessWidget {
   }
 }
 
-class _InteractivePanchangCard extends StatefulWidget {
-  final IconData icon;
+enum _TilePosition { topLeft, topRight, bottomLeft, bottomRight }
+
+class _ElegantPanchangTile extends StatefulWidget {
+  final String symbol;
   final String label;
   final String value;
-  final String subValue;
-  final Color color;
-  final bool showIndicator;
-  final Color? indicatorColor;
+  final String detail;
+  final String? detailPrefix;
+  final String? badge;
+  final Color? badgeColor;
+  final bool showWarning;
+  final _TilePosition position;
   final InsightData insight;
 
-  const _InteractivePanchangCard({
-    required this.icon,
+  const _ElegantPanchangTile({
+    required this.symbol,
     required this.label,
     required this.value,
-    required this.subValue,
-    required this.color,
+    required this.detail,
+    this.detailPrefix,
+    this.badge,
+    this.badgeColor,
+    this.showWarning = false,
+    required this.position,
     required this.insight,
-    this.showIndicator = false,
-    this.indicatorColor,
   });
 
   @override
-  State<_InteractivePanchangCard> createState() =>
-      _InteractivePanchangCardState();
+  State<_ElegantPanchangTile> createState() => _ElegantPanchangTileState();
 }
 
-class _InteractivePanchangCardState extends State<_InteractivePanchangCard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+class _ElegantPanchangTileState extends State<_ElegantPanchangTile> {
   bool _isPressed = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 100),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.96).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _onTapDown(TapDownDetails details) {
-    setState(() => _isPressed = true);
-    _controller.forward();
-    HapticFeedback.selectionClick();
-  }
-
-  void _onTapUp(TapUpDetails details) {
-    setState(() => _isPressed = false);
-    _controller.reverse();
-    _showInsightSheet(context, widget.insight);
-  }
-
-  void _onTapCancel() {
-    setState(() => _isPressed = false);
-    _controller.reverse();
+  BorderRadius _getBorderRadius() {
+    const r = Radius.circular(14);
+    const s = Radius.circular(4);
+    switch (widget.position) {
+      case _TilePosition.topLeft:
+        return const BorderRadius.only(topLeft: r, topRight: s, bottomLeft: s, bottomRight: s);
+      case _TilePosition.topRight:
+        return const BorderRadius.only(topLeft: s, topRight: r, bottomLeft: s, bottomRight: s);
+      case _TilePosition.bottomLeft:
+        return const BorderRadius.only(topLeft: s, topRight: s, bottomLeft: r, bottomRight: s);
+      case _TilePosition.bottomRight:
+        return const BorderRadius.only(topLeft: s, topRight: s, bottomLeft: s, bottomRight: r);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final accentColor = widget.badgeColor ?? const Color(0xFF6B7280);
+    
     return GestureDetector(
-      onTapDown: _onTapDown,
-      onTapUp: _onTapUp,
-      onTapCancel: _onTapCancel,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 100),
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: _Colors.surface.withOpacity(0.4),
-                borderRadius: BorderRadius.circular(_DesignTokens.radiusMd),
-                border: Border.all(
-                  color: widget.color.withOpacity(_isPressed ? 0.4 : 0.2),
-                  width: _isPressed ? 1 : 0.5,
-                ),
-                boxShadow: _isPressed
-                    ? [
-                        BoxShadow(
-                          color: widget.color.withOpacity(0.15),
-                          blurRadius: 12,
-                          spreadRadius: -2,
-                        ),
-                      ]
-                    : null,
-              ),
-              child: child,
-            ),
-          );
-        },
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.lightImpact();
+        _showInsightSheet(context, widget.insight);
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOutCubic,
+        margin: const EdgeInsets.all(2),
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+        decoration: BoxDecoration(
+          color: _isPressed 
+              ? const Color(0xFF1A1820)
+              : const Color(0xFF141218),
+          borderRadius: _getBorderRadius(),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header row with symbol and label
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: widget.color.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(8),
+                // Symbol
+                Text(
+                  widget.symbol,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: _isPressed 
+                        ? _Colors.textSecondary 
+                        : const Color(0xFF4A4654),
                   ),
-                  child: Icon(widget.icon, size: 14, color: widget.color),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
+                // Label
                 Expanded(
                   child: Text(
                     widget.label,
                     style: GoogleFonts.inter(
-                      fontSize: 10,
-                      color: _Colors.textTertiary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF6B6779),
+                      letterSpacing: 0.1,
                     ),
                   ),
                 ),
-                if (widget.showIndicator)
+                // Badge or warning indicator
+                if (widget.badge != null)
                   Container(
-                    width: 8,
-                    height: 8,
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                     decoration: BoxDecoration(
-                      color: widget.indicatorColor ?? widget.color,
-                      shape: BoxShape.circle,
+                      color: accentColor.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(4),
                     ),
+                    child: Text(
+                      widget.badge!,
+                      style: GoogleFonts.jetBrainsMono(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w500,
+                        color: accentColor.withOpacity(0.8),
+                      ),
+                    ),
+                  ),
+                if (widget.showWarning)
+                  Icon(
+                    Icons.error_outline_rounded,
+                    size: 12,
+                    color: _Colors.coral.withOpacity(0.6),
                   ),
               ],
             ),
+            
             const SizedBox(height: 10),
+            
+            // Main value
+            Text(
+              widget.value,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: _Colors.textPrimary,
+                letterSpacing: -0.2,
+                height: 1.2,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            
+            const SizedBox(height: 4),
+            
+            // Detail text with optional prefix
             Row(
               children: [
+                if (widget.detailPrefix != null) ...[
+                  Text(
+                    '${widget.detailPrefix}: ',
+                    style: GoogleFonts.inter(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF5A5666),
+                    ),
+                  ),
+                ],
                 Expanded(
                   child: Text(
-                    widget.value,
+                    widget.detail,
                     style: GoogleFonts.inter(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: _Colors.textPrimary,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: widget.detailPrefix != null 
+                          ? const Color(0xFF9D99A9)
+                          : (widget.badgeColor ?? const Color(0xFF8A8698)),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Icon(
-                  Icons.chevron_right_rounded,
-                  size: 14,
-                  color: widget.color.withOpacity(0.5),
-                ),
               ],
-            ),
-            const SizedBox(height: 2),
-            Text(
-              widget.subValue,
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: widget.color,
-              ),
             ),
           ],
         ),
@@ -3073,7 +3085,7 @@ class _BirthTimeMarker extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// VARSHPHAL CARD - Interactive
+// VARSHPHAL CARD - Elegant Minimal Design
 // ═══════════════════════════════════════════════════════════════════════════
 class _VarshphalCard extends StatefulWidget {
   final VarshphalData varshphal;
@@ -3084,111 +3096,89 @@ class _VarshphalCard extends StatefulWidget {
   State<_VarshphalCard> createState() => _VarshphalCardState();
 }
 
-class _VarshphalCardState extends State<_VarshphalCard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+class _VarshphalCardState extends State<_VarshphalCard> {
   bool _isPressed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.98).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   void _onTapDown(TapDownDetails details) {
     setState(() => _isPressed = true);
-    _controller.forward();
-    HapticFeedback.selectionClick();
+    HapticFeedback.lightImpact();
   }
 
   void _onTapUp(TapUpDetails details) {
     setState(() => _isPressed = false);
-    _controller.reverse();
     _showInsightSheet(context, _getVarshphalInsight(widget.varshphal));
   }
 
   void _onTapCancel() {
     setState(() => _isPressed = false);
-    _controller.reverse();
+  }
+
+  Color _getYearLordColor(String lord) {
+    const colors = {
+      'Sun': Color(0xFFD4AF37),
+      'Moon': Color(0xFF6EE7B7),
+      'Mars': Color(0xFFF87171),
+      'Mercury': Color(0xFF34D399),
+      'Jupiter': Color(0xFFFBBF24),
+      'Venus': Color(0xFFF472B6),
+      'Saturn': Color(0xFF9CA3AF),
+    };
+    return colors[lord] ?? _Colors.textTertiary;
+  }
+
+  String _getYearLordSymbol(String lord) {
+    const symbols = {
+      'Sun': '☉',
+      'Moon': '☽',
+      'Mars': '♂',
+      'Mercury': '☿',
+      'Jupiter': '♃',
+      'Venus': '♀',
+      'Saturn': '♄',
+    };
+    return symbols[lord] ?? '•';
+  }
+
+  String _getSignSymbol(String sign) {
+    const symbols = {
+      'Aries': '♈', 'Taurus': '♉', 'Gemini': '♊', 'Cancer': '♋',
+      'Leo': '♌', 'Virgo': '♍', 'Libra': '♎', 'Scorpio': '♏',
+      'Sagittarius': '♐', 'Capricorn': '♑', 'Aquarius': '♒', 'Pisces': '♓',
+    };
+    return symbols[sign] ?? '•';
   }
 
   @override
   Widget build(BuildContext context) {
+    final yearLordColor = _getYearLordColor(widget.varshphal.yearLord);
+    
     return GestureDetector(
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
       onTapCancel: _onTapCancel,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    _Colors.amber.withOpacity(_isPressed ? 0.2 : 0.12),
-                    const Color(0xFFF97316)
-                        .withOpacity(_isPressed ? 0.1 : 0.05),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
-                border: Border.all(
-                  color: _Colors.amber.withOpacity(_isPressed ? 0.4 : 0.2),
-                  width: _isPressed ? 1 : 0.5,
-                ),
-                boxShadow: _isPressed
-                    ? [
-                        BoxShadow(
-                          color: _Colors.amber.withOpacity(0.2),
-                          blurRadius: 20,
-                          spreadRadius: -4,
-                        ),
-                      ]
-                    : null,
-              ),
-              child: child,
-            ),
-          );
-        },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: _isPressed 
+              ? const Color(0xFF1A1820)
+              : const Color(0xFF141218),
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           children: [
+            // Header row
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Age indicator - minimal circle
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: 52,
+                  height: 52,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        _Colors.amber.withOpacity(0.2),
-                        _Colors.amber.withOpacity(0.08),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: _Colors.amber.withOpacity(0.3),
-                      width: 1,
-                    ),
+                    color: const Color(0xFF1E1C24),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -3196,60 +3186,55 @@ class _VarshphalCardState extends State<_VarshphalCard>
                       Text(
                         '${widget.varshphal.age}',
                         style: GoogleFonts.inter(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
-                          color: _Colors.amber,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: _Colors.textPrimary,
                           height: 1,
                         ),
                       ),
+                      const SizedBox(height: 2),
                       Text(
                         'years',
                         style: GoogleFonts.inter(
                           fontSize: 9,
-                          color: _Colors.textTertiary,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF6B6779),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
+                // Title and date
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Solar Return ${widget.varshphal.year}',
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: _Colors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Icon(
-                            Icons.info_outline_rounded,
-                            size: 14,
-                            color: _Colors.amber.withOpacity(0.5),
-                          ),
-                        ],
+                      const SizedBox(height: 2),
+                      Text(
+                        'Solar Return ${widget.varshphal.year}',
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: _Colors.textPrimary,
+                          letterSpacing: -0.2,
+                        ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       Row(
                         children: [
-                          const Icon(
-                            Icons.event_rounded,
+                          Icon(
+                            Icons.event_outlined,
                             size: 12,
-                            color: _Colors.textTertiary,
+                            color: const Color(0xFF5A5666),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 5),
                           Text(
-                            DateFormat('d MMM yyyy')
-                                .format(widget.varshphal.solarReturnDate),
+                            DateFormat('d MMM yyyy').format(widget.varshphal.solarReturnDate),
                             style: GoogleFonts.inter(
                               fontSize: 11,
-                              color: _Colors.textTertiary,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xFF8A8698),
                             ),
                           ),
                         ],
@@ -3257,65 +3242,52 @@ class _VarshphalCardState extends State<_VarshphalCard>
                     ],
                   ),
                 ),
+                // Info icon
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 120),
+                  opacity: _isPressed ? 1.0 : 0.4,
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 12,
+                    color: const Color(0xFF6B6779),
+                  ),
+                ),
               ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
+            // Divider
+            Container(
+              height: 1,
+              color: const Color(0xFF1E1C26),
+            ),
+
+            const SizedBox(height: 14),
+
+            // Info tiles row
             Row(
               children: [
+                // Muntha Sign
                 Expanded(
-                  child: _VarshphalInfoTile(
-                    icon: Icons.place_rounded,
-                    label: 'Muntha Sign',
+                  child: _MinimalInfoTile(
+                    symbol: _getSignSymbol(widget.varshphal.munthaSign),
+                    label: 'Muntha',
                     value: widget.varshphal.munthaSign,
-                    color: _Colors.violet,
+                    symbolColor: _Colors.violet,
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 12),
+                // Year Lord
                 Expanded(
-                  child: _VarshphalInfoTile(
-                    icon: Icons.person_rounded,
+                  child: _MinimalInfoTile(
+                    symbol: _getYearLordSymbol(widget.varshphal.yearLord),
                     label: 'Year Lord',
                     value: widget.varshphal.yearLord,
-                    color: _Colors.amber,
+                    symbolColor: yearLordColor,
                   ),
                 ),
               ],
-            ),
-
-            const SizedBox(height: 12),
-
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: _Colors.surface.withOpacity(0.4),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.lightbulb_outline_rounded,
-                    size: 14,
-                    color: _Colors.textTertiary.withOpacity(0.6),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Tap for detailed Varshphal insights and predictions',
-                      style: GoogleFonts.inter(
-                        fontSize: 9,
-                        color: _Colors.textTertiary.withOpacity(0.7),
-                      ),
-                    ),
-                  ),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    size: 14,
-                    color: _Colors.amber.withOpacity(0.4),
-                  ),
-                ],
-              ),
             ),
           ],
         ),
@@ -3324,34 +3296,36 @@ class _VarshphalCardState extends State<_VarshphalCard>
   }
 }
 
-class _VarshphalInfoTile extends StatelessWidget {
-  final IconData icon;
+class _MinimalInfoTile extends StatelessWidget {
+  final String symbol;
   final String label;
   final String value;
-  final Color color;
+  final Color symbolColor;
 
-  const _VarshphalInfoTile({
-    required this.icon,
+  const _MinimalInfoTile({
+    required this.symbol,
     required this.label,
     required this.value,
-    required this.color,
+    required this.symbolColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(_DesignTokens.radiusMd),
-        border: Border.all(
-          color: color.withOpacity(0.15),
-          width: 0.5,
-        ),
+        color: const Color(0xFF1A181F),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: color),
+          Text(
+            symbol,
+            style: TextStyle(
+              fontSize: 16,
+              color: symbolColor,
+            ),
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -3361,14 +3335,16 @@ class _VarshphalInfoTile extends StatelessWidget {
                   label,
                   style: GoogleFonts.inter(
                     fontSize: 9,
-                    color: _Colors.textTertiary,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF6B6779),
                   ),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   value,
                   style: GoogleFonts.inter(
                     fontSize: 13,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                     color: _Colors.textPrimary,
                   ),
                 ),

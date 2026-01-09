@@ -414,23 +414,25 @@ InsightData _getYogaOverviewInsight(
   String ascendant,
 ) {
   final balance = yogaCount - severeDoshas;
-  final balanceStatus = yogaCount > 0 && doshaCount == 0
-      ? 'Excellent'
-      : balance >= 3
+  final balanceStatus =
+      yogaCount > 0 && doshaCount == 0
+          ? 'Excellent'
+          : balance >= 3
           ? 'Very Favorable'
           : balance >= 1
-              ? 'Favorable'
-              : balance >= -1
-                  ? 'Mixed'
-                  : 'Challenging';
+          ? 'Favorable'
+          : balance >= -1
+          ? 'Mixed'
+          : 'Challenging';
 
-  final color = balance >= 3
-      ? _Colors.emerald
-      : balance >= 0
+  final color =
+      balance >= 3
+          ? _Colors.emerald
+          : balance >= 0
           ? _Colors.sky
           : balance >= -2
-              ? _Colors.amber
-              : _Colors.coral;
+          ? _Colors.amber
+          : _Colors.coral;
 
   return InsightData(
     title: 'Yoga & Dosha Overview',
@@ -491,7 +493,8 @@ InsightData _getYogaTypeInsight(String type, bool isYoga) {
     ),
   };
 
-  final info = descriptions[type] ??
+  final info =
+      descriptions[type] ??
       (
         isYoga
             ? 'This is a beneficial planetary combination that enhances specific life areas.'
@@ -505,19 +508,20 @@ InsightData _getYogaTypeInsight(String type, bool isYoga) {
     value: type,
     description: info.$1,
     significance: info.$2,
-    keyPoints: isYoga
-        ? [
-            'Type: $type',
-            'Nature: Benefic combination',
-            'Activation: During relevant Dasha periods',
-            'Strength depends on planet dignity and aspects',
-          ]
-        : [
-            'Severity: $type',
-            'Impact varies by chart context',
-            'Remedies can mitigate effects',
-            'Consult an astrologer for personalized guidance',
-          ],
+    keyPoints:
+        isYoga
+            ? [
+              'Type: $type',
+              'Nature: Benefic combination',
+              'Activation: During relevant Dasha periods',
+              'Strength depends on planet dignity and aspects',
+            ]
+            : [
+              'Severity: $type',
+              'Impact varies by chart context',
+              'Remedies can mitigate effects',
+              'Consult an astrologer for personalized guidance',
+            ],
     accentColor: info.$3,
     icon: isYoga ? Icons.auto_awesome_rounded : Icons.warning_amber_rounded,
   );
@@ -555,15 +559,20 @@ InsightData _getStrengthInsight(String strength, int count, String label) {
       if (label == 'Severe') 'Remedies recommended',
     ],
     accentColor: info.$2,
-    icon: label == 'Severe'
-        ? Icons.warning_rounded
-        : label == 'Strong'
+    icon:
+        label == 'Severe'
+            ? Icons.warning_rounded
+            : label == 'Strong'
             ? Icons.keyboard_double_arrow_up_rounded
             : Icons.remove_rounded,
   );
 }
 
-InsightData _getInsightCardInsight(String title, String description, Color color) {
+InsightData _getInsightCardInsight(
+  String title,
+  String description,
+  Color color,
+) {
   final detailedDescriptions = {
     'Understanding': (
       'Yogas are beneficial planetary combinations formed by specific relationships between planets and houses. They indicate areas of life where you have special potential or blessings.',
@@ -607,7 +616,8 @@ InsightData _getInsightCardInsight(String title, String description, Color color
     ),
   };
 
-  final info = detailedDescriptions[title] ??
+  final info =
+      detailedDescriptions[title] ??
       (
         description,
         'Important aspect of chart analysis.',
@@ -621,13 +631,14 @@ InsightData _getInsightCardInsight(String title, String description, Color color
     significance: info.$2,
     keyPoints: info.$3,
     accentColor: color,
-    icon: title == 'Understanding'
-        ? Icons.lightbulb_outline_rounded
-        : title == 'Activation'
+    icon:
+        title == 'Understanding'
+            ? Icons.lightbulb_outline_rounded
+            : title == 'Activation'
             ? Icons.schedule_rounded
             : title == 'Strength'
-                ? Icons.fitness_center_rounded
-                : Icons.healing_outlined,
+            ? Icons.fitness_center_rounded
+            : Icons.healing_outlined,
   );
 }
 
@@ -734,43 +745,45 @@ class _YogasTabState extends State<YogasTab> {
     final analyzedYogas = _analyzeYogas(widget.kundaliData);
     final analyzedDoshas = _analyzeDoshas(widget.kundaliData);
 
-    final strongYogas = analyzedYogas.where((y) => y['strength'] == 'Strong').length;
+    final strongYogas =
+        analyzedYogas.where((y) => y['strength'] == 'Strong').length;
     final partialYogas = analyzedYogas.length - strongYogas;
-    final severeDoshas = analyzedDoshas.where((d) => d['severity'] == 'High').length;
+    final severeDoshas =
+        analyzedDoshas.where((d) => d['severity'] == 'High').length;
 
     return Stack(
       children: [
         SingleChildScrollView(
           controller: _scrollController,
-      physics: const BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ═══════════════════════════════════════════════════════════════
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ═══════════════════════════════════════════════════════════════
               // OVERVIEW SECTION
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['overview'],
                 sectionKey: _sectionKeys['overview']!,
                 accentColor: _Colors.emerald,
                 child: _AnimatedCardWrapper(
                   child: _YogaHeroCard(
-            yogaCount: analyzedYogas.length,
-            doshaCount: analyzedDoshas.length,
-            strongYogas: strongYogas,
-            partialYogas: partialYogas,
-            severeDoshas: severeDoshas,
+                    yogaCount: analyzedYogas.length,
+                    doshaCount: analyzedDoshas.length,
+                    strongYogas: strongYogas,
+                    partialYogas: partialYogas,
+                    severeDoshas: severeDoshas,
                     ascendant: widget.kundaliData.ascendant.sign,
                   ),
                 ),
-          ),
+              ),
 
               const SizedBox(height: _DesignTokens.space24),
 
-          // ═══════════════════════════════════════════════════════════════
-          // YOGAS SECTION
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
+              // YOGAS SECTION
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['yogas'],
                 sectionKey: _sectionKeys['yogas']!,
@@ -779,8 +792,9 @@ class _YogasTabState extends State<YogasTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-              title: 'Auspicious Yogas',
-              subtitle: '${analyzedYogas.length} beneficial combinations',
+                      title: 'Auspicious Yogas',
+                      subtitle:
+                          '${analyzedYogas.length} beneficial combinations',
                       accentColor: _Colors.gold,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -790,21 +804,24 @@ class _YogasTabState extends State<YogasTab> {
                         child: _YogaTypeLegend(isYoga: true),
                       ),
                       const SizedBox(height: _DesignTokens.space12),
-                      ...analyzedYogas.asMap().entries.map((entry) => _AnimatedCardWrapper(
-                            delay: 100 + (entry.key * 50),
-                            child: _PremiumYogaCard(
-                  yogaData: entry.value,
-                  index: entry.key,
-                  isDosha: false,
-                              planetPositions: widget.kundaliData.planetPositions,
-                            ),
-                          )),
+                      ...analyzedYogas.asMap().entries.map(
+                        (entry) => _AnimatedCardWrapper(
+                          delay: 100 + (entry.key * 50),
+                          child: _PremiumYogaCard(
+                            yogaData: entry.value,
+                            index: entry.key,
+                            isDosha: false,
+                            planetPositions: widget.kundaliData.planetPositions,
+                          ),
+                        ),
+                      ),
                     ] else ...[
                       _AnimatedCardWrapper(
                         delay: 50,
                         child: _EmptyStateCard(
                           title: 'No Yogas Detected',
-                          message: 'Standard chart configuration without special combinations.',
+                          message:
+                              'Standard chart configuration without special combinations.',
                           icon: Icons.auto_awesome_outlined,
                           color: _Colors.gold,
                         ),
@@ -816,9 +833,9 @@ class _YogasTabState extends State<YogasTab> {
 
               const SizedBox(height: _DesignTokens.space24),
 
-          // ═══════════════════════════════════════════════════════════════
-          // DOSHAS SECTION
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
+              // DOSHAS SECTION
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['doshas'],
                 sectionKey: _sectionKeys['doshas']!,
@@ -827,8 +844,8 @@ class _YogasTabState extends State<YogasTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-              title: 'Doshas Present',
-              subtitle: '${analyzedDoshas.length} detected',
+                      title: 'Doshas Present',
+                      subtitle: '${analyzedDoshas.length} detected',
                       accentColor: _Colors.coral,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -838,15 +855,17 @@ class _YogasTabState extends State<YogasTab> {
                         child: _YogaTypeLegend(isYoga: false),
                       ),
                       const SizedBox(height: _DesignTokens.space12),
-                      ...analyzedDoshas.asMap().entries.map((entry) => _AnimatedCardWrapper(
-                            delay: 100 + (entry.key * 50),
-                            child: _PremiumYogaCard(
-                  yogaData: entry.value,
-                  index: entry.key,
-                  isDosha: true,
-                              planetPositions: widget.kundaliData.planetPositions,
-                            ),
-                          )),
+                      ...analyzedDoshas.asMap().entries.map(
+                        (entry) => _AnimatedCardWrapper(
+                          delay: 100 + (entry.key * 50),
+                          child: _PremiumYogaCard(
+                            yogaData: entry.value,
+                            index: entry.key,
+                            isDosha: true,
+                            planetPositions: widget.kundaliData.planetPositions,
+                          ),
+                        ),
+                      ),
                     ] else ...[
                       _AnimatedCardWrapper(
                         delay: 50,
@@ -864,9 +883,9 @@ class _YogasTabState extends State<YogasTab> {
 
               const SizedBox(height: _DesignTokens.space24),
 
-          // ═══════════════════════════════════════════════════════════════
-          // INSIGHTS SECTION
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
+              // INSIGHTS SECTION
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['insights'],
                 sectionKey: _sectionKeys['insights']!,
@@ -875,20 +894,24 @@ class _YogasTabState extends State<YogasTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-            title: 'Astrological Insights',
-            subtitle: 'Understanding your chart',
+                      title: 'Astrological Insights',
+                      subtitle: 'Understanding your chart',
                       accentColor: _Colors.violet,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
                     _AnimatedCardWrapper(
                       delay: 50,
                       child: _InsightsGrid(
-                        hasKaalSarp: widget.kundaliData.doshas.contains('Kaal Sarp Dosha'),
-                        hasManglik: widget.kundaliData.doshas.contains('Manglik Dosha'),
+                        hasKaalSarp: widget.kundaliData.doshas.contains(
+                          'Kaal Sarp Dosha',
+                        ),
+                        hasManglik: widget.kundaliData.doshas.contains(
+                          'Manglik Dosha',
+                        ),
                       ),
-          ),
-        ],
-      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -916,7 +939,12 @@ class _YogasTabState extends State<YogasTab> {
     final ascSign = data.ascendant.sign;
 
     for (final yogaName in data.yogas) {
-      final analysis = _analyzeSpecificYoga(yogaName, positions, houses, ascSign);
+      final analysis = _analyzeSpecificYoga(
+        yogaName,
+        positions,
+        houses,
+        ascSign,
+      );
       results.add(analysis);
     }
 
@@ -930,7 +958,12 @@ class _YogasTabState extends State<YogasTab> {
     final ascSign = data.ascendant.sign;
 
     for (final doshaName in data.doshas) {
-      final analysis = _analyzeSpecificDosha(doshaName, positions, houses, ascSign);
+      final analysis = _analyzeSpecificDosha(
+        doshaName,
+        positions,
+        houses,
+        ascSign,
+      );
       results.add(analysis);
     }
 
@@ -944,8 +977,18 @@ class _YogasTabState extends State<YogasTab> {
     String ascSign,
   ) {
     final signs = [
-      'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
-      'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+      'Aries',
+      'Taurus',
+      'Gemini',
+      'Cancer',
+      'Leo',
+      'Virgo',
+      'Libra',
+      'Scorpio',
+      'Sagittarius',
+      'Capricorn',
+      'Aquarius',
+      'Pisces',
     ];
 
     Map<String, dynamic> result = {
@@ -971,7 +1014,8 @@ class _YogasTabState extends State<YogasTab> {
           result['houses'] = [jupHouse, moonHouse];
           result['formationRule'] = 'Jupiter in H$jupHouseFromMoon from Moon';
           // Strength based on Kendra from Moon, not from Ascendant
-          result['strength'] = _isInKendra(jupHouseFromMoon) ? 'Strong' : 'Moderate';
+          result['strength'] =
+              _isInKendra(jupHouseFromMoon) ? 'Strong' : 'Moderate';
         }
         break;
 
@@ -982,11 +1026,12 @@ class _YogasTabState extends State<YogasTab> {
           result['planets'] = ['Jupiter'];
           result['houses'] = [jupHouse];
           result['formationRule'] = 'Jupiter in H$jupHouse (${jupiter.sign})';
-          result['strength'] = (jupiter.sign == 'Sagittarius' ||
-                  jupiter.sign == 'Pisces' ||
-                  jupiter.sign == 'Cancer')
-              ? 'Strong'
-              : 'Moderate';
+          result['strength'] =
+              (jupiter.sign == 'Sagittarius' ||
+                      jupiter.sign == 'Pisces' ||
+                      jupiter.sign == 'Cancer')
+                  ? 'Strong'
+                  : 'Moderate';
         }
         break;
 
@@ -997,11 +1042,12 @@ class _YogasTabState extends State<YogasTab> {
           result['planets'] = ['Venus'];
           result['houses'] = [venHouse];
           result['formationRule'] = 'Venus in H$venHouse (${venus.sign})';
-          result['strength'] = (venus.sign == 'Taurus' ||
-                  venus.sign == 'Libra' ||
-                  venus.sign == 'Pisces')
-              ? 'Strong'
-              : 'Moderate';
+          result['strength'] =
+              (venus.sign == 'Taurus' ||
+                      venus.sign == 'Libra' ||
+                      venus.sign == 'Pisces')
+                  ? 'Strong'
+                  : 'Moderate';
         }
         break;
 
@@ -1013,7 +1059,9 @@ class _YogasTabState extends State<YogasTab> {
           result['houses'] = [merHouse];
           result['formationRule'] = 'Mercury in H$merHouse (${mercury.sign})';
           result['strength'] =
-              (mercury.sign == 'Gemini' || mercury.sign == 'Virgo') ? 'Strong' : 'Moderate';
+              (mercury.sign == 'Gemini' || mercury.sign == 'Virgo')
+                  ? 'Strong'
+                  : 'Moderate';
         }
         break;
 
@@ -1024,11 +1072,12 @@ class _YogasTabState extends State<YogasTab> {
           result['planets'] = ['Mars'];
           result['houses'] = [marsHouse];
           result['formationRule'] = 'Mars in H$marsHouse (${mars.sign})';
-          result['strength'] = (mars.sign == 'Aries' ||
-                  mars.sign == 'Scorpio' ||
-                  mars.sign == 'Capricorn')
-              ? 'Strong'
-              : 'Moderate';
+          result['strength'] =
+              (mars.sign == 'Aries' ||
+                      mars.sign == 'Scorpio' ||
+                      mars.sign == 'Capricorn')
+                  ? 'Strong'
+                  : 'Moderate';
         }
         break;
 
@@ -1039,11 +1088,12 @@ class _YogasTabState extends State<YogasTab> {
           result['planets'] = ['Saturn'];
           result['houses'] = [satHouse];
           result['formationRule'] = 'Saturn in H$satHouse (${saturn.sign})';
-          result['strength'] = (saturn.sign == 'Capricorn' ||
-                  saturn.sign == 'Aquarius' ||
-                  saturn.sign == 'Libra')
-              ? 'Strong'
-              : 'Moderate';
+          result['strength'] =
+              (saturn.sign == 'Capricorn' ||
+                      saturn.sign == 'Aquarius' ||
+                      saturn.sign == 'Libra')
+                  ? 'Strong'
+                  : 'Moderate';
         }
         break;
 
@@ -1086,8 +1136,18 @@ class _YogasTabState extends State<YogasTab> {
     String ascSign,
   ) {
     final signs = [
-      'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
-      'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+      'Aries',
+      'Taurus',
+      'Gemini',
+      'Cancer',
+      'Leo',
+      'Virgo',
+      'Libra',
+      'Scorpio',
+      'Sagittarius',
+      'Capricorn',
+      'Aquarius',
+      'Pisces',
     ];
 
     Map<String, dynamic> result = {
@@ -1108,7 +1168,9 @@ class _YogasTabState extends State<YogasTab> {
           result['formationRule'] = 'Mars in H$marsHouse from Lagna';
           if (marsHouse == 7 || marsHouse == 8) {
             result['severity'] = 'High';
-          } else if (mars.sign == 'Aries' || mars.sign == 'Scorpio' || mars.sign == 'Capricorn') {
+          } else if (mars.sign == 'Aries' ||
+              mars.sign == 'Scorpio' ||
+              mars.sign == 'Capricorn') {
             result['severity'] = 'Low';
           }
         }
@@ -1196,7 +1258,8 @@ class _AnimatedSectionWrapper extends StatefulWidget {
   });
 
   @override
-  State<_AnimatedSectionWrapper> createState() => _AnimatedSectionWrapperState();
+  State<_AnimatedSectionWrapper> createState() =>
+      _AnimatedSectionWrapperState();
 }
 
 class _AnimatedSectionWrapperState extends State<_AnimatedSectionWrapper> {
@@ -1231,7 +1294,8 @@ class _SectionAnimationProvider extends InheritedWidget {
   });
 
   static _SectionAnimationProvider? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<_SectionAnimationProvider>();
+    return context
+        .dependOnInheritedWidgetOfExactType<_SectionAnimationProvider>();
   }
 
   @override
@@ -1279,11 +1343,17 @@ class _AnimatedSectionHeaderState extends State<_AnimatedSectionHeader>
 
     _textPulseAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 0.0,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 30,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween(
+          begin: 1.0,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 70,
       ),
     ]).animate(_controller);
@@ -1312,27 +1382,28 @@ class _AnimatedSectionHeaderState extends State<_AnimatedSectionHeader>
         final textPulse = _textPulseAnimation.value;
         final underlineWidth = _underlineAnimation.value;
 
-        final textColor = Color.lerp(
-          _Colors.textTertiary,
-          widget.accentColor,
-          textPulse * 0.8,
-        )!;
+        final textColor =
+            Color.lerp(
+              _Colors.textTertiary,
+              widget.accentColor,
+              textPulse * 0.8,
+            )!;
 
         return Padding(
           padding: const EdgeInsets.only(left: _DesignTokens.space4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
+            children: [
+              Text(
                 widget.title.toUpperCase(),
                 style: GoogleFonts.inter(
                   fontSize: 11,
-                    fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: 1.0,
                   color: textColor,
-                  ),
                 ),
+              ),
               if (widget.subtitle != null) ...[
                 const SizedBox(height: 2),
                 Text(
@@ -1351,7 +1422,9 @@ class _AnimatedSectionHeaderState extends State<_AnimatedSectionHeader>
                     height: 2,
                     width: maxWidth * underlineWidth,
                     decoration: BoxDecoration(
-                      color: widget.accentColor.withOpacity(0.6 + textPulse * 0.4),
+                      color: widget.accentColor.withOpacity(
+                        0.6 + textPulse * 0.4,
+                      ),
                       borderRadius: BorderRadius.circular(1),
                     ),
                   );
@@ -1394,22 +1467,34 @@ class _AnimatedCardWrapperState extends State<_AnimatedCardWrapper>
 
     _scaleAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 1.025).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 1.0,
+          end: 1.025,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 35,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.025, end: 1.0).chain(CurveTween(curve: Curves.elasticOut)),
+        tween: Tween(
+          begin: 1.025,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.elasticOut)),
         weight: 65,
       ),
     ]).animate(_controller);
 
     _shadowAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeOut)),
+        tween: Tween(
+          begin: 0.0,
+          end: 1.0,
+        ).chain(CurveTween(curve: Curves.easeOut)),
         weight: 30,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeInOut)),
+        tween: Tween(
+          begin: 1.0,
+          end: 0.0,
+        ).chain(CurveTween(curve: Curves.easeInOut)),
         weight: 70,
       ),
     ]).animate(_controller);
@@ -1446,19 +1531,22 @@ class _AnimatedCardWrapperState extends State<_AnimatedCardWrapper>
         return Transform.scale(
           scale: scale,
           child: Container(
-            decoration: shadow > 0.01
-                ? BoxDecoration(
-                    borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
-                    boxShadow: [
-                      BoxShadow(
-                        color: accentColor.withOpacity(shadow * 0.2),
-                        blurRadius: 16 * shadow,
-                        spreadRadius: -4,
-                        offset: Offset(0, 4 * shadow),
+            decoration:
+                shadow > 0.01
+                    ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(
+                        _DesignTokens.radiusLg,
                       ),
-                    ],
-                  )
-                : null,
+                      boxShadow: [
+                        BoxShadow(
+                          color: accentColor.withOpacity(shadow * 0.2),
+                          blurRadius: 16 * shadow,
+                          spreadRadius: -4,
+                          offset: Offset(0, 4 * shadow),
+                        ),
+                      ],
+                    )
+                    : null,
             child: child,
           ),
         );
@@ -1470,6 +1558,9 @@ class _AnimatedCardWrapperState extends State<_AnimatedCardWrapper>
 
 // ═══════════════════════════════════════════════════════════════════════════
 // YOGA HERO CARD - Interactive
+// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// YOGA HERO CARD - Minimal Elegant Design
 // ═══════════════════════════════════════════════════════════════════════════
 class _YogaHeroCard extends StatefulWidget {
   final int yogaCount;
@@ -1492,51 +1583,8 @@ class _YogaHeroCard extends StatefulWidget {
   State<_YogaHeroCard> createState() => _YogaHeroCardState();
 }
 
-class _YogaHeroCardState extends State<_YogaHeroCard>
-    with TickerProviderStateMixin {
-  late AnimationController _controller;
-  late AnimationController _fadeController;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
+class _YogaHeroCardState extends State<_YogaHeroCard> {
   bool _isPressed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.98,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
-
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 600),
-      vsync: this,
-    );
-    _fadeAnimation = CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOut,
-    );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.05),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOutCubic,
-    ));
-    _fadeController.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _fadeController.dispose();
-    super.dispose();
-  }
 
   Color _getBalanceColor(int balance) {
     if (balance >= 3) return _Colors.emerald;
@@ -1546,325 +1594,220 @@ class _YogaHeroCardState extends State<_YogaHeroCard>
   }
 
   String _getBalanceStatus(int balance, int yogas, int doshas) {
-    if (yogas > 0 && doshas == 0) return 'EXCELLENT';
-    if (balance >= 3) return 'VERY FAVORABLE';
-    if (balance >= 1) return 'FAVORABLE';
-    if (balance >= -1) return 'MIXED';
-    if (balance >= -3) return 'CHALLENGING';
-    return 'NEEDS ATTENTION';
-  }
-
-  void _onTapDown(TapDownDetails details) {
-    setState(() => _isPressed = true);
-    _controller.forward();
-    HapticFeedback.selectionClick();
-  }
-
-  void _onTapUp(TapUpDetails details) {
-    setState(() => _isPressed = false);
-    _controller.reverse();
-    _showInsightSheet(
-      context,
-      _getYogaOverviewInsight(
-        widget.yogaCount,
-        widget.doshaCount,
-        widget.strongYogas,
-        widget.severeDoshas,
-        widget.ascendant,
-      ),
-    );
-  }
-
-  void _onTapCancel() {
-    setState(() => _isPressed = false);
-    _controller.reverse();
+    if (yogas > 0 && doshas == 0) return 'Excellent';
+    if (balance >= 3) return 'Very Good';
+    if (balance >= 1) return 'Good';
+    if (balance >= -1) return 'Mixed';
+    if (balance >= -3) return 'Challenging';
+    return 'Needs Attention';
   }
 
   @override
   Widget build(BuildContext context) {
     final balance = widget.yogaCount - widget.severeDoshas;
-    final balanceStatus = _getBalanceStatus(balance, widget.yogaCount, widget.doshaCount);
+    final balanceStatus = _getBalanceStatus(
+      balance,
+      widget.yogaCount,
+      widget.doshaCount,
+    );
     final balanceColor = _getBalanceColor(balance);
+    final ascendantColor = _getZodiacColor(widget.ascendant);
 
     return GestureDetector(
-      onTapDown: _onTapDown,
-      onTapUp: _onTapUp,
-      onTapCancel: _onTapCancel,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: child,
-          );
-        },
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: const Color(0xFF141218),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: const Color(0xFF262432),
-                  width: 1,
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+        _showInsightSheet(
+          context,
+          _getYogaOverviewInsight(
+            widget.yogaCount,
+            widget.doshaCount,
+            widget.strongYogas,
+            widget.severeDoshas,
+            widget.ascendant,
+          ),
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: _isPressed ? const Color(0xFF1A1820) : const Color(0xFF141218),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header row - Balance indicator + Title
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Minimal balance indicator
+                _MinimalYogaBalanceIndicator(
+                  yogaCount: widget.yogaCount,
+                  doshaCount: widget.doshaCount,
+                  color: balanceColor,
                 ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header Row with Status Badge and Lagna
-                  Row(
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: balanceColor.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          balanceStatus,
-                          style: GoogleFonts.inter(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                            color: balanceColor,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A181F),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: const Color(0xFF2A2838),
-                            width: 0.5,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.adjust_rounded,
-                              size: 11,
-                              color: const Color(0xFF7C7889),
+                      // Status + Title row
+                      Row(
+                        children: [
+                          Text(
+                            balanceStatus,
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: balanceColor,
+                              letterSpacing: 0.3,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${widget.ascendant} Lagna',
-                              style: GoogleFonts.inter(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w500,
-                                color: const Color(0xFFB8B5C2),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 6),
+                            width: 3,
+                            height: 3,
+                            decoration: BoxDecoration(
+                              color: balanceColor.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          Text(
+                            'Yoga Overview',
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xFF6A6778),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      // Yogas/Doshas inline stats
+                      Row(
+                        children: [
+                          _MinimalYogaStat(
+                            value: widget.yogaCount,
+                            label: 'Yogas',
+                            color: _Colors.gold,
+                            isPositive: true,
+                          ),
+                          const SizedBox(width: 16),
+                          _MinimalYogaStat(
+                            value: widget.doshaCount,
+                            label: 'Doshas',
+                            color: _Colors.coral,
+                            isPositive: false,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                // Subtle info icon
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 100),
+                  opacity: _isPressed ? 1.0 : 0.4,
+                  child: const Icon(
+                    Icons.chevron_right_rounded,
+                    size: 16,
+                    color: Color(0xFF6A6778),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 14),
+
+            // Bottom row - Ascendant + Strength stats
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F0D14),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  // Strength stats inline
+                  _MinimalStrengthStat(
+                    value: widget.strongYogas,
+                    label: 'Strong',
+                    color: _Colors.emerald,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    width: 1,
+                    height: 14,
+                    color: const Color(0xFF2A2838),
+                  ),
+                  _MinimalStrengthStat(
+                    value: widget.partialYogas,
+                    label: 'Moderate',
+                    color: _Colors.amber,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    width: 1,
+                    height: 14,
+                    color: const Color(0xFF2A2838),
+                  ),
+                  _MinimalStrengthStat(
+                    value: widget.severeDoshas,
+                    label: 'Severe',
+                    color: _Colors.coral,
+                  ),
+                  const Spacer(),
+                  // Lagna with zodiac image
+                  Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: ascendantColor.withOpacity(0.2),
+                          blurRadius: 4,
+                          spreadRadius: -1,
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: Image.asset(
+                        _getZodiacImagePath(widget.ascendant),
+                        width: 20,
+                        height: 20,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (_, __, ___) => Container(
+                              color: ascendantColor.withOpacity(0.15),
+                              child: Center(
+                                child: Text(
+                                  _getSignSymbol(widget.ascendant),
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: ascendantColor,
+                                  ),
+                                ),
                               ),
                             ),
-                          ],
-                        ),
                       ),
-                      const SizedBox(width: 10),
-                      Icon(
-                        Icons.info_outline_rounded,
-                        size: 16,
-                        color: const Color(0xFF6E6A7A),
-                      ),
-                    ],
+                    ),
                   ),
-
-                  const SizedBox(height: 18),
-
-                  // Yogas and Doshas Counts
-                  Row(
-                    children: [
-                      // Yogas Count
-                      Expanded(
-                        child: _CompactCountDisplay(
-                          count: widget.yogaCount,
-                          label: 'Yogas',
-                          icon: Icons.auto_awesome_rounded,
-                          color: _Colors.gold,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      // Doshas Count
-                      Expanded(
-                        child: _CompactCountDisplay(
-                          count: widget.doshaCount,
-                          label: 'Doshas',
-                          icon: Icons.warning_amber_rounded,
-                          color: _Colors.coral,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  // Strength Chips Row
-                  Row(
-                    children: [
-                      _CompactStrengthChip(
-                        icon: Icons.keyboard_double_arrow_up_rounded,
-                        count: widget.strongYogas,
-                        label: 'Strong',
-                        color: _Colors.emerald,
-                      ),
-                      const SizedBox(width: 6),
-                      _CompactStrengthChip(
-                        icon: Icons.remove_rounded,
-                        count: widget.partialYogas,
-                        label: 'Moderate',
-                        color: _Colors.amber,
-                      ),
-                      const SizedBox(width: 6),
-                      _CompactStrengthChip(
-                        icon: Icons.warning_rounded,
-                        count: widget.severeDoshas,
-                        label: 'Severe',
-                        color: _Colors.coral,
-                      ),
-                    ],
+                  const SizedBox(width: 8),
+                  Text(
+                    widget.ascendant,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: ascendantColor,
+                    ),
                   ),
                 ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Compact Count Display Widget
-class _CompactCountDisplay extends StatelessWidget {
-  final int count;
-  final String label;
-  final IconData icon;
-  final Color color;
-
-  const _CompactCountDisplay({
-    required this.count,
-    required this.label,
-    required this.icon,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: color.withOpacity(0.15),
-          width: 0.5,
-        ),
-      ),
-      child: Row(
-        children: [
-          // Count circle
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: color.withOpacity(0.4),
-                width: 2,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                '$count',
-                style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: color,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Label
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, size: 14, color: color),
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFFB8B5C2),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Compact Strength Chip Widget
-class _CompactStrengthChip extends StatelessWidget {
-  final IconData icon;
-  final int count;
-  final String label;
-  final Color color;
-
-  const _CompactStrengthChip({
-    required this.icon,
-    required this.count,
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: color.withOpacity(0.12),
-            width: 0.5,
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 12, color: color),
-            const SizedBox(width: 4),
-            Text(
-              '$count',
-              style: GoogleFonts.inter(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: color,
-                letterSpacing: -0.3,
-              ),
-            ),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 9,
-                fontWeight: FontWeight.w400,
-                color: const Color(0xFF7C7889),
               ),
             ),
           ],
@@ -1874,8 +1817,139 @@ class _CompactStrengthChip extends StatelessWidget {
   }
 }
 
+// Minimal Balance Indicator - Simple visual for yoga/dosha ratio
+class _MinimalYogaBalanceIndicator extends StatelessWidget {
+  final int yogaCount;
+  final int doshaCount;
+  final Color color;
+
+  const _MinimalYogaBalanceIndicator({
+    required this.yogaCount,
+    required this.doshaCount,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final balance = yogaCount - doshaCount;
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.2), width: 1),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '✦',
+            style: TextStyle(fontSize: 12, color: color.withOpacity(0.7)),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            balance >= 0 ? '+$balance' : '$balance',
+            style: GoogleFonts.jetBrainsMono(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Minimal Yoga Stat - Inline yoga/dosha count
+class _MinimalYogaStat extends StatelessWidget {
+  final int value;
+  final String label;
+  final Color color;
+  final bool isPositive;
+
+  const _MinimalYogaStat({
+    required this.value,
+    required this.label,
+    required this.color,
+    required this.isPositive,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 5,
+          height: 5,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          '$value',
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 10,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF6A6778),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Minimal Strength Stat - For strong/moderate/severe counts
+class _MinimalStrengthStat extends StatelessWidget {
+  final int value;
+  final String label;
+  final Color color;
+
+  const _MinimalStrengthStat({
+    required this.value,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '$value',
+          style: GoogleFonts.jetBrainsMono(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: color,
+          ),
+        ),
+        const SizedBox(width: 3),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 9,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF7C7889),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
-// YOGA TYPE LEGEND - Interactive
+// YOGA TYPE LEGEND - Minimal Design
 // ═══════════════════════════════════════════════════════════════════════════
 class _YogaTypeLegend extends StatelessWidget {
   final bool isYoga;
@@ -1884,54 +1958,54 @@ class _YogaTypeLegend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = isYoga
-        ? [
-            ('Raja Yoga', _Colors.gold),
-            ('Dhana Yoga', _Colors.emerald),
-            ('Pancha Mahapurusha', _Colors.violet),
-            ('Lunar Yoga', _Colors.sky),
-          ]
-        : [
-            ('High', _Colors.coral),
-            ('Moderate', _Colors.amber),
-            ('Low', _Colors.sky),
-          ];
+    final items =
+        isYoga
+            ? [
+              ('Raja', _Colors.gold),
+              ('Dhana', _Colors.emerald),
+              ('Mahapurusha', _Colors.violet),
+              ('Lunar', _Colors.sky),
+            ]
+            : [
+              ('Severe', _Colors.coral),
+              ('Moderate', _Colors.amber),
+              ('Mild', _Colors.sky),
+            ];
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Row(
-        children: items
-            .map((item) => Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: _InteractiveLegendChip(
+    return Row(
+      children:
+          items
+              .map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: _MinimalLegendItem(
                     label: item.$1,
                     color: item.$2,
                     isYoga: isYoga,
                   ),
-                ))
-            .toList(),
-      ),
+                ),
+              )
+              .toList(),
     );
   }
 }
 
-class _InteractiveLegendChip extends StatefulWidget {
+class _MinimalLegendItem extends StatefulWidget {
   final String label;
   final Color color;
   final bool isYoga;
 
-  const _InteractiveLegendChip({
+  const _MinimalLegendItem({
     required this.label,
     required this.color,
     required this.isYoga,
   });
 
   @override
-  State<_InteractiveLegendChip> createState() => _InteractiveLegendChipState();
+  State<_MinimalLegendItem> createState() => _MinimalLegendItemState();
 }
 
-class _InteractiveLegendChipState extends State<_InteractiveLegendChip> {
+class _MinimalLegendItemState extends State<_MinimalLegendItem> {
   bool _isPressed = false;
 
   @override
@@ -1940,77 +2014,35 @@ class _InteractiveLegendChipState extends State<_InteractiveLegendChip> {
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
         setState(() => _isPressed = false);
-        HapticFeedback.selectionClick();
+        HapticFeedback.lightImpact();
         _showInsightSheet(
           context,
           _getYogaTypeInsight(widget.label, widget.isYoga),
         );
       },
       onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: widget.color.withOpacity(_isPressed ? 0.18 : 0.1),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: widget.color.withOpacity(_isPressed ? 0.4 : 0.2),
-            width: _isPressed ? 1 : 0.5,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 100),
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: widget.color.withOpacity(_isPressed ? 1.0 : 0.7),
+              shape: BoxShape.circle,
+            ),
           ),
-          boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: widget.color.withOpacity(0.15),
-                    blurRadius: 8,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 100),
-              width: _isPressed ? 10 : 8,
-              height: _isPressed ? 10 : 8,
-              decoration: BoxDecoration(
-                color: widget.color,
-                shape: BoxShape.circle,
-                boxShadow: _isPressed
-                    ? [
-                        BoxShadow(
-                          color: widget.color.withOpacity(0.4),
-                          blurRadius: 4,
-                          spreadRadius: 0,
-                        ),
-                      ]
-                    : null,
-              ),
+          const SizedBox(width: 5),
+          Text(
+            widget.label,
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              fontWeight: FontWeight.w400,
+              color: _isPressed ? widget.color : const Color(0xFF7A7686),
             ),
-            const SizedBox(width: 6),
-            Text(
-              widget.label,
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                fontWeight: _isPressed ? FontWeight.w600 : FontWeight.w500,
-                color: widget.color,
-              ),
-            ),
-            AnimatedOpacity(
-              duration: const Duration(milliseconds: 100),
-              opacity: _isPressed ? 1.0 : 0.0,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 4),
-                child: Icon(
-                  Icons.info_outline_rounded,
-                  size: 10,
-                  color: widget.color,
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -2053,25 +2085,27 @@ class _EmptyStateCardState extends State<_EmptyStateCard> {
           InsightData(
             title: isNoYogas ? 'No Special Yogas' : 'Dosha-Free Chart',
             value: widget.title,
-            description: isNoYogas
-                ? 'Your chart does not have any of the commonly recognized special yogas. This is normal and doesn\'t mean anything negative—many successful people have charts without named yogas. The strength of your chart comes from other factors like planet dignity, house placements, and aspects.'
-                : 'Congratulations! Your chart is free from major doshas like Manglik, Kaal Sarp, or other challenging combinations. This indicates fewer karmic obstacles in the areas typically affected by these doshas.',
+            description:
+                isNoYogas
+                    ? 'Your chart does not have any of the commonly recognized special yogas. This is normal and doesn\'t mean anything negative—many successful people have charts without named yogas. The strength of your chart comes from other factors like planet dignity, house placements, and aspects.'
+                    : 'Congratulations! Your chart is free from major doshas like Manglik, Kaal Sarp, or other challenging combinations. This indicates fewer karmic obstacles in the areas typically affected by these doshas.',
             significance: widget.message,
-            keyPoints: isNoYogas
-                ? [
-                    'Standard chart configuration',
-                    'Success depends on overall chart strength',
-                    'Dasha periods still important for timing',
-                    'Individual planet strengths matter more',
-                    'Aspects and house placements are key factors',
-                  ]
-                : [
-                    'No major doshas detected',
-                    'Fewer karmic obstacles expected',
-                    'Marriage and relationships less afflicted',
-                    'Still check for other challenging aspects',
-                    'Overall chart analysis recommended',
-                  ],
+            keyPoints:
+                isNoYogas
+                    ? [
+                      'Standard chart configuration',
+                      'Success depends on overall chart strength',
+                      'Dasha periods still important for timing',
+                      'Individual planet strengths matter more',
+                      'Aspects and house placements are key factors',
+                    ]
+                    : [
+                      'No major doshas detected',
+                      'Fewer karmic obstacles expected',
+                      'Marriage and relationships less afflicted',
+                      'Still check for other challenging aspects',
+                      'Overall chart analysis recommended',
+                    ],
             accentColor: widget.color,
             icon: widget.icon,
           ),
@@ -2088,15 +2122,16 @@ class _EmptyStateCardState extends State<_EmptyStateCard> {
             color: widget.color.withOpacity(_isPressed ? 0.4 : 0.2),
             width: _isPressed ? 1 : 0.5,
           ),
-          boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: widget.color.withOpacity(0.1),
-                    blurRadius: 12,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : null,
+          boxShadow:
+              _isPressed
+                  ? [
+                    BoxShadow(
+                      color: widget.color.withOpacity(0.1),
+                      blurRadius: 12,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : null,
         ),
         child: Row(
           children: [
@@ -2107,15 +2142,16 @@ class _EmptyStateCardState extends State<_EmptyStateCard> {
               decoration: BoxDecoration(
                 color: widget.color.withOpacity(_isPressed ? 0.2 : 0.12),
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: _isPressed
-                    ? [
-                        BoxShadow(
-                          color: widget.color.withOpacity(0.2),
-                          blurRadius: 8,
-                          spreadRadius: -2,
-                        ),
-                      ]
-                    : null,
+                boxShadow:
+                    _isPressed
+                        ? [
+                          BoxShadow(
+                            color: widget.color.withOpacity(0.2),
+                            blurRadius: 8,
+                            spreadRadius: -2,
+                          ),
+                        ]
+                        : null,
               ),
               child: Center(
                 child: Icon(widget.icon, size: 24, color: widget.color),
@@ -2167,7 +2203,7 @@ class _EmptyStateCardState extends State<_EmptyStateCard> {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PREMIUM YOGA CARD - Interactive
+// PREMIUM YOGA CARD - Elegant Minimal Design
 // ═══════════════════════════════════════════════════════════════════════════
 class _PremiumYogaCard extends StatefulWidget {
   final Map<String, dynamic> yogaData;
@@ -2186,30 +2222,8 @@ class _PremiumYogaCard extends StatefulWidget {
   State<_PremiumYogaCard> createState() => _PremiumYogaCardState();
 }
 
-class _PremiumYogaCardState extends State<_PremiumYogaCard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+class _PremiumYogaCardState extends State<_PremiumYogaCard> {
   bool _isPressed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 120),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.98,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   Color _getStrengthColor(String strength) {
     switch (strength) {
@@ -2226,25 +2240,26 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard>
     }
   }
 
-  IconData _getStrengthIcon(String strength) {
+  String _getStrengthSymbol(String strength) {
     switch (strength) {
       case 'Strong':
-        return Icons.keyboard_double_arrow_up_rounded;
+        return '↑↑';
       case 'High':
-        return Icons.priority_high_rounded;
+        return '!!';
       case 'Moderate':
-        return Icons.remove_rounded;
+        return '—';
       case 'Low':
-        return Icons.keyboard_double_arrow_down_rounded;
+        return '↓';
       default:
-        return Icons.remove_rounded;
+        return '—';
     }
   }
 
   Color _getTypeColor(String type) {
     if (type.contains('Raja')) return _Colors.gold;
     if (type.contains('Dhana')) return _Colors.emerald;
-    if (type.contains('Pancha') || type.contains('Mahapurusha')) return _Colors.violet;
+    if (type.contains('Pancha') || type.contains('Mahapurusha'))
+      return _Colors.violet;
     if (type.contains('Lunar')) return _Colors.sky;
     if (type.contains('Dosha') || type.contains('Grahan')) return _Colors.coral;
     return _Colors.textTertiary;
@@ -2252,13 +2267,11 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard>
 
   void _onTapDown(TapDownDetails details) {
     setState(() => _isPressed = true);
-    _controller.forward();
-    HapticFeedback.selectionClick();
+    HapticFeedback.lightImpact();
   }
 
   void _onTapUp(TapUpDetails details) {
     setState(() => _isPressed = false);
-    _controller.reverse();
     _showYogaDetails(
       context,
       widget.yogaData['name'] as String,
@@ -2269,20 +2282,19 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard>
 
   void _onTapCancel() {
     setState(() => _isPressed = false);
-    _controller.reverse();
   }
 
   @override
   Widget build(BuildContext context) {
     final yogaName = widget.yogaData['name'] as String;
     final planets = widget.yogaData['planets'] as List<String>? ?? [];
-    final strength = widget.yogaData['strength'] as String? ??
+    final strength =
+        widget.yogaData['strength'] as String? ??
         widget.yogaData['severity'] as String? ??
         'Moderate';
     final formationRule = widget.yogaData['formationRule'] as String? ?? '';
     final yogaInfo = _getYogaInfo(yogaName, widget.isDosha);
 
-    final color = widget.isDosha ? _Colors.coral : _Colors.gold;
     final strengthColor = _getStrengthColor(strength);
     final typeColor = _getTypeColor(yogaInfo['type'] ?? '');
 
@@ -2290,281 +2302,155 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard>
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
       onTapCancel: _onTapCancel,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 120),
-              margin: const EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(
-                color: _Colors.surface.withOpacity(_isPressed ? 0.6 : 0.4),
-                borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
-                border: Border.all(
-                  color: _isPressed
-                      ? color.withOpacity(0.5)
-                      : strength == 'Strong' || strength == 'High'
-                          ? strengthColor.withOpacity(0.4)
-                          : color.withOpacity(0.2),
-                  width: _isPressed || strength == 'Strong' || strength == 'High'
-                      ? 1.5
-                      : 0.5,
-                ),
-                boxShadow: _isPressed
-                    ? [
-                        BoxShadow(
-                          color: color.withOpacity(0.18),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ]
-                    : strength == 'Strong'
-                        ? [
-                            BoxShadow(
-                              color: strengthColor.withOpacity(0.08),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ]
-                        : null,
-              ),
-              child: child,
-            ),
-          );
-        },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOutCubic,
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: _isPressed ? const Color(0xFF1A1820) : const Color(0xFF141218),
+          borderRadius: BorderRadius.circular(14),
+        ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.all(14),
-              child: Column(
-                children: [
-                  Row(
+            // Main content row
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Yoga name and type
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 120),
-                        width: 46,
-                        height: 46,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              color.withOpacity(_isPressed ? 0.3 : 0.2),
-                              color.withOpacity(_isPressed ? 0.15 : 0.08),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: color.withOpacity(_isPressed ? 0.5 : 0.3),
-                            width: 1,
-                          ),
-                          boxShadow: _isPressed
-                              ? [
-                                  BoxShadow(
-                                    color: color.withOpacity(0.3),
-                                    blurRadius: 10,
-                                    spreadRadius: -2,
-                                  ),
-                                ]
-                              : null,
-                        ),
-                        child: Center(
-                          child: Icon(
-                            widget.isDosha
-                                ? Icons.warning_amber_rounded
-                                : Icons.auto_awesome_rounded,
-                            color: color,
-                            size: 22,
-                          ),
+                      Text(
+                        yogaName,
+                        style: GoogleFonts.inter(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: _Colors.textPrimary,
+                          letterSpacing: -0.2,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    yogaName,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: _Colors.textPrimary,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                AnimatedOpacity(
-                                  duration: const Duration(milliseconds: 150),
-                                  opacity: _isPressed ? 1.0 : 0.3,
-                                  child: Icon(
-                                    Icons.info_outline_rounded,
-                                    size: 14,
-                                    color: color,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: typeColor.withOpacity(0.12),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                yogaInfo['type'] ??
-                                    (widget.isDosha ? 'Dosha' : 'Yoga'),
-                                style: GoogleFonts.jetBrainsMono(
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.w600,
-                                  color: typeColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: strengthColor.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(
-                              _getStrengthIcon(strength),
-                              size: 16,
-                              color: strengthColor,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              strength.split(' ').first,
-                              style: GoogleFonts.inter(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w600,
-                                color: strengthColor,
-                              ),
-                            ),
-                          ],
+                      const SizedBox(height: 5),
+                      Text(
+                        yogaInfo['type'] ?? (widget.isDosha ? 'Dosha' : 'Yoga'),
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: typeColor.withOpacity(0.8),
                         ),
                       ),
                     ],
                   ),
-
-                  if (planets.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: _Colors.surface.withOpacity(0.4),
-                        borderRadius: BorderRadius.circular(10),
+                ),
+                // Strength indicator
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: strengthColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _getStrengthSymbol(strength),
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: strengthColor,
+                        ),
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.hub_rounded,
-                            size: 12,
-                            color: _Colors.textTertiary,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Wrap(
-                              spacing: 6,
-                              runSpacing: 4,
-                              children: planets.map((planet) {
-                                final pos = widget.planetPositions[planet];
-                                final planetColor = _getPlanetColor(planet);
+                      const SizedBox(width: 4),
+                      Text(
+                        strength,
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: strengthColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
 
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: planetColor.withOpacity(0.12),
-                                    borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(
-                                      color: planetColor.withOpacity(0.25),
-                                      width: 0.5,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        _getPlanetSymbol(planet),
-                                        style: TextStyle(
-                                            fontSize: 12, color: planetColor),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        pos != null
-                                            ? pos.sign.substring(0, 3)
-                                            : planet,
-                                        style: GoogleFonts.jetBrainsMono(
-                                          fontSize: 9,
-                                          color: _Colors.textPrimary,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
+            // Planets involved
+            if (planets.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  ...planets.take(3).map((planet) {
+                    final pos = widget.planetPositions[planet];
+                    final planetColor = _getPlanetColor(planet);
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _getPlanetSymbol(planet),
+                            style: TextStyle(fontSize: 12, color: planetColor),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            pos != null
+                                ? pos.sign.substring(0, 3)
+                                : planet.substring(0, 3),
+                            style: GoogleFonts.inter(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xFF9590A0),
                             ),
                           ),
                         ],
                       ),
+                    );
+                  }),
+                  if (planets.length > 3)
+                    Text(
+                      '+${planets.length - 3}',
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        color: const Color(0xFF6B6779),
+                      ),
                     ),
-                  ],
                 ],
               ),
-            ),
+            ],
 
-            if (formationRule.isNotEmpty)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(_isPressed ? 0.08 : 0.04),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(_DesignTokens.radiusLg),
-                    bottomRight: Radius.circular(_DesignTokens.radiusLg),
+            // Formation rule
+            if (formationRule.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      formationRule,
+                      style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF6B6779),
+                      ),
+                    ),
                   ),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.rule_rounded,
-                      size: 12,
-                      color: _Colors.textTertiary,
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 100),
+                    opacity: _isPressed ? 1.0 : 0.4,
+                    child: Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 10,
+                      color: const Color(0xFF6B6779),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        formationRule,
-                        style: GoogleFonts.jetBrainsMono(
-                          fontSize: 9,
-                          color: _Colors.textSecondary,
-                        ),
-                      ),
-                    ),
-                    AnimatedOpacity(
-                      duration: const Duration(milliseconds: 100),
-                      opacity: _isPressed ? 1.0 : 0.5,
-                      child: Icon(
-                        Icons.chevron_right_rounded,
-                        size: 16,
-                        color: color,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+            ],
           ],
         ),
       ),
@@ -2572,285 +2458,339 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard>
   }
 
   void _showYogaDetails(
-      BuildContext context, String yogaName, bool isDosha, Map<String, dynamic> yogaData) {
+    BuildContext context,
+    String yogaName,
+    bool isDosha,
+    Map<String, dynamic> yogaData,
+  ) {
     final color = isDosha ? _Colors.coral : _Colors.gold;
     final details = _getFullYogaDetails(yogaName, isDosha);
     final planets = yogaData['planets'] as List<String>? ?? [];
     final formationRule = yogaData['formationRule'] as String? ?? '';
-    final strength = yogaData['strength'] as String? ?? yogaData['severity'] as String? ?? 'Moderate';
+    final strength =
+        yogaData['strength'] as String? ??
+        yogaData['severity'] as String? ??
+        'Moderate';
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.75,
-        minChildSize: 0.4,
-        maxChildSize: 0.9,
-        builder: (context, scrollController) => Container(
-          decoration: BoxDecoration(
-            color: _Colors.bgSecondary,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            border: Border.all(color: color.withOpacity(0.3), width: 1),
-          ),
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: _Colors.border,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+      builder:
+          (context) => DraggableScrollableSheet(
+            initialChildSize: 0.75,
+            minChildSize: 0.4,
+            maxChildSize: 0.9,
+            builder:
+                (context, scrollController) => Container(
+                  decoration: BoxDecoration(
+                    color: _Colors.bgSecondary,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                    border: Border.all(color: color.withOpacity(0.3), width: 1),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 12),
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: _Colors.border,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
 
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            color.withOpacity(0.2),
-                            color.withOpacity(0.08),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 56,
+                              height: 56,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    color.withOpacity(0.2),
+                                    color.withOpacity(0.08),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: color.withOpacity(0.3),
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  isDosha
+                                      ? Icons.warning_amber_rounded
+                                      : Icons.auto_awesome_rounded,
+                                  color: color,
+                                  size: 28,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    yogaName,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      color: _Colors.textPrimary,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: color.withOpacity(0.12),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          details['type']!,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w600,
+                                            color: color,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: _getStrengthColor(
+                                            strength,
+                                          ).withOpacity(0.12),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          strength,
+                                          style: GoogleFonts.inter(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w600,
+                                            color: _getStrengthColor(strength),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: color.withOpacity(0.3),
-                          width: 1.5,
-                        ),
                       ),
-                      child: Center(
-                        child: Icon(
-                          isDosha ? Icons.warning_amber_rounded : Icons.auto_awesome_rounded,
-                          color: color,
-                          size: 28,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            yogaName,
-                            style: GoogleFonts.inter(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: _Colors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: color.withOpacity(0.12),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  details['type']!,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w600,
-                                    color: color,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: _getStrengthColor(strength).withOpacity(0.12),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  strength,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w600,
-                                    color: _getStrengthColor(strength),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
 
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                  children: [
-                    if (planets.isNotEmpty || formationRule.isNotEmpty)
-                      _DetailSection(
-                        title: 'Formation',
-                        icon: Icons.architecture_rounded,
-                        color: _Colors.violet,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      Expanded(
+                        child: ListView(
+                          controller: scrollController,
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
                           children: [
-                            if (planets.isNotEmpty) ...[
-                              Text(
-                                'Planets Involved',
-                                style: GoogleFonts.inter(
-                                  fontSize: 10,
-                                  color: _Colors.textTertiary,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: planets.map((planet) {
-                                  final pos = widget.planetPositions[planet];
-                                  final planetColor = _getPlanetColor(planet);
-
-                                  return Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: planetColor.withOpacity(0.08),
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                        color: planetColor.withOpacity(0.2),
-                                        width: 0.5,
-                                      ),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          _getPlanetSymbol(planet),
-                                          style: TextStyle(fontSize: 16, color: planetColor),
+                            if (planets.isNotEmpty || formationRule.isNotEmpty)
+                              _DetailSection(
+                                title: 'Formation',
+                                icon: Icons.architecture_rounded,
+                                color: _Colors.violet,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (planets.isNotEmpty) ...[
+                                      Text(
+                                        'Planets Involved',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 10,
+                                          color: _Colors.textTertiary,
                                         ),
-                                        const SizedBox(width: 8),
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 8,
+                                        children:
+                                            planets.map((planet) {
+                                              final pos =
+                                                  widget
+                                                      .planetPositions[planet];
+                                              final planetColor =
+                                                  _getPlanetColor(planet);
+
+                                              return Container(
+                                                padding: const EdgeInsets.all(
+                                                  10,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: planetColor
+                                                      .withOpacity(0.08),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  border: Border.all(
+                                                    color: planetColor
+                                                        .withOpacity(0.2),
+                                                    width: 0.5,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      _getPlanetSymbol(planet),
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        color: planetColor,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          planet,
+                                                          style: GoogleFonts.inter(
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            color:
+                                                                _Colors
+                                                                    .textPrimary,
+                                                          ),
+                                                        ),
+                                                        if (pos != null)
+                                                          Text(
+                                                            '${pos.sign} ${pos.signDegree.toStringAsFixed(1)}°',
+                                                            style: GoogleFonts.jetBrainsMono(
+                                                              fontSize: 9,
+                                                              color:
+                                                                  _Colors
+                                                                      .textTertiary,
+                                                            ),
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }).toList(),
+                                      ),
+                                      const SizedBox(height: 12),
+                                    ],
+                                    if (formationRule.isNotEmpty)
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: _Colors.surface.withOpacity(
+                                            0.4,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: Row(
                                           children: [
-                                            Text(
-                                              planet,
-                                              style: GoogleFonts.inter(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
-                                                color: _Colors.textPrimary,
+                                            const Icon(
+                                              Icons.rule_rounded,
+                                              size: 14,
+                                              color: _Colors.textTertiary,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                formationRule,
+                                                style:
+                                                    GoogleFonts.jetBrainsMono(
+                                                      fontSize: 10,
+                                                      color:
+                                                          _Colors.textSecondary,
+                                                    ),
                                               ),
                                             ),
-                                            if (pos != null)
-                                              Text(
-                                                '${pos.sign} ${pos.signDegree.toStringAsFixed(1)}°',
-                                                style: GoogleFonts.jetBrainsMono(
-                                                  fontSize: 9,
-                                                  color: _Colors.textTertiary,
-                                                ),
-                                              ),
                                           ],
                                         ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                              const SizedBox(height: 12),
-                            ],
-                            if (formationRule.isNotEmpty)
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: _Colors.surface.withOpacity(0.4),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.rule_rounded,
-                                      size: 14,
-                                      color: _Colors.textTertiary,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        formationRule,
-                                        style: GoogleFonts.jetBrainsMono(
-                                          fontSize: 10,
-                                          color: _Colors.textSecondary,
-                                        ),
                                       ),
-                                    ),
                                   ],
                                 ),
                               ),
+
+                            const SizedBox(height: 16),
+
+                            _DetailSection(
+                              title: 'What is $yogaName?',
+                              icon: Icons.info_outline_rounded,
+                              color: _Colors.sky,
+                              child: Text(
+                                details['description']!,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: _Colors.textSecondary,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            _DetailSection(
+                              title: isDosha ? 'Potential Effects' : 'Benefits',
+                              icon:
+                                  isDosha
+                                      ? Icons.warning_amber_outlined
+                                      : Icons.star_outline_rounded,
+                              color: isDosha ? _Colors.amber : _Colors.emerald,
+                              child: Text(
+                                details['effects']!,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: _Colors.textSecondary,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            _DetailSection(
+                              title: isDosha ? 'Remedies' : 'How to Strengthen',
+                              icon: Icons.healing_rounded,
+                              color: _Colors.sky,
+                              child: Text(
+                                details['remedies']!,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: _Colors.textSecondary,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
-
-                    const SizedBox(height: 16),
-
-                    _DetailSection(
-                      title: 'What is $yogaName?',
-                      icon: Icons.info_outline_rounded,
-                      color: _Colors.sky,
-                      child: Text(
-                        details['description']!,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: _Colors.textSecondary,
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    _DetailSection(
-                      title: isDosha ? 'Potential Effects' : 'Benefits',
-                      icon: isDosha ? Icons.warning_amber_outlined : Icons.star_outline_rounded,
-                      color: isDosha ? _Colors.amber : _Colors.emerald,
-                      child: Text(
-                        details['effects']!,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: _Colors.textSecondary,
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    _DetailSection(
-                      title: isDosha ? 'Remedies' : 'How to Strengthen',
-                      icon: Icons.healing_rounded,
-                      color: _Colors.sky,
-                      child: Text(
-                        details['remedies']!,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: _Colors.textSecondary,
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
           ),
-        ),
-      ),
     );
   }
 }
@@ -2875,10 +2815,7 @@ class _DetailSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: _Colors.surface.withOpacity(0.4),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: color.withOpacity(0.15),
-          width: 0.5,
-        ),
+        border: Border.all(color: color.withOpacity(0.15), width: 0.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2919,10 +2856,7 @@ class _InsightsGrid extends StatelessWidget {
   final bool hasKaalSarp;
   final bool hasManglik;
 
-  const _InsightsGrid({
-    this.hasKaalSarp = false,
-    this.hasManglik = false,
-  });
+  const _InsightsGrid({this.hasKaalSarp = false, this.hasManglik = false});
 
   @override
   Widget build(BuildContext context) {
@@ -2933,7 +2867,8 @@ class _InsightsGrid extends StatelessWidget {
             Expanded(
               child: _InteractiveInsightCard(
                 title: 'Understanding',
-                description: 'Yogas are beneficial combinations that enhance life areas.',
+                description:
+                    'Yogas are beneficial combinations that enhance life areas.',
                 icon: Icons.lightbulb_outline_rounded,
                 color: _Colors.violet,
               ),
@@ -2942,7 +2877,8 @@ class _InsightsGrid extends StatelessWidget {
             Expanded(
               child: _InteractiveInsightCard(
                 title: 'Activation',
-                description: 'Yogas manifest during their planetary Dasha periods.',
+                description:
+                    'Yogas manifest during their planetary Dasha periods.',
                 icon: Icons.schedule_rounded,
                 color: _Colors.emerald,
               ),
@@ -2955,7 +2891,8 @@ class _InsightsGrid extends StatelessWidget {
             Expanded(
               child: _InteractiveInsightCard(
                 title: 'Strength',
-                description: 'Planet placement determines yoga manifestation level.',
+                description:
+                    'Planet placement determines yoga manifestation level.',
                 icon: Icons.fitness_center_rounded,
                 color: _Colors.amber,
               ),
@@ -2964,7 +2901,8 @@ class _InsightsGrid extends StatelessWidget {
             Expanded(
               child: _InteractiveInsightCard(
                 title: 'Remedies',
-                description: 'Most doshas can be mitigated through proper remedies.',
+                description:
+                    'Most doshas can be mitigated through proper remedies.',
                 icon: Icons.healing_outlined,
                 color: _Colors.sky,
               ),
@@ -2976,7 +2914,8 @@ class _InsightsGrid extends StatelessWidget {
           if (hasKaalSarp)
             _InteractiveRemedyCard(
               title: 'Kaal Sarp Remedy',
-              description: 'Trimbakeshwar Puja recommended. Chant Maha Mrityunjaya Mantra 108 times daily.',
+              description:
+                  'Trimbakeshwar Puja recommended. Chant Maha Mrityunjaya Mantra 108 times daily.',
               icon: Icons.auto_fix_high_rounded,
               color: _Colors.coral,
               doshaType: 'Kaal Sarp Dosha',
@@ -2985,7 +2924,8 @@ class _InsightsGrid extends StatelessWidget {
             const SizedBox(height: 10),
             _InteractiveRemedyCard(
               title: 'Manglik Remedy',
-              description: 'Perform Mangal Shanti Puja. Recite Hanuman Chalisa on Tuesdays.',
+              description:
+                  'Perform Mangal Shanti Puja. Recite Hanuman Chalisa on Tuesdays.',
               icon: Icons.auto_fix_high_rounded,
               color: _Colors.coral,
               doshaType: 'Manglik Dosha',
@@ -3011,7 +2951,8 @@ class _InteractiveInsightCard extends StatefulWidget {
   });
 
   @override
-  State<_InteractiveInsightCard> createState() => _InteractiveInsightCardState();
+  State<_InteractiveInsightCard> createState() =>
+      _InteractiveInsightCardState();
 }
 
 class _InteractiveInsightCardState extends State<_InteractiveInsightCard> {
@@ -3026,7 +2967,11 @@ class _InteractiveInsightCardState extends State<_InteractiveInsightCard> {
         HapticFeedback.selectionClick();
         _showInsightSheet(
           context,
-          _getInsightCardInsight(widget.title, widget.description, widget.color),
+          _getInsightCardInsight(
+            widget.title,
+            widget.description,
+            widget.color,
+          ),
         );
       },
       onTapCancel: () => setState(() => _isPressed = false),
@@ -3040,15 +2985,16 @@ class _InteractiveInsightCardState extends State<_InteractiveInsightCard> {
             color: widget.color.withOpacity(_isPressed ? 0.35 : 0.15),
             width: _isPressed ? 1 : 0.5,
           ),
-          boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: widget.color.withOpacity(0.12),
-                    blurRadius: 10,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : null,
+          boxShadow:
+              _isPressed
+                  ? [
+                    BoxShadow(
+                      color: widget.color.withOpacity(0.12),
+                      blurRadius: 10,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -3061,15 +3007,16 @@ class _InteractiveInsightCardState extends State<_InteractiveInsightCard> {
                   decoration: BoxDecoration(
                     color: widget.color.withOpacity(_isPressed ? 0.2 : 0.12),
                     borderRadius: BorderRadius.circular(8),
-                    boxShadow: _isPressed
-                        ? [
-                            BoxShadow(
-                              color: widget.color.withOpacity(0.2),
-                              blurRadius: 6,
-                              spreadRadius: -2,
-                            ),
-                          ]
-                        : null,
+                    boxShadow:
+                        _isPressed
+                            ? [
+                              BoxShadow(
+                                color: widget.color.withOpacity(0.2),
+                                blurRadius: 6,
+                                spreadRadius: -2,
+                              ),
+                            ]
+                            : null,
                   ),
                   child: Icon(widget.icon, size: 14, color: widget.color),
                 ),
@@ -3144,25 +3091,27 @@ class _InteractiveRemedyCardState extends State<_InteractiveRemedyCard> {
           InsightData(
             title: 'Dosha Remedy',
             value: widget.doshaType,
-            description: widget.doshaType == 'Kaal Sarp Dosha'
-                ? 'Kaal Sarp Dosha occurs when all planets are hemmed between Rahu and Ketu. This can cause delays, obstacles, and sudden changes in life. However, with proper remedies, its effects can be significantly reduced.'
-                : 'Manglik Dosha occurs when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. It primarily affects marriage and relationships but can be effectively remedied.',
+            description:
+                widget.doshaType == 'Kaal Sarp Dosha'
+                    ? 'Kaal Sarp Dosha occurs when all planets are hemmed between Rahu and Ketu. This can cause delays, obstacles, and sudden changes in life. However, with proper remedies, its effects can be significantly reduced.'
+                    : 'Manglik Dosha occurs when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. It primarily affects marriage and relationships but can be effectively remedied.',
             significance: widget.description,
-            keyPoints: widget.doshaType == 'Kaal Sarp Dosha'
-                ? [
-                    'Visit Trimbakeshwar for Kaal Sarp Puja',
-                    'Chant Maha Mrityunjaya Mantra 108 times daily',
-                    'Offer milk to Shivling on Mondays',
-                    'Keep a snake made of silver in your home',
-                    'Donate to the needy on Saturdays',
-                  ]
-                : [
-                    'Perform Mangal Shanti Puja',
-                    'Recite Hanuman Chalisa on Tuesdays',
-                    'Fast on Tuesdays',
-                    'Wear Red Coral gemstone (after consultation)',
-                    'Donate red items on Tuesdays',
-                  ],
+            keyPoints:
+                widget.doshaType == 'Kaal Sarp Dosha'
+                    ? [
+                      'Visit Trimbakeshwar for Kaal Sarp Puja',
+                      'Chant Maha Mrityunjaya Mantra 108 times daily',
+                      'Offer milk to Shivling on Mondays',
+                      'Keep a snake made of silver in your home',
+                      'Donate to the needy on Saturdays',
+                    ]
+                    : [
+                      'Perform Mangal Shanti Puja',
+                      'Recite Hanuman Chalisa on Tuesdays',
+                      'Fast on Tuesdays',
+                      'Wear Red Coral gemstone (after consultation)',
+                      'Donate red items on Tuesdays',
+                    ],
             accentColor: widget.color,
             icon: widget.icon,
           ),
@@ -3184,15 +3133,16 @@ class _InteractiveRemedyCardState extends State<_InteractiveRemedyCard> {
             color: widget.color.withOpacity(_isPressed ? 0.4 : 0.2),
             width: _isPressed ? 1 : 0.5,
           ),
-          boxShadow: _isPressed
-              ? [
-                  BoxShadow(
-                    color: widget.color.withOpacity(0.15),
-                    blurRadius: 12,
-                    spreadRadius: -2,
-                  ),
-                ]
-              : null,
+          boxShadow:
+              _isPressed
+                  ? [
+                    BoxShadow(
+                      color: widget.color.withOpacity(0.15),
+                      blurRadius: 12,
+                      spreadRadius: -2,
+                    ),
+                  ]
+                  : null,
         ),
         child: Row(
           children: [
@@ -3202,15 +3152,16 @@ class _InteractiveRemedyCardState extends State<_InteractiveRemedyCard> {
               decoration: BoxDecoration(
                 color: widget.color.withOpacity(_isPressed ? 0.25 : 0.15),
                 borderRadius: BorderRadius.circular(10),
-                boxShadow: _isPressed
-                    ? [
-                        BoxShadow(
-                          color: widget.color.withOpacity(0.25),
-                          blurRadius: 8,
-                          spreadRadius: -2,
-                        ),
-                      ]
-                    : null,
+                boxShadow:
+                    _isPressed
+                        ? [
+                          BoxShadow(
+                            color: widget.color.withOpacity(0.25),
+                            blurRadius: 8,
+                            spreadRadius: -2,
+                          ),
+                        ]
+                        : null,
               ),
               child: Icon(widget.icon, size: 18, color: widget.color),
             ),
@@ -3293,6 +3244,46 @@ String _getPlanetSymbol(String planet) {
   return symbols[planet] ?? '•';
 }
 
+Color _getZodiacColor(String sign) {
+  const colors = {
+    'Aries': Color(0xFFEE5A5A),
+    'Taurus': Color(0xFF4ADE80),
+    'Gemini': Color(0xFFFFD93D),
+    'Cancer': Color(0xFFF5F5F5),
+    'Leo': Color(0xFFFF9F43),
+    'Virgo': Color(0xFF26DE81),
+    'Libra': Color(0xFFFF6B9D),
+    'Scorpio': Color(0xFFEE5A5A),
+    'Sagittarius': Color(0xFFFFD93D),
+    'Capricorn': Color(0xFF5C7AEA),
+    'Aquarius': Color(0xFF5C7AEA),
+    'Pisces': Color(0xFF9C88FF),
+  };
+  return colors[sign] ?? const Color(0xFFA09CAC);
+}
+
+String _getZodiacImagePath(String sign) {
+  return 'assets/images/zodiac/${sign.toLowerCase()}.png';
+}
+
+String _getSignSymbol(String sign) {
+  const symbols = {
+    'Aries': '♈',
+    'Taurus': '♉',
+    'Gemini': '♊',
+    'Cancer': '♋',
+    'Leo': '♌',
+    'Virgo': '♍',
+    'Libra': '♎',
+    'Scorpio': '♏',
+    'Sagittarius': '♐',
+    'Capricorn': '♑',
+    'Aquarius': '♒',
+    'Pisces': '♓',
+  };
+  return symbols[sign] ?? '?';
+}
+
 Map<String, String> _getYogaInfo(String yogaName, bool isDosha) {
   final yogaInfoMap = {
     'Hamsa Yoga': {'type': 'Pancha Mahapurusha'},
@@ -3332,7 +3323,8 @@ Map<String, String> _getFullYogaDetails(String yogaName, bool isDosha) {
       'type': 'Raja Yoga',
       'description':
           'One of the most auspicious yogas, formed when Jupiter is in a Kendra from the Moon.',
-      'effects': 'Grants wisdom, intelligence, excellent reputation, wealth, and leadership.',
+      'effects':
+          'Grants wisdom, intelligence, excellent reputation, wealth, and leadership.',
       'remedies':
           'Worship Lord Ganesha and Jupiter, chant Guru mantras on Thursdays.',
     },
@@ -3347,7 +3339,8 @@ Map<String, String> _getFullYogaDetails(String yogaName, bool isDosha) {
     'Kaal Sarp Dosha': {
       'type': 'Major Dosha',
       'description': 'All planets hemmed between Rahu and Ketu axis.',
-      'effects': 'May bring sudden ups and downs, struggles, delays in success.',
+      'effects':
+          'May bring sudden ups and downs, struggles, delays in success.',
       'remedies':
           'Visit Trimbakeshwar for Kaal Sarp Puja, chant Maha Mrityunjaya Mantra.',
     },
@@ -3356,14 +3349,17 @@ Map<String, String> _getFullYogaDetails(String yogaName, bool isDosha) {
   return detailsMap[yogaName] ??
       {
         'type': isDosha ? 'Dosha' : 'Benefic Yoga',
-        'description': isDosha
-            ? 'This dosha indicates certain karmic patterns creating challenges.'
-            : 'This yoga indicates beneficial combinations enhancing life areas.',
-        'effects': isDosha
-            ? 'Effects vary based on planet strength and placement.'
-            : 'Benefits manifest according to overall chart strength.',
-        'remedies': isDosha
-            ? 'Consult an astrologer for personalized remedies.'
-            : 'Strengthen involved planets through mantras and gemstones.',
+        'description':
+            isDosha
+                ? 'This dosha indicates certain karmic patterns creating challenges.'
+                : 'This yoga indicates beneficial combinations enhancing life areas.',
+        'effects':
+            isDosha
+                ? 'Effects vary based on planet strength and placement.'
+                : 'Benefits manifest according to overall chart strength.',
+        'remedies':
+            isDosha
+                ? 'Consult an astrologer for personalized remedies.'
+                : 'Strengthen involved planets through mantras and gemstones.',
       };
 }

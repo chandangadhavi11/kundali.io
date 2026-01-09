@@ -752,7 +752,7 @@ class _RefinedCharProgressBar extends StatelessWidget {
     final lightColor = Color.lerp(baseColor, Colors.white, 0.35)!;
     final paleColor = Color.lerp(baseColor, Colors.white, 0.55)!;
     final clampedProgress = progress.clamp(0.0, 1.0);
-    
+
     return Container(
       height: 3,
       decoration: BoxDecoration(
@@ -1525,9 +1525,9 @@ class _CharTimelineItem extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PERIOD ITEMS
+// PERIOD ITEMS - Premium Minimal Design
 // ═══════════════════════════════════════════════════════════════════════════
-class _CharPeriodItem extends StatelessWidget {
+class _CharPeriodItem extends StatefulWidget {
   final CharaPeriodDetail periodDetail;
   final int index;
   final bool isCurrent;
@@ -1543,131 +1543,300 @@ class _CharPeriodItem extends StatelessWidget {
   });
 
   @override
+  State<_CharPeriodItem> createState() => _CharPeriodItemState();
+}
+
+class _CharPeriodItemState extends State<_CharPeriodItem> {
+  bool _isPressed = false;
+
+  String _getSignLord(String sign) {
+    const lords = {
+      'Aries': 'Mars',
+      'Taurus': 'Venus',
+      'Gemini': 'Mercury',
+      'Cancer': 'Moon',
+      'Leo': 'Sun',
+      'Virgo': 'Mercury',
+      'Libra': 'Venus',
+      'Scorpio': 'Mars',
+      'Sagittarius': 'Jupiter',
+      'Capricorn': 'Saturn',
+      'Aquarius': 'Saturn',
+      'Pisces': 'Jupiter',
+    };
+    return lords[sign] ?? 'Unknown';
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final signColor = getSignColor(periodDetail.sign);
+    final signColor = getSignColor(widget.periodDetail.sign);
+    final lordPlanet =
+        widget.periodDetail.signLord ?? _getSignLord(widget.periodDetail.sign);
+    final lordColor = getPlanetColor(lordPlanet);
+    final opacity = widget.isPast && !widget.isCurrent ? 0.6 : 1.0;
 
     return GestureDetector(
-      onTap: () => _showCharPeriodSheet(context, periodDetail, isClockwise),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.all(12),
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+        showCharPeriodBottomSheet(
+          context,
+          widget.periodDetail,
+          [],
+          widget.isClockwise,
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        margin: const EdgeInsets.only(bottom: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: isCurrent ? signColor.withOpacity(0.08) : DashaColors.surface,
-          borderRadius: BorderRadius.circular(DashaDesignTokens.radiusMd),
-          border: Border.all(
-            color:
-                isCurrent
-                    ? signColor.withOpacity(0.3)
-                    : DashaColors.border.withOpacity(isPast ? 0.15 : 0.3),
-            width: isCurrent ? 1.5 : 0.5,
-          ),
+          color:
+              _isPressed
+                  ? const Color(0xFF1A1820)
+                  : widget.isCurrent
+                  ? const Color(0xFF161420)
+                  : const Color(0xFF141218),
+          borderRadius: BorderRadius.circular(14),
+          border:
+              widget.isCurrent
+                  ? Border.all(color: signColor.withOpacity(0.25), width: 1)
+                  : null,
         ),
         child: Row(
           children: [
+            // Zodiac sign image
             Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                color: signColor.withOpacity(isCurrent ? 0.2 : 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Center(
-                child: Text(
-                  getSignSymbol(periodDetail.sign),
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: isPast ? signColor.withOpacity(0.5) : signColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: signColor.withOpacity(
+                      widget.isCurrent ? 0.25 : 0.15,
+                    ),
+                    blurRadius: widget.isCurrent ? 12 : 8,
+                    spreadRadius: -2,
                   ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  getZodiacImagePath(widget.periodDetail.sign),
+                  width: 44,
+                  height: 44,
+                  fit: BoxFit.cover,
+                  opacity: AlwaysStoppedAnimation(opacity),
+                  errorBuilder:
+                      (_, __, ___) => Container(
+                        color: signColor.withOpacity(0.15),
+                        child: Center(
+                          child: Text(
+                            getSignSymbol(widget.periodDetail.sign),
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: signColor.withOpacity(opacity),
+                            ),
+                          ),
+                        ),
+                      ),
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
+
+            // Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Sign name with status
                   Row(
                     children: [
                       Text(
-                        periodDetail.sign,
+                        widget.periodDetail.sign,
                         style: GoogleFonts.inter(
-                          fontSize: 14,
+                          fontSize: 15,
                           fontWeight:
-                              isCurrent ? FontWeight.w700 : FontWeight.w600,
+                              widget.isCurrent
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
                           color:
-                              isPast
-                                  ? DashaColors.textTertiary
-                                  : DashaColors.textPrimary,
+                              widget.isPast
+                                  ? const Color(0xFF7A7786)
+                                  : Colors.white,
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      if (isCurrent) const ActiveNowBadge(fontSize: 7),
-                      if (isPast && !isCurrent)
+                      if (widget.isPast && !widget.isCurrent) ...[
+                        const SizedBox(width: 6),
                         Icon(
-                          Icons.check_circle_rounded,
-                          size: 14,
-                          color: DashaColors.textTertiary.withOpacity(0.4),
+                          Icons.check_rounded,
+                          size: 12,
+                          color: const Color(0xFF4ADE80).withOpacity(0.5),
                         ),
+                      ],
+                      if (widget.isCurrent) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1A3A2A),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 4,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF4ADE80),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'NOW',
+                                style: GoogleFonts.inter(
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF4ADE80),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
-                  if (periodDetail.signLord != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      'Lord: ${periodDetail.signLord}',
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        color: signColor.withOpacity(0.8),
+
+                  const SizedBox(height: 4),
+
+                  // Lord with planet image
+                  Row(
+                    children: [
+                      Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          boxShadow: [
+                            BoxShadow(
+                              color: lordColor.withOpacity(0.25),
+                              blurRadius: 4,
+                              spreadRadius: -1,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: Image.asset(
+                            getPlanetImagePath(lordPlanet),
+                            width: 14,
+                            height: 14,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (_, __, ___) => Container(
+                                  color: lordColor.withOpacity(0.2),
+                                  child: Center(
+                                    child: Text(
+                                      getPlanetSymbol(lordPlanet),
+                                      style: TextStyle(
+                                        fontSize: 8,
+                                        color: lordColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
-                  const SizedBox(height: 2),
-                  Text(
-                    '${formatDateShort(periodDetail.startDate)} → ${formatDateShort(periodDetail.endDate)}',
-                    style: GoogleFonts.jetBrainsMono(
-                      fontSize: 10,
-                      color: DashaColors.textTertiary,
-                    ),
+                      const SizedBox(width: 5),
+                      Text(
+                        lordPlanet,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: lordColor.withOpacity(
+                            widget.isPast ? 0.6 : 0.9,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 3,
+                        height: 3,
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4A4858),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      Text(
+                        '${formatDateShort(widget.periodDetail.startDate)} → ${formatDateShort(widget.periodDetail.endDate)}',
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 9,
+                          color: const Color(0xFF6A6778),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
+
+            // Duration badge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: signColor.withOpacity(isPast ? 0.05 : 0.1),
+                color:
+                    widget.isCurrent
+                        ? signColor.withOpacity(0.12)
+                        : const Color(0xFF1A1820),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                '${periodDetail.durationYears.round()}y',
+                '${widget.periodDetail.durationYears.round()}y',
                 style: GoogleFonts.jetBrainsMono(
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.w600,
-                  color: isPast ? DashaColors.textTertiary : signColor,
+                  color:
+                      widget.isPast
+                          ? const Color(0xFF6A6778)
+                          : widget.isCurrent
+                          ? signColor
+                          : const Color(0xFF9A97A6),
                 ),
               ),
             ),
-            const SizedBox(width: 8),
-            Icon(
-              Icons.chevron_right_rounded,
-              size: 18,
-              color: DashaColors.textTertiary.withOpacity(0.4),
+
+            const SizedBox(width: 6),
+
+            // Arrow
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 100),
+              opacity: _isPressed ? 1.0 : 0.4,
+              child: Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: const Color(0xFF6A6778),
+              ),
             ),
           ],
         ),
       ),
     );
   }
-
-  void _showCharPeriodSheet(
-    BuildContext context,
-    CharaPeriodDetail period,
-    bool isClockwise,
-  ) {
-    showCharPeriodBottomSheet(context, period, [], isClockwise);
-  }
 }
 
-class _CharPeriodItemFallback extends StatelessWidget {
+class _CharPeriodItemFallback extends StatefulWidget {
   final CharaPeriod period;
   final int index;
   final bool isCurrent;
@@ -1685,94 +1854,288 @@ class _CharPeriodItemFallback extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final signColor = getSignColor(period.sign);
+  State<_CharPeriodItemFallback> createState() =>
+      _CharPeriodItemFallbackState();
+}
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isCurrent ? signColor.withOpacity(0.08) : DashaColors.surface,
-        borderRadius: BorderRadius.circular(DashaDesignTokens.radiusMd),
-        border: Border.all(
+class _CharPeriodItemFallbackState extends State<_CharPeriodItemFallback> {
+  bool _isPressed = false;
+
+  String _getSignLord(String sign) {
+    const lords = {
+      'Aries': 'Mars',
+      'Taurus': 'Venus',
+      'Gemini': 'Mercury',
+      'Cancer': 'Moon',
+      'Leo': 'Sun',
+      'Virgo': 'Mercury',
+      'Libra': 'Venus',
+      'Scorpio': 'Mars',
+      'Sagittarius': 'Jupiter',
+      'Capricorn': 'Saturn',
+      'Aquarius': 'Saturn',
+      'Pisces': 'Jupiter',
+    };
+    return lords[sign] ?? 'Unknown';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final signColor = getSignColor(widget.period.sign);
+    final lordPlanet = _getSignLord(widget.period.sign);
+    final lordColor = getPlanetColor(lordPlanet);
+    final opacity = widget.isPast && !widget.isCurrent ? 0.6 : 1.0;
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.selectionClick();
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        margin: const EdgeInsets.only(bottom: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
           color:
-              isCurrent
-                  ? signColor.withOpacity(0.3)
-                  : DashaColors.border.withOpacity(isPast ? 0.15 : 0.3),
-          width: isCurrent ? 1.5 : 0.5,
+              _isPressed
+                  ? const Color(0xFF1A1820)
+                  : widget.isCurrent
+                  ? const Color(0xFF161420)
+                  : const Color(0xFF141218),
+          borderRadius: BorderRadius.circular(14),
+          border:
+              widget.isCurrent
+                  ? Border.all(color: signColor.withOpacity(0.25), width: 1)
+                  : null,
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: signColor.withOpacity(isCurrent ? 0.2 : 0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: Text(
-                getSignSymbol(period.sign),
-                style: TextStyle(
-                  fontSize: 18,
-                  color: isPast ? signColor.withOpacity(0.5) : signColor,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      period.sign,
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        fontWeight:
-                            isCurrent ? FontWeight.w700 : FontWeight.w600,
-                        color:
-                            isPast
-                                ? DashaColors.textTertiary
-                                : DashaColors.textPrimary,
-                      ),
+        child: Row(
+          children: [
+            // Zodiac sign image
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: signColor.withOpacity(
+                      widget.isCurrent ? 0.25 : 0.15,
                     ),
-                    if (isCurrent) ...[
-                      const SizedBox(width: 8),
-                      const ActiveNowBadge(fontSize: 7),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${formatDateShort(startDate)} → ${formatDateShort(endDate)}',
-                  style: GoogleFonts.jetBrainsMono(
-                    fontSize: 10,
-                    color: DashaColors.textTertiary,
+                    blurRadius: widget.isCurrent ? 12 : 8,
+                    spreadRadius: -2,
                   ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  getZodiacImagePath(widget.period.sign),
+                  width: 44,
+                  height: 44,
+                  fit: BoxFit.cover,
+                  opacity: AlwaysStoppedAnimation(opacity),
+                  errorBuilder:
+                      (_, __, ___) => Container(
+                        color: signColor.withOpacity(0.15),
+                        child: Center(
+                          child: Text(
+                            getSignSymbol(widget.period.sign),
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: signColor.withOpacity(opacity),
+                            ),
+                          ),
+                        ),
+                      ),
                 ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: signColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '${period.years}y',
-              style: GoogleFonts.jetBrainsMono(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: signColor,
               ),
             ),
-          ),
-        ],
+            const SizedBox(width: 14),
+
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Sign name with status
+                  Row(
+                    children: [
+                      Text(
+                        widget.period.sign,
+                        style: GoogleFonts.inter(
+                          fontSize: 15,
+                          fontWeight:
+                              widget.isCurrent
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
+                          color:
+                              widget.isPast
+                                  ? const Color(0xFF7A7786)
+                                  : Colors.white,
+                        ),
+                      ),
+                      if (widget.isPast && !widget.isCurrent) ...[
+                        const SizedBox(width: 6),
+                        Icon(
+                          Icons.check_rounded,
+                          size: 12,
+                          color: const Color(0xFF4ADE80).withOpacity(0.5),
+                        ),
+                      ],
+                      if (widget.isCurrent) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1A3A2A),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 4,
+                                height: 4,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF4ADE80),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'NOW',
+                                style: GoogleFonts.inter(
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF4ADE80),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  // Lord with planet image
+                  Row(
+                    children: [
+                      Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          boxShadow: [
+                            BoxShadow(
+                              color: lordColor.withOpacity(0.25),
+                              blurRadius: 4,
+                              spreadRadius: -1,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: Image.asset(
+                            getPlanetImagePath(lordPlanet),
+                            width: 14,
+                            height: 14,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (_, __, ___) => Container(
+                                  color: lordColor.withOpacity(0.2),
+                                  child: Center(
+                                    child: Text(
+                                      getPlanetSymbol(lordPlanet),
+                                      style: TextStyle(
+                                        fontSize: 8,
+                                        color: lordColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        lordPlanet,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: lordColor.withOpacity(
+                            widget.isPast ? 0.6 : 0.9,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: 3,
+                        height: 3,
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4A4858),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      Text(
+                        '${formatDateShort(widget.startDate)} → ${formatDateShort(widget.endDate)}',
+                        style: GoogleFonts.jetBrainsMono(
+                          fontSize: 9,
+                          color: const Color(0xFF6A6778),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            // Duration badge
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color:
+                    widget.isCurrent
+                        ? signColor.withOpacity(0.12)
+                        : const Color(0xFF1A1820),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '${widget.period.years}y',
+                style: GoogleFonts.jetBrainsMono(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color:
+                      widget.isPast
+                          ? const Color(0xFF6A6778)
+                          : widget.isCurrent
+                          ? signColor
+                          : const Color(0xFF9A97A6),
+                ),
+              ),
+            ),
+
+            const SizedBox(width: 6),
+
+            // Arrow
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 100),
+              opacity: _isPressed ? 1.0 : 0.4,
+              child: Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: const Color(0xFF6A6778),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

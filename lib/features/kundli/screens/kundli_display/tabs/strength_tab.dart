@@ -3762,7 +3762,7 @@ class _InteractiveVimshopakaPlanetRowState
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ASHTAKAVARGA COMPONENTS
+// ASHTAKAVARGA COMPONENTS - Elegant Minimal Design
 // ═══════════════════════════════════════════════════════════════════════════
 class _AshtakavargaSummaryCard extends StatefulWidget {
   final Map<String, List<int>> ashtakavarga;
@@ -3857,93 +3857,95 @@ class _AshtakavargaSummaryCardState extends State<_AshtakavargaSummaryCard> {
       },
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
+        duration: const Duration(milliseconds: 120),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: _Colors.emerald.withOpacity(_isPressed ? 0.12 : 0.06),
-          borderRadius: BorderRadius.circular(_DesignTokens.radiusMd),
-          border: Border.all(
-            color: _Colors.emerald.withOpacity(_isPressed ? 0.3 : 0.15),
-            width: _isPressed ? 1 : 0.5,
-          ),
-          boxShadow:
-              _isPressed
-                  ? [
-                    BoxShadow(
-                      color: _Colors.emerald.withOpacity(0.15),
-                      blurRadius: 10,
-                      spreadRadius: -2,
-                    ),
-                  ]
-                  : null,
+          color: _isPressed ? const Color(0xFF1A1820) : const Color(0xFF141218),
+          borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
           children: [
-            Row(
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 100),
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: _Colors.emerald.withOpacity(_isPressed ? 0.2 : 0.12),
-                    borderRadius: BorderRadius.circular(6),
+            // Minimal info hint row
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Text(
+                    'Points 0-8 per sign',
+                    style: GoogleFonts.inter(
+                      fontSize: 9,
+                      color: const Color(0xFF5A5766),
+                    ),
                   ),
-                  child: Icon(
-                    Icons.info_outline_rounded,
-                    size: 12,
-                    color: _Colors.emerald,
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    width: 3,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF3A3846),
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Tap for detailed explanation',
-                        style: GoogleFonts.inter(
-                          fontSize: 8,
-                          color: _Colors.emerald.withOpacity(0.7),
-                        ),
-                      ),
-                      Text(
-                        'Points 0-8 per sign · ≥4 Auspicious · SAV ≥28 Strong',
-                        style: GoogleFonts.inter(
-                          fontSize: 9,
-                          color: _Colors.textTertiary,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    '≥4 Good',
+                    style: GoogleFonts.inter(
+                      fontSize: 9,
+                      color: const Color(0xFF5A5766),
+                    ),
                   ),
-                ),
-              ],
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    width: 3,
+                    height: 3,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF3A3846),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Text(
+                    'SAV ≥28 Strong',
+                    style: GoogleFonts.inter(
+                      fontSize: 9,
+                      color: const Color(0xFF5A5766),
+                    ),
+                  ),
+                  const Spacer(),
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 100),
+                    opacity: _isPressed ? 1.0 : 0.4,
+                    child: Icon(
+                      Icons.info_outline_rounded,
+                      size: 12,
+                      color: const Color(0xFF6A6778),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 12),
+            // Summary stats row
             Row(
               children: [
                 Expanded(
-                  child: _InteractiveSavHighlight(
+                  child: _MinimalSavStat(
                     label: 'Strongest',
                     sign: _signs[maxIndex],
                     signSymbol: _signSymbols[maxIndex],
                     points: maxSav,
-                    icon: Icons.arrow_upward_rounded,
-                    color: _Colors.emerald,
+                    isPositive: true,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _InteractiveSavHighlight(
+                  child: _MinimalSavStat(
                     label: 'Weakest',
                     sign: _signs[minIndex],
                     signSymbol: _signSymbols[minIndex],
                     points: minSav,
-                    icon: Icons.arrow_downward_rounded,
-                    color: _Colors.coral,
+                    isPositive: false,
                   ),
                 ),
                 const SizedBox(width: 8),
-                Expanded(child: _InteractiveTotalSav(totalSav: totalSav)),
+                Expanded(child: _MinimalTotalSav(totalSav: totalSav)),
               ],
             ),
           ],
@@ -3953,6 +3955,254 @@ class _AshtakavargaSummaryCardState extends State<_AshtakavargaSummaryCard> {
   }
 }
 
+// Minimal SAV Stat Card with Zodiac Image
+class _MinimalSavStat extends StatefulWidget {
+  final String label;
+  final String sign;
+  final String signSymbol;
+  final int points;
+  final bool isPositive;
+
+  const _MinimalSavStat({
+    required this.label,
+    required this.sign,
+    required this.signSymbol,
+    required this.points,
+    required this.isPositive,
+  });
+
+  @override
+  State<_MinimalSavStat> createState() => _MinimalSavStatState();
+}
+
+class _MinimalSavStatState extends State<_MinimalSavStat> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = widget.isPositive ? _Colors.emerald : _Colors.coral;
+    final signColor = _getZodiacColor(widget.sign);
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.lightImpact();
+        _showInsightSheet(
+          context,
+          _getAshtakavargaInsight(
+            '${widget.signSymbol} ${widget.sign}',
+            widget.points,
+            'SAV',
+          ),
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+        decoration: BoxDecoration(
+          color: _isPressed ? const Color(0xFF1E1C24) : const Color(0xFF0F0D14),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          children: [
+            // Label row with arrow
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  widget.isPositive ? '↑' : '↓',
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: color.withOpacity(0.7),
+                  ),
+                ),
+                const SizedBox(width: 3),
+                Text(
+                  widget.label,
+                  style: GoogleFonts.inter(
+                    fontSize: 9,
+                    color: const Color(0xFF6A6778),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            // Zodiac image with sign name
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 22,
+                  height: 22,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    boxShadow: [
+                      BoxShadow(
+                        color: signColor.withOpacity(_isPressed ? 0.3 : 0.15),
+                        blurRadius: _isPressed ? 6 : 4,
+                        spreadRadius: -1,
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Image.asset(
+                      _getZodiacImagePath(widget.sign),
+                      width: 22,
+                      height: 22,
+                      fit: BoxFit.cover,
+                      errorBuilder:
+                          (_, __, ___) => Container(
+                            color: signColor.withOpacity(0.15),
+                            child: Center(
+                              child: Text(
+                                widget.signSymbol,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: signColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    widget.sign,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: _Colors.textPrimary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            // Points
+            Text(
+              '${widget.points} pts',
+              style: GoogleFonts.jetBrainsMono(
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Minimal Total SAV Card
+class _MinimalTotalSav extends StatefulWidget {
+  final int totalSav;
+
+  const _MinimalTotalSav({required this.totalSav});
+
+  @override
+  State<_MinimalTotalSav> createState() => _MinimalTotalSavState();
+}
+
+class _MinimalTotalSavState extends State<_MinimalTotalSav> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.lightImpact();
+        _showInsightSheet(
+          context,
+          InsightData(
+            title: 'Total Sarvashtakavarga',
+            value: '${widget.totalSav} Points',
+            description:
+                'The Total SAV is the sum of all Sarvashtakavarga points across all 12 signs. Maximum possible is 337 points. A higher total indicates overall stronger chart for transits.',
+            significance:
+                'Your total SAV of ${widget.totalSav} points ${widget.totalSav >= 300
+                    ? "is excellent, indicating a strong overall chart"
+                    : widget.totalSav >= 250
+                    ? "is good, showing balanced strength"
+                    : "suggests focusing on beneficial transit periods"}.',
+            keyPoints: [
+              'Total SAV: ${widget.totalSav} points',
+              'Maximum possible: 337 points',
+              'Calculation: Sum of all 12 sign SAV values',
+              'Higher = Better overall transit strength',
+            ],
+            accentColor: _Colors.sky,
+            icon: Icons.functions_rounded,
+          ),
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+        decoration: BoxDecoration(
+          color: _isPressed ? const Color(0xFF1E1C24) : const Color(0xFF0F0D14),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          children: [
+            // Label row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Σ',
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: _Colors.sky.withOpacity(0.7),
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Total SAV',
+                  style: GoogleFonts.inter(
+                    fontSize: 9,
+                    color: const Color(0xFF6A6778),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            // Total value
+            Text(
+              '${widget.totalSav}',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: _Colors.sky,
+                letterSpacing: -0.5,
+              ),
+            ),
+            Text(
+              'points',
+              style: GoogleFonts.inter(
+                fontSize: 8,
+                color: const Color(0xFF5A5766),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Legacy widgets kept for backward compatibility
 class _InteractiveSavHighlight extends StatefulWidget {
   final String label;
   final String sign;
@@ -4177,6 +4427,9 @@ class _InteractiveTotalSavState extends State<_InteractiveTotalSav> {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// ASHTAKAVARGA HEATMAP - Premium Design with Images
+// ═══════════════════════════════════════════════════════════════════════════
 class _AshtakavargaHeatmap extends StatelessWidget {
   final Map<String, List<int>> ashtakavarga;
   final List<int> sav;
@@ -4213,20 +4466,22 @@ class _AshtakavargaHeatmap extends StatelessWidget {
     '♓',
   ];
 
-  Color _getHeatmapColor(int value) {
-    if (value >= 6) return _Colors.emerald;
-    if (value >= 4) return _Colors.emerald.withOpacity(0.4);
-    if (value >= 3) return _Colors.amber.withOpacity(0.3);
-    if (value >= 2) return _Colors.coral.withOpacity(0.2);
-    return _Colors.coral.withOpacity(0.1);
+  // Simplified heatmap colors - more subtle gradient
+  Color _getCellColor(int value) {
+    if (value >= 6) return const Color(0xFF4ADE80); // Strong green
+    if (value >= 4) return const Color(0xFF6B8E5C); // Muted olive green
+    if (value >= 3) return const Color(0xFF7A7258); // Warm neutral
+    if (value >= 2) return const Color(0xFF6A5D5D); // Muted brown
+    return const Color(0xFF4A4555); // Dark neutral
   }
 
-  Color _getSavColor(int value) {
-    if (value >= 30) return _Colors.emerald;
-    if (value >= 28) return _Colors.emerald.withOpacity(0.6);
-    if (value >= 25) return _Colors.amber.withOpacity(0.4);
-    if (value >= 22) return _Colors.coral.withOpacity(0.3);
-    return _Colors.coral.withOpacity(0.15);
+  // SAV row colors
+  Color _getSavCellColor(int value) {
+    if (value >= 30) return const Color(0xFF4ADE80);
+    if (value >= 28) return const Color(0xFF6B8E5C);
+    if (value >= 25) return const Color(0xFF7A7258);
+    if (value >= 22) return const Color(0xFF6A5D5D);
+    return const Color(0xFF4A4555);
   }
 
   @override
@@ -4235,79 +4490,130 @@ class _AshtakavargaHeatmap extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: _Colors.surface.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(_DesignTokens.radiusLg),
-        border: Border.all(color: _Colors.border.withOpacity(0.3), width: 0.5),
+        color: const Color(0xFF0D0B12),
+        borderRadius: BorderRadius.circular(14),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          // Header row with signs
+          // Header row with zodiac images
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            decoration: BoxDecoration(
-              color: _Colors.surface.withOpacity(0.5),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(_DesignTokens.radiusLg),
-                topRight: Radius.circular(_DesignTokens.radiusLg),
-              ),
-            ),
+            padding: const EdgeInsets.fromLTRB(6, 10, 6, 8),
             child: Row(
               children: [
-                const SizedBox(width: 40),
-                ..._signs.map(
-                  (s) => Expanded(
+                const SizedBox(width: 38),
+                ..._signNames.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final signName = entry.value;
+                  final signColor = _getZodiacColor(signName);
+                  return Expanded(
                     child: Center(
-                      child: Text(
-                        s,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: _Colors.textTertiary,
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: signColor.withOpacity(0.15),
+                              blurRadius: 4,
+                              spreadRadius: -1,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(5),
+                          child: Image.asset(
+                            _getZodiacImagePath(signName),
+                            width: 20,
+                            height: 20,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (_, __, ___) => Container(
+                                  color: signColor.withOpacity(0.15),
+                                  child: Center(
+                                    child: Text(
+                                      _signs[index],
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        color: signColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
+                  );
+                }),
               ],
             ),
           ),
 
-          // Data rows
+          // Data rows with planet images
           ...planets.map((planet) {
             final values = ashtakavarga[planet]!;
+            final planetColor = _getPlanetColor(planet);
             return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: _Colors.border.withOpacity(0.15),
-                    width: 0.5,
-                  ),
-                ),
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
               child: Row(
                 children: [
+                  // Planet image + abbreviated name
                   SizedBox(
-                    width: 40,
-                    child: Text(
-                      planet.length > 3 ? planet.substring(0, 3) : planet,
-                      style: GoogleFonts.inter(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: _getPlanetColor(planet),
-                      ),
+                    width: 38,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            boxShadow: [
+                              BoxShadow(
+                                color: planetColor.withOpacity(0.2),
+                                blurRadius: 3,
+                                spreadRadius: -1,
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(5),
+                            child: Image.asset(
+                              _getPlanetImagePath(planet),
+                              width: 18,
+                              height: 18,
+                              fit: BoxFit.cover,
+                              errorBuilder:
+                                  (_, __, ___) => Container(
+                                    color: planetColor.withOpacity(0.15),
+                                    child: Center(
+                                      child: Text(
+                                        _getPlanetSymbol(planet),
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          color: planetColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                      ],
                     ),
                   ),
                   ...values.asMap().entries.map((entry) {
                     final index = entry.key;
                     final v = entry.value;
                     return Expanded(
-                      child: _InteractiveAshtakavargaCell(
+                      child: _MinimalHeatmapCell(
                         value: v,
                         signName: _signNames[index],
                         signSymbol: _signs[index],
                         planetName: planet,
-                        color: _getHeatmapColor(v),
-                        type: 'BAV',
+                        color: _getCellColor(v),
                       ),
                     );
                   }),
@@ -4316,38 +4622,53 @@ class _AshtakavargaHeatmap extends StatelessWidget {
             );
           }),
 
-          // SAV row
+          // Divider
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            decoration: BoxDecoration(
-              color: _Colors.violet.withOpacity(0.06),
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(_DesignTokens.radiusLg),
-                bottomRight: Radius.circular(_DesignTokens.radiusLg),
-              ),
-            ),
+            margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            height: 0.5,
+            color: const Color(0xFF2A2838),
+          ),
+
+          // SAV row with Sigma icon
+          Container(
+            padding: const EdgeInsets.fromLTRB(6, 6, 6, 10),
             child: Row(
               children: [
                 SizedBox(
-                  width: 40,
-                  child: Text(
-                    'SAV',
-                    style: GoogleFonts.inter(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      color: _Colors.violet,
-                    ),
+                  width: 38,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 18,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: _Colors.emerald.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Σ',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: _Colors.emerald,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                    ],
                   ),
                 ),
                 ...sav.asMap().entries.map((entry) {
                   final index = entry.key;
                   final v = entry.value;
                   return Expanded(
-                    child: _InteractiveSavCell(
+                    child: _MinimalSavCell(
                       value: v,
                       signName: _signNames[index],
                       signSymbol: _signs[index],
-                      color: _getSavColor(v),
+                      color: _getSavCellColor(v),
                     ),
                   );
                 }),
@@ -4360,6 +4681,149 @@ class _AshtakavargaHeatmap extends StatelessWidget {
   }
 }
 
+// Minimal Heatmap Cell
+class _MinimalHeatmapCell extends StatefulWidget {
+  final int value;
+  final String signName;
+  final String signSymbol;
+  final String planetName;
+  final Color color;
+
+  const _MinimalHeatmapCell({
+    required this.value,
+    required this.signName,
+    required this.signSymbol,
+    required this.planetName,
+    required this.color,
+  });
+
+  @override
+  State<_MinimalHeatmapCell> createState() => _MinimalHeatmapCellState();
+}
+
+class _MinimalHeatmapCellState extends State<_MinimalHeatmapCell> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.lightImpact();
+        _showInsightSheet(
+          context,
+          _getAshtakavargaInsight(
+            '${widget.signSymbol} ${widget.signName}',
+            widget.value,
+            'BAV',
+          ),
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: Center(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 80),
+          width: 22,
+          height: 22,
+          margin: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            color:
+                _isPressed
+                    ? widget.color.withOpacity(1.0)
+                    : widget.color.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Center(
+            child: Text(
+              '${widget.value}',
+              style: GoogleFonts.jetBrainsMono(
+                fontSize: 9,
+                fontWeight: FontWeight.w600,
+                color:
+                    widget.value >= 4
+                        ? Colors.white.withOpacity(0.95)
+                        : const Color(0xFFB8B5C2),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Minimal SAV Cell
+class _MinimalSavCell extends StatefulWidget {
+  final int value;
+  final String signName;
+  final String signSymbol;
+  final Color color;
+
+  const _MinimalSavCell({
+    required this.value,
+    required this.signName,
+    required this.signSymbol,
+    required this.color,
+  });
+
+  @override
+  State<_MinimalSavCell> createState() => _MinimalSavCellState();
+}
+
+class _MinimalSavCellState extends State<_MinimalSavCell> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        HapticFeedback.lightImpact();
+        _showInsightSheet(
+          context,
+          _getAshtakavargaInsight(
+            '${widget.signSymbol} ${widget.signName}',
+            widget.value,
+            'SAV',
+          ),
+        );
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: Center(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 80),
+          width: 22,
+          height: 22,
+          margin: const EdgeInsets.all(1),
+          decoration: BoxDecoration(
+            color:
+                _isPressed
+                    ? widget.color.withOpacity(1.0)
+                    : widget.color.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Center(
+            child: Text(
+              '${widget.value}',
+              style: GoogleFonts.jetBrainsMono(
+                fontSize: 9,
+                fontWeight: FontWeight.w600,
+                color:
+                    widget.value >= 28
+                        ? Colors.white.withOpacity(0.95)
+                        : const Color(0xFFB8B5C2),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Legacy cell widgets kept for backward compatibility
 class _InteractiveAshtakavargaCell extends StatefulWidget {
   final int value;
   final String signName;
@@ -4576,4 +5040,9 @@ Color _getZodiacColor(String sign) {
     'Pisces': Color(0xFF64B5F6),
   };
   return colors[sign] ?? const Color(0xFFA09CAC);
+}
+
+/// Get zodiac image path for premium visuals
+String _getZodiacImagePath(String sign) {
+  return 'assets/images/zodiac/${sign.toLowerCase()}.png';
 }
