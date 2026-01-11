@@ -174,4 +174,3 @@ Color getSignColor(String sign) {
   };
   return colors[sign] ?? const Color(0xFFA09CAC);
 }
-

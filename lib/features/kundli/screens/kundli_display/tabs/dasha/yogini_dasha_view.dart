@@ -3,17 +3,21 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../../shared/constants.dart' show getPlanetColor;
 import 'dasha_shared_widgets.dart';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVIGATION SECTIONS
 // ═══════════════════════════════════════════════════════════════════════════
-const _sections = [
-  DashaNavSection(id: 'current', label: 'Current', color: DashaColors.emerald),
-  DashaNavSection(id: 'yoginis', label: 'Yoginis', color: DashaColors.yogini),
-  DashaNavSection(id: 'timeline', label: 'Timeline', color: DashaColors.rose),
+List<DashaNavSection> _getSections(AppLocalizations l10n) => [
+  DashaNavSection(id: 'current', label: l10n.yogini_nav_current, color: DashaColors.emerald),
+  DashaNavSection(id: 'yoginis', label: l10n.yogini_nav_yoginis, color: DashaColors.yogini),
+  DashaNavSection(id: 'timeline', label: l10n.yogini_nav_timeline, color: DashaColors.rose),
 ];
+
+// Static section IDs for initialization
+const _sectionIds = ['current', 'yoginis', 'timeline'];
 
 /// Yogini Dasha View - Premium 36-year cycle with 8 divine Yoginis
 class YoginiDashaView extends StatefulWidget {
@@ -38,9 +42,9 @@ class _YoginiDashaViewState extends State<YoginiDashaView> {
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
 
-    for (final section in _sections) {
-      _sectionKeys[section.id] = GlobalKey();
-      _animatedKeys[section.id] = GlobalKey<DashaAnimatedSectionWrapperState>();
+    for (final id in _sectionIds) {
+      _sectionKeys[id] = GlobalKey();
+      _animatedKeys[id] = GlobalKey<DashaAnimatedSectionWrapperState>();
     }
   }
 
@@ -59,8 +63,8 @@ class _YoginiDashaViewState extends State<YoginiDashaView> {
 
     int newActiveIndex = 0;
 
-    for (int i = 0; i < _sections.length; i++) {
-      final key = _sectionKeys[_sections[i].id];
+    for (int i = 0; i < _sectionIds.length; i++) {
+      final key = _sectionKeys[_sectionIds[i]];
       if (key?.currentContext != null) {
         final box = key!.currentContext!.findRenderObject() as RenderBox?;
         if (box != null) {
@@ -77,8 +81,8 @@ class _YoginiDashaViewState extends State<YoginiDashaView> {
     }
   }
 
-  Future<void> _scrollToSection(int index) async {
-    final section = _sections[index];
+  Future<void> _scrollToSection(int index, List<DashaNavSection> sections) async {
+    final section = sections[index];
     final key = _sectionKeys[section.id];
 
     if (key?.currentContext == null) return;
@@ -104,10 +108,12 @@ class _YoginiDashaViewState extends State<YoginiDashaView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final sections = _getSections(l10n);
     final yogini = widget.kundaliData.yoginiDashaInfo;
 
     if (yogini == null) {
-      return _buildNoDataView();
+      return _buildNoDataView(l10n);
     }
 
     final now = DateTime.now();
@@ -143,7 +149,7 @@ class _YoginiDashaViewState extends State<YoginiDashaView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashaAnimatedSectionHeader(
-                      title: 'Active Yogini Periods',
+                      title: l10n.yogini_activeYoginiPeriods,
                       accentColor: DashaColors.emerald,
                       icon: Icons.timeline_rounded,
                     ),
@@ -171,7 +177,7 @@ class _YoginiDashaViewState extends State<YoginiDashaView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashaAnimatedSectionHeader(
-                      title: 'The 8 Divine Yoginis',
+                      title: l10n.yogini_divineYoginis,
                       accentColor: DashaColors.yogini,
                       icon: Icons.donut_large_rounded,
                     ),
@@ -195,7 +201,7 @@ class _YoginiDashaViewState extends State<YoginiDashaView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashaAnimatedSectionHeader(
-                      title: 'Yogini Timeline',
+                      title: l10n.yogini_timeline,
                       accentColor: DashaColors.rose,
                       icon: Icons.view_timeline_rounded,
                     ),
@@ -212,8 +218,8 @@ class _YoginiDashaViewState extends State<YoginiDashaView> {
 
               const SizedBox(height: DashaDesignTokens.space16),
 
-              const DashaInfoFooter(
-                text: 'Yogini Dasha is a 36-year cycle based on 8 divine Yoginis representing cosmic feminine energies.',
+              DashaInfoFooter(
+                text: l10n.yogini_infoFooter,
               ),
             ],
           ),
@@ -225,16 +231,16 @@ class _YoginiDashaViewState extends State<YoginiDashaView> {
           right: 16,
           bottom: MediaQuery.of(context).padding.bottom + 16,
           child: DashaFloatingNavBar(
-            sections: _sections,
+            sections: sections,
             activeIndex: _activeIndex,
-            onTap: _scrollToSection,
+            onTap: (index) => _scrollToSection(index, sections),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildNoDataView() {
+  Widget _buildNoDataView(AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -256,7 +262,7 @@ class _YoginiDashaViewState extends State<YoginiDashaView> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Yogini Dasha Unavailable',
+              l10n.yogini_unavailableTitle,
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -265,7 +271,7 @@ class _YoginiDashaViewState extends State<YoginiDashaView> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Unable to calculate Yogini Dasha for this chart.',
+              l10n.yogini_unavailableMessage,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 color: DashaColors.textTertiary,
@@ -496,7 +502,7 @@ class _YoginiHeroCardState extends State<_YoginiHeroCard>
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      'ACTIVE',
+                      AppLocalizations.of(context).yogini_active,
                       style: GoogleFonts.inter(
                         fontSize: 9,
                         fontWeight: FontWeight.w600,
@@ -509,7 +515,7 @@ class _YoginiHeroCardState extends State<_YoginiHeroCard>
               ),
               const SizedBox(height: 6),
               Text(
-                '${widget.yogini.currentYogini.displayName} Dasha',
+                AppLocalizations.of(context).yogini_dashaName(widget.yogini.currentYogini.displayName),
                 style: GoogleFonts.instrumentSans(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -596,7 +602,7 @@ class _YoginiHeroCardState extends State<_YoginiHeroCard>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Journey Progress',
+                AppLocalizations.of(context).yogini_journeyProgress,
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
@@ -639,21 +645,21 @@ class _YoginiHeroCardState extends State<_YoginiHeroCard>
               _YoginiStatChip(
                 icon: Icons.hourglass_top_rounded,
                 value: formatDuration(widget.dynamicRemainingYears),
-                label: 'Remaining',
+                label: AppLocalizations.of(context).yogini_remaining,
                 iconColor: color,
               ),
               _buildDivider(),
               _YoginiStatChip(
                 icon: Icons.schedule_rounded,
-                value: '$totalYears yrs',
-                label: 'Duration',
+                value: AppLocalizations.of(context).yogini_yearsAbbr(totalYears.toString()),
+                label: AppLocalizations.of(context).yogini_duration,
                 iconColor: const Color(0xFF7C7889),
               ),
               _buildDivider(),
               _YoginiStatChip(
                 icon: Icons.check_circle_rounded,
                 value: '${widget.completedPeriods}/8',
-                label: 'Cycles',
+                label: AppLocalizations.of(context).yogini_cycles,
                 iconColor: const Color(0xFF4ADE80),
               ),
             ],
@@ -855,11 +861,12 @@ class _CurrentPeriodsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       children: [
         Expanded(
           child: _CompactYoginiCard(
-            label: 'Mahadasha',
+            label: l10n.dasha_mahadasha,
             yogini: yogini.currentYogini,
             remainingYears: dynamicRemainingYears,
             progress: _calculateProgress(),
@@ -870,7 +877,7 @@ class _CurrentPeriodsCard extends StatelessWidget {
         if (yogini.currentAntardasha != null)
           Expanded(
             child: _CompactYoginiCard(
-              label: 'Antardasha',
+              label: l10n.dasha_antardasha,
               yogini: yogini.currentAntardasha!,
               remainingYears: yogini.antardashaRemainingYears ?? 0,
               progress: 0.5,
@@ -966,7 +973,7 @@ class _CompactYoginiCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '${formatDuration(remainingYears)} left',
+            AppLocalizations.of(context).yogini_left(formatDuration(remainingYears)),
             style: GoogleFonts.jetBrainsMono(
               fontSize: 9,
               color: DashaColors.textTertiary,
@@ -1047,7 +1054,7 @@ class _YoginiWheelCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      'NOW',
+                      AppLocalizations.of(context).dasha_now,
                       style: GoogleFonts.jetBrainsMono(
                         fontSize: 7,
                         fontWeight: FontWeight.w700,
@@ -1344,7 +1351,7 @@ class _YoginiPeriodItem extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Ruled by ${periodDetail.yogini.planet}',
+                        AppLocalizations.of(context).yogini_ruledBy(periodDetail.yogini.planet),
                         style: GoogleFonts.inter(
                           fontSize: 10,
                           color: getPlanetColor(periodDetail.yogini.planet).withOpacity(0.8),
@@ -1654,7 +1661,7 @@ void showYoginiPeriodBottomSheet(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Start', style: GoogleFonts.inter(fontSize: 9, color: DashaColors.textTertiary)),
+                              Text(AppLocalizations.of(context).yogini_start, style: GoogleFonts.inter(fontSize: 9, color: DashaColors.textTertiary)),
                               Text(formatDate(period.startDate), style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.w500, color: DashaColors.textSecondary)),
                             ],
                           ),
@@ -1666,7 +1673,7 @@ void showYoginiPeriodBottomSheet(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('End', style: GoogleFonts.inter(fontSize: 9, color: DashaColors.textTertiary)),
+                                Text(AppLocalizations.of(context).yogini_end, style: GoogleFonts.inter(fontSize: 9, color: DashaColors.textTertiary)),
                                 Text(formatDate(period.endDate), style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.w500, color: DashaColors.textSecondary)),
                               ],
                             ),
@@ -1679,7 +1686,7 @@ void showYoginiPeriodBottomSheet(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Duration', style: GoogleFonts.inter(fontSize: 9, color: DashaColors.textTertiary)),
+                                Text(AppLocalizations.of(context).yogini_duration, style: GoogleFonts.inter(fontSize: 9, color: DashaColors.textTertiary)),
                                 Text(formatDuration(period.durationYears), style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.w600, color: yoginiColor)),
                               ],
                             ),
@@ -1697,7 +1704,7 @@ void showYoginiPeriodBottomSheet(
                 child: Row(
                   children: [
                     Text(
-                      'Sub-Periods (${period.subPeriods!.length})',
+                      AppLocalizations.of(context).yogini_subPeriods(period.subPeriods!.length.toString()),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -1811,7 +1818,7 @@ void showYoginiPeriodBottomSheet(
                     )
                   : Center(
                       child: Text(
-                        'No sub-periods available',
+                        AppLocalizations.of(context).yogini_noSubPeriods,
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           color: DashaColors.textTertiary,

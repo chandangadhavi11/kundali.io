@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/providers/auth_provider.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 
 // Responsive breakpoints
 class ProfileBreakpoints {
@@ -573,7 +573,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen>
       borderRadius: BorderRadius.circular(12),
       child: InputDecorator(
         decoration: InputDecoration(
-          labelText: l10n.dateOfBirth,
+          labelText: l10n.input_dateOfBirth,
           prefixIcon: const Icon(Icons.calendar_today),
           suffixIcon: const Icon(Icons.arrow_drop_down),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -593,7 +593,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen>
       borderRadius: BorderRadius.circular(12),
       child: InputDecorator(
         decoration: InputDecoration(
-          labelText: l10n.timeOfBirth,
+          labelText: l10n.input_timeOfBirth,
           prefixIcon: const Icon(Icons.access_time),
           suffixIcon: const Icon(Icons.arrow_drop_down),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -611,7 +611,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen>
     return TextFormField(
       controller: _birthPlaceController,
       decoration: InputDecoration(
-        labelText: l10n.placeOfBirth,
+        labelText: l10n.input_placeOfBirth,
         prefixIcon: const Icon(Icons.location_on_outlined),
         hintText: 'e.g., Mumbai, India',
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
@@ -629,7 +629,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen>
     return DropdownButtonFormField<String>(
       value: _selectedGender,
       decoration: InputDecoration(
-        labelText: l10n.gender,
+        labelText: l10n.input_gender,
         prefixIcon: const Icon(Icons.person_outline),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),

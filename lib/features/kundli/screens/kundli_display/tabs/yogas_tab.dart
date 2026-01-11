@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../shared/floating_nav_bar.dart';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -266,13 +267,13 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
 
                     // Description
                     Text(
-                      'What This Means',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                        color: _Colors.textSecondary,
-                      ),
+                    AppLocalizations.of(context).insight_whatThisMeans,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                      color: _Colors.textSecondary,
+                    ),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -319,7 +320,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Significance',
+                                  AppLocalizations.of(context).insight_significance,
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -347,7 +348,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                     if (insight.keyPoints.isNotEmpty) ...[
                       const SizedBox(height: 24),
                       Text(
-                        'Key Points',
+                        AppLocalizations.of(context).insight_keyPoints,
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -645,11 +646,11 @@ InsightData _getInsightCardInsight(
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVIGATION SECTION DATA
 // ═══════════════════════════════════════════════════════════════════════════
-const _sections = [
-  NavSection(id: 'overview', label: 'Overview', color: _Colors.emerald),
-  NavSection(id: 'yogas', label: 'Yogas', color: _Colors.gold),
-  NavSection(id: 'doshas', label: 'Doshas', color: _Colors.coral),
-  NavSection(id: 'insights', label: 'Insights', color: _Colors.violet),
+List<NavSection> _getSections(AppLocalizations l10n) => [
+  NavSection(id: 'overview', label: l10n.yogas_nav_overview, color: _Colors.emerald),
+  NavSection(id: 'yogas', label: l10n.yogas_nav_yogas, color: _Colors.gold),
+  NavSection(id: 'doshas', label: l10n.yogas_nav_doshas, color: _Colors.coral),
+  NavSection(id: 'insights', label: l10n.yogas_nav_insights, color: _Colors.violet),
 ];
 
 /// Yogas & Doshas Tab - Shows all yogas and doshas with details
@@ -669,6 +670,9 @@ class _YogasTabState extends State<YogasTab> {
   final Map<String, GlobalKey<_AnimatedSectionWrapperState>> _animatedKeys = {};
   int _activeIndex = 0;
   bool _isScrolling = false;
+  
+  // Static section IDs for initialization
+  static const _sectionIds = ['overview', 'yogas', 'doshas', 'insights'];
 
   @override
   void initState() {
@@ -676,9 +680,9 @@ class _YogasTabState extends State<YogasTab> {
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
 
-    for (final section in _sections) {
-      _sectionKeys[section.id] = GlobalKey();
-      _animatedKeys[section.id] = GlobalKey<_AnimatedSectionWrapperState>();
+    for (final id in _sectionIds) {
+      _sectionKeys[id] = GlobalKey();
+      _animatedKeys[id] = GlobalKey<_AnimatedSectionWrapperState>();
     }
   }
 
@@ -697,8 +701,8 @@ class _YogasTabState extends State<YogasTab> {
 
     int newActiveIndex = 0;
 
-    for (int i = 0; i < _sections.length; i++) {
-      final key = _sectionKeys[_sections[i].id];
+    for (int i = 0; i < _sectionIds.length; i++) {
+      final key = _sectionKeys[_sectionIds[i]];
       if (key?.currentContext != null) {
         final box = key!.currentContext!.findRenderObject() as RenderBox?;
         if (box != null) {
@@ -715,8 +719,8 @@ class _YogasTabState extends State<YogasTab> {
     }
   }
 
-  Future<void> _scrollToSection(int index) async {
-    final section = _sections[index];
+  Future<void> _scrollToSection(int index, List<NavSection> sections) async {
+    final section = sections[index];
     final key = _sectionKeys[section.id];
 
     if (key?.currentContext == null) return;
@@ -742,6 +746,8 @@ class _YogasTabState extends State<YogasTab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final sections = _getSections(l10n);
     final analyzedYogas = _analyzeYogas(widget.kundaliData);
     final analyzedDoshas = _analyzeDoshas(widget.kundaliData);
 
@@ -792,9 +798,8 @@ class _YogasTabState extends State<YogasTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Auspicious Yogas',
-                      subtitle:
-                          '${analyzedYogas.length} beneficial combinations',
+                      title: l10n.yogas_auspiciousYogas,
+                      subtitle: l10n.yogas_beneficialCombinations(analyzedYogas.length.toString()),
                       accentColor: _Colors.gold,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -819,9 +824,8 @@ class _YogasTabState extends State<YogasTab> {
                       _AnimatedCardWrapper(
                         delay: 50,
                         child: _EmptyStateCard(
-                          title: 'No Yogas Detected',
-                          message:
-                              'Standard chart configuration without special combinations.',
+                          title: l10n.yogas_noYogasDetected,
+                          message: l10n.yogas_noYogasMessage,
                           icon: Icons.auto_awesome_outlined,
                           color: _Colors.gold,
                         ),
@@ -844,8 +848,8 @@ class _YogasTabState extends State<YogasTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Doshas Present',
-                      subtitle: '${analyzedDoshas.length} detected',
+                      title: l10n.yogas_doshasPresent,
+                      subtitle: l10n.yogas_detected(analyzedDoshas.length.toString()),
                       accentColor: _Colors.coral,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -870,8 +874,8 @@ class _YogasTabState extends State<YogasTab> {
                       _AnimatedCardWrapper(
                         delay: 50,
                         child: _EmptyStateCard(
-                          title: 'No Doshas Found',
-                          message: 'Your chart is free from major doshas.',
+                          title: l10n.yogas_noDoshasFound,
+                          message: l10n.yogas_noDoshasMessage,
                           icon: Icons.check_circle_outline_rounded,
                           color: _Colors.emerald,
                         ),
@@ -894,8 +898,8 @@ class _YogasTabState extends State<YogasTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Astrological Insights',
-                      subtitle: 'Understanding your chart',
+                      title: l10n.yogas_astrologicalInsights,
+                      subtitle: l10n.yogas_understandingYourChart,
                       accentColor: _Colors.violet,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -923,9 +927,9 @@ class _YogasTabState extends State<YogasTab> {
           right: 16,
           bottom: MediaQuery.of(context).padding.bottom + 16,
           child: FloatingNavBar(
-            sections: _sections,
+            sections: sections,
             activeIndex: _activeIndex,
-            onTap: _scrollToSection,
+            onTap: (index) => _scrollToSection(index, sections),
           ),
         ),
       ],
@@ -1593,22 +1597,24 @@ class _YogaHeroCardState extends State<_YogaHeroCard> {
     return _Colors.coral;
   }
 
-  String _getBalanceStatus(int balance, int yogas, int doshas) {
-    if (yogas > 0 && doshas == 0) return 'Excellent';
-    if (balance >= 3) return 'Very Good';
-    if (balance >= 1) return 'Good';
-    if (balance >= -1) return 'Mixed';
-    if (balance >= -3) return 'Challenging';
-    return 'Needs Attention';
+  String _getBalanceStatus(int balance, int yogas, int doshas, AppLocalizations l10n) {
+    if (yogas > 0 && doshas == 0) return l10n.yogas_balance_excellent;
+    if (balance >= 3) return l10n.yogas_balance_veryGood;
+    if (balance >= 1) return l10n.yogas_balance_good;
+    if (balance >= -1) return l10n.yogas_balance_mixed;
+    if (balance >= -3) return l10n.yogas_balance_challenging;
+    return l10n.yogas_balance_needsAttention;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final balance = widget.yogaCount - widget.severeDoshas;
     final balanceStatus = _getBalanceStatus(
       balance,
       widget.yogaCount,
       widget.doshaCount,
+      l10n,
     );
     final balanceColor = _getBalanceColor(balance);
     final ascendantColor = _getZodiacColor(widget.ascendant);
@@ -1677,7 +1683,7 @@ class _YogaHeroCardState extends State<_YogaHeroCard> {
                             ),
                           ),
                           Text(
-                            'Yoga Overview',
+                            l10n.yogas_overview_title,
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w400,
@@ -1692,14 +1698,14 @@ class _YogaHeroCardState extends State<_YogaHeroCard> {
                         children: [
                           _MinimalYogaStat(
                             value: widget.yogaCount,
-                            label: 'Yogas',
+                            label: l10n.yogas_yogas,
                             color: _Colors.gold,
                             isPositive: true,
                           ),
                           const SizedBox(width: 16),
                           _MinimalYogaStat(
                             value: widget.doshaCount,
-                            label: 'Doshas',
+                            label: l10n.yogas_doshas,
                             color: _Colors.coral,
                             isPositive: false,
                           ),
@@ -1735,7 +1741,7 @@ class _YogaHeroCardState extends State<_YogaHeroCard> {
                   // Strength stats inline
                   _MinimalStrengthStat(
                     value: widget.strongYogas,
-                    label: 'Strong',
+                    label: l10n.yogas_strong,
                     color: _Colors.emerald,
                   ),
                   Container(
@@ -1746,7 +1752,7 @@ class _YogaHeroCardState extends State<_YogaHeroCard> {
                   ),
                   _MinimalStrengthStat(
                     value: widget.partialYogas,
-                    label: 'Moderate',
+                    label: l10n.yogas_moderate,
                     color: _Colors.amber,
                   ),
                   Container(
@@ -1757,7 +1763,7 @@ class _YogaHeroCardState extends State<_YogaHeroCard> {
                   ),
                   _MinimalStrengthStat(
                     value: widget.severeDoshas,
-                    label: 'Severe',
+                    label: l10n.yogas_severe,
                     color: _Colors.coral,
                   ),
                   const Spacer(),
@@ -1958,18 +1964,19 @@ class _YogaTypeLegend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final items =
         isYoga
             ? [
-              ('Raja', _Colors.gold),
-              ('Dhana', _Colors.emerald),
-              ('Mahapurusha', _Colors.violet),
-              ('Lunar', _Colors.sky),
+              (l10n.yogas_type_raja, _Colors.gold),
+              (l10n.yogas_type_dhana, _Colors.emerald),
+              (l10n.yogas_type_mahapurusha, _Colors.violet),
+              (l10n.yogas_type_lunar, _Colors.sky),
             ]
             : [
-              ('Severe', _Colors.coral),
-              ('Moderate', _Colors.amber),
-              ('Mild', _Colors.sky),
+              (l10n.yogas_severe, _Colors.coral),
+              (l10n.yogas_moderate, _Colors.amber),
+              (l10n.yogas_mild, _Colors.sky),
             ];
 
     return Row(
@@ -2463,14 +2470,15 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard> {
     bool isDosha,
     Map<String, dynamic> yogaData,
   ) {
+    final l10n = AppLocalizations.of(context);
     final color = isDosha ? _Colors.coral : _Colors.gold;
-    final details = _getFullYogaDetails(yogaName, isDosha);
+    final details = _getFullYogaDetails(yogaName, isDosha, l10n);
     final planets = yogaData['planets'] as List<String>? ?? [];
     final formationRule = yogaData['formationRule'] as String? ?? '';
     final strength =
         yogaData['strength'] as String? ??
         yogaData['severity'] as String? ??
-        'Moderate';
+        l10n.yogas_moderate;
 
     showModalBottomSheet(
       context: context,
@@ -2609,7 +2617,7 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard> {
                           children: [
                             if (planets.isNotEmpty || formationRule.isNotEmpty)
                               _DetailSection(
-                                title: 'Formation',
+                                title: l10n.yogas_formation,
                                 icon: Icons.architecture_rounded,
                                 color: _Colors.violet,
                                 child: Column(
@@ -2617,7 +2625,7 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard> {
                                   children: [
                                     if (planets.isNotEmpty) ...[
                                       Text(
-                                        'Planets Involved',
+                                        l10n.yogas_planetsInvolved,
                                         style: GoogleFonts.inter(
                                           fontSize: 10,
                                           color: _Colors.textTertiary,
@@ -2737,7 +2745,7 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard> {
                             const SizedBox(height: 16),
 
                             _DetailSection(
-                              title: 'What is $yogaName?',
+                              title: l10n.yogas_whatIs(yogaName),
                               icon: Icons.info_outline_rounded,
                               color: _Colors.sky,
                               child: Text(
@@ -2753,7 +2761,7 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard> {
                             const SizedBox(height: 16),
 
                             _DetailSection(
-                              title: isDosha ? 'Potential Effects' : 'Benefits',
+                              title: isDosha ? l10n.yogas_potentialEffects : l10n.yogas_benefits,
                               icon:
                                   isDosha
                                       ? Icons.warning_amber_outlined
@@ -2772,7 +2780,7 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard> {
                             const SizedBox(height: 16),
 
                             _DetailSection(
-                              title: isDosha ? 'Remedies' : 'How to Strengthen',
+                              title: isDosha ? l10n.yogas_remedies : l10n.yogas_howToStrengthen,
                               icon: Icons.healing_rounded,
                               color: _Colors.sky,
                               child: Text(
@@ -2860,15 +2868,15 @@ class _InsightsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         Row(
           children: [
             Expanded(
               child: _InteractiveInsightCard(
-                title: 'Understanding',
-                description:
-                    'Yogas are beneficial combinations that enhance life areas.',
+                title: l10n.yogas_insight_understanding,
+                description: l10n.yogas_insight_understanding_desc,
                 icon: Icons.lightbulb_outline_rounded,
                 color: _Colors.violet,
               ),
@@ -2876,9 +2884,8 @@ class _InsightsGrid extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: _InteractiveInsightCard(
-                title: 'Activation',
-                description:
-                    'Yogas manifest during their planetary Dasha periods.',
+                title: l10n.yogas_insight_activation,
+                description: l10n.yogas_insight_activation_desc,
                 icon: Icons.schedule_rounded,
                 color: _Colors.emerald,
               ),
@@ -2890,9 +2897,8 @@ class _InsightsGrid extends StatelessWidget {
           children: [
             Expanded(
               child: _InteractiveInsightCard(
-                title: 'Strength',
-                description:
-                    'Planet placement determines yoga manifestation level.',
+                title: l10n.yogas_insight_strength,
+                description: l10n.yogas_insight_strength_desc,
                 icon: Icons.fitness_center_rounded,
                 color: _Colors.amber,
               ),
@@ -2900,9 +2906,8 @@ class _InsightsGrid extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: _InteractiveInsightCard(
-                title: 'Remedies',
-                description:
-                    'Most doshas can be mitigated through proper remedies.',
+                title: l10n.yogas_insight_remedies,
+                description: l10n.yogas_insight_remedies_desc,
                 icon: Icons.healing_outlined,
                 color: _Colors.sky,
               ),
@@ -2913,9 +2918,8 @@ class _InsightsGrid extends StatelessWidget {
           const SizedBox(height: 16),
           if (hasKaalSarp)
             _InteractiveRemedyCard(
-              title: 'Kaal Sarp Remedy',
-              description:
-                  'Trimbakeshwar Puja recommended. Chant Maha Mrityunjaya Mantra 108 times daily.',
+              title: l10n.yogas_kaalSarpRemedy,
+              description: l10n.yogas_kaalSarpRemedy_desc,
               icon: Icons.auto_fix_high_rounded,
               color: _Colors.coral,
               doshaType: 'Kaal Sarp Dosha',
@@ -2923,9 +2927,8 @@ class _InsightsGrid extends StatelessWidget {
           if (hasManglik) ...[
             const SizedBox(height: 10),
             _InteractiveRemedyCard(
-              title: 'Manglik Remedy',
-              description:
-                  'Perform Mangal Shanti Puja. Recite Hanuman Chalisa on Tuesdays.',
+              title: l10n.yogas_manglikRemedy,
+              description: l10n.yogas_manglikRemedy_desc,
               icon: Icons.auto_fix_high_rounded,
               color: _Colors.coral,
               doshaType: 'Manglik Dosha',
@@ -3308,7 +3311,9 @@ Map<String, String> _getYogaInfo(String yogaName, bool isDosha) {
   return yogaInfoMap[yogaName] ?? {'type': isDosha ? 'Dosha' : 'Benefic Yoga'};
 }
 
-Map<String, String> _getFullYogaDetails(String yogaName, bool isDosha) {
+Map<String, String> _getFullYogaDetails(String yogaName, bool isDosha, AppLocalizations l10n) {
+  // Note: These yoga-specific descriptions are kept in English as they are technical astrological terms
+  // that may not translate well. The structure labels are localized.
   final detailsMap = {
     'Hamsa Yoga': {
       'type': 'Pancha Mahapurusha Yoga',
@@ -3348,7 +3353,7 @@ Map<String, String> _getFullYogaDetails(String yogaName, bool isDosha) {
 
   return detailsMap[yogaName] ??
       {
-        'type': isDosha ? 'Dosha' : 'Benefic Yoga',
+        'type': isDosha ? l10n.yogas_type_dosha : l10n.yogas_type_yoga,
         'description':
             isDosha
                 ? 'This dosha indicates certain karmic patterns creating challenges.'

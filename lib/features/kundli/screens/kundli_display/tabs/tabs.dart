@@ -10,4 +10,3 @@ export 'details_tab.dart';
 
 // Shared components
 export '../shared/floating_nav_bar.dart';
-

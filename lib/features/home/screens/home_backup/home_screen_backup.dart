@@ -6,7 +6,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/providers/horoscope_provider.dart';
 import '../../../../core/providers/panchang_provider.dart';
-import '../../../../l10n/app_localizations.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../../../../shared/widgets/modern_feature_card.dart';
 import '../../../../shared/widgets/custom_icons.dart';
 import '../../../../shared/widgets/modern_horoscope_card.dart';
@@ -723,7 +723,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final features = [
       {
         'icon': CustomIcons.kundliIcon(),
-        'title': l10n?.generateKundli ?? 'Generate Kundli',
+        'title': l10n?.home_generateKundli ?? 'Generate Kundli',
         'subtitle': 'Create birth chart',
         'primaryColor': const Color(0xFFFF6B6B),
         'secondaryColor': const Color(0xFFFFE0E0),
@@ -734,7 +734,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       },
       {
         'icon': CustomIcons.compatibilityIcon(),
-        'title': l10n?.kundliMatching ?? 'Kundli Matching',
+        'title': l10n?.home_kundliMatching ?? 'Kundli Matching',
         'subtitle': 'Check compatibility',
         'primaryColor': const Color(0xFF6C5CE7),
         'secondaryColor': const Color(0xFFE8E5FF),

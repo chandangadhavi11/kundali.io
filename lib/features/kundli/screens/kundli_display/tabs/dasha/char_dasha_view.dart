@@ -3,17 +3,21 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../../shared/constants.dart';
 import 'dasha_shared_widgets.dart' hide getPlanetImagePath;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVIGATION SECTIONS
 // ═══════════════════════════════════════════════════════════════════════════
-const _sections = [
-  DashaNavSection(id: 'current', label: 'Current', color: DashaColors.emerald),
-  DashaNavSection(id: 'karakas', label: 'Karakas', color: DashaColors.char),
-  DashaNavSection(id: 'timeline', label: 'Timeline', color: DashaColors.sky),
+List<DashaNavSection> _getSections(AppLocalizations l10n) => [
+  DashaNavSection(id: 'current', label: l10n.charDasha_nav_current, color: DashaColors.emerald),
+  DashaNavSection(id: 'karakas', label: l10n.charDasha_nav_karakas, color: DashaColors.char),
+  DashaNavSection(id: 'timeline', label: l10n.charDasha_nav_timeline, color: DashaColors.sky),
 ];
+
+// Static section IDs for initialization
+const _sectionIds = ['current', 'karakas', 'timeline'];
 
 /// Char Dasha View - Premium Jaimini sign-based Dasha system
 class CharDashaView extends StatefulWidget {
@@ -39,9 +43,9 @@ class _CharDashaViewState extends State<CharDashaView> {
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
 
-    for (final section in _sections) {
-      _sectionKeys[section.id] = GlobalKey();
-      _animatedKeys[section.id] = GlobalKey<DashaAnimatedSectionWrapperState>();
+    for (final id in _sectionIds) {
+      _sectionKeys[id] = GlobalKey();
+      _animatedKeys[id] = GlobalKey<DashaAnimatedSectionWrapperState>();
     }
   }
 
@@ -60,8 +64,8 @@ class _CharDashaViewState extends State<CharDashaView> {
 
     int newActiveIndex = 0;
 
-    for (int i = 0; i < _sections.length; i++) {
-      final key = _sectionKeys[_sections[i].id];
+    for (int i = 0; i < _sectionIds.length; i++) {
+      final key = _sectionKeys[_sectionIds[i]];
       if (key?.currentContext != null) {
         final box = key!.currentContext!.findRenderObject() as RenderBox?;
         if (box != null) {
@@ -78,8 +82,8 @@ class _CharDashaViewState extends State<CharDashaView> {
     }
   }
 
-  Future<void> _scrollToSection(int index) async {
-    final section = _sections[index];
+  Future<void> _scrollToSection(int index, List<DashaNavSection> sections) async {
+    final section = sections[index];
     final key = _sectionKeys[section.id];
 
     if (key?.currentContext == null) return;
@@ -105,10 +109,12 @@ class _CharDashaViewState extends State<CharDashaView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final sections = _getSections(l10n);
     final charDasha = widget.kundaliData.charDashaInfo;
 
     if (charDasha == null) {
-      return _buildNoDataView();
+      return _buildNoDataView(l10n);
     }
 
     final now = DateTime.now();
@@ -149,7 +155,7 @@ class _CharDashaViewState extends State<CharDashaView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashaAnimatedSectionHeader(
-                      title: 'Active Rasi Dasha',
+                      title: l10n.charDasha_activeRasiDasha,
                       accentColor: DashaColors.emerald,
                       icon: Icons.timeline_rounded,
                     ),
@@ -185,7 +191,7 @@ class _CharDashaViewState extends State<CharDashaView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashaAnimatedSectionHeader(
-                      title: 'Jaimini Karakas',
+                      title: l10n.charDasha_jaiminiKarakas,
                       accentColor: DashaColors.char,
                       icon: Icons.star_rounded,
                     ),
@@ -209,7 +215,7 @@ class _CharDashaViewState extends State<CharDashaView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashaAnimatedSectionHeader(
-                      title: 'Rasi Dasha Timeline',
+                      title: l10n.charDasha_rasiDashaTimeline,
                       accentColor: DashaColors.sky,
                       icon: Icons.view_timeline_rounded,
                     ),
@@ -229,9 +235,8 @@ class _CharDashaViewState extends State<CharDashaView> {
 
               const SizedBox(height: DashaDesignTokens.space16),
 
-              const DashaInfoFooter(
-                text:
-                    'Char Dasha (Jaimini) is a sign-based system. Duration varies based on the lord\'s position.',
+              DashaInfoFooter(
+                text: l10n.charDasha_infoFooter,
               ),
             ],
           ),
@@ -243,16 +248,16 @@ class _CharDashaViewState extends State<CharDashaView> {
           right: 16,
           bottom: MediaQuery.of(context).padding.bottom + 16,
           child: DashaFloatingNavBar(
-            sections: _sections,
+            sections: sections,
             activeIndex: _activeIndex,
-            onTap: _scrollToSection,
+            onTap: (index) => _scrollToSection(index, sections),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildNoDataView() {
+  Widget _buildNoDataView(AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -274,7 +279,7 @@ class _CharDashaViewState extends State<CharDashaView> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Char Dasha Unavailable',
+              l10n.charDasha_unavailable,
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -283,7 +288,7 @@ class _CharDashaViewState extends State<CharDashaView> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Unable to calculate Char Dasha for this chart.',
+              l10n.charDasha_unableToCalculate,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 color: DashaColors.textTertiary,
@@ -524,7 +529,7 @@ class _CharHeroCardState extends State<_CharHeroCard>
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      'ACTIVE',
+                      AppLocalizations.of(context).charDasha_active,
                       style: GoogleFonts.inter(
                         fontSize: 9,
                         fontWeight: FontWeight.w600,
@@ -537,7 +542,7 @@ class _CharHeroCardState extends State<_CharHeroCard>
               ),
               const SizedBox(height: 6),
               Text(
-                '${widget.charDasha.currentSign} Rasi Dasha',
+                AppLocalizations.of(context).charDasha_signRasiDasha(widget.charDasha.currentSign),
                 style: GoogleFonts.instrumentSans(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -551,7 +556,7 @@ class _CharHeroCardState extends State<_CharHeroCard>
                 children: [
                   Flexible(
                     child: Text(
-                      _getSignDescription(widget.charDasha.currentSign),
+                      _getSignDescription(widget.charDasha.currentSign, AppLocalizations.of(context)),
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w400,
@@ -625,7 +630,7 @@ class _CharHeroCardState extends State<_CharHeroCard>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Journey Progress',
+                AppLocalizations.of(context).charDasha_journeyProgress,
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
@@ -668,21 +673,21 @@ class _CharHeroCardState extends State<_CharHeroCard>
               _CharStatChip(
                 icon: Icons.hourglass_top_rounded,
                 value: formatDuration(widget.dynamicRemainingYears),
-                label: 'Remaining',
+                label: AppLocalizations.of(context).charDasha_remaining,
                 iconColor: color,
               ),
               _buildDivider(),
               _CharStatChip(
                 icon: Icons.schedule_rounded,
-                value: '$totalYears yrs',
-                label: 'Duration',
+                value: AppLocalizations.of(context).charDasha_yearsAbbr(totalYears.toString()),
+                label: AppLocalizations.of(context).charDasha_duration,
                 iconColor: const Color(0xFF7C7889),
               ),
               _buildDivider(),
               _CharStatChip(
                 icon: Icons.check_circle_rounded,
                 value: '${widget.completedPeriods}/12',
-                label: 'Cycles',
+                label: AppLocalizations.of(context).charDasha_cycles,
                 iconColor: const Color(0xFF4ADE80),
               ),
             ],
@@ -701,22 +706,35 @@ class _CharHeroCardState extends State<_CharHeroCard>
     );
   }
 
-  String _getSignDescription(String sign) {
-    const descriptions = {
-      'Aries': 'Initiative & leadership',
-      'Taurus': 'Stability & comfort',
-      'Gemini': 'Communication & learning',
-      'Cancer': 'Emotions & nurturing',
-      'Leo': 'Creativity & authority',
-      'Virgo': 'Service & analysis',
-      'Libra': 'Partnerships & balance',
-      'Scorpio': 'Transformation & depth',
-      'Sagittarius': 'Expansion & wisdom',
-      'Capricorn': 'Ambition & structure',
-      'Aquarius': 'Innovation & humanity',
-      'Pisces': 'Spirituality & intuition',
-    };
-    return descriptions[sign] ?? 'Cosmic influence';
+  String _getSignDescription(String sign, AppLocalizations l10n) {
+    switch (sign) {
+      case 'Aries':
+        return l10n.charDasha_signDesc_aries;
+      case 'Taurus':
+        return l10n.charDasha_signDesc_taurus;
+      case 'Gemini':
+        return l10n.charDasha_signDesc_gemini;
+      case 'Cancer':
+        return l10n.charDasha_signDesc_cancer;
+      case 'Leo':
+        return l10n.charDasha_signDesc_leo;
+      case 'Virgo':
+        return l10n.charDasha_signDesc_virgo;
+      case 'Libra':
+        return l10n.charDasha_signDesc_libra;
+      case 'Scorpio':
+        return l10n.charDasha_signDesc_scorpio;
+      case 'Sagittarius':
+        return l10n.charDasha_signDesc_sagittarius;
+      case 'Capricorn':
+        return l10n.charDasha_signDesc_capricorn;
+      case 'Aquarius':
+        return l10n.charDasha_signDesc_aquarius;
+      case 'Pisces':
+        return l10n.charDasha_signDesc_pisces;
+      default:
+        return l10n.charDasha_signDesc_default;
+    }
   }
 
   String _getSignLord(String sign) {
@@ -917,11 +935,12 @@ class _CurrentPeriodsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       children: [
         Expanded(
           child: _CompactSignCard(
-            label: 'Rasi Dasha',
+            label: l10n.charDasha_rasiDasha,
             sign: charDasha.currentSign,
             remainingYears: dynamicRemainingYears,
             progress: _calculateProgress(),
@@ -932,7 +951,7 @@ class _CurrentPeriodsCard extends StatelessWidget {
         if (charDasha.currentAntardasha != null)
           Expanded(
             child: _CompactSignCard(
-              label: 'Antardasha',
+              label: l10n.charDasha_antardasha,
               sign: charDasha.currentAntardasha!,
               remainingYears: charDasha.antardashaRemainingYears ?? 0,
               progress: 0.5,
@@ -1032,7 +1051,7 @@ class _CompactSignCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '${formatDuration(remainingYears)} left',
+            AppLocalizations.of(context).charDasha_left(formatDuration(remainingYears)),
             style: GoogleFonts.jetBrainsMono(
               fontSize: 9,
               color: DashaColors.textTertiary,
@@ -1055,6 +1074,7 @@ class _DirectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return DashaPremiumCard(
       child: Row(
         children: [
@@ -1081,7 +1101,7 @@ class _DirectionCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Dasha Direction',
+                  l10n.charDasha_dashaDirection,
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     color: DashaColors.textTertiary,
@@ -1090,7 +1110,7 @@ class _DirectionCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      isClockwise ? 'Clockwise' : 'Anti-clockwise',
+                      isClockwise ? l10n.charDasha_clockwise : l10n.charDasha_antiClockwise,
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -1108,7 +1128,7 @@ class _DirectionCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        'from $startingSign',
+                        l10n.charDasha_fromSign(startingSign),
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           color: getSignColor(startingSign),
@@ -1154,6 +1174,7 @@ class _KarakasCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return DashaPremiumCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1163,8 +1184,8 @@ class _KarakasCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _KarakaItem(
-                  shortName: 'AK',
-                  fullName: 'Atmakaraka',
+                  shortName: l10n.charDasha_karaka_ak,
+                  fullName: l10n.charDasha_karaka_atmakaraka,
                   planet: karakas.atmakaraka,
                   degree: karakas.atmakarakaDegree,
                   isHighlight: true,
@@ -1172,24 +1193,24 @@ class _KarakasCard extends StatelessWidget {
               ),
               Expanded(
                 child: _KarakaItem(
-                  shortName: 'AmK',
-                  fullName: 'Amatyakaraka',
+                  shortName: l10n.charDasha_karaka_amk,
+                  fullName: l10n.charDasha_karaka_amatyakaraka,
                   planet: karakas.amatyakaraka,
                   degree: karakas.amatyakarakaDegree,
                 ),
               ),
               Expanded(
                 child: _KarakaItem(
-                  shortName: 'BK',
-                  fullName: 'Bhratrikaraka',
+                  shortName: l10n.charDasha_karaka_bk,
+                  fullName: l10n.charDasha_karaka_bhratrikaraka,
                   planet: karakas.bhratrikaraka,
                   degree: karakas.bhratrikarakaDegree,
                 ),
               ),
               Expanded(
                 child: _KarakaItem(
-                  shortName: 'MK',
-                  fullName: 'Matrikaraka',
+                  shortName: l10n.charDasha_karaka_mk,
+                  fullName: l10n.charDasha_karaka_matrikaraka,
                   planet: karakas.matrikaraka,
                   degree: karakas.matrikarakaDegree,
                 ),
@@ -1202,32 +1223,32 @@ class _KarakasCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _KarakaItem(
-                  shortName: 'PiK',
-                  fullName: 'Pitrikaraka',
+                  shortName: l10n.charDasha_karaka_pik,
+                  fullName: l10n.charDasha_karaka_pitrikaraka,
                   planet: karakas.pitrikaraka,
                   degree: karakas.pitrikarakaDegree,
                 ),
               ),
               Expanded(
                 child: _KarakaItem(
-                  shortName: 'PuK',
-                  fullName: 'Putrakaraka',
+                  shortName: l10n.charDasha_karaka_puk,
+                  fullName: l10n.charDasha_karaka_putrakaraka,
                   planet: karakas.putrakaraka,
                   degree: karakas.putrakarakaDegree,
                 ),
               ),
               Expanded(
                 child: _KarakaItem(
-                  shortName: 'GK',
-                  fullName: 'Gnatikaraka',
+                  shortName: l10n.charDasha_karaka_gk,
+                  fullName: l10n.charDasha_karaka_gnatikaraka,
                   planet: karakas.gnatikaraka,
                   degree: karakas.gnatrikarakaDegree,
                 ),
               ),
               Expanded(
                 child: _KarakaItem(
-                  shortName: 'DK',
-                  fullName: 'Darakaraka',
+                  shortName: l10n.charDasha_karaka_dk,
+                  fullName: l10n.charDasha_karaka_darakaraka,
                   planet: karakas.darakaraka,
                   degree: karakas.darakarakaDegree,
                 ),
@@ -1267,14 +1288,14 @@ class _KarakasCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Karakamsa',
+                      l10n.charDasha_karakamsa,
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         color: DashaColors.textTertiary,
                       ),
                     ),
                     Text(
-                      '${karakas.karakamsa} (AK in Navamsa)',
+                      l10n.charDasha_karakamsa_desc(karakas.karakamsa),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -1755,7 +1776,7 @@ class _CharPeriodItemState extends State<_CharPeriodItem> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'NOW',
+                                AppLocalizations.of(context).charDasha_now,
                                 style: GoogleFonts.inter(
                                   fontSize: 8,
                                   fontWeight: FontWeight.w700,
@@ -2060,7 +2081,7 @@ class _CharPeriodItemFallbackState extends State<_CharPeriodItemFallback> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'NOW',
+                                AppLocalizations.of(context).charDasha_now,
                                 style: GoogleFonts.inter(
                                   fontSize: 8,
                                   fontWeight: FontWeight.w700,
@@ -2364,7 +2385,7 @@ void showCharPeriodBottomSheet(
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Start',
+                                        AppLocalizations.of(context).charDasha_start,
                                         style: GoogleFonts.inter(
                                           fontSize: 9,
                                           color: DashaColors.textTertiary,
@@ -2394,7 +2415,7 @@ void showCharPeriodBottomSheet(
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'End',
+                                          AppLocalizations.of(context).charDasha_end,
                                           style: GoogleFonts.inter(
                                             fontSize: 9,
                                             color: DashaColors.textTertiary,
@@ -2425,7 +2446,7 @@ void showCharPeriodBottomSheet(
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Duration',
+                                          AppLocalizations.of(context).charDasha_duration,
                                           style: GoogleFonts.inter(
                                             fontSize: 9,
                                             color: DashaColors.textTertiary,
@@ -2455,7 +2476,7 @@ void showCharPeriodBottomSheet(
                         child: Row(
                           children: [
                             Text(
-                              'Sub-Periods (${period.subPeriods!.length})',
+                              AppLocalizations.of(context).charDasha_subPeriods(period.subPeriods!.length.toString()),
                               style: GoogleFonts.inter(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -2611,14 +2632,14 @@ void showCharPeriodBottomSheet(
                                 },
                               )
                               : Center(
-                                child: Text(
-                                  'No sub-periods available',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 13,
-                                    color: DashaColors.textTertiary,
+                                  child: Text(
+                                    AppLocalizations.of(context).charDasha_noSubPeriods,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13,
+                                      color: DashaColors.textTertiary,
+                                    ),
                                   ),
                                 ),
-                              ),
                     ),
                   ],
                 ),

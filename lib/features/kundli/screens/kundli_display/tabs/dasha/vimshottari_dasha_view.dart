@@ -3,17 +3,21 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../../shared/constants.dart';
 import 'dasha_shared_widgets.dart' hide getPlanetImagePath;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVIGATION SECTIONS
 // ═══════════════════════════════════════════════════════════════════════════
-const _sections = [
-  DashaNavSection(id: 'current', label: 'Current', color: DashaColors.emerald),
-  DashaNavSection(id: 'birth', label: 'Birth', color: DashaColors.amber),
-  DashaNavSection(id: 'timeline', label: 'Timeline', color: DashaColors.vimshottari),
+List<DashaNavSection> _getSections(AppLocalizations l10n) => [
+  DashaNavSection(id: 'current', label: l10n.vimshottari_nav_current, color: DashaColors.emerald),
+  DashaNavSection(id: 'birth', label: l10n.vimshottari_nav_birth, color: DashaColors.amber),
+  DashaNavSection(id: 'timeline', label: l10n.vimshottari_nav_timeline, color: DashaColors.vimshottari),
 ];
+
+// Static section IDs for initialization
+const _sectionIds = ['current', 'birth', 'timeline'];
 
 /// Vimshottari Dasha View - Premium 120-year Dasha with drill-down
 class VimshottariDashaView extends StatefulWidget {
@@ -38,9 +42,9 @@ class _VimshottariDashaViewState extends State<VimshottariDashaView> {
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
 
-    for (final section in _sections) {
-      _sectionKeys[section.id] = GlobalKey();
-      _animatedKeys[section.id] = GlobalKey<DashaAnimatedSectionWrapperState>();
+    for (final id in _sectionIds) {
+      _sectionKeys[id] = GlobalKey();
+      _animatedKeys[id] = GlobalKey<DashaAnimatedSectionWrapperState>();
     }
   }
 
@@ -59,8 +63,8 @@ class _VimshottariDashaViewState extends State<VimshottariDashaView> {
 
     int newActiveIndex = 0;
 
-    for (int i = 0; i < _sections.length; i++) {
-      final key = _sectionKeys[_sections[i].id];
+    for (int i = 0; i < _sectionIds.length; i++) {
+      final key = _sectionKeys[_sectionIds[i]];
       if (key?.currentContext != null) {
         final box = key!.currentContext!.findRenderObject() as RenderBox?;
         if (box != null) {
@@ -77,8 +81,8 @@ class _VimshottariDashaViewState extends State<VimshottariDashaView> {
     }
   }
 
-  Future<void> _scrollToSection(int index) async {
-    final section = _sections[index];
+  Future<void> _scrollToSection(int index, List<DashaNavSection> sections) async {
+    final section = sections[index];
     final key = _sectionKeys[section.id];
 
     if (key?.currentContext == null) return;
@@ -104,6 +108,8 @@ class _VimshottariDashaViewState extends State<VimshottariDashaView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final sections = _getSections(l10n);
     final dasha = widget.kundaliData.dashaInfo;
     final now = DateTime.now();
     final dynamicRemainingYears = _calculateDynamicRemainingYears(dasha, now);
@@ -138,7 +144,7 @@ class _VimshottariDashaViewState extends State<VimshottariDashaView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashaAnimatedSectionHeader(
-                      title: 'Active Periods',
+                      title: l10n.vimshottari_activePeriods,
                       accentColor: DashaColors.emerald,
                       icon: Icons.timeline_rounded,
                     ),
@@ -167,7 +173,7 @@ class _VimshottariDashaViewState extends State<VimshottariDashaView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       DashaAnimatedSectionHeader(
-                        title: 'Birth Configuration',
+                        title: l10n.vimshottari_birthConfiguration,
                         accentColor: DashaColors.amber,
                         icon: Icons.child_care_rounded,
                       ),
@@ -195,7 +201,7 @@ class _VimshottariDashaViewState extends State<VimshottariDashaView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashaAnimatedSectionHeader(
-                      title: 'Life Timeline',
+                      title: l10n.vimshottari_lifeTimeline,
                       accentColor: DashaColors.vimshottari,
                       icon: Icons.view_timeline_rounded,
                     ),
@@ -215,8 +221,8 @@ class _VimshottariDashaViewState extends State<VimshottariDashaView> {
 
               const SizedBox(height: DashaDesignTokens.space16),
 
-              const DashaInfoFooter(
-                text: 'Vimshottari Dasha is a 120-year cycle based on Moon\'s nakshatra at birth. Tap any period to see sub-periods.',
+              DashaInfoFooter(
+                text: l10n.vimshottari_infoFooter,
               ),
             ],
           ),
@@ -228,9 +234,9 @@ class _VimshottariDashaViewState extends State<VimshottariDashaView> {
           right: 16,
           bottom: MediaQuery.of(context).padding.bottom + 16,
           child: DashaFloatingNavBar(
-            sections: _sections,
+            sections: sections,
             activeIndex: _activeIndex,
-            onTap: _scrollToSection,
+            onTap: (index) => _scrollToSection(index, sections),
           ),
         ),
       ],
@@ -463,7 +469,7 @@ class _VimshottariHeroCardState extends State<_VimshottariHeroCard>
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      'ACTIVE',
+                      AppLocalizations.of(context).vimshottari_active,
                       style: GoogleFonts.inter(
                         fontSize: 9,
                         fontWeight: FontWeight.w600,
@@ -476,7 +482,7 @@ class _VimshottariHeroCardState extends State<_VimshottariHeroCard>
               ),
               const SizedBox(height: 6),
               Text(
-                '${widget.dasha.currentMahadasha} Mahadasha',
+                AppLocalizations.of(context).vimshottari_planetMahadasha(widget.dasha.currentMahadasha),
                 style: GoogleFonts.instrumentSans(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -486,7 +492,7 @@ class _VimshottariHeroCardState extends State<_VimshottariHeroCard>
               ),
               const SizedBox(height: 2),
               Text(
-                _getPlanetDescription(widget.dasha.currentMahadasha),
+                _getPlanetDescription(widget.dasha.currentMahadasha, AppLocalizations.of(context)),
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w400,
@@ -519,7 +525,7 @@ class _VimshottariHeroCardState extends State<_VimshottariHeroCard>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Journey Progress',
+                AppLocalizations.of(context).vimshottari_journeyProgress,
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
@@ -562,21 +568,21 @@ class _VimshottariHeroCardState extends State<_VimshottariHeroCard>
               _StatChip(
                 icon: Icons.hourglass_top_rounded,
                 value: formatDuration(widget.dynamicRemainingYears),
-                label: 'Remaining',
+                label: AppLocalizations.of(context).vimshottari_remaining,
                 iconColor: color,
               ),
               _buildDivider(),
               _StatChip(
                 icon: Icons.schedule_rounded,
-                value: '$totalYears yrs',
-                label: 'Duration',
+                value: AppLocalizations.of(context).vimshottari_yearsAbbr(totalYears.toString()),
+                label: AppLocalizations.of(context).vimshottari_duration,
                 iconColor: const Color(0xFF7C7889),
               ),
               _buildDivider(),
               _StatChip(
                 icon: Icons.check_circle_rounded,
                 value: '${widget.completedPeriods}/9',
-                label: 'Cycles',
+                label: AppLocalizations.of(context).vimshottari_cycles,
                 iconColor: const Color(0xFF4ADE80),
               ),
             ],
@@ -600,7 +606,7 @@ class _VimshottariHeroCardState extends State<_VimshottariHeroCard>
       children: [
         Expanded(
           child: _TimelineItem(
-            label: 'Started',
+            label: AppLocalizations.of(context).vimshottari_started,
             date: widget.dasha.mahadashaStartDate!,
             alignment: CrossAxisAlignment.start,
           ),
@@ -644,7 +650,7 @@ class _VimshottariHeroCardState extends State<_VimshottariHeroCard>
         ),
         Expanded(
           child: _TimelineItem(
-            label: 'Ends',
+            label: AppLocalizations.of(context).vimshottari_ends,
             date: widget.dasha.mahadashaEndDate!,
             alignment: CrossAxisAlignment.end,
           ),
@@ -653,19 +659,29 @@ class _VimshottariHeroCardState extends State<_VimshottariHeroCard>
     );
   }
 
-  String _getPlanetDescription(String planet) {
-    const descriptions = {
-      'Sun': 'Period of authority and leadership',
-      'Moon': 'Period of emotions and intuition',
-      'Mars': 'Period of action and courage',
-      'Mercury': 'Period of intellect and learning',
-      'Jupiter': 'Period of wisdom and fortune',
-      'Venus': 'Period of love and prosperity',
-      'Saturn': 'Period of discipline and karma',
-      'Rahu': 'Period of worldly desires',
-      'Ketu': 'Period of spiritual growth',
-    };
-    return descriptions[planet] ?? 'Planetary period of influence';
+  String _getPlanetDescription(String planet, AppLocalizations l10n) {
+    switch (planet) {
+      case 'Sun':
+        return l10n.vimshottari_desc_sun;
+      case 'Moon':
+        return l10n.vimshottari_desc_moon;
+      case 'Mars':
+        return l10n.vimshottari_desc_mars;
+      case 'Mercury':
+        return l10n.vimshottari_desc_mercury;
+      case 'Jupiter':
+        return l10n.vimshottari_desc_jupiter;
+      case 'Venus':
+        return l10n.vimshottari_desc_venus;
+      case 'Saturn':
+        return l10n.vimshottari_desc_saturn;
+      case 'Rahu':
+        return l10n.vimshottari_desc_rahu;
+      case 'Ketu':
+        return l10n.vimshottari_desc_ketu;
+      default:
+        return l10n.vimshottari_desc_default;
+    }
   }
 }
 
@@ -890,11 +906,12 @@ class _CurrentPeriodsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       children: [
         Expanded(
           child: _CompactPeriodCard(
-            label: 'Mahadasha',
+            label: l10n.dasha_mahadasha,
             planet: dasha.currentMahadasha,
             remainingYears: dynamicRemainingYears,
             progress: _calculateProgress(),
@@ -905,7 +922,7 @@ class _CurrentPeriodsCard extends StatelessWidget {
         if (dasha.currentAntardasha != null || dasha.currentAntardashaDetail != null)
           Expanded(
             child: _CompactPeriodCard(
-              label: 'Antardasha',
+              label: l10n.dasha_antardasha,
               planet: dasha.currentAntardashaDetail?.planet ?? dasha.currentAntardasha ?? '',
               remainingYears: _getAntardashaRemaining(),
               progress: _getAntardashaProgress(),
@@ -1011,7 +1028,7 @@ class _CompactPeriodCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '${formatDuration(remainingYears)} left',
+            AppLocalizations.of(context).vimshottari_left(formatDuration(remainingYears)),
             style: GoogleFonts.jetBrainsMono(
               fontSize: 9,
               color: DashaColors.textTertiary,
@@ -1034,6 +1051,7 @@ class _BirthConfigCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return DashaPremiumCard(
       child: Row(
         children: [
@@ -1041,7 +1059,7 @@ class _BirthConfigCard extends StatelessWidget {
             Expanded(
               child: _ConfigItem(
                 icon: Icons.stars_rounded,
-                label: 'Nakshatra Lord',
+                label: l10n.vimshottari_nakshatraLord,
                 value: dasha.birthNakshatraLord!,
                 color: getPlanetColor(dasha.birthNakshatraLord!),
               ),
@@ -1057,7 +1075,7 @@ class _BirthConfigCard extends StatelessWidget {
             Expanded(
               child: _ConfigItem(
                 icon: Icons.hourglass_top_rounded,
-                label: 'Balance at Birth',
+                label: l10n.vimshottari_balanceAtBirth,
                 value: formatDuration(dasha.balanceYearsAtBirth!),
                 color: DashaColors.amber,
               ),
@@ -1630,7 +1648,7 @@ void showVimshottariPeriodSheet(
                 child: Row(
                   children: [
                     Text(
-                      '${_getLevelDisplayName(nextLevel)} Periods',
+                      AppLocalizations.of(context).vimshottari_levelPeriods(_getLevelDisplayName(nextLevel, AppLocalizations.of(context))),
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -1682,7 +1700,7 @@ void showVimshottariPeriodSheet(
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            'Loading sub-periods...',
+                            AppLocalizations.of(context).vimshottari_loadingSubPeriods,
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               color: DashaColors.textTertiary,
@@ -1714,19 +1732,19 @@ DashaLevel? _getNextDashaLevel(DashaLevel current) {
   }
 }
 
-String _getLevelDisplayName(DashaLevel? level) {
+String _getLevelDisplayName(DashaLevel? level, AppLocalizations l10n) {
   if (level == null) return '';
   switch (level) {
     case DashaLevel.mahadasha:
-      return 'Mahadasha';
+      return l10n.dasha_mahadasha;
     case DashaLevel.antardasha:
-      return 'Antardasha';
+      return l10n.dasha_antardasha;
     case DashaLevel.pratyantara:
-      return 'Pratyantara';
+      return l10n.dasha_pratyantardasha;
     case DashaLevel.sookshma:
-      return 'Sookshma';
+      return l10n.vimshottari_sookshma;
     case DashaLevel.prana:
-      return 'Prana';
+      return l10n.vimshottari_prana;
   }
 }
 
@@ -1831,12 +1849,12 @@ class _VimshottariPeriodHeader extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                _DateColumn(label: 'Start', date: period.startDate),
+                _DateColumn(label: AppLocalizations.of(context).vimshottari_start, date: period.startDate),
                 Container(width: 1, height: 28, color: DashaColors.border),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 12),
-                    child: _DateColumn(label: 'End', date: period.endDate),
+                    child: _DateColumn(label: AppLocalizations.of(context).vimshottari_end, date: period.endDate),
                   ),
                 ),
                 Container(width: 1, height: 28, color: DashaColors.border),
@@ -1847,7 +1865,7 @@ class _VimshottariPeriodHeader extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Duration',
+                          AppLocalizations.of(context).vimshottari_duration,
                           style: GoogleFonts.inter(
                             fontSize: 9,
                             color: DashaColors.textTertiary,

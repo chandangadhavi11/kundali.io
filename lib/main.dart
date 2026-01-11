@@ -17,7 +17,7 @@ import 'core/providers/theme_provider.dart';
 import 'core/providers/compatibility_provider.dart';
 import 'core/services/sweph_service.dart';
 import 'core/services/chat_storage_service.dart';
-import 'l10n/app_localizations.dart';
+import 'l10n/generated/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -81,7 +81,20 @@ class KundaliApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [Locale('en', ''), Locale('hi', '')],
+          supportedLocales: const [
+            Locale('en'), // English
+            Locale('hi'), // Hindi
+            Locale('bn'), // Bengali
+            Locale('mr'), // Marathi
+            Locale('te'), // Telugu
+            Locale('ta'), // Tamil
+            Locale('gu'), // Gujarati
+            Locale('kn'), // Kannada
+            Locale('or'), // Odia
+            Locale('pa'), // Punjabi
+            Locale('ml'), // Malayalam
+            Locale('as'), // Assamese
+          ],
           routerConfig: AppRouter.router,
         );
       },

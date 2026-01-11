@@ -125,11 +125,42 @@ class AppConstants {
   // Chart Styles
   static const List<String> chartStyles = ['North Indian', 'South Indian'];
 
-  // Languages
+  // Languages - 12 Indian languages supported
   static const Map<String, String> supportedLanguages = {
     'en': 'English',
     'hi': 'हिन्दी',
+    'bn': 'বাংলা',
+    'mr': 'मराठी',
+    'te': 'తెలుగు',
+    'ta': 'தமிழ்',
+    'gu': 'ગુજરાતી',
+    'kn': 'ಕನ್ನಡ',
+    'or': 'ଓଡ଼ିଆ',
+    'pa': 'ਪੰਜਾਬੀ',
+    'ml': 'മലയാളം',
+    'as': 'অসমীয়া',
   };
+
+  /// Get the native name for a language code
+  static String getNativeLanguageName(String code) {
+    return supportedLanguages[code] ?? 'English';
+  }
+
+  /// List of all supported locale codes
+  static const List<String> supportedLocaleCodes = [
+    'en',
+    'hi',
+    'bn',
+    'mr',
+    'te',
+    'ta',
+    'gu',
+    'kn',
+    'or',
+    'pa',
+    'ml',
+    'as',
+  ];
 
   // Date Formats
   static const String dateFormat = 'dd MMM yyyy';
@@ -150,5 +181,3 @@ class AppConstants {
   static const String loadingAnimation = 'assets/animations/loading.json';
   static const String successAnimation = 'assets/animations/success.json';
 }
-
-

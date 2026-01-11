@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import 'dasha/vimshottari_dasha_view.dart';
 import 'dasha/mahadasha_phala_view.dart';
 import 'dasha/yogini_dasha_view.dart';
@@ -40,76 +41,68 @@ class DashaInsightData {
 // ═══════════════════════════════════════════════════════════════════════════
 // INSIGHT GENERATORS
 // ═══════════════════════════════════════════════════════════════════════════
-DashaInsightData _getDashaTypeInsight(DashaType type) {
+DashaInsightData _getDashaTypeInsight(DashaType type, AppLocalizations l10n) {
   switch (type) {
     case DashaType.vimshottari:
       return DashaInsightData(
-        title: 'Dasha System',
-        value: 'Vimshottari',
-        description:
-            'Vimshottari Dasha is the most widely used planetary period system in Vedic astrology. It\'s a 120-year cycle based on the Moon\'s Nakshatra (lunar mansion) at birth.',
-        significance:
-            'This system reveals the timing of life events by showing which planetary energies are active during specific periods of your life.',
+        title: l10n.dasha_insight_system,
+        value: l10n.dasha_vimshottari_title,
+        description: l10n.dasha_vimshottari_desc,
+        significance: l10n.dasha_vimshottari_significance,
         keyPoints: [
-          'Based on Moon\'s birth Nakshatra',
-          '120-year complete cycle',
-          '9 planetary periods (Mahadasha)',
-          'Each period has sub-periods (Antardasha)',
-          'Most accurate for timing predictions',
+          l10n.dasha_vimshottari_point1,
+          l10n.dasha_vimshottari_point2,
+          l10n.dasha_vimshottari_point3,
+          l10n.dasha_vimshottari_point4,
+          l10n.dasha_vimshottari_point5,
         ],
         accentColor: DashaColors.vimshottari,
         icon: Icons.brightness_2_rounded,
       );
     case DashaType.mahadashaPhala:
       return DashaInsightData(
-        title: 'Dasha System',
-        value: 'Mahadasha Phala',
-        description:
-            'Mahadasha Phala focuses on the results and effects of major planetary periods. It provides detailed predictions for each Mahadasha based on planetary positions.',
-        significance:
-            'This analysis helps understand what specific results each Mahadasha will bring based on the planet\'s house placement and aspects.',
+        title: l10n.dasha_insight_system,
+        value: l10n.dasha_phala_title,
+        description: l10n.dasha_phala_desc,
+        significance: l10n.dasha_phala_significance,
         keyPoints: [
-          'Focuses on period results',
-          'House-based predictions',
-          'Considers planetary aspects',
-          'Shows favorable/unfavorable periods',
-          'Helps in life planning',
+          l10n.dasha_phala_point1,
+          l10n.dasha_phala_point2,
+          l10n.dasha_phala_point3,
+          l10n.dasha_phala_point4,
+          l10n.dasha_phala_point5,
         ],
         accentColor: DashaColors.phala,
         icon: Icons.auto_awesome_rounded,
       );
     case DashaType.yogini:
       return DashaInsightData(
-        title: 'Dasha System',
-        value: 'Yogini',
-        description:
-            'Yogini Dasha is a unique 36-year cycle named after 8 Yoginis (divine feminine energies). It\'s particularly useful for timing events and is known for its accuracy.',
-        significance:
-            'This shorter cycle system is excellent for precise timing and is said to give results that are more immediately noticeable.',
+        title: l10n.dasha_insight_system,
+        value: l10n.dasha_yogini_title,
+        description: l10n.dasha_yogini_desc,
+        significance: l10n.dasha_yogini_significance,
         keyPoints: [
-          '36-year complete cycle',
-          '8 Yogini periods',
-          'Named after divine feminine',
-          'Excellent for timing events',
-          'Complementary to Vimshottari',
+          l10n.dasha_yogini_point1,
+          l10n.dasha_yogini_point2,
+          l10n.dasha_yogini_point3,
+          l10n.dasha_yogini_point4,
+          l10n.dasha_yogini_point5,
         ],
         accentColor: DashaColors.yogini,
         icon: Icons.spa_rounded,
       );
     case DashaType.char:
       return DashaInsightData(
-        title: 'Dasha System',
-        value: 'Chara (Jaimini)',
-        description:
-            'Chara Dasha is from the Jaimini system of astrology. It uses zodiac signs rather than planets and is based on the Karakamsha (soul\'s desire).',
-        significance:
-            'This sign-based system provides a different perspective on life timing and is particularly useful for understanding soul-level desires and karmic patterns.',
+        title: l10n.dasha_insight_system,
+        value: l10n.dasha_char_title,
+        description: l10n.dasha_char_desc,
+        significance: l10n.dasha_char_significance,
         keyPoints: [
-          'Jaimini astrology system',
-          'Sign-based periods',
-          'Based on Karakamsha',
-          'Shows karmic patterns',
-          'Complements planetary Dashas',
+          l10n.dasha_char_point1,
+          l10n.dasha_char_point2,
+          l10n.dasha_char_point3,
+          l10n.dasha_char_point4,
+          l10n.dasha_char_point5,
         ],
         accentColor: DashaColors.char,
         icon: Icons.donut_small_rounded,
@@ -308,14 +301,19 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                     const SizedBox(height: 20),
 
                     // Description
-                    Text(
-                      'What This Means',
-                      style: GoogleFonts.inter(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                        color: DashaColors.textSecondary,
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final l10n = AppLocalizations.of(context)!;
+                        return Text(
+                          l10n.dasha_insight_whatThisMeans,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                            color: DashaColors.textSecondary,
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -361,13 +359,18 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Significance',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: insight.accentColor,
-                                  ),
+                                Builder(
+                                  builder: (context) {
+                                    final l10n = AppLocalizations.of(context)!;
+                                    return Text(
+                                      l10n.dasha_insight_significance,
+                                      style: GoogleFonts.inter(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        color: insight.accentColor,
+                                      ),
+                                    );
+                                  },
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
@@ -389,14 +392,19 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                     // Key points
                     if (insight.keyPoints.isNotEmpty) ...[
                       const SizedBox(height: 24),
-                      Text(
-                        'Key Points',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                          color: DashaColors.textSecondary,
-                        ),
+                      Builder(
+                        builder: (context) {
+                          final l10n = AppLocalizations.of(context)!;
+                          return Text(
+                            l10n.dasha_insight_keyPoints,
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                              color: DashaColors.textSecondary,
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 12),
                       ...insight.keyPoints.asMap().entries.map((entry) {
@@ -514,6 +522,7 @@ class _DashaTabState extends State<DashaTab> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Premium Dasha Type Selector
@@ -524,7 +533,7 @@ class _DashaTabState extends State<DashaTab> with TickerProviderStateMixin {
             onSelect: _selectDashaType,
             onInfoTap:
                 (type) =>
-                    _showInsightSheet(context, _getDashaTypeInsight(type)),
+                    _showInsightSheet(context, _getDashaTypeInsight(type, l10n)),
           ),
         ),
 
@@ -745,21 +754,22 @@ class _DashaTypeTabState extends State<_DashaTypeTab>
     }
   }
 
-  String get _shortLabel {
+  String _getShortLabel(AppLocalizations l10n) {
     switch (widget.type) {
       case DashaType.vimshottari:
-        return 'Vimshottari';
+        return l10n.dasha_tab_vimshottari;
       case DashaType.mahadashaPhala:
-        return 'Phala';
+        return l10n.dasha_tab_phala;
       case DashaType.yogini:
-        return 'Yogini';
+        return l10n.dasha_tab_yogini;
       case DashaType.char:
-        return 'Char';
+        return l10n.dasha_tab_char;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
@@ -846,7 +856,7 @@ class _DashaTypeTabState extends State<_DashaTypeTab>
                   const SizedBox(width: 8),
                   // Label
                   Text(
-                    _shortLabel,
+                    _getShortLabel(l10n),
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight:

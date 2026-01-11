@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../widgets/moon_phase_widget.dart';
 import '../shared/floating_nav_bar.dart';
 
@@ -552,7 +553,7 @@ class _TappableInsightState extends State<_TappableInsight>
 // ═══════════════════════════════════════════════════════════════════════════
 // INSIGHT GENERATORS
 // ═══════════════════════════════════════════════════════════════════════════
-InsightData _getTithiInsight(PanchangData panchang, String tithiLord) {
+InsightData _getTithiInsight(PanchangData panchang, String tithiLord, AppLocalizations l10n) {
   final tithiDescriptions = {
     1: 'Pratipada - First lunar day, new beginnings and fresh starts',
     2: 'Dwitiya - Second lunar day, partnerships and relationships',
@@ -570,25 +571,27 @@ InsightData _getTithiInsight(PanchangData panchang, String tithiLord) {
     14: 'Chaturdashi - Fourteenth lunar day, transition period',
     15: 'Purnima/Amavasya - Full/New Moon, peak lunar energy',
   };
+  
+  final pakshaType = panchang.paksha == "Shukla" ? l10n.panchang_waxing : l10n.panchang_waning;
 
   return InsightData(
-    title: 'Tithi',
+    title: l10n.panchang_tithi_title,
     value: panchang.tithi,
-    description: 'Tithi is the lunar day in the Hindu calendar, representing the angle between the Sun and Moon. Each Tithi has its own energy and is ruled by a specific planet. ${tithiDescriptions[panchang.tithiNumber] ?? ""}',
-    significance: 'Your birth Tithi is ${panchang.tithi} (${panchang.tithiNumber}/15 in ${panchang.paksha} Paksha), ruled by $tithiLord. This influences your emotional nature and the lunar energy you carry.',
+    description: '${l10n.panchang_tithi_desc} ${tithiDescriptions[panchang.tithiNumber] ?? ""}',
+    significance: l10n.panchang_tithi_significance(panchang.tithi, panchang.tithiNumber, panchang.paksha, tithiLord),
     keyPoints: [
-      'Tithi Number: ${panchang.tithiNumber} of 15',
-      'Paksha: ${panchang.paksha} (${panchang.paksha == "Shukla" ? "Waxing" : "Waning"} Moon)',
-      'Tithi Lord: $tithiLord',
-      'Each Tithi spans approximately 12 degrees of Moon-Sun elongation',
-      'Tithis are used for muhurta (auspicious timing)',
+      l10n.panchang_tithi_point1(panchang.tithiNumber),
+      l10n.panchang_tithi_point2(panchang.paksha, pakshaType),
+      l10n.panchang_tithi_point3(tithiLord),
+      l10n.panchang_tithi_point4,
+      l10n.panchang_tithi_point5,
     ],
     accentColor: _Colors.emerald,
     icon: Icons.brightness_2_rounded,
   );
 }
 
-InsightData _getNakshatraInsight(PanchangData panchang) {
+InsightData _getNakshatraInsight(PanchangData panchang, AppLocalizations l10n) {
   final nakshatraLords = {
     'Ashwini': 'Ketu', 'Bharani': 'Venus', 'Krittika': 'Sun',
     'Rohini': 'Moon', 'Mrigashira': 'Mars', 'Ardra': 'Rahu',
@@ -604,23 +607,23 @@ InsightData _getNakshatraInsight(PanchangData panchang) {
   final lord = nakshatraLords[panchang.nakshatra] ?? 'Unknown';
 
   return InsightData(
-    title: 'Nakshatra',
-    value: '${panchang.nakshatra} (Pada ${panchang.nakshatraPada})',
-    description: 'Nakshatra is the lunar mansion or star constellation where the Moon was positioned at birth. There are 27 Nakshatras, each spanning 13°20\' of the zodiac. Each Nakshatra has 4 Padas (quarters) of 3°20\' each.',
-    significance: 'The Moon in ${panchang.nakshatra} Nakshatra, Pada ${panchang.nakshatraPada}, shapes your inner emotional nature, instincts, and subconscious patterns. The Nakshatra lord $lord influences your Vimshottari Dasha sequence.',
+    title: l10n.panchang_nakshatra_title,
+    value: l10n.panchang_nakshatra_value(panchang.nakshatra, panchang.nakshatraPada),
+    description: l10n.panchang_nakshatra_desc,
+    significance: l10n.panchang_nakshatra_significance(panchang.nakshatra, panchang.nakshatraPada, lord),
     keyPoints: [
-      'Nakshatra: ${panchang.nakshatra}',
-      'Pada (Quarter): ${panchang.nakshatraPada} of 4',
-      'Nakshatra Lord: $lord',
-      'Each Nakshatra has a presiding deity and specific qualities',
-      'Determines the starting Mahadasha in Vimshottari Dasha system',
+      l10n.panchang_nakshatra_point1(panchang.nakshatra),
+      l10n.panchang_nakshatra_point2(panchang.nakshatraPada),
+      l10n.panchang_nakshatra_point3(lord),
+      l10n.panchang_nakshatra_point4,
+      l10n.panchang_nakshatra_point5,
     ],
     accentColor: _Colors.amber,
     icon: Icons.star_rounded,
   );
 }
 
-InsightData _getYogaInsight(PanchangData panchang, String yogaType) {
+InsightData _getYogaInsight(PanchangData panchang, String yogaType, AppLocalizations l10n) {
   final yogaDescriptions = {
     'Vishkumbha': 'Obstacle-creating yoga, challenges may arise',
     'Priti': 'Love and affection, favorable for relationships',
@@ -651,27 +654,27 @@ InsightData _getYogaInsight(PanchangData panchang, String yogaType) {
     'Vaidhriti': 'Discord - the most inauspicious yoga',
   };
 
-  final yogaColor = yogaType == 'Auspicious' ? _Colors.emerald : 
-                    yogaType == 'Inauspicious' ? _Colors.coral : _Colors.sky;
+  final yogaColor = yogaType == l10n.panchang_yoga_auspicious ? _Colors.emerald : 
+                    yogaType == l10n.panchang_yoga_inauspicious ? _Colors.coral : _Colors.sky;
 
   return InsightData(
-    title: 'Yoga',
-    value: '${panchang.yoga} (${panchang.yogaNumber}/27)',
-    description: 'Yoga in Panchang is calculated from the combined longitude of the Sun and Moon. There are 27 Yogas, each spanning 13°20\'. ${yogaDescriptions[panchang.yoga] ?? "This Yoga influences the overall energy of the day."}',
-    significance: 'Your birth Yoga is ${panchang.yoga}, which is considered $yogaType. This cosmic combination of Sun and Moon energies influences your life path and the general fortune you carry.',
+    title: l10n.panchang_yoga_title,
+    value: l10n.panchang_yoga_value(panchang.yoga, panchang.yogaNumber),
+    description: '${l10n.panchang_yoga_desc} ${yogaDescriptions[panchang.yoga] ?? ""}',
+    significance: l10n.panchang_yoga_significance(panchang.yoga, yogaType),
     keyPoints: [
-      'Yoga: ${panchang.yoga}',
-      'Number: ${panchang.yogaNumber} of 27',
-      'Type: $yogaType',
-      'Formula: (Sun longitude + Moon longitude) ÷ 13°20\'',
-      'Affects overall auspiciousness of the birth moment',
+      l10n.panchang_yoga_point1(panchang.yoga),
+      l10n.panchang_yoga_point2(panchang.yogaNumber),
+      l10n.panchang_yoga_point3(yogaType),
+      l10n.panchang_yoga_point4,
+      l10n.panchang_yoga_point5,
     ],
     accentColor: yogaColor,
     icon: Icons.link_rounded,
   );
 }
 
-InsightData _getKaranaInsight(PanchangData panchang, String karanaType) {
+InsightData _getKaranaInsight(PanchangData panchang, String karanaType, AppLocalizations l10n) {
   final karanaDescriptions = {
     'Bava': 'Lion - Courage, leadership, administrative work',
     'Balava': 'Tiger - Strength, aggressive pursuits',
@@ -686,26 +689,27 @@ InsightData _getKaranaInsight(PanchangData panchang, String karanaType) {
     'Kimstughna': 'Dead creature - Auspicious, destroys obstacles (Fixed)',
   };
 
-  final karanaColor = karanaType.contains('Bhadra') ? _Colors.coral : _Colors.violet;
+  final isBhadra = karanaType == l10n.panchang_karana_bhadra;
+  final karanaColor = isBhadra ? _Colors.coral : _Colors.violet;
 
   return InsightData(
-    title: 'Karana',
+    title: l10n.panchang_karana_title,
     value: panchang.karana,
-    description: 'Karana is half of a Tithi, with 11 Karanas repeating to make 60 half-Tithis in a lunar month. 7 are movable (Chara) and 4 are fixed (Sthira). ${karanaDescriptions[panchang.karana] ?? "Each Karana has its own characteristics."}',
-    significance: 'Born in ${panchang.karana} Karana, which is $karanaType. Karanas influence specific activities and the energy of the half-day period.',
+    description: '${l10n.panchang_karana_desc} ${karanaDescriptions[panchang.karana] ?? ""}',
+    significance: l10n.panchang_karana_significance(panchang.karana, karanaType),
     keyPoints: [
-      'Karana: ${panchang.karana}',
-      'Type: $karanaType',
-      '7 Movable (Chara): Bava to Vishti, repeat 8 times',
-      '4 Fixed (Sthira): Shakuni, Chatushpada, Naga, Kimstughna',
-      'Vishti (Bhadra) is considered inauspicious',
+      l10n.panchang_karana_point1(panchang.karana),
+      l10n.panchang_karana_point2(karanaType),
+      l10n.panchang_karana_point3,
+      l10n.panchang_karana_point4,
+      l10n.panchang_karana_point5,
     ],
     accentColor: karanaColor,
     icon: Icons.hourglass_bottom_rounded,
   );
 }
 
-InsightData _getVaraInsight(PanchangData panchang) {
+InsightData _getVaraInsight(PanchangData panchang, AppLocalizations l10n) {
   final varaInfo = {
     'Sunday': {'lord': 'Sun', 'deity': 'Surya', 'color': _Colors.gold, 'nature': 'Royal, authoritative, government-related activities'},
     'Monday': {'lord': 'Moon', 'deity': 'Chandra', 'color': _Colors.emerald, 'nature': 'Emotional, nurturing, travel, public dealings'},
@@ -717,57 +721,62 @@ InsightData _getVaraInsight(PanchangData panchang) {
   };
 
   final info = varaInfo[panchang.vara] ?? {'lord': 'Unknown', 'deity': 'Unknown', 'color': _Colors.textSecondary, 'nature': ''};
+  final lord = info['lord'] as String;
 
   return InsightData(
-    title: 'Vara (Weekday)',
+    title: l10n.panchang_vara_title,
     value: panchang.vara,
-    description: 'Vara is the weekday, one of the five limbs of Panchang. Each day is ruled by a planet, influencing the energy and suitable activities for that day. ${info['nature']}',
-    significance: 'Born on ${panchang.vara}, ruled by ${info['lord']}. This planetary influence colors your personality and the types of activities that come naturally to you.',
+    description: '${l10n.panchang_vara_desc} ${info['nature']}',
+    significance: l10n.panchang_vara_significance(panchang.vara, lord),
     keyPoints: [
-      'Vara: ${panchang.vara}',
-      'Vara Lord: ${info['lord']}',
-      'Presiding Deity: ${panchang.varaDeity}',
-      'Each Vara has specific auspicious and inauspicious hours',
-      'Vara lord placement in chart strengthens its effects',
+      l10n.panchang_vara_point1(panchang.vara),
+      l10n.panchang_vara_point2(lord),
+      l10n.panchang_vara_point3(panchang.varaDeity),
+      l10n.panchang_vara_point4,
+      l10n.panchang_vara_point5,
     ],
     accentColor: info['color'] as Color,
     icon: Icons.calendar_today_rounded,
   );
 }
 
-InsightData _getMoonPhaseInsight(PanchangData panchang, double illumination) {
-  final phaseType = panchang.paksha == 'Shukla' ? 'Waxing' : 'Waning';
+InsightData _getMoonPhaseInsight(PanchangData panchang, double illumination, AppLocalizations l10n) {
+  final phaseType = panchang.paksha == 'Shukla' ? l10n.panchang_waxing : l10n.panchang_waning;
   String phase;
   if (panchang.tithiNumber == 15) {
-    phase = panchang.paksha == 'Shukla' ? 'Full Moon (Purnima)' : 'New Moon (Amavasya)';
+    phase = panchang.paksha == 'Shukla' ? l10n.panchang_phase_fullMoon : l10n.panchang_phase_newMoon;
   } else if (panchang.tithiNumber <= 3) {
-    phase = panchang.paksha == 'Shukla' ? 'Waxing Crescent' : 'Waning Gibbous';
+    phase = panchang.paksha == 'Shukla' ? l10n.panchang_phase_waxingCrescent : l10n.panchang_phase_waningGibbous;
   } else if (panchang.tithiNumber <= 7) {
-    phase = panchang.paksha == 'Shukla' ? 'First Quarter' : 'Third Quarter';
+    phase = panchang.paksha == 'Shukla' ? l10n.panchang_phase_firstQuarter : l10n.panchang_phase_thirdQuarter;
   } else if (panchang.tithiNumber <= 11) {
-    phase = panchang.paksha == 'Shukla' ? 'Waxing Gibbous' : 'Waning Crescent';
+    phase = panchang.paksha == 'Shukla' ? l10n.panchang_phase_waxingGibbous : l10n.panchang_phase_waningCrescent;
   } else {
-    phase = panchang.paksha == 'Shukla' ? 'Nearly Full' : 'Nearly New';
+    phase = panchang.paksha == 'Shukla' ? l10n.panchang_phase_nearlyFull : l10n.panchang_phase_nearlyNew;
   }
 
+  final nature = panchang.paksha == "Shukla" 
+      ? l10n.panchang_moonPhase_nature_shukla 
+      : l10n.panchang_moonPhase_nature_krishna;
+
   return InsightData(
-    title: 'Moon Phase',
+    title: l10n.panchang_moonPhase_title,
     value: phase,
-    description: 'The Moon phase at birth indicates the relationship between the Sun and Moon, reflecting the interplay of consciousness (Sun) and mind (Moon). A ${phaseType.toLowerCase()} moon suggests ${panchang.paksha == "Shukla" ? "growth, expansion, and building energy" : "release, introspection, and completion energy"}.',
-    significance: 'Born during ${panchang.paksha} Paksha with ${illumination.toStringAsFixed(0)}% illumination. This indicates a ${panchang.paksha == "Shukla" ? "more outgoing, action-oriented nature with growing vitality" : "more introspective, wisdom-seeking nature with releasing tendencies"}.',
+    description: l10n.panchang_moonPhase_desc,
+    significance: l10n.panchang_moonPhase_significance(panchang.paksha, illumination.toStringAsFixed(0), nature),
     keyPoints: [
-      'Phase: $phase',
-      'Paksha: ${panchang.paksha} ($phaseType)',
-      'Illumination: ${illumination.toStringAsFixed(1)}%',
-      'Tithi: ${panchang.tithi} (${panchang.tithiNumber}/15)',
-      'Moon phase affects emotional patterns and life cycles',
+      l10n.panchang_moonPhase_point1(phase),
+      l10n.panchang_moonPhase_point2(panchang.paksha, phaseType),
+      l10n.panchang_moonPhase_point3(illumination.toStringAsFixed(1)),
+      l10n.panchang_moonPhase_point4(panchang.tithi, panchang.tithiNumber),
+      l10n.panchang_moonPhase_point5,
     ],
     accentColor: _Colors.indigo,
     icon: Icons.nightlight_round,
   );
 }
 
-InsightData _getHoraInsight(String hora, DateTime birthTime) {
+InsightData _getHoraInsight(String hora, DateTime birthTime, AppLocalizations l10n) {
   final horaInfo = {
     'Sun': {'nature': 'Authority, leadership, government work, fame', 'color': _Colors.gold},
     'Moon': {'nature': 'Travel, emotions, public, nurturing', 'color': _Colors.emerald},
@@ -781,42 +790,48 @@ InsightData _getHoraInsight(String hora, DateTime birthTime) {
   final info = horaInfo[hora] ?? {'nature': '', 'color': _Colors.textSecondary};
 
   return InsightData(
-    title: 'Hora',
-    value: '$hora Hora',
-    description: 'Hora divides each day into 24 planetary hours, with each hour ruled by a planet in a specific sequence. The Hora at birth indicates the planetary influence active at that moment. ${info['nature']}',
-    significance: 'Born during $hora Hora, you carry the energy of $hora in your personality and approach to life. Activities related to $hora come naturally to you.',
+    title: l10n.panchang_hora_title,
+    value: l10n.panchang_hora_value(hora),
+    description: '${l10n.panchang_hora_desc} ${info['nature']}',
+    significance: l10n.panchang_hora_significance(hora),
     keyPoints: [
-      'Birth Hora: $hora',
-      'Time: ${DateFormat('HH:mm').format(birthTime)}',
-      'Hora sequence follows: Sun→Venus→Mercury→Moon→Saturn→Jupiter→Mars',
-      'Each hora lasts approximately 1 hour',
-      'Hora influences the energy available for activities',
+      l10n.panchang_hora_point1(hora),
+      l10n.panchang_hora_point2(DateFormat('HH:mm').format(birthTime)),
+      l10n.panchang_hora_point3,
+      l10n.panchang_hora_point4,
+      l10n.panchang_hora_point5,
     ],
     accentColor: info['color'] as Color,
     icon: Icons.access_time_rounded,
   );
 }
 
-InsightData _getInauspiciousPeriodInsight(TimePeriod period, Color color) {
-  final descriptions = {
-    'Rahu Kala': 'Rahu Kala is the most inauspicious period of the day, ruled by the shadow planet Rahu. Starting new ventures, important meetings, or auspicious activities should be avoided during this time. However, activities related to Rahu (foreign connections, unconventional work) may actually benefit.',
-    'Yamaghanda': 'Yamaghanda, also called Yama Ghantaka, is ruled by Yama, the god of death. This period is considered inauspicious for starting journeys, especially in the direction governed by Yama that day. Medical treatments and risky activities should be avoided.',
-    'Gulika': 'Gulika Kala, ruled by Saturn\'s son Gulika (Mandi), is associated with poison and hidden dangers. While generally avoided for new beginnings, it\'s considered good for activities requiring secrecy or dealing with underground matters.',
-  };
+InsightData _getInauspiciousPeriodInsight(TimePeriod period, Color color, AppLocalizations l10n) {
+  String description;
+  String point4;
+  
+  if (period.name == 'Rahu Kala') {
+    description = l10n.panchang_inauspicious_rahuKala_desc;
+    point4 = l10n.panchang_inauspicious_point4_rahu;
+  } else if (period.name == 'Yamaghanda') {
+    description = l10n.panchang_inauspicious_yamaghanda_desc;
+    point4 = l10n.panchang_inauspicious_point4_yama;
+  } else {
+    description = l10n.panchang_inauspicious_gulika_desc;
+    point4 = l10n.panchang_inauspicious_point4_gulika;
+  }
 
   return InsightData(
-    title: 'Inauspicious Period',
+    title: l10n.panchang_inauspicious_title,
     value: period.name,
-    description: descriptions[period.name] ?? period.description,
-    significance: 'Birth during ${period.name} (${period.formattedTime}) suggests specific karmic lessons related to this period\'s ruler. Understanding this helps in timing important life decisions.',
+    description: description,
+    significance: l10n.panchang_inauspicious_significance(period.name, period.formattedTime),
     keyPoints: [
-      'Period: ${period.name}',
-      'Time: ${period.formattedTime}',
-      'Duration: Approximately 1.5 hours',
-      period.name == 'Rahu Kala' ? 'Most important inauspicious period' :
-      period.name == 'Yamaghanda' ? 'Avoid travels and risky activities' :
-      'Related to hidden matters and secrecy',
-      'Each weekday has different timings for these periods',
+      l10n.panchang_inauspicious_point1(period.name),
+      l10n.panchang_inauspicious_point2(period.formattedTime),
+      l10n.panchang_inauspicious_point3,
+      point4,
+      l10n.panchang_inauspicious_point5,
     ],
     accentColor: color,
     icon: period.name == 'Rahu Kala' ? Icons.do_not_disturb_on_rounded :
@@ -825,18 +840,18 @@ InsightData _getInauspiciousPeriodInsight(TimePeriod period, Color color) {
   );
 }
 
-InsightData _getVarshphalInsight(VarshphalData varshphal) {
+InsightData _getVarshphalInsight(VarshphalData varshphal, AppLocalizations l10n) {
   return InsightData(
-    title: 'Varshphal',
-    value: 'Solar Return ${varshphal.year}',
-    description: 'Varshphal (Annual Horoscope) is the chart cast for the exact moment when the Sun returns to its birth position each year. It provides insights into the themes, opportunities, and challenges for that specific year of life.',
-    significance: 'At age ${varshphal.age}, your Muntha (progressed Ascendant) is in ${varshphal.munthaSign}, and the Year Lord is ${varshphal.yearLord}. These factors shape the major themes of this year.',
+    title: l10n.panchang_varshphal_title,
+    value: l10n.panchang_varshphal_value(varshphal.year),
+    description: l10n.panchang_varshphal_desc,
+    significance: l10n.panchang_varshphal_significance(varshphal.age, varshphal.munthaSign, varshphal.yearLord),
     keyPoints: [
-      'Year: ${varshphal.year}',
-      'Age: ${varshphal.age} years',
-      'Solar Return: ${DateFormat('d MMM yyyy').format(varshphal.solarReturnDate)}',
-      'Muntha Sign: ${varshphal.munthaSign}',
-      'Year Lord: ${varshphal.yearLord}',
+      l10n.panchang_varshphal_point1(varshphal.year),
+      l10n.panchang_varshphal_point2(varshphal.age),
+      l10n.panchang_varshphal_point3(DateFormat('d MMM yyyy').format(varshphal.solarReturnDate)),
+      l10n.panchang_varshphal_point4(varshphal.munthaSign),
+      l10n.panchang_varshphal_point5(varshphal.yearLord),
     ],
     accentColor: _Colors.amber,
     icon: Icons.wb_sunny_rounded,
@@ -846,13 +861,15 @@ InsightData _getVarshphalInsight(VarshphalData varshphal) {
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVIGATION SECTION DATA
 // ═══════════════════════════════════════════════════════════════════════════
-const _sections = [
-  NavSection(id: 'moon', label: 'Moon', color: _Colors.indigo),
-  NavSection(id: 'elements', label: 'Elements', color: _Colors.emerald),
-  NavSection(id: 'hora', label: 'Hora', color: _Colors.sky),
-  NavSection(id: 'periods', label: 'Periods', color: _Colors.coral),
-  NavSection(id: 'varshphal', label: 'Varshphal', color: _Colors.amber),
+List<NavSection> _getSections(AppLocalizations l10n) => [
+  NavSection(id: 'moon', label: l10n.panchang_nav_moon, color: _Colors.indigo),
+  NavSection(id: 'elements', label: l10n.panchang_nav_elements, color: _Colors.emerald),
+  NavSection(id: 'hora', label: l10n.panchang_nav_hora, color: _Colors.sky),
+  NavSection(id: 'periods', label: l10n.panchang_nav_periods, color: _Colors.coral),
+  NavSection(id: 'varshphal', label: l10n.panchang_nav_varshphal, color: _Colors.amber),
 ];
+
+const _sectionIds = ['moon', 'elements', 'hora', 'periods', 'varshphal'];
 
 /// Panchang Tab - Shows birth panchang, inauspicious periods, and varshphal
 /// Premium, elegant UI with clear visual hierarchy
@@ -878,9 +895,9 @@ class _PanchangTabState extends State<PanchangTab> {
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
 
-    for (final section in _sections) {
-      _sectionKeys[section.id] = GlobalKey();
-      _animatedKeys[section.id] = GlobalKey<_AnimatedSectionWrapperState>();
+    for (final sectionId in _sectionIds) {
+      _sectionKeys[sectionId] = GlobalKey();
+      _animatedKeys[sectionId] = GlobalKey<_AnimatedSectionWrapperState>();
     }
   }
 
@@ -899,8 +916,8 @@ class _PanchangTabState extends State<PanchangTab> {
 
     int newActiveIndex = 0;
 
-    for (int i = 0; i < _sections.length; i++) {
-      final key = _sectionKeys[_sections[i].id];
+    for (int i = 0; i < _sectionIds.length; i++) {
+      final key = _sectionKeys[_sectionIds[i]];
       if (key?.currentContext != null) {
         final box = key!.currentContext!.findRenderObject() as RenderBox?;
         if (box != null) {
@@ -918,8 +935,8 @@ class _PanchangTabState extends State<PanchangTab> {
   }
 
   Future<void> _scrollToSection(int index) async {
-    final section = _sections[index];
-    final key = _sectionKeys[section.id];
+    final sectionId = _sectionIds[index];
+    final key = _sectionKeys[sectionId];
 
     if (key?.currentContext == null) return;
 
@@ -937,13 +954,15 @@ class _PanchangTabState extends State<PanchangTab> {
       alignment: 0.08,
     );
 
-    _animatedKeys[section.id]?.currentState?.triggerHighlight();
+    _animatedKeys[sectionId]?.currentState?.triggerHighlight();
 
     setState(() => _isScrolling = false);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final sections = _getSections(l10n);
     final sunPos = widget.kundaliData.planetPositions['Sun'];
     final moonPos = widget.kundaliData.planetPositions['Moon'];
 
@@ -971,40 +990,41 @@ class _PanchangTabState extends State<PanchangTab> {
 
     // Derive additional Panchang details
     final tithiLord = _getTithiLord(panchang.tithiNumber, panchang.paksha);
-    final yogaType = _getYogaType(panchang.yogaNumber);
-    final karanaType = _getKaranaType(panchang.karana);
+    final yogaType = _getYogaType(panchang.yogaNumber, l10n);
+    final karanaType = _getKaranaType(panchang.karana, l10n);
 
     return Stack(
       children: [
         SingleChildScrollView(
           controller: _scrollController,
-      physics: const BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 120),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ═══════════════════════════════════════════════════════════════
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ═══════════════════════════════════════════════════════════════
               // MOON PHASE SECTION
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['moon'],
                 sectionKey: _sectionKeys['moon']!,
                 accentColor: _Colors.indigo,
                 child: _AnimatedCardWrapper(
                   child: _MoonPhaseHeroCard(
-            panchang: panchang,
-            moonPos: moonPos,
-            sunPos: sunPos,
+                    panchang: panchang,
+                    moonPos: moonPos,
+                    sunPos: sunPos,
                     birthDateTime: widget.kundaliData.birthDateTime,
+                    l10n: l10n,
                   ),
                 ),
-          ),
+              ),
 
               const SizedBox(height: _DesignTokens.space24),
 
-          // ═══════════════════════════════════════════════════════════════
-          // PANCHANG ELEMENTS
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
+              // PANCHANG ELEMENTS
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['elements'],
                 sectionKey: _sectionKeys['elements']!,
@@ -1013,29 +1033,30 @@ class _PanchangTabState extends State<PanchangTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-            title: 'Five Limbs of Time',
-            subtitle: 'Panchang elements at birth',
+                      title: l10n.panchang_fiveLimbs,
+                      subtitle: l10n.panchang_elementsAtBirth,
                       accentColor: _Colors.emerald,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
                     _AnimatedCardWrapper(
                       delay: 50,
                       child: _PanchangElementsGrid(
-            panchang: panchang,
-            tithiLord: tithiLord,
-            yogaType: yogaType,
-            karanaType: karanaType,
+                        panchang: panchang,
+                        tithiLord: tithiLord,
+                        yogaType: yogaType,
+                        karanaType: karanaType,
+                        l10n: l10n,
                       ),
                     ),
                   ],
                 ),
-          ),
+              ),
 
               const SizedBox(height: _DesignTokens.space24),
 
-          // ═══════════════════════════════════════════════════════════════
-          // HORA & WEEKDAY
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
+              // HORA & WEEKDAY
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['hora'],
                 sectionKey: _sectionKeys['hora']!,
@@ -1044,34 +1065,38 @@ class _PanchangTabState extends State<PanchangTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-            title: 'Hora & Weekday',
-            subtitle: 'Planetary hour and day influences',
+                      title: l10n.panchang_horaWeekday,
+                      subtitle: l10n.panchang_horaSubtitle,
                       accentColor: _Colors.sky,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
                     _AnimatedCardWrapper(
                       delay: 50,
                       child: Row(
-            children: [
-              Expanded(
-                            child: _HoraCard(hora: hora, birthTime: widget.kundaliData.birthDateTime),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _WeekdayCard(panchang: panchang),
-              ),
-            ],
+                        children: [
+                          Expanded(
+                            child: _HoraCard(
+                              hora: hora,
+                              birthTime: widget.kundaliData.birthDateTime,
+                              l10n: l10n,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _WeekdayCard(panchang: panchang, l10n: l10n),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-          ),
+              ),
 
               const SizedBox(height: _DesignTokens.space24),
 
-          // ═══════════════════════════════════════════════════════════════
-          // INAUSPICIOUS PERIODS
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
+              // INAUSPICIOUS PERIODS
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['periods'],
                 sectionKey: _sectionKeys['periods']!,
@@ -1080,16 +1105,17 @@ class _PanchangTabState extends State<PanchangTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-            title: 'Inauspicious Periods',
-                      subtitle: 'On ${DateFormat('EEEE').format(widget.kundaliData.birthDateTime)}',
+                      title: l10n.panchang_inauspiciousPeriods,
+                      subtitle: l10n.panchang_onDay(DateFormat('EEEE').format(widget.kundaliData.birthDateTime)),
                       accentColor: _Colors.coral,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
                     _AnimatedCardWrapper(
                       delay: 50,
                       child: _InauspiciousPeriodsCard(
-            periods: inauspiciousPeriods,
+                        periods: inauspiciousPeriods,
                         birthDateTime: widget.kundaliData.birthDateTime,
+                        l10n: l10n,
                       ),
                     ),
                   ],
@@ -1098,9 +1124,9 @@ class _PanchangTabState extends State<PanchangTab> {
 
               const SizedBox(height: _DesignTokens.space24),
 
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
               // VARSHPHAL
-          // ═══════════════════════════════════════════════════════════════
+              // ═══════════════════════════════════════════════════════════════
               _AnimatedSectionWrapper(
                 key: _animatedKeys['varshphal'],
                 sectionKey: _sectionKeys['varshphal']!,
@@ -1109,14 +1135,14 @@ class _PanchangTabState extends State<PanchangTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-            title: 'Varshphal ${varshphal.year}',
-            subtitle: 'Solar Return / Annual Horoscope',
+                      title: l10n.panchang_varshphalYear(varshphal.year),
+                      subtitle: l10n.panchang_solarReturnSubtitle,
                       accentColor: _Colors.amber,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
                     _AnimatedCardWrapper(
                       delay: 50,
-                      child: _VarshphalCard(varshphal: varshphal),
+                      child: _VarshphalCard(varshphal: varshphal, l10n: l10n),
                     ),
                   ],
                 ),
@@ -1131,7 +1157,7 @@ class _PanchangTabState extends State<PanchangTab> {
           right: 16,
           bottom: MediaQuery.of(context).padding.bottom + 16,
           child: FloatingNavBar(
-            sections: _sections,
+            sections: sections,
             activeIndex: _activeIndex,
             onTap: _scrollToSection,
           ),
@@ -1162,7 +1188,7 @@ class _PanchangTabState extends State<PanchangTab> {
     return tithiLords[index];
   }
 
-  String _getYogaType(int yogaNumber) {
+  String _getYogaType(int yogaNumber, AppLocalizations l10n) {
     // Inauspicious Yogas per traditional Vedic astrology:
     // 1-Vishkumbha, 6-Atiganda, 9-Shula, 10-Ganda, 13-Vyaghata,
     // 15-Vajra, 17-Vyatipata, 19-Parigha, 27-Vaidhriti
@@ -1174,20 +1200,20 @@ class _PanchangTabState extends State<PanchangTab> {
     // 21-Siddha, 22-Sadhya, 23-Shubha, 24-Shukla, 25-Brahma, 26-Indra
     const auspiciousYogas = [2, 3, 4, 5, 7, 8, 11, 12, 14, 16, 18, 20, 21, 22, 23, 24, 25, 26];
 
-    if (inauspiciousYogas.contains(yogaNumber)) return 'Inauspicious';
-    if (auspiciousYogas.contains(yogaNumber)) return 'Auspicious';
-    return 'Neutral';
+    if (inauspiciousYogas.contains(yogaNumber)) return l10n.panchang_yoga_inauspicious;
+    if (auspiciousYogas.contains(yogaNumber)) return l10n.panchang_yoga_auspicious;
+    return l10n.panchang_yoga_neutral;
   }
 
-  String _getKaranaType(String karana) {
+  String _getKaranaType(String karana, AppLocalizations l10n) {
     const movableKaranas = ['Bava', 'Balava', 'Kaulava', 'Taitila', 'Gara', 'Vanija', 'Vishti'];
     const fixedKaranas = ['Shakuni', 'Chatushpada', 'Naga', 'Kimstughna'];
 
     if (movableKaranas.contains(karana)) {
-      if (karana == 'Vishti') return 'Bhadra (Avoid)';
-      return 'Chara (Movable)';
+      if (karana == 'Vishti') return l10n.panchang_karana_bhadra;
+      return l10n.panchang_karana_chara;
     }
-    if (fixedKaranas.contains(karana)) return 'Sthira (Fixed)';
+    if (fixedKaranas.contains(karana)) return l10n.panchang_karana_sthira;
     return 'Unknown';
   }
 }
@@ -1488,12 +1514,14 @@ class _MoonPhaseHeroCard extends StatefulWidget {
   final PlanetPosition? moonPos;
   final PlanetPosition? sunPos;
   final DateTime birthDateTime;
+  final AppLocalizations l10n;
 
   const _MoonPhaseHeroCard({
     required this.panchang,
     required this.moonPos,
     required this.sunPos,
     required this.birthDateTime,
+    required this.l10n,
   });
 
   @override
@@ -1568,7 +1596,7 @@ class _MoonPhaseHeroCardState extends State<_MoonPhaseHeroCard>
     );
     _showInsightSheet(
       context,
-      _getMoonPhaseInsight(widget.panchang, illumination),
+      _getMoonPhaseInsight(widget.panchang, illumination, widget.l10n),
     );
   }
 
@@ -1585,6 +1613,7 @@ class _MoonPhaseHeroCardState extends State<_MoonPhaseHeroCard>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = widget.l10n;
     final moonLong = widget.moonPos?.longitude ?? 0;
     final sunLong = widget.sunPos?.longitude ?? 0;
     double elongation = moonLong - sunLong;
@@ -1593,6 +1622,7 @@ class _MoonPhaseHeroCardState extends State<_MoonPhaseHeroCard>
     final phaseDescription = _getPhaseDescription(
       widget.panchang.tithiNumber,
       widget.panchang.paksha,
+      l10n,
     );
     final illumination = _calculateIllumination(
       widget.panchang.tithiNumber,
@@ -1663,7 +1693,7 @@ class _MoonPhaseHeroCardState extends State<_MoonPhaseHeroCard>
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              '${illumination.toStringAsFixed(0)}% lit',
+                              l10n.panchang_percentLit(illumination.toStringAsFixed(0)),
                               style: GoogleFonts.jetBrainsMono(
                                 fontSize: 9,
                                 fontWeight: FontWeight.w600,
@@ -1691,7 +1721,7 @@ class _MoonPhaseHeroCardState extends State<_MoonPhaseHeroCard>
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                '${widget.panchang.paksha.toUpperCase()} PAKSHA',
+                                l10n.panchang_paksha(widget.panchang.paksha.toUpperCase()),
                                 style: GoogleFonts.inter(
                                   fontSize: 9,
                                   fontWeight: FontWeight.w600,
@@ -1802,14 +1832,14 @@ class _MoonPhaseHeroCardState extends State<_MoonPhaseHeroCard>
                     children: [
                       _CompactMoonStat(
                         icon: Icons.nightlight_round,
-                        label: 'Moon Sign',
+                        label: l10n.panchang_moonSign,
                         value: widget.moonPos?.sign ?? '?',
                         color: _Colors.emerald,
                       ),
                       const SizedBox(width: 8),
                       _CompactMoonStat(
                         icon: Icons.straighten_rounded,
-                        label: 'Degree',
+                        label: l10n.panchang_degree,
                         value:
                             '${(widget.moonPos?.signDegree ?? 0).toStringAsFixed(1)}°',
                         color: _Colors.sky,
@@ -1817,7 +1847,7 @@ class _MoonPhaseHeroCardState extends State<_MoonPhaseHeroCard>
                       const SizedBox(width: 8),
                       _CompactMoonStat(
                         icon: Icons.compare_arrows_rounded,
-                        label: 'Elongation',
+                        label: l10n.panchang_elongation,
                         value: '${elongation.toStringAsFixed(1)}°',
                         color: _Colors.violet,
                       ),
@@ -1890,19 +1920,19 @@ class _CompactMoonStat extends StatelessWidget {
   }
 }
 
-String _getPhaseDescription(int tithi, String paksha) {
+String _getPhaseDescription(int tithi, String paksha, AppLocalizations l10n) {
   if (paksha == 'Shukla') {
-    if (tithi <= 3) return 'Waxing Crescent';
-    if (tithi <= 7) return 'First Quarter';
-    if (tithi <= 11) return 'Waxing Gibbous';
-    if (tithi <= 14) return 'Nearly Full';
-    return 'Full Moon (Purnima)';
+    if (tithi <= 3) return l10n.panchang_phase_waxingCrescent;
+    if (tithi <= 7) return l10n.panchang_phase_firstQuarter;
+    if (tithi <= 11) return l10n.panchang_phase_waxingGibbous;
+    if (tithi <= 14) return l10n.panchang_phase_nearlyFull;
+    return l10n.panchang_phase_fullMoon;
   } else {
-    if (tithi <= 3) return 'Waning Gibbous';
-    if (tithi <= 7) return 'Third Quarter';
-    if (tithi <= 11) return 'Waning Crescent';
-    if (tithi <= 14) return 'Nearly New';
-    return 'New Moon (Amavasya)';
+    if (tithi <= 3) return l10n.panchang_phase_waningGibbous;
+    if (tithi <= 7) return l10n.panchang_phase_thirdQuarter;
+    if (tithi <= 11) return l10n.panchang_phase_waningCrescent;
+    if (tithi <= 14) return l10n.panchang_phase_nearlyNew;
+    return l10n.panchang_phase_newMoon;
   }
 }
 
@@ -1915,19 +1945,21 @@ class _PanchangElementsGrid extends StatelessWidget {
   final String tithiLord;
   final String yogaType;
   final String karanaType;
+  final AppLocalizations l10n;
 
   const _PanchangElementsGrid({
     required this.panchang,
     required this.tithiLord,
     required this.yogaType,
     required this.karanaType,
+    required this.l10n,
   });
 
   @override
   Widget build(BuildContext context) {
-    final yogaColor = _getYogaTypeColor(yogaType);
-    final karanaColor =
-        karanaType.contains('Bhadra') ? _Colors.coral : _Colors.violet;
+    final yogaColor = _getYogaTypeColor(yogaType, l10n);
+    final isBhadra = karanaType == l10n.panchang_karana_bhadra;
+    final karanaColor = isBhadra ? _Colors.coral : _Colors.violet;
 
     return Container(
       padding: const EdgeInsets.all(2),
@@ -1942,22 +1974,22 @@ class _PanchangElementsGrid extends StatelessWidget {
               Expanded(
                 child: _ElegantPanchangTile(
                   symbol: '☽',
-                  label: 'Tithi',
+                  label: l10n.panchang_tithi,
                   value: panchang.tithi,
                   detail: tithiLord,
-                  detailPrefix: 'Lord',
+                  detailPrefix: l10n.panchang_lord,
                   position: _TilePosition.topLeft,
-                  insight: _getTithiInsight(panchang, tithiLord),
+                  insight: _getTithiInsight(panchang, tithiLord, l10n),
                 ),
               ),
               Expanded(
                 child: _ElegantPanchangTile(
                   symbol: '✦',
-                  label: 'Nakshatra',
+                  label: l10n.panchang_nakshatra,
                   value: panchang.nakshatra,
-                  detail: 'Pada ${panchang.nakshatraPada}',
+                  detail: l10n.panchang_pada(panchang.nakshatraPada),
                   position: _TilePosition.topRight,
-                  insight: _getNakshatraInsight(panchang),
+                  insight: _getNakshatraInsight(panchang, l10n),
                 ),
               ),
             ],
@@ -1967,25 +1999,25 @@ class _PanchangElementsGrid extends StatelessWidget {
               Expanded(
                 child: _ElegantPanchangTile(
                   symbol: '☯',
-                  label: 'Yoga',
+                  label: l10n.panchang_yoga,
                   value: panchang.yoga,
                   detail: yogaType,
                   badge: '${panchang.yogaNumber}/27',
                   badgeColor: yogaColor,
                   position: _TilePosition.bottomLeft,
-                  insight: _getYogaInsight(panchang, yogaType),
+                  insight: _getYogaInsight(panchang, yogaType, l10n),
                 ),
               ),
               Expanded(
                 child: _ElegantPanchangTile(
                   symbol: '⧗',
-                  label: 'Karana',
+                  label: l10n.panchang_karana,
                   value: panchang.karana,
                   detail: karanaType,
                   badgeColor: karanaColor,
-                  showWarning: karanaType.contains('Bhadra'),
+                  showWarning: isBhadra,
                   position: _TilePosition.bottomRight,
-                  insight: _getKaranaInsight(panchang, karanaType),
+                  insight: _getKaranaInsight(panchang, karanaType, l10n),
                 ),
               ),
             ],
@@ -1995,15 +2027,13 @@ class _PanchangElementsGrid extends StatelessWidget {
     );
   }
 
-  Color _getYogaTypeColor(String type) {
-    switch (type) {
-      case 'Auspicious':
-        return _Colors.emerald;
-      case 'Inauspicious':
-        return _Colors.coral;
-      default:
-        return _Colors.sky;
+  Color _getYogaTypeColor(String type, AppLocalizations l10n) {
+    if (type == l10n.panchang_yoga_auspicious) {
+      return _Colors.emerald;
+    } else if (type == l10n.panchang_yoga_inauspicious) {
+      return _Colors.coral;
     }
+    return _Colors.sky;
   }
 }
 
@@ -2194,8 +2224,9 @@ class _ElegantPanchangTileState extends State<_ElegantPanchangTile> {
 class _HoraCard extends StatefulWidget {
   final String hora;
   final DateTime birthTime;
+  final AppLocalizations l10n;
 
-  const _HoraCard({required this.hora, required this.birthTime});
+  const _HoraCard({required this.hora, required this.birthTime, required this.l10n});
 
   @override
   State<_HoraCard> createState() => _HoraCardState();
@@ -2236,7 +2267,7 @@ class _HoraCardState extends State<_HoraCard>
     _controller.reverse();
     _showInsightSheet(
       context,
-      _getHoraInsight(widget.hora, widget.birthTime),
+      _getHoraInsight(widget.hora, widget.birthTime, widget.l10n),
     );
   }
 
@@ -2271,15 +2302,15 @@ class _HoraCardState extends State<_HoraCard>
     return symbols[planet] ?? '•';
   }
 
-  String _getHoraDescription(String planet) {
-    const descriptions = {
-      'Sun': 'Authority, government work, leadership',
-      'Moon': 'Travel, emotions, public dealing',
-      'Mars': 'Courage, competition, action',
-      'Mercury': 'Communication, learning, business',
-      'Jupiter': 'Education, spirituality, expansion',
-      'Venus': 'Arts, relationships, pleasures',
-      'Saturn': 'Hard work, discipline, patience',
+  String _getHoraDescription(String planet, AppLocalizations l10n) {
+    final descriptions = {
+      'Sun': l10n.panchang_hora_desc_sun,
+      'Moon': l10n.panchang_hora_desc_moon,
+      'Mars': l10n.panchang_hora_desc_mars,
+      'Mercury': l10n.panchang_hora_desc_mercury,
+      'Jupiter': l10n.panchang_hora_desc_jupiter,
+      'Venus': l10n.panchang_hora_desc_venus,
+      'Saturn': l10n.panchang_hora_desc_saturn,
     };
     return descriptions[planet] ?? '';
   }
@@ -2350,14 +2381,14 @@ class _HoraCardState extends State<_HoraCard>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Birth Hora',
+                        widget.l10n.panchang_birthHora,
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           color: _Colors.textTertiary,
                         ),
                       ),
                       Text(
-                        '${widget.hora} Hora',
+                        widget.l10n.panchang_hora_value(widget.hora),
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
@@ -2376,7 +2407,7 @@ class _HoraCardState extends State<_HoraCard>
             ),
             const SizedBox(height: 10),
             Text(
-              _getHoraDescription(widget.hora),
+              _getHoraDescription(widget.hora, widget.l10n),
               style: GoogleFonts.inter(
                 fontSize: 9,
                 color: _Colors.textTertiary,
@@ -2397,8 +2428,9 @@ class _HoraCardState extends State<_HoraCard>
 // ═══════════════════════════════════════════════════════════════════════════
 class _WeekdayCard extends StatefulWidget {
   final PanchangData panchang;
+  final AppLocalizations l10n;
 
-  const _WeekdayCard({required this.panchang});
+  const _WeekdayCard({required this.panchang, required this.l10n});
 
   @override
   State<_WeekdayCard> createState() => _WeekdayCardState();
@@ -2437,7 +2469,7 @@ class _WeekdayCardState extends State<_WeekdayCard>
   void _onTapUp(TapUpDetails details) {
     setState(() => _isPressed = false);
     _controller.reverse();
-    _showInsightSheet(context, _getVaraInsight(widget.panchang));
+    _showInsightSheet(context, _getVaraInsight(widget.panchang, widget.l10n));
   }
 
   void _onTapCancel() {
@@ -2551,7 +2583,7 @@ class _WeekdayCardState extends State<_WeekdayCard>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Vara (Weekday)',
+                        widget.l10n.panchang_varaWeekday,
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           color: _Colors.textTertiary,
@@ -2579,7 +2611,7 @@ class _WeekdayCardState extends State<_WeekdayCard>
             Row(
               children: [
                 Text(
-                  'Lord: ',
+                  '${widget.l10n.panchang_lord}: ',
                   style: GoogleFonts.inter(
                     fontSize: 9,
                     color: _Colors.textTertiary,
@@ -2616,10 +2648,12 @@ class _WeekdayCardState extends State<_WeekdayCard>
 class _InauspiciousPeriodsCard extends StatelessWidget {
   final InauspiciousPeriods periods;
   final DateTime birthDateTime;
+  final AppLocalizations l10n;
 
   const _InauspiciousPeriodsCard({
     required this.periods,
     required this.birthDateTime,
+    required this.l10n,
   });
 
   @override
@@ -2639,7 +2673,7 @@ class _InauspiciousPeriodsCard extends StatelessWidget {
       child: Column(
         children: [
           if (currentPeriod != null) ...[
-            _BirthWarningBanner(period: currentPeriod),
+            _BirthWarningBanner(period: currentPeriod, l10n: l10n),
             const SizedBox(height: 14),
           ],
 
@@ -2647,18 +2681,21 @@ class _InauspiciousPeriodsCard extends StatelessWidget {
             period: periods.rahukala,
             color: _Colors.coral,
             icon: Icons.do_not_disturb_on_rounded,
+            l10n: l10n,
           ),
           const SizedBox(height: 8),
           _InauspiciousPeriodRow(
             period: periods.yamaghanda,
             color: _Colors.amber,
             icon: Icons.warning_rounded,
+            l10n: l10n,
           ),
           const SizedBox(height: 8),
           _InauspiciousPeriodRow(
             period: periods.gulika,
             color: _Colors.violet,
             icon: Icons.brightness_3_rounded,
+            l10n: l10n,
           ),
 
           const SizedBox(height: 14),
@@ -2666,6 +2703,7 @@ class _InauspiciousPeriodsCard extends StatelessWidget {
           _InauspiciousTimeline(
             periods: periods,
             birthDateTime: birthDateTime,
+            l10n: l10n,
           ),
         ],
       ),
@@ -2675,8 +2713,9 @@ class _InauspiciousPeriodsCard extends StatelessWidget {
 
 class _BirthWarningBanner extends StatelessWidget {
   final TimePeriod period;
+  final AppLocalizations l10n;
 
-  const _BirthWarningBanner({required this.period});
+  const _BirthWarningBanner({required this.period, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -2717,7 +2756,7 @@ class _BirthWarningBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Birth during ${period.name}',
+                  l10n.panchang_birthDuring(period.name),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -2745,11 +2784,13 @@ class _InauspiciousPeriodRow extends StatefulWidget {
   final TimePeriod period;
   final Color color;
   final IconData icon;
+  final AppLocalizations l10n;
 
   const _InauspiciousPeriodRow({
     required this.period,
     required this.color,
     required this.icon,
+    required this.l10n,
   });
 
   @override
@@ -2791,7 +2832,7 @@ class _InauspiciousPeriodRowState extends State<_InauspiciousPeriodRow>
     _controller.reverse();
     _showInsightSheet(
       context,
-      _getInauspiciousPeriodInsight(widget.period, widget.color),
+      _getInauspiciousPeriodInsight(widget.period, widget.color, widget.l10n),
     );
   }
 
@@ -2894,10 +2935,12 @@ class _InauspiciousPeriodRowState extends State<_InauspiciousPeriodRow>
 class _InauspiciousTimeline extends StatelessWidget {
   final InauspiciousPeriods periods;
   final DateTime birthDateTime;
+  final AppLocalizations l10n;
 
   const _InauspiciousTimeline({
     required this.periods,
     required this.birthDateTime,
+    required this.l10n,
   });
 
   @override
@@ -2918,7 +2961,7 @@ class _InauspiciousTimeline extends StatelessWidget {
             ),
             const SizedBox(width: 6),
             Text(
-              'Day Timeline (6 AM - 6 PM)',
+              l10n.panchang_dayTimeline,
               style: GoogleFonts.inter(
                 fontSize: 10,
                 color: _Colors.textTertiary,
@@ -2932,7 +2975,7 @@ class _InauspiciousTimeline extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              'Birth',
+              l10n.panchang_birth,
               style: GoogleFonts.jetBrainsMono(
                 fontSize: 8,
                 color: _Colors.violet,
@@ -3089,8 +3132,9 @@ class _BirthTimeMarker extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════════════════════
 class _VarshphalCard extends StatefulWidget {
   final VarshphalData varshphal;
+  final AppLocalizations l10n;
 
-  const _VarshphalCard({required this.varshphal});
+  const _VarshphalCard({required this.varshphal, required this.l10n});
 
   @override
   State<_VarshphalCard> createState() => _VarshphalCardState();
@@ -3106,7 +3150,7 @@ class _VarshphalCardState extends State<_VarshphalCard> {
 
   void _onTapUp(TapUpDetails details) {
     setState(() => _isPressed = false);
-    _showInsightSheet(context, _getVarshphalInsight(widget.varshphal));
+    _showInsightSheet(context, _getVarshphalInsight(widget.varshphal, widget.l10n));
   }
 
   void _onTapCancel() {
@@ -3194,7 +3238,7 @@ class _VarshphalCardState extends State<_VarshphalCard> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'years',
+                        widget.l10n.panchang_years,
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           fontWeight: FontWeight.w400,
@@ -3212,7 +3256,7 @@ class _VarshphalCardState extends State<_VarshphalCard> {
                     children: [
                       const SizedBox(height: 2),
                       Text(
-                        'Solar Return ${widget.varshphal.year}',
+                        widget.l10n.panchang_varshphal_value(widget.varshphal.year),
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
@@ -3272,7 +3316,7 @@ class _VarshphalCardState extends State<_VarshphalCard> {
                 Expanded(
                   child: _MinimalInfoTile(
                     symbol: _getSignSymbol(widget.varshphal.munthaSign),
-                    label: 'Muntha',
+                    label: widget.l10n.panchang_muntha,
                     value: widget.varshphal.munthaSign,
                     symbolColor: _Colors.violet,
                   ),
@@ -3282,7 +3326,7 @@ class _VarshphalCardState extends State<_VarshphalCard> {
                 Expanded(
                   child: _MinimalInfoTile(
                     symbol: _getYearLordSymbol(widget.varshphal.yearLord),
-                    label: 'Year Lord',
+                    label: widget.l10n.panchang_yearLord,
                     value: widget.varshphal.yearLord,
                     symbolColor: yearLordColor,
                   ),

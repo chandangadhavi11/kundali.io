@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../../shared/constants.dart' show getPlanetColor, getPlanetSymbol, getSignColor, getSignSymbol, getZodiacImagePath;
 export '../../shared/constants.dart' show getSignColor, getSignSymbol, getZodiacImagePath;
 
@@ -902,6 +903,7 @@ class ActiveNowBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
@@ -921,7 +923,7 @@ class ActiveNowBadge extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            'NOW',
+            l10n.dasha_now,
             style: GoogleFonts.jetBrainsMono(
               fontSize: fontSize,
               fontWeight: FontWeight.w700,
@@ -1148,7 +1150,7 @@ String formatDateShortWithTime(DateTime date) {
   return '${date.day}/${date.month} $hour:$minute';
 }
 
-/// Format duration in years, months, days
+/// Format duration in years, months, days (non-localized, for utility use)
 String formatDuration(double durationYears) {
   final totalDays = durationYears * 365.25;
 
@@ -1178,6 +1180,40 @@ String formatDuration(double durationYears) {
       final minutes = (totalHours * 60).round();
       if (minutes > 0) return '$minutes min';
       return '< 1 min';
+    }
+  }
+}
+
+/// Format duration in years, months, days (localized)
+String formatDurationLocalized(double durationYears, AppLocalizations l10n) {
+  final totalDays = durationYears * 365.25;
+
+  if (totalDays >= 365) {
+    final years = totalDays ~/ 365.25;
+    final remainingDays = totalDays - (years * 365.25);
+    final months = remainingDays ~/ 30.44;
+    final days = (remainingDays - (months * 30.44)).round();
+    return l10n.dasha_duration_years(years.toString(), months.toString(), days.toString());
+  } else if (totalDays >= 30) {
+    final months = totalDays ~/ 30.44;
+    final days = (totalDays - (months * 30.44)).round();
+    return l10n.dasha_duration_months(months.toString(), days.toString());
+  } else if (totalDays >= 1) {
+    final days = totalDays.floor();
+    final hours = ((totalDays - days) * 24).round();
+    if (hours > 0) return l10n.dasha_duration_days_hours(days.toString(), hours.toString());
+    return l10n.dasha_duration_days(days.toString());
+  } else {
+    final totalHours = totalDays * 24;
+    if (totalHours >= 1) {
+      final hours = totalHours.floor();
+      final minutes = ((totalHours - hours) * 60).round();
+      if (minutes > 0) return l10n.dasha_duration_hours_minutes(hours.toString(), minutes.toString());
+      return l10n.dasha_duration_hours(hours.toString());
+    } else {
+      final minutes = (totalHours * 60).round();
+      if (minutes > 0) return l10n.dasha_duration_minutes(minutes.toString());
+      return l10n.dasha_duration_lessThanMinute;
     }
   }
 }

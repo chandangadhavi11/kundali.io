@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../widgets/moon_phase_widget.dart';
 import '../shared/floating_nav_bar.dart';
 
@@ -194,6 +195,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final insight = widget.insight;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
@@ -344,7 +346,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
 
                     // Description
                     Text(
-                      'What This Means',
+                      l10n.details_whatThisMeans,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -397,7 +399,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Significance',
+                                  l10n.details_significance,
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -425,7 +427,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                     if (insight.keyPoints.isNotEmpty) ...[
                       const SizedBox(height: 24),
                       Text(
-                        'Key Points',
+                        l10n.details_keyPoints,
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -1106,14 +1108,38 @@ InsightData _getPlanetaryStatusInsight(String status, List<String> planets) {
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVIGATION SECTION DATA
 // ═══════════════════════════════════════════════════════════════════════════
-const _sections = [
-  NavSection(id: 'profile', label: 'Profile', color: _Colors.violet),
-  NavSection(id: 'star', label: 'Star', color: _Colors.rose),
-  NavSection(id: 'panchang', label: 'Panchang', color: _Colors.emerald),
-  NavSection(id: 'dasha', label: 'Dasha', color: _Colors.sky),
-  NavSection(id: 'guna', label: 'Guna', color: _Colors.coral),
-  NavSection(id: 'lucky', label: 'Lucky', color: _Colors.gold),
-  NavSection(id: 'planets', label: 'Planets', color: _Colors.teal),
+/// Section IDs (constant for key mapping)
+const _sectionIds = [
+  'profile',
+  'star',
+  'panchang',
+  'dasha',
+  'guna',
+  'lucky',
+  'planets',
+];
+
+/// Build localized sections
+List<NavSection> _buildSections(AppLocalizations l10n) => [
+  NavSection(
+    id: 'profile',
+    label: l10n.details_nav_profile,
+    color: _Colors.violet,
+  ),
+  NavSection(id: 'star', label: l10n.details_nav_star, color: _Colors.rose),
+  NavSection(
+    id: 'panchang',
+    label: l10n.details_nav_panchang,
+    color: _Colors.emerald,
+  ),
+  NavSection(id: 'dasha', label: l10n.details_nav_dasha, color: _Colors.sky),
+  NavSection(id: 'guna', label: l10n.details_nav_guna, color: _Colors.coral),
+  NavSection(id: 'lucky', label: l10n.details_nav_lucky, color: _Colors.gold),
+  NavSection(
+    id: 'planets',
+    label: l10n.details_nav_planets,
+    color: _Colors.teal,
+  ),
 ];
 
 /// Details Tab - Shows comprehensive birth chart details
@@ -1141,9 +1167,9 @@ class _DetailsTabState extends State<DetailsTab> {
     _scrollController.addListener(_onScroll);
 
     // Initialize keys for each section
-    for (final section in _sections) {
-      _sectionKeys[section.id] = GlobalKey();
-      _animatedKeys[section.id] = GlobalKey<_AnimatedSectionWrapperState>();
+    for (final sectionId in _sectionIds) {
+      _sectionKeys[sectionId] = GlobalKey();
+      _animatedKeys[sectionId] = GlobalKey<_AnimatedSectionWrapperState>();
     }
   }
 
@@ -1162,8 +1188,8 @@ class _DetailsTabState extends State<DetailsTab> {
 
     int newActiveIndex = 0;
 
-    for (int i = 0; i < _sections.length; i++) {
-      final key = _sectionKeys[_sections[i].id];
+    for (int i = 0; i < _sectionIds.length; i++) {
+      final key = _sectionKeys[_sectionIds[i]];
       if (key?.currentContext != null) {
         final box = key!.currentContext!.findRenderObject() as RenderBox?;
         if (box != null) {
@@ -1181,8 +1207,8 @@ class _DetailsTabState extends State<DetailsTab> {
   }
 
   Future<void> _scrollToSection(int index) async {
-    final section = _sections[index];
-    final key = _sectionKeys[section.id];
+    final sectionId = _sectionIds[index];
+    final key = _sectionKeys[sectionId];
 
     if (key?.currentContext == null) return;
 
@@ -1202,13 +1228,16 @@ class _DetailsTabState extends State<DetailsTab> {
     );
 
     // Trigger the section highlight animation
-    _animatedKeys[section.id]?.currentState?.triggerHighlight();
+    _animatedKeys[sectionId]?.currentState?.triggerHighlight();
 
     setState(() => _isScrolling = false);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final sections = _buildSections(l10n);
+
     return Stack(
       children: [
         // Scrollable content
@@ -1240,7 +1269,7 @@ class _DetailsTabState extends State<DetailsTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Core Elements',
+                      title: l10n.details_section_coreElements,
                       accentColor: _Colors.rose,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -1250,7 +1279,7 @@ class _DetailsTabState extends State<DetailsTab> {
                     ),
                     const SizedBox(height: _DesignTokens.space24),
                     _AnimatedSectionHeader(
-                      title: 'Birth Star',
+                      title: l10n.details_section_birthStar,
                       accentColor: _Colors.rose,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -1273,7 +1302,7 @@ class _DetailsTabState extends State<DetailsTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Panchang',
+                      title: l10n.details_section_panchang,
                       accentColor: _Colors.emerald,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -1296,7 +1325,7 @@ class _DetailsTabState extends State<DetailsTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Current Period',
+                      title: l10n.details_section_currentPeriod,
                       accentColor: _Colors.sky,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -1319,7 +1348,7 @@ class _DetailsTabState extends State<DetailsTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Guna Factors',
+                      title: l10n.details_section_gunaFactors,
                       accentColor: _Colors.coral,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -1342,7 +1371,7 @@ class _DetailsTabState extends State<DetailsTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Favorable Elements',
+                      title: l10n.details_section_favorableElements,
                       accentColor: _Colors.gold,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -1367,7 +1396,7 @@ class _DetailsTabState extends State<DetailsTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Planetary Status',
+                      title: l10n.details_section_planetaryStatus,
                       accentColor: _Colors.teal,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -1390,7 +1419,7 @@ class _DetailsTabState extends State<DetailsTab> {
           right: 16,
           bottom: MediaQuery.of(context).padding.bottom + 16,
           child: FloatingNavBar(
-            sections: _sections,
+            sections: sections,
             activeIndex: _activeIndex,
             onTap: _scrollToSection,
           ),
@@ -1778,49 +1807,51 @@ class _ProfileCard extends StatelessWidget {
 
           // Three pillars - interactive cards
           Builder(
-            builder:
-                (context) => Padding(
-                  padding: const EdgeInsets.all(_DesignTokens.space12),
-                  child: Row(
-                    children: [
-                      _InteractivePillar(
-                        label: 'Ascendant',
-                        sign: kundaliData.ascendant.sign,
-                        icon: Icons.wb_twilight_rounded,
-                        onTap:
-                            () => _showInsightSheet(
-                              context,
-                              _getAscendantInsight(
-                                kundaliData.ascendant.sign,
-                                kundaliData.ascendant.signDegree,
-                              ),
+            builder: (context) {
+              final l10n = AppLocalizations.of(context)!;
+              return Padding(
+                padding: const EdgeInsets.all(_DesignTokens.space12),
+                child: Row(
+                  children: [
+                    _InteractivePillar(
+                      label: l10n.details_ascendant,
+                      sign: kundaliData.ascendant.sign,
+                      icon: Icons.wb_twilight_rounded,
+                      onTap:
+                          () => _showInsightSheet(
+                            context,
+                            _getAscendantInsight(
+                              kundaliData.ascendant.sign,
+                              kundaliData.ascendant.signDegree,
                             ),
-                      ),
-                      const SizedBox(width: _DesignTokens.space8),
-                      _InteractivePillar(
-                        label: 'Moon',
-                        sign: kundaliData.moonSign,
-                        icon: Icons.nightlight_round,
-                        onTap:
-                            () => _showInsightSheet(
-                              context,
-                              _getMoonSignInsight(kundaliData.moonSign),
-                            ),
-                      ),
-                      const SizedBox(width: _DesignTokens.space8),
-                      _InteractivePillar(
-                        label: 'Sun',
-                        sign: kundaliData.sunSign,
-                        icon: Icons.wb_sunny_rounded,
-                        onTap:
-                            () => _showInsightSheet(
-                              context,
-                              _getSunSignInsight(kundaliData.sunSign),
-                            ),
-                      ),
-                    ],
-                  ),
+                          ),
+                    ),
+                    const SizedBox(width: _DesignTokens.space8),
+                    _InteractivePillar(
+                      label: l10n.details_moon,
+                      sign: kundaliData.moonSign,
+                      icon: Icons.nightlight_round,
+                      onTap:
+                          () => _showInsightSheet(
+                            context,
+                            _getMoonSignInsight(kundaliData.moonSign),
+                          ),
+                    ),
+                    const SizedBox(width: _DesignTokens.space8),
+                    _InteractivePillar(
+                      label: l10n.details_sun,
+                      sign: kundaliData.sunSign,
+                      icon: Icons.wb_sunny_rounded,
+                      onTap:
+                          () => _showInsightSheet(
+                            context,
+                            _getSunSignInsight(kundaliData.sunSign),
+                          ),
+                    ),
+                  ],
                 ),
+              );
+            },
           ),
 
           // Disclaimer about Vedic vs Western astrology
@@ -1931,6 +1962,7 @@ class _VedicDisclaimer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final westernColor = _getZodiacColor(westernSign);
 
     return Container(
@@ -1966,10 +1998,10 @@ class _VedicDisclaimer extends StatelessWidget {
                   height: 1.4,
                 ),
                 children: [
-                  const TextSpan(text: 'Based on Vedic planetary positions. '),
-                  const TextSpan(
-                    text: 'Western astrology: ',
-                    style: TextStyle(fontWeight: FontWeight.w500),
+                  TextSpan(text: '${l10n.details_vedicDisclaimer} '),
+                  TextSpan(
+                    text: '${l10n.details_westernAstrology} ',
+                    style: const TextStyle(fontWeight: FontWeight.w500),
                   ),
                   TextSpan(
                     text: westernSign,
@@ -2281,17 +2313,22 @@ class _InteractivePillarState extends State<_InteractivePillar>
                 ),
                 const SizedBox(height: _DesignTokens.space6),
                 // Sign name
-                Text(
-                  widget.sign,
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: zodiacColor,
-                    letterSpacing: -0.2,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Builder(
+                  builder: (context) {
+                    final l10n = AppLocalizations.of(context)!;
+                    return Text(
+                      getLocalizedZodiacSign(widget.sign, l10n),
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: zodiacColor,
+                        letterSpacing: -0.2,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  },
                 ),
               ],
             ),
@@ -2312,6 +2349,7 @@ class _CoreElementsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final ascendant = kundaliData.ascendant;
     final element = _getSignElement(ascendant.sign);
     final lagnaLord = _getLagnaLord(ascendant.sign);
@@ -2324,8 +2362,9 @@ class _CoreElementsGrid extends StatelessWidget {
           children: [
             Expanded(
               child: _MetricTile(
-                label: 'Rising Sign',
-                value: ascendant.sign,
+                label: l10n.details_risingSign,
+                value: getLocalizedZodiacSign(ascendant.sign, l10n),
+                imageKey: ascendant.sign,
                 sublabel: '${ascendant.signDegree.toStringAsFixed(1)}°',
                 color: zodiacColor,
                 showZodiacImage: true,
@@ -2342,9 +2381,10 @@ class _CoreElementsGrid extends StatelessWidget {
             const SizedBox(width: _DesignTokens.space8),
             Expanded(
               child: _MetricTile(
-                label: 'Element',
-                value: element,
-                sublabel: _getElementDescription(element),
+                label: l10n.details_element,
+                value: getLocalizedElement(element, l10n),
+                imageKey: element,
+                sublabel: _getElementDescription(element, l10n),
                 color: _getElementColor(element),
                 showElementImage: true,
                 onTap:
@@ -2361,9 +2401,10 @@ class _CoreElementsGrid extends StatelessWidget {
           children: [
             Expanded(
               child: _MetricTile(
-                label: 'Lagna Lord',
-                value: lagnaLord,
-                sublabel: 'Chart ruler',
+                label: l10n.details_lagnaLord,
+                value: getLocalizedPlanetName(lagnaLord, l10n),
+                imageKey: lagnaLord,
+                sublabel: l10n.details_chartRuler,
                 color: _getPlanetColor(lagnaLord),
                 showPlanetImage: true,
                 onTap:
@@ -2376,9 +2417,10 @@ class _CoreElementsGrid extends StatelessWidget {
             const SizedBox(width: _DesignTokens.space8),
             Expanded(
               child: _MetricTile(
-                label: 'Nakshatra Lord',
-                value: nakshatraLord,
-                sublabel: 'Star lord',
+                label: l10n.details_nakshatraLord,
+                value: getLocalizedPlanetName(nakshatraLord, l10n),
+                imageKey: nakshatraLord,
+                sublabel: l10n.details_starLord,
                 color: _getPlanetColor(nakshatraLord),
                 showPlanetImage: true,
                 onTap:
@@ -2397,16 +2439,16 @@ class _CoreElementsGrid extends StatelessWidget {
     );
   }
 
-  String _getElementDescription(String element) {
+  String _getElementDescription(String element, AppLocalizations l10n) {
     switch (element) {
       case 'Fire':
-        return 'Dynamic';
+        return l10n.details_dynamic;
       case 'Earth':
-        return 'Grounded';
+        return l10n.details_grounded;
       case 'Air':
-        return 'Intellectual';
+        return l10n.details_intellectual;
       case 'Water':
-        return 'Intuitive';
+        return l10n.details_intuitive;
       default:
         return '';
     }
@@ -2438,6 +2480,7 @@ class _MetricTile extends StatefulWidget {
   final bool showPlanetImage;
   final bool showElementImage;
   final VoidCallback? onTap;
+  final String? imageKey; // English key for image path lookup
 
   const _MetricTile({
     required this.label,
@@ -2448,6 +2491,7 @@ class _MetricTile extends StatefulWidget {
     this.showPlanetImage = false,
     this.showElementImage = false,
     this.onTap,
+    this.imageKey,
   });
 
   @override
@@ -2505,16 +2549,19 @@ class _MetricTileState extends State<_MetricTile>
         widget.showPlanetImage ||
         widget.showElementImage;
 
+    // Use imageKey for image paths, fallback to value if not provided
+    final keyForImage = widget.imageKey ?? widget.value;
+
     String getImagePath() {
-      if (widget.showPlanetImage) return _getPlanetImagePath(widget.value);
-      if (widget.showElementImage) return _getElementImagePath(widget.value);
-      return _getZodiacImagePath(widget.value);
+      if (widget.showPlanetImage) return _getPlanetImagePath(keyForImage);
+      if (widget.showElementImage) return _getElementImagePath(keyForImage);
+      return _getZodiacImagePath(keyForImage);
     }
 
     String getFallbackSymbol() {
-      if (widget.showPlanetImage) return _getPlanetSymbol(widget.value);
-      if (widget.showElementImage) return _getElementSymbol(widget.value);
-      return _getSignSymbol(widget.value);
+      if (widget.showPlanetImage) return _getPlanetSymbol(keyForImage);
+      if (widget.showElementImage) return _getElementSymbol(keyForImage);
+      return _getSignSymbol(keyForImage);
     }
 
     return GestureDetector(
@@ -2670,6 +2717,7 @@ class _NakshatraCardState extends State<_NakshatraCard>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final nakshatra = widget.kundaliData.birthNakshatra;
     final pada = widget.kundaliData.birthNakshatraPada;
     final moonPos = widget.kundaliData.planetPositions['Moon'];
@@ -2715,16 +2763,22 @@ class _NakshatraCardState extends State<_NakshatraCard>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(nakshatra, style: _DesignTokens.titleMd),
+                            Text(
+                              getLocalizedNakshatra(nakshatra, l10n),
+                              style: _DesignTokens.titleMd,
+                            ),
                             const SizedBox(height: _DesignTokens.space2),
                             Text(
-                              'Pada $pada • ${moonPos?.signDegree.toStringAsFixed(1)}° in ${moonPos?.sign ?? ''}',
+                              '${l10n.details_pada(pada)} • ${moonPos?.signDegree.toStringAsFixed(1)}° in ${getLocalizedZodiacSign(moonPos?.sign ?? '', l10n)}',
                               style: _DesignTokens.labelSm,
                             ),
                           ],
                         ),
                       ),
-                      _StatusChip(label: gana, color: _getGanaColor(gana)),
+                      _StatusChip(
+                        label: getLocalizedGana(gana, l10n),
+                        color: _getGanaColor(gana),
+                      ),
                     ],
                   ),
 
@@ -2742,17 +2796,38 @@ class _NakshatraCardState extends State<_NakshatraCard>
                     child: Row(
                       children: [
                         _InfoCell(
-                          label: 'Lord',
-                          value: _getNakshatraLord(nakshatra),
+                          label: l10n.details_lord,
+                          value: getLocalizedPlanetName(
+                            _getNakshatraLord(nakshatra),
+                            l10n,
+                          ),
                           isPlanet: true,
+                          imageKey: _getNakshatraLord(nakshatra),
                         ),
                         _InfoCell(
-                          label: 'Deity',
+                          label: l10n.details_deity,
                           value: _getNakshatraDeity(nakshatra),
                         ),
-                        _InfoCell(
-                          label: 'Yoni',
-                          value: _getNakshatraYoni(nakshatra),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Text(
+                                l10n.details_yoni,
+                                style: _DesignTokens.labelXs,
+                              ),
+                              const SizedBox(height: _DesignTokens.space6),
+                              Text(
+                                getLocalizedYoni(
+                                  _getNakshatraYoni(nakshatra),
+                                  l10n,
+                                ),
+                                style: _DesignTokens.bodySm,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -2799,16 +2874,19 @@ class _InfoCell extends StatelessWidget {
   final String label;
   final String value;
   final bool isPlanet;
+  final String? imageKey; // English key for image path lookup
 
   const _InfoCell({
     required this.label,
     required this.value,
     this.isPlanet = false,
+    this.imageKey,
   });
 
   @override
   Widget build(BuildContext context) {
-    final planetColor = isPlanet ? _getPlanetColor(value) : null;
+    final keyForImage = imageKey ?? value;
+    final planetColor = isPlanet ? _getPlanetColor(keyForImage) : null;
 
     return Expanded(
       child: Column(
@@ -2833,7 +2911,7 @@ class _InfoCell extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.asset(
-                  _getPlanetImagePath(value),
+                  _getPlanetImagePath(keyForImage),
                   width: 28,
                   height: 28,
                   fit: BoxFit.cover,
@@ -2842,7 +2920,7 @@ class _InfoCell extends StatelessWidget {
                       color: planetColor.withOpacity(0.1),
                       child: Center(
                         child: Text(
-                          _getPlanetSymbol(value),
+                          _getPlanetSymbol(keyForImage),
                           style: TextStyle(fontSize: 14, color: planetColor),
                         ),
                       ),
@@ -2884,6 +2962,7 @@ class _PanchangCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final sunPos = kundaliData.planetPositions['Sun'];
     final moonPos = kundaliData.planetPositions['Moon'];
 
@@ -2913,7 +2992,7 @@ class _PanchangCard extends StatelessWidget {
                       Text(panchang.tithi, style: _DesignTokens.titleMd),
                       const SizedBox(height: _DesignTokens.space2),
                       Text(
-                        '${panchang.paksha} Paksha',
+                        l10n.details_paksha(panchang.paksha),
                         style: _DesignTokens.labelSm,
                       ),
                     ],
@@ -2944,7 +3023,7 @@ class _PanchangCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _TappablePanchangItem(
-                        label: 'Yoga',
+                        label: l10n.details_yoga,
                         value: panchang.yoga,
                         onTap:
                             () => _showInsightSheet(
@@ -2955,7 +3034,7 @@ class _PanchangCard extends StatelessWidget {
                     ),
                     Expanded(
                       child: _TappablePanchangItem(
-                        label: 'Karana',
+                        label: l10n.details_karana,
                         value: panchang.karana,
                         onTap:
                             () => _showInsightSheet(
@@ -2971,7 +3050,7 @@ class _PanchangCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _TappablePanchangItem(
-                        label: 'Vara',
+                        label: l10n.details_vara,
                         value: panchang.vara,
                         onTap:
                             () => _showInsightSheet(
@@ -2983,7 +3062,10 @@ class _PanchangCard extends StatelessWidget {
                             ),
                       ),
                     ),
-                    _InfoCell(label: 'Nakshatra', value: panchang.nakshatra),
+                    _InfoCell(
+                      label: l10n.details_nakshatra,
+                      value: panchang.nakshatra,
+                    ),
                   ],
                 ),
               ],
@@ -3155,6 +3237,7 @@ class _DashaCardState extends State<_DashaCard>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final dasha = widget.kundaliData.dashaInfo;
     final planetColor = _getPlanetColor(dasha.currentMahadasha);
 
@@ -3229,7 +3312,12 @@ class _DashaCardState extends State<_DashaCard>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${dasha.currentMahadasha} Mahadasha',
+                              l10n.details_mahadasha(
+                                getLocalizedPlanetName(
+                                  dasha.currentMahadasha,
+                                  l10n,
+                                ),
+                              ),
                               style: _DesignTokens.titleMd,
                             ),
                             const SizedBox(height: _DesignTokens.space4),
@@ -3242,7 +3330,9 @@ class _DashaCardState extends State<_DashaCard>
                                 ),
                                 const SizedBox(width: _DesignTokens.space4),
                                 Text(
-                                  '${dasha.remainingYears.toStringAsFixed(1)} years remaining',
+                                  l10n.details_yearsRemaining(
+                                    dasha.remainingYears.toStringAsFixed(1),
+                                  ),
                                   style: _DesignTokens.labelSm,
                                 ),
                               ],
@@ -3256,7 +3346,7 @@ class _DashaCardState extends State<_DashaCard>
                   const SizedBox(height: _DesignTokens.space16),
 
                   // Dasha sequence
-                  Text('UPCOMING', style: _DesignTokens.labelXs),
+                  Text(l10n.details_upcoming, style: _DesignTokens.labelXs),
                   const SizedBox(height: _DesignTokens.space8),
                   SizedBox(
                     height: 88,
@@ -3358,16 +3448,21 @@ class _DashaPeriodChip extends StatelessWidget {
           ),
           const SizedBox(height: _DesignTokens.space4),
           // Planet name
-          Text(
-            _getShortPlanetName(planet),
-            style: GoogleFonts.inter(
-              fontSize: 9,
-              fontWeight: FontWeight.w500,
-              color: isActive ? color : _Colors.textSecondary,
-              letterSpacing: -0.2,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          Builder(
+            builder: (context) {
+              final l10n = AppLocalizations.of(context)!;
+              return Text(
+                getLocalizedPlanetName(planet, l10n),
+                style: GoogleFonts.inter(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w500,
+                  color: isActive ? color : _Colors.textSecondary,
+                  letterSpacing: -0.2,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              );
+            },
           ),
           const SizedBox(height: _DesignTokens.space2),
           // Duration
@@ -3395,6 +3490,7 @@ class _GunaFactorsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final nakshatra = kundaliData.birthNakshatra;
     final moonSign = kundaliData.moonSign;
     final nakshatraIndex = KundaliCalculationService.nakshatras.indexOf(
@@ -3422,7 +3518,7 @@ class _GunaFactorsCard extends StatelessWidget {
                 const SizedBox(width: _DesignTokens.space8),
                 Expanded(
                   child: Text(
-                    'Your Ashtakoot factors for compatibility matching',
+                    l10n.details_gunaInfo,
                     style: _DesignTokens.labelSm.copyWith(
                       color: _Colors.textSecondary,
                     ),
@@ -3437,19 +3533,50 @@ class _GunaFactorsCard extends StatelessWidget {
           // Guna grid
           _GunaGrid(
             items: [
-              _GunaData('Varna', _getVarna(moonSign), _Colors.amber),
-              _GunaData('Vashya', _getVashya(moonSign), _Colors.sky),
-              _GunaData('Tara', _getTaraName(taraNumber), _Colors.emerald),
-              _GunaData('Yoni', _getNakshatraYoni(nakshatra), _Colors.violet),
+              _GunaData(
+                'Varna',
+                getLocalizedVarna(_getVarna(moonSign), l10n),
+                _Colors.amber,
+              ),
+              _GunaData(
+                'Vashya',
+                getLocalizedVashya(_getVashya(moonSign), l10n),
+                _Colors.sky,
+              ),
+              _GunaData(
+                'Tara',
+                getLocalizedTara(_getTaraName(taraNumber), l10n),
+                _Colors.emerald,
+              ),
+              _GunaData(
+                'Yoni',
+                getLocalizedYoni(_getNakshatraYoni(nakshatra), l10n),
+                _Colors.violet,
+              ),
               _GunaData(
                 'Graha Maitri',
-                _getLagnaLord(moonSign),
+                getLocalizedPlanetName(_getLagnaLord(moonSign), l10n),
                 _Colors.teal,
                 isPlanet: true,
+                imageKey: _getLagnaLord(moonSign),
               ),
-              _GunaData('Gana', _getNakshatraGana(nakshatra), _Colors.rose),
-              _GunaData('Bhakoot', moonSign, _Colors.coral, isZodiacSign: true),
-              _GunaData('Nadi', _getNadi(nakshatra), _Colors.gold),
+              _GunaData(
+                'Gana',
+                getLocalizedGana(_getNakshatraGana(nakshatra), l10n),
+                _Colors.rose,
+              ),
+              _GunaData(
+                'Bhakoot',
+                getLocalizedZodiacSign(moonSign, l10n),
+                _Colors.coral,
+                isZodiacSign: true,
+                imageKey: moonSign,
+              ),
+              _GunaData(
+                'Nadi',
+                getLocalizedNadi(_getNadi(nakshatra), l10n),
+                _Colors.gold,
+              ),
             ],
           ),
         ],
@@ -3464,6 +3591,7 @@ class _GunaData {
   final Color color;
   final bool isZodiacSign;
   final bool isPlanet;
+  final String? imageKey; // English key for image path lookup
 
   _GunaData(
     this.label,
@@ -3471,6 +3599,7 @@ class _GunaData {
     this.color, {
     this.isZodiacSign = false,
     this.isPlanet = false,
+    this.imageKey,
   });
 }
 
@@ -3499,6 +3628,7 @@ class _GunaGrid extends StatelessWidget {
           color: item.color,
           isZodiacSign: item.isZodiacSign,
           isPlanet: item.isPlanet,
+          imageKey: item.imageKey,
         );
       },
     );
@@ -3511,6 +3641,7 @@ class _GunaCell extends StatefulWidget {
   final Color color;
   final bool isZodiacSign;
   final bool isPlanet;
+  final String? imageKey;
 
   const _GunaCell({
     required this.label,
@@ -3518,6 +3649,7 @@ class _GunaCell extends StatefulWidget {
     required this.color,
     this.isZodiacSign = false,
     this.isPlanet = false,
+    this.imageKey,
   });
 
   @override
@@ -3536,10 +3668,11 @@ class _GunaCellState extends State<_GunaCell> {
 
   @override
   Widget build(BuildContext context) {
+    final keyForImage = widget.imageKey ?? widget.value;
     final displayColor =
         widget.isZodiacSign
-            ? _getZodiacColor(widget.value)
-            : (widget.isPlanet ? _getPlanetColor(widget.value) : widget.color);
+            ? _getZodiacColor(keyForImage)
+            : (widget.isPlanet ? _getPlanetColor(keyForImage) : widget.color);
     final hasImage = widget.isZodiacSign || widget.isPlanet;
 
     return GestureDetector(
@@ -3586,8 +3719,8 @@ class _GunaCellState extends State<_GunaCell> {
                   borderRadius: BorderRadius.circular(8),
                   child: Image.asset(
                     widget.isPlanet
-                        ? _getPlanetImagePath(widget.value)
-                        : _getZodiacImagePath(widget.value),
+                        ? _getPlanetImagePath(keyForImage)
+                        : _getZodiacImagePath(keyForImage),
                     width: 28,
                     height: 28,
                     fit: BoxFit.cover,
@@ -3597,8 +3730,8 @@ class _GunaCellState extends State<_GunaCell> {
                         child: Center(
                           child: Text(
                             widget.isPlanet
-                                ? _getPlanetSymbol(widget.value)
-                                : _getSignSymbol(widget.value),
+                                ? _getPlanetSymbol(keyForImage)
+                                : _getSignSymbol(keyForImage),
                             style: TextStyle(fontSize: 14, color: displayColor),
                           ),
                         ),
@@ -3659,6 +3792,7 @@ class _LuckyElementsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final moonSign = kundaliData.moonSign;
     final gemstone = _getLuckyGemstone(moonSign);
 
@@ -3676,7 +3810,7 @@ class _LuckyElementsCard extends StatelessWidget {
               Expanded(
                 child: _LuckyTile(
                   icon: Icons.tag_rounded,
-                  label: 'Numbers',
+                  label: l10n.details_numbers,
                   value: _getLuckyNumbers(moonSign),
                   onTap:
                       () => _showInsightSheet(
@@ -3692,8 +3826,8 @@ class _LuckyElementsCard extends StatelessWidget {
               Expanded(
                 child: _LuckyTile(
                   icon: Icons.calendar_today_rounded,
-                  label: 'Day',
-                  value: _getLuckyDay(moonSign),
+                  label: l10n.details_day,
+                  value: getLocalizedDay(_getLuckyDay(moonSign), l10n),
                   onTap:
                       () => _showInsightSheet(
                         context,
@@ -3709,7 +3843,7 @@ class _LuckyElementsCard extends StatelessWidget {
               Expanded(
                 child: _LuckyTile(
                   icon: Icons.palette_outlined,
-                  label: 'Colors',
+                  label: l10n.details_colors,
                   value: _getLuckyColors(moonSign),
                   onTap:
                       () => _showInsightSheet(
@@ -3725,8 +3859,8 @@ class _LuckyElementsCard extends StatelessWidget {
               Expanded(
                 child: _LuckyTile(
                   icon: Icons.hexagon_outlined,
-                  label: 'Metal',
-                  value: _getLuckyMetal(moonSign),
+                  label: l10n.details_metal,
+                  value: getLocalizedMetal(_getLuckyMetal(moonSign), l10n),
                   onTap:
                       () => _showInsightSheet(
                         context,
@@ -3781,6 +3915,7 @@ class _InteractiveGemstoneRowState extends State<_InteractiveGemstoneRow>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final gemstoneColor = _getGemstoneColor(widget.gemstone);
     final gemstonePath = _getGemstoneImagePath(widget.gemstone);
 
@@ -3872,14 +4007,14 @@ class _InteractiveGemstoneRowState extends State<_InteractiveGemstoneRow>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Primary Gemstone',
+                    l10n.details_primaryGemstone,
                     style: _DesignTokens.labelXs.copyWith(
                       color: _Colors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: _DesignTokens.space4),
                   Text(
-                    widget.gemstone,
+                    getLocalizedGemstone(widget.gemstone, l10n),
                     style: _DesignTokens.titleMd.copyWith(
                       color: gemstoneColor,
                       fontWeight: FontWeight.w600,
@@ -3895,7 +4030,9 @@ class _InteractiveGemstoneRowState extends State<_InteractiveGemstoneRow>
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Wear on ${_getLuckyDay(widget.moonSign)}',
+                        l10n.details_wearOn(
+                          getLocalizedDay(_getLuckyDay(widget.moonSign), l10n),
+                        ),
                         style: _DesignTokens.labelXs.copyWith(
                           color: gemstoneColor.withOpacity(0.8),
                         ),
@@ -4080,33 +4217,35 @@ class _PlanetaryStatusCard extends StatelessWidget {
       }
     });
 
+    final l10n = AppLocalizations.of(context)!;
+
     return _Card(
       child: Column(
         children: [
           _StatusRowItem(
             icon: Icons.arrow_upward_rounded,
-            label: 'Exalted',
+            label: l10n.details_exalted,
             planets: exalted,
             color: _Colors.emerald,
           ),
           const SizedBox(height: _DesignTokens.space8),
           _StatusRowItem(
             icon: Icons.arrow_downward_rounded,
-            label: 'Debilitated',
+            label: l10n.details_debilitated,
             planets: debilitated,
             color: _Colors.coral,
           ),
           const SizedBox(height: _DesignTokens.space8),
           _StatusRowItem(
             icon: Icons.replay_rounded,
-            label: 'Retrograde',
+            label: l10n.details_retrograde,
             planets: retrograde,
             color: _Colors.amber,
           ),
           const SizedBox(height: _DesignTokens.space8),
           _StatusRowItem(
             icon: Icons.local_fire_department_outlined,
-            label: 'Combust',
+            label: l10n.details_combust,
             planets: combust,
             color: _Colors.rose,
           ),
@@ -4151,6 +4290,7 @@ class _StatusRowItemState extends State<_StatusRowItem> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isEmpty = widget.planets.isEmpty;
 
     return GestureDetector(
@@ -4199,7 +4339,7 @@ class _StatusRowItemState extends State<_StatusRowItem> {
             const Spacer(),
             if (isEmpty)
               Text(
-                'None',
+                l10n.details_none,
                 style: _DesignTokens.labelSm.copyWith(
                   color: _Colors.textTertiary,
                 ),
@@ -4256,7 +4396,7 @@ class _StatusRowItemState extends State<_StatusRowItem> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            _getShortPlanetName(p),
+                            getLocalizedPlanetName(p, l10n),
                             style: GoogleFonts.inter(
                               fontSize: 8,
                               fontWeight: FontWeight.w500,
@@ -4918,4 +5058,362 @@ Color _getElementColorFromImage(String element) {
     'Air': Color(0xFFB794F6),
   };
   return colors[element] ?? const Color(0xFFA09CAC);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LOCALIZATION HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// Get localized zodiac sign name
+String getLocalizedZodiacSign(String englishSign, AppLocalizations l10n) {
+  switch (englishSign) {
+    case 'Aries':
+      return l10n.zodiac_aries;
+    case 'Taurus':
+      return l10n.zodiac_taurus;
+    case 'Gemini':
+      return l10n.zodiac_gemini;
+    case 'Cancer':
+      return l10n.zodiac_cancer;
+    case 'Leo':
+      return l10n.zodiac_leo;
+    case 'Virgo':
+      return l10n.zodiac_virgo;
+    case 'Libra':
+      return l10n.zodiac_libra;
+    case 'Scorpio':
+      return l10n.zodiac_scorpio;
+    case 'Sagittarius':
+      return l10n.zodiac_sagittarius;
+    case 'Capricorn':
+      return l10n.zodiac_capricorn;
+    case 'Aquarius':
+      return l10n.zodiac_aquarius;
+    case 'Pisces':
+      return l10n.zodiac_pisces;
+    default:
+      return englishSign;
+  }
+}
+
+/// Get localized planet name
+String getLocalizedPlanetName(String englishPlanet, AppLocalizations l10n) {
+  switch (englishPlanet) {
+    case 'Sun':
+      return l10n.planet_sun;
+    case 'Moon':
+      return l10n.planet_moon;
+    case 'Mars':
+      return l10n.planet_mars;
+    case 'Mercury':
+      return l10n.planet_mercury;
+    case 'Jupiter':
+      return l10n.planet_jupiter;
+    case 'Venus':
+      return l10n.planet_venus;
+    case 'Saturn':
+      return l10n.planet_saturn;
+    case 'Rahu':
+      return l10n.planet_rahu;
+    case 'Ketu':
+      return l10n.planet_ketu;
+    case 'Uranus':
+      return l10n.planet_uranus;
+    case 'Neptune':
+      return l10n.planet_neptune;
+    case 'Pluto':
+      return l10n.planet_pluto;
+    default:
+      return englishPlanet;
+  }
+}
+
+/// Get localized element name
+String getLocalizedElement(String englishElement, AppLocalizations l10n) {
+  switch (englishElement) {
+    case 'Fire':
+      return l10n.element_fire;
+    case 'Earth':
+      return l10n.element_earth;
+    case 'Air':
+      return l10n.element_air;
+    case 'Water':
+      return l10n.element_water;
+    default:
+      return englishElement;
+  }
+}
+
+/// Get localized element description
+String getLocalizedElementDesc(String englishElement, AppLocalizations l10n) {
+  switch (englishElement) {
+    case 'Fire':
+      return l10n.element_fire_desc;
+    case 'Earth':
+      return l10n.element_earth_desc;
+    case 'Air':
+      return l10n.element_air_desc;
+    case 'Water':
+      return l10n.element_water_desc;
+    default:
+      return '';
+  }
+}
+
+/// Get localized gana name
+String getLocalizedGana(String englishGana, AppLocalizations l10n) {
+  switch (englishGana) {
+    case 'Deva':
+      return l10n.gana_deva;
+    case 'Manushya':
+      return l10n.gana_manushya;
+    case 'Rakshasa':
+      return l10n.gana_rakshasa;
+    default:
+      return englishGana;
+  }
+}
+
+/// Get localized varna name
+String getLocalizedVarna(String englishVarna, AppLocalizations l10n) {
+  switch (englishVarna) {
+    case 'Brahmin':
+      return l10n.varna_brahmin;
+    case 'Kshatriya':
+      return l10n.varna_kshatriya;
+    case 'Vaishya':
+      return l10n.varna_vaishya;
+    case 'Shudra':
+      return l10n.varna_shudra;
+    default:
+      return englishVarna;
+  }
+}
+
+/// Get localized vashya name
+String getLocalizedVashya(String englishVashya, AppLocalizations l10n) {
+  switch (englishVashya) {
+    case 'Chatushpad':
+      return l10n.vashya_chatushpad;
+    case 'Vanchar':
+      return l10n.vashya_vanchar;
+    case 'Nara':
+      return l10n.vashya_nara;
+    case 'Jalachara':
+      return l10n.vashya_jalachara;
+    case 'Keeta':
+      return l10n.vashya_keeta;
+    default:
+      return englishVashya;
+  }
+}
+
+/// Get localized nadi name
+String getLocalizedNadi(String englishNadi, AppLocalizations l10n) {
+  switch (englishNadi) {
+    case 'Aadi':
+      return l10n.nadi_aadi;
+    case 'Madhya':
+      return l10n.nadi_madhya;
+    case 'Antya':
+      return l10n.nadi_antya;
+    default:
+      return englishNadi;
+  }
+}
+
+/// Get localized day name
+String getLocalizedDay(String englishDay, AppLocalizations l10n) {
+  switch (englishDay) {
+    case 'Sunday':
+      return l10n.day_sunday;
+    case 'Monday':
+      return l10n.day_monday;
+    case 'Tuesday':
+      return l10n.day_tuesday;
+    case 'Wednesday':
+      return l10n.day_wednesday;
+    case 'Thursday':
+      return l10n.day_thursday;
+    case 'Friday':
+      return l10n.day_friday;
+    case 'Saturday':
+      return l10n.day_saturday;
+    default:
+      return englishDay;
+  }
+}
+
+/// Get localized gemstone name
+String getLocalizedGemstone(String englishGemstone, AppLocalizations l10n) {
+  switch (englishGemstone) {
+    case 'Ruby':
+      return l10n.gemstone_ruby;
+    case 'Pearl':
+      return l10n.gemstone_pearl;
+    case 'Red Coral':
+      return l10n.gemstone_redcoral;
+    case 'Emerald':
+      return l10n.gemstone_emerald;
+    case 'Yellow Sapphire':
+      return l10n.gemstone_yellowsapphire;
+    case 'Diamond':
+      return l10n.gemstone_diamond;
+    case 'Blue Sapphire':
+      return l10n.gemstone_bluesapphire;
+    case 'Hessonite':
+      return l10n.gemstone_hessonite;
+    case 'Cat\'s Eye':
+      return l10n.gemstone_catseye;
+    default:
+      return englishGemstone;
+  }
+}
+
+/// Get localized metal name
+String getLocalizedMetal(String englishMetal, AppLocalizations l10n) {
+  switch (englishMetal) {
+    case 'Gold':
+      return l10n.metal_gold;
+    case 'Silver':
+      return l10n.metal_silver;
+    case 'Copper':
+      return l10n.metal_copper;
+    case 'Iron':
+      return l10n.metal_iron;
+    case 'Brass':
+      return l10n.metal_brass;
+    case 'Bronze':
+      return l10n.metal_bronze;
+    case 'Tin':
+      return l10n.metal_tin;
+    case 'Lead':
+      return l10n.metal_lead;
+    default:
+      return englishMetal;
+  }
+}
+
+/// Get localized yoni name
+String getLocalizedYoni(String englishYoni, AppLocalizations l10n) {
+  switch (englishYoni) {
+    case 'Horse':
+      return l10n.yoni_horse;
+    case 'Elephant':
+      return l10n.yoni_elephant;
+    case 'Goat':
+      return l10n.yoni_goat;
+    case 'Serpent':
+      return l10n.yoni_serpent;
+    case 'Dog':
+      return l10n.yoni_dog;
+    case 'Cat':
+      return l10n.yoni_cat;
+    case 'Rat':
+      return l10n.yoni_rat;
+    case 'Cow':
+      return l10n.yoni_cow;
+    case 'Buffalo':
+      return l10n.yoni_buffalo;
+    case 'Tiger':
+      return l10n.yoni_tiger;
+    case 'Deer':
+      return l10n.yoni_deer;
+    case 'Monkey':
+      return l10n.yoni_monkey;
+    case 'Mongoose':
+      return l10n.yoni_mongoose;
+    case 'Lion':
+      return l10n.yoni_lion;
+    default:
+      return englishYoni;
+  }
+}
+
+/// Get localized tara name
+String getLocalizedTara(String englishTara, AppLocalizations l10n) {
+  switch (englishTara) {
+    case 'Janma':
+      return l10n.tara_janma;
+    case 'Sampat':
+      return l10n.tara_sampat;
+    case 'Vipat':
+      return l10n.tara_vipat;
+    case 'Kshema':
+      return l10n.tara_kshema;
+    case 'Pratyak':
+      return l10n.tara_pratyak;
+    case 'Sadhana':
+      return l10n.tara_sadhana;
+    case 'Naidhana':
+      return l10n.tara_naidhana;
+    case 'Mitra':
+      return l10n.tara_mitra;
+    case 'Parama Mitra':
+      return l10n.tara_paramamitra;
+    default:
+      return englishTara;
+  }
+}
+
+/// Get localized nakshatra name
+String getLocalizedNakshatra(String englishNakshatra, AppLocalizations l10n) {
+  switch (englishNakshatra) {
+    case 'Ashwini':
+      return l10n.nakshatra_ashwini;
+    case 'Bharani':
+      return l10n.nakshatra_bharani;
+    case 'Krittika':
+      return l10n.nakshatra_krittika;
+    case 'Rohini':
+      return l10n.nakshatra_rohini;
+    case 'Mrigashira':
+      return l10n.nakshatra_mrigashira;
+    case 'Ardra':
+      return l10n.nakshatra_ardra;
+    case 'Punarvasu':
+      return l10n.nakshatra_punarvasu;
+    case 'Pushya':
+      return l10n.nakshatra_pushya;
+    case 'Ashlesha':
+      return l10n.nakshatra_ashlesha;
+    case 'Magha':
+      return l10n.nakshatra_magha;
+    case 'Purva Phalguni':
+      return l10n.nakshatra_purvaphalguni;
+    case 'Uttara Phalguni':
+      return l10n.nakshatra_uttaraphalguni;
+    case 'Hasta':
+      return l10n.nakshatra_hasta;
+    case 'Chitra':
+      return l10n.nakshatra_chitra;
+    case 'Swati':
+      return l10n.nakshatra_swati;
+    case 'Vishakha':
+      return l10n.nakshatra_vishakha;
+    case 'Anuradha':
+      return l10n.nakshatra_anuradha;
+    case 'Jyeshtha':
+      return l10n.nakshatra_jyeshtha;
+    case 'Mula':
+      return l10n.nakshatra_mula;
+    case 'Purva Ashadha':
+      return l10n.nakshatra_purvashadha;
+    case 'Uttara Ashadha':
+      return l10n.nakshatra_uttarashadha;
+    case 'Shravana':
+      return l10n.nakshatra_shravana;
+    case 'Dhanishta':
+      return l10n.nakshatra_dhanishta;
+    case 'Shatabhisha':
+      return l10n.nakshatra_shatabhisha;
+    case 'Purva Bhadrapada':
+      return l10n.nakshatra_purvabhadrapada;
+    case 'Uttara Bhadrapada':
+      return l10n.nakshatra_uttarabhadrapada;
+    case 'Revati':
+      return l10n.nakshatra_revati;
+    default:
+      return englishNakshatra;
+  }
 }

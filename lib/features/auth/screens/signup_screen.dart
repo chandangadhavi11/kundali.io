@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'dart:math' as math;
 import '../../../core/constants/app_colors.dart';
 import '../../../core/providers/auth_provider.dart';
-import '../../../l10n/app_localizations.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 
 // Responsive breakpoints
 class SignupBreakpoints {
@@ -534,7 +534,7 @@ class _SignupScreenState extends State<SignupScreen>
       textCapitalization: TextCapitalization.words,
       style: TextStyle(fontSize: fontSize),
       decoration: InputDecoration(
-        labelText: l10n.name,
+        labelText: l10n.input_name,
         prefixIcon: Icon(Icons.person_outline, size: fontSize * 1.3),
         contentPadding: EdgeInsets.symmetric(
           horizontal: 16,
@@ -571,7 +571,7 @@ class _SignupScreenState extends State<SignupScreen>
       textInputAction: TextInputAction.next,
       style: TextStyle(fontSize: fontSize),
       decoration: InputDecoration(
-        labelText: l10n.email,
+        labelText: l10n.auth_email,
         prefixIcon: Icon(Icons.email_outlined, size: fontSize * 1.3),
         contentPadding: EdgeInsets.symmetric(
           horizontal: 16,
@@ -731,7 +731,7 @@ class _SignupScreenState extends State<SignupScreen>
       textInputAction: TextInputAction.next,
       style: TextStyle(fontSize: fontSize),
       decoration: InputDecoration(
-        labelText: l10n.password,
+        labelText: l10n.auth_password,
         prefixIcon: Icon(Icons.lock_outline, size: fontSize * 1.3),
         suffixIcon: IconButton(
           icon: Icon(
@@ -854,7 +854,7 @@ class _SignupScreenState extends State<SignupScreen>
       textInputAction: TextInputAction.done,
       style: TextStyle(fontSize: fontSize),
       decoration: InputDecoration(
-        labelText: l10n.confirmPassword,
+        labelText: l10n.auth_confirmPassword,
         prefixIcon: Icon(Icons.lock_outline, size: fontSize * 1.3),
         suffixIcon: IconButton(
           icon: Icon(
@@ -967,7 +967,7 @@ class _SignupScreenState extends State<SignupScreen>
                   ),
                 )
                 : Text(
-                  l10n.signup,
+                  l10n.common_signup,
                   style: TextStyle(
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold,
@@ -1003,7 +1003,7 @@ class _SignupScreenState extends State<SignupScreen>
             minimumSize: const Size(48, 48),
           ),
           child: Text(
-            l10n.login,
+            l10n.common_login,
             style: TextStyle(
               fontSize: fontSize * 0.9,
               fontWeight: FontWeight.bold,

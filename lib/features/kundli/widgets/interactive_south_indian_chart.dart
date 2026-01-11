@@ -16,6 +16,8 @@ class InteractiveSouthIndianChart extends StatefulWidget {
   final Map<String, PlanetPosition> planetPositions;
   final String ascendantSign;
   final bool isDarkMode;
+  final Map<String, String>? planetAbbreviations;
+  final Map<String, String>? signAbbreviations;
 
   const InteractiveSouthIndianChart({
     super.key,
@@ -23,6 +25,8 @@ class InteractiveSouthIndianChart extends StatefulWidget {
     required this.planetPositions,
     required this.ascendantSign,
     this.isDarkMode = true,
+    this.planetAbbreviations,
+    this.signAbbreviations,
   });
 
   @override
@@ -332,7 +336,9 @@ class _InteractiveSouthIndianChartState extends State<InteractiveSouthIndianChar
     
     // Build planet abbreviations with adjusted line height
     final planetWidgets = planets.map((p) {
-      final abbr = p.length > 2 ? p.substring(0, 2) : p;
+      // Use localized abbreviation if available, otherwise fallback to first 2 chars
+      final abbr = widget.planetAbbreviations?[p] ?? 
+          (p.length > 2 ? p.substring(0, 2) : p);
       return Text(
         abbr,
         style: GoogleFonts.dmSans(
@@ -396,6 +402,7 @@ class _InteractiveSouthIndianChartState extends State<InteractiveSouthIndianChar
             planetPositions: widget.planetPositions,
             ascendantSign: widget.ascendantSign,
             animation: animation,
+            planetAbbreviations: widget.planetAbbreviations,
           );
         },
       ),
@@ -464,6 +471,7 @@ class _HouseDetailModal extends StatelessWidget {
   final Map<String, PlanetPosition> planetPositions;
   final String ascendantSign;
   final Animation<double> animation;
+  final Map<String, String>? planetAbbreviations;
 
   const _HouseDetailModal({
     required this.house,
@@ -471,6 +479,7 @@ class _HouseDetailModal extends StatelessWidget {
     required this.planetPositions,
     required this.ascendantSign,
     required this.animation,
+    this.planetAbbreviations,
   });
 
   static const _bgPrimary = Color(0xFF0A0910);
@@ -736,7 +745,9 @@ class _HouseDetailModal extends StatelessWidget {
   Widget _buildPlanetRow(String planetName) {
     final position = planetPositions[planetName];
     final color = _getPlanetColor(planetName);
-    final symbol = planetName.length > 2 ? planetName.substring(0, 2) : planetName;
+    // Use localized abbreviation if available
+    final symbol = planetAbbreviations?[planetName] ?? 
+        (planetName.length > 2 ? planetName.substring(0, 2) : planetName);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 6),

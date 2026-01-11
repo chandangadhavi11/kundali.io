@@ -13,6 +13,8 @@ class InteractiveKundliChart extends StatefulWidget {
   final String ascendantSign;
   final ChartStyle chartStyle;
   final bool isDarkMode;
+  final Map<String, String>? planetAbbreviations;
+  final Map<String, String>? signAbbreviations;
 
   const InteractiveKundliChart({
     super.key,
@@ -21,6 +23,8 @@ class InteractiveKundliChart extends StatefulWidget {
     required this.ascendantSign,
     this.chartStyle = ChartStyle.northIndian,
     this.isDarkMode = true,
+    this.planetAbbreviations,
+    this.signAbbreviations,
   });
 
   @override
@@ -313,6 +317,8 @@ class _InteractiveKundliChartState extends State<InteractiveKundliChart>
                   pressedHouse: _pressedVisualPos, // Visual position for press
                   glowIntensity: _glowAnimation.value,
                   housePaths: _housePaths,
+                  planetAbbreviations: widget.planetAbbreviations,
+                  signAbbreviations: widget.signAbbreviations,
                 ),
               );
             },
@@ -360,6 +366,8 @@ class _GlowingChartPainter extends CustomPainter {
   final int? pressedHouse;
   final double glowIntensity;
   final Map<int, Path> housePaths;
+  final Map<String, String>? planetAbbreviations;
+  final Map<String, String>? signAbbreviations;
 
   _GlowingChartPainter({
     required this.houses,
@@ -369,6 +377,8 @@ class _GlowingChartPainter extends CustomPainter {
     this.pressedHouse,
     required this.glowIntensity,
     required this.housePaths,
+    this.planetAbbreviations,
+    this.signAbbreviations,
   });
 
   // Colors
@@ -893,15 +903,21 @@ class _GlowingChartPainter extends CustomPainter {
     }
   }
 
-  // Dynamic abbreviation - takes first 3 chars of sign name
+  // Dynamic abbreviation - uses localized map or takes first 3 chars of sign name
   String _getSignAbbreviation(String sign) {
     if (sign.isEmpty) return '';
+    if (signAbbreviations != null && signAbbreviations!.containsKey(sign)) {
+      return signAbbreviations![sign]!;
+    }
     return sign.length > 3 ? sign.substring(0, 3) : sign;
   }
 
-  // Dynamic abbreviation - takes first 2 chars of planet name
+  // Dynamic abbreviation - uses localized map or takes first 2 chars of planet name
   String _getPlanetSymbol(String planet) {
     if (planet.isEmpty) return '';
+    if (planetAbbreviations != null && planetAbbreviations!.containsKey(planet)) {
+      return planetAbbreviations![planet]!;
+    }
     return planet.length > 2 ? planet.substring(0, 2) : planet;
   }
 

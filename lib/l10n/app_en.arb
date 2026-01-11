@@ -1,0 +1,2559 @@
+{
+  "@@locale": "en",
+  "@@last_modified": "2026-01-10",
+
+  "appName": "Kundali",
+  "@appName": {"description": "Application name"},
+
+  "common_save": "Save",
+  "common_cancel": "Cancel",
+  "common_delete": "Delete",
+  "common_share": "Share",
+  "common_download": "Download",
+  "common_loading": "Loading...",
+  "common_error": "Error",
+  "common_success": "Success",
+  "common_ok": "OK",
+  "common_yes": "Yes",
+  "common_no": "No",
+  "common_close": "Close",
+  "common_back": "Back",
+  "common_next": "Next",
+  "common_done": "Done",
+  "common_confirm": "Confirm",
+  "common_retry": "Retry",
+  "common_submit": "Submit",
+  "common_update": "Update",
+  "common_reset": "Reset",
+  "common_apply": "Apply",
+  "common_search": "Search",
+  "common_settings": "Settings",
+  "insight_whatThisMeans": "What This Means",
+  "insight_significance": "Significance",
+  "insight_keyPoints": "Key Points",
+  "common_language": "Language",
+  "common_theme": "Theme",
+  "common_logout": "Logout",
+  "common_login": "Login",
+  "common_signup": "Sign Up",
+
+  "nav_home": "Home",
+  "nav_horoscope": "Horoscope",
+  "nav_panchang": "Panchang",
+  "nav_chat": "Chat",
+  "nav_profile": "Profile",
+
+  "display_tab_chart": "Chart",
+  "display_tab_details": "Details",
+  "display_tab_planets": "Planets",
+  "display_tab_houses": "Houses",
+  "display_tab_dasha": "Dasha",
+  "display_tab_yogas": "Yogas",
+  "display_tab_transit": "Transit",
+  "display_tab_panchang": "Panchang",
+  "display_tab_strength": "Strength",
+
+  "display_menu_exportPdf": "Export PDF",
+  "display_menu_setAsPrimary": "Set as Primary",
+  "display_menu_duplicate": "Duplicate",
+  "display_menu_delete": "Delete",
+  "display_menu_language": "Language",
+
+  "display_viewChartFor": "View Chart For",
+  "display_date": "Date",
+  "display_time": "Time",
+  "display_viewCurrentTimeChart": "View Current Time Chart",
+  "display_chartTypes": "Chart Types",
+  "display_divisionalCharts": "Divisional Charts",
+  "display_chartStyle": "Chart Style",
+  "display_northIndian": "North Indian",
+  "display_southIndian": "South Indian",
+  "display_fullscreen": "Fullscreen",
+  "display_zoomIn": "Zoom In",
+  "display_zoomOut": "Zoom Out",
+  "display_selectChartType": "Select Chart Type",
+  "display_learnMore": "Learn More",
+
+  "chart_lagna": "Lagna",
+  "chart_moon": "Moon",
+  "chart_sun": "Sun",
+  "chart_bhava": "Bhava",
+  "chart_hora": "Hora",
+  "chart_drekkana": "Drekkana",
+  "chart_chaturthamsa": "Chaturthamsa",
+  "chart_saptamsa": "Saptamsa",
+  "chart_navamsa": "Navamsa",
+  "chart_dasamsa": "Dasamsa",
+  "chart_dwadasamsa": "Dwadasamsa",
+  "chart_shodasamsa": "Shodasamsa",
+  "chart_vimsamsa": "Vimsamsa",
+  "chart_chaturvimsamsa": "Chaturvimsamsa",
+  "chart_bhamsa": "Bhamsa",
+  "chart_trimshamsa": "Trimshamsa",
+  "chart_khavedamsa": "Khavedamsa",
+  "chart_akshavedamsa": "Akshavedamsa",
+  "chart_shashtiamsa": "Shashtiamsa",
+  "chart_sudarshan": "Sudarshan",
+  "chart_ashtakavarga": "Ashtakavarga",
+
+  "chart_category_primary": "Primary Charts",
+  "chart_category_primary_desc": "The main birth charts for overall life analysis",
+  "chart_category_divisional": "Divisional Charts (Vargas)",
+  "chart_category_divisional_desc": "Specialized charts for specific life areas",
+  "chart_category_special": "Special Charts",
+  "chart_category_special_desc": "Unique analytical methods",
+
+  "display_shareComingSoon": "Share coming soon",
+  "display_am": "AM",
+  "display_pm": "PM",
+
+  "language_title": "Language",
+  "language_subtitle": "Choose your preferred language",
+  "language_changed": "Language changed to {language}",
+  "@language_changed": {
+    "placeholders": {
+      "language": {"type": "String"}
+    }
+  },
+
+  "input_title": "Create Kundali",
+  "input_name": "Name",
+  "input_namePlaceholder": "Enter name",
+  "input_dateOfBirth": "Date of Birth",
+  "input_timeOfBirth": "Time of Birth",
+  "input_placeOfBirth": "Place of Birth",
+  "input_placePlaceholder": "Enter city name",
+  "input_gender": "Gender",
+  "input_male": "Male",
+  "input_female": "Female",
+  "input_other": "Other",
+  "input_generateKundali": "Generate Kundali",
+  "input_saveAndView": "Save & View",
+  "input_advancedOptions": "Advanced Options",
+  "input_chartStyle": "Chart Style",
+  "input_timezone": "Timezone",
+  "input_setPrimary": "Set as Primary",
+  "input_validationNameRequired": "Name is required",
+  "input_validationPlaceRequired": "Place of birth is required",
+  "input_selectDate": "Select Date",
+  "input_selectTime": "Select Time",
+  "input_searchPlace": "Search place...",
+  "input_recentSearches": "Recent Searches",
+  "input_popularCities": "Popular Cities",
+  "input_noResultsFound": "No results found",
+  "input_generating": "Generating Kundali...",
+
+  "planet_sun": "Sun",
+  "planet_moon": "Moon",
+  "planet_mars": "Mars",
+  "planet_mercury": "Mercury",
+  "planet_jupiter": "Jupiter",
+  "planet_venus": "Venus",
+  "planet_saturn": "Saturn",
+  "planet_rahu": "Rahu",
+  "planet_ketu": "Ketu",
+  "planet_uranus": "Uranus",
+  "planet_neptune": "Neptune",
+  "planet_pluto": "Pluto",
+
+  "planet_sun_sanskrit": "Surya",
+  "planet_moon_sanskrit": "Chandra",
+  "planet_mars_sanskrit": "Mangal",
+  "planet_mercury_sanskrit": "Budh",
+  "planet_jupiter_sanskrit": "Guru",
+  "planet_venus_sanskrit": "Shukra",
+  "planet_saturn_sanskrit": "Shani",
+  "planet_rahu_sanskrit": "Rahu",
+  "planet_ketu_sanskrit": "Ketu",
+
+  "planet_sun_abbr": "Su",
+  "planet_moon_abbr": "Mo",
+  "planet_mars_abbr": "Ma",
+  "planet_mercury_abbr": "Me",
+  "planet_jupiter_abbr": "Ju",
+  "planet_venus_abbr": "Ve",
+  "planet_saturn_abbr": "Sa",
+  "planet_rahu_abbr": "Ra",
+  "planet_ketu_abbr": "Ke",
+  "planet_uranus_abbr": "Ur",
+  "planet_neptune_abbr": "Ne",
+  "planet_pluto_abbr": "Pl",
+
+  "planets_overview": "Planets Overview",
+  "planets_position": "Position",
+  "planets_degree": "Degree",
+  "planets_sign": "Sign",
+  "planets_house": "House",
+  "planets_nakshatra": "Nakshatra",
+  "planets_retrograde": "Retrograde",
+  "planets_combust": "Combust",
+  "planets_exalted": "Exalted",
+  "planets_debilitated": "Debilitated",
+  "planets_ownSign": "Own Sign",
+  "planets_friendly": "Friendly",
+  "planets_neutral": "Neutral",
+  "planets_enemy": "Enemy",
+
+  "zodiac_aries": "Aries",
+  "zodiac_taurus": "Taurus",
+  "zodiac_gemini": "Gemini",
+  "zodiac_cancer": "Cancer",
+  "zodiac_leo": "Leo",
+  "zodiac_virgo": "Virgo",
+  "zodiac_libra": "Libra",
+  "zodiac_scorpio": "Scorpio",
+  "zodiac_sagittarius": "Sagittarius",
+  "zodiac_capricorn": "Capricorn",
+  "zodiac_aquarius": "Aquarius",
+  "zodiac_pisces": "Pisces",
+
+  "zodiac_aries_abbr": "Ari",
+  "zodiac_taurus_abbr": "Tau",
+  "zodiac_gemini_abbr": "Gem",
+  "zodiac_cancer_abbr": "Can",
+  "zodiac_leo_abbr": "Leo",
+  "zodiac_virgo_abbr": "Vir",
+  "zodiac_libra_abbr": "Lib",
+  "zodiac_scorpio_abbr": "Sco",
+  "zodiac_sagittarius_abbr": "Sag",
+  "zodiac_capricorn_abbr": "Cap",
+  "zodiac_aquarius_abbr": "Aqu",
+  "zodiac_pisces_abbr": "Pis",
+
+  "zodiac_aries_sanskrit": "Mesha",
+  "zodiac_taurus_sanskrit": "Vrishabha",
+  "zodiac_gemini_sanskrit": "Mithuna",
+  "zodiac_cancer_sanskrit": "Karka",
+  "zodiac_leo_sanskrit": "Simha",
+  "zodiac_virgo_sanskrit": "Kanya",
+  "zodiac_libra_sanskrit": "Tula",
+  "zodiac_scorpio_sanskrit": "Vrishchika",
+  "zodiac_sagittarius_sanskrit": "Dhanu",
+  "zodiac_capricorn_sanskrit": "Makara",
+  "zodiac_aquarius_sanskrit": "Kumbha",
+  "zodiac_pisces_sanskrit": "Meena",
+
+  "nakshatra_ashwini": "Ashwini",
+  "nakshatra_bharani": "Bharani",
+  "nakshatra_krittika": "Krittika",
+  "nakshatra_rohini": "Rohini",
+  "nakshatra_mrigashira": "Mrigashira",
+  "nakshatra_ardra": "Ardra",
+  "nakshatra_punarvasu": "Punarvasu",
+  "nakshatra_pushya": "Pushya",
+  "nakshatra_ashlesha": "Ashlesha",
+  "nakshatra_magha": "Magha",
+  "nakshatra_purvaphalguni": "Purva Phalguni",
+  "nakshatra_uttaraphalguni": "Uttara Phalguni",
+  "nakshatra_hasta": "Hasta",
+  "nakshatra_chitra": "Chitra",
+  "nakshatra_swati": "Swati",
+  "nakshatra_vishakha": "Vishakha",
+  "nakshatra_anuradha": "Anuradha",
+  "nakshatra_jyeshtha": "Jyeshtha",
+  "nakshatra_mula": "Mula",
+  "nakshatra_purvashadha": "Purva Ashadha",
+  "nakshatra_uttarashadha": "Uttara Ashadha",
+  "nakshatra_shravana": "Shravana",
+  "nakshatra_dhanishta": "Dhanishta",
+  "nakshatra_shatabhisha": "Shatabhisha",
+  "nakshatra_purvabhadrapada": "Purva Bhadrapada",
+  "nakshatra_uttarabhadrapada": "Uttara Bhadrapada",
+  "nakshatra_revati": "Revati",
+
+  "element_fire": "Fire",
+  "element_earth": "Earth",
+  "element_air": "Air",
+  "element_water": "Water",
+  "element_fire_desc": "Dynamic",
+  "element_earth_desc": "Grounded",
+  "element_air_desc": "Intellectual",
+  "element_water_desc": "Intuitive",
+
+  "gana_deva": "Deva",
+  "gana_manushya": "Manushya",
+  "gana_rakshasa": "Rakshasa",
+
+  "varna_brahmin": "Brahmin",
+  "varna_kshatriya": "Kshatriya",
+  "varna_vaishya": "Vaishya",
+  "varna_shudra": "Shudra",
+
+  "vashya_chatushpad": "Chatushpad",
+  "vashya_vanchar": "Vanchar",
+  "vashya_nara": "Nara",
+  "vashya_jalachara": "Jalachara",
+  "vashya_keeta": "Keeta",
+
+  "nadi_aadi": "Aadi",
+  "nadi_madhya": "Madhya",
+  "nadi_antya": "Antya",
+
+  "day_sunday": "Sunday",
+  "day_monday": "Monday",
+  "day_tuesday": "Tuesday",
+  "day_wednesday": "Wednesday",
+  "day_thursday": "Thursday",
+  "day_friday": "Friday",
+  "day_saturday": "Saturday",
+
+  "metal_gold": "Gold",
+  "metal_silver": "Silver",
+  "metal_copper": "Copper",
+  "metal_iron": "Iron",
+  "metal_brass": "Brass",
+  "metal_bronze": "Bronze",
+  "metal_tin": "Tin",
+  "metal_lead": "Lead",
+
+  "gemstone_ruby": "Ruby",
+  "gemstone_pearl": "Pearl",
+  "gemstone_redcoral": "Red Coral",
+  "gemstone_emerald": "Emerald",
+  "gemstone_yellowsapphire": "Yellow Sapphire",
+  "gemstone_diamond": "Diamond",
+  "gemstone_bluesapphire": "Blue Sapphire",
+  "gemstone_hessonite": "Hessonite",
+  "gemstone_catseye": "Cat's Eye",
+
+  "yoni_horse": "Horse",
+  "yoni_elephant": "Elephant",
+  "yoni_goat": "Goat",
+  "yoni_serpent": "Serpent",
+  "yoni_dog": "Dog",
+  "yoni_cat": "Cat",
+  "yoni_rat": "Rat",
+  "yoni_cow": "Cow",
+  "yoni_buffalo": "Buffalo",
+  "yoni_tiger": "Tiger",
+  "yoni_deer": "Deer",
+  "yoni_monkey": "Monkey",
+  "yoni_mongoose": "Mongoose",
+  "yoni_lion": "Lion",
+
+  "tara_janma": "Janma",
+  "tara_sampat": "Sampat",
+  "tara_vipat": "Vipat",
+  "tara_kshema": "Kshema",
+  "tara_pratyak": "Pratyak",
+  "tara_sadhana": "Sadhana",
+  "tara_naidhana": "Naidhana",
+  "tara_mitra": "Mitra",
+  "tara_paramamitra": "Parama Mitra",
+
+  "house_1": "1st House",
+  "house_2": "2nd House",
+  "house_3": "3rd House",
+  "house_4": "4th House",
+  "house_5": "5th House",
+  "house_6": "6th House",
+  "house_7": "7th House",
+  "house_8": "8th House",
+  "house_9": "9th House",
+  "house_10": "10th House",
+  "house_11": "11th House",
+  "house_12": "12th House",
+
+  "house_1_name": "Lagna",
+  "house_2_name": "Dhana",
+  "house_3_name": "Sahaja",
+  "house_4_name": "Sukha",
+  "house_5_name": "Putra",
+  "house_6_name": "Ripu",
+  "house_7_name": "Kalatra",
+  "house_8_name": "Ayu",
+  "house_9_name": "Dharma",
+  "house_10_name": "Karma",
+  "house_11_name": "Labha",
+  "house_12_name": "Vyaya",
+
+  "house_1_meaning": "Self, personality, physical body, health",
+  "house_2_meaning": "Wealth, family, speech, values",
+  "house_3_meaning": "Siblings, courage, communication, short travels",
+  "house_4_meaning": "Mother, home, property, happiness, education",
+  "house_5_meaning": "Children, creativity, intelligence, romance",
+  "house_6_meaning": "Enemies, diseases, debts, daily work",
+  "house_7_meaning": "Marriage, partnerships, business, spouse",
+  "house_8_meaning": "Longevity, transformation, inheritance, occult",
+  "house_9_meaning": "Fortune, dharma, father, higher learning",
+  "house_10_meaning": "Career, status, fame, authority",
+  "house_11_meaning": "Gains, income, friends, aspirations",
+  "house_12_meaning": "Losses, expenses, spirituality, foreign lands",
+
+  "houses_significations": "Significations",
+  "houses_lord": "Lord",
+  "houses_planets": "Planets",
+  "houses_aspects": "Aspects",
+  "houses_strength": "Strength",
+
+  "chartType_lagna": "Lagna",
+  "chartType_moon": "Moon",
+  "chartType_sun": "Sun",
+  "chartType_navamsa": "Navamsa (D9)",
+  "chartType_hora": "Hora (D2)",
+  "chartType_drekkana": "Drekkana (D3)",
+  "chartType_chaturthamsa": "Chaturthamsa (D4)",
+  "chartType_saptamsa": "Saptamsa (D7)",
+  "chartType_dasamsa": "Dasamsa (D10)",
+  "chartType_dwadasamsa": "Dwadasamsa (D12)",
+  "chartType_shodasamsa": "Shodasamsa (D16)",
+  "chartType_vimsamsa": "Vimsamsa (D20)",
+  "chartType_chaturvimsamsa": "Chaturvimsamsa (D24)",
+  "chartType_saptavimsamsa": "Saptavimsamsa (D27)",
+  "chartType_trimsamsa": "Trimsamsa (D30)",
+  "chartType_khavedamsa": "Khavedamsa (D40)",
+  "chartType_akshavedamsa": "Akshavedamsa (D45)",
+  "chartType_shashtiamsa": "Shashtiamsa (D60)",
+
+  "dasha_mahadasha": "Mahadasha",
+  "dasha_antardasha": "Antardasha",
+  "dasha_pratyantardasha": "Pratyantardasha",
+  "dasha_currentPeriod": "Current Period",
+  "dasha_startDate": "Start Date",
+  "dasha_endDate": "End Date",
+  "dasha_duration": "Duration",
+  "dasha_years": "years",
+  "dasha_months": "months",
+  "dasha_days": "days",
+  "dasha_remaining": "Remaining",
+  "dasha_elapsed": "Elapsed",
+  "dasha_vimshottari": "Vimshottari Dasha",
+  "dasha_yogini": "Yogini Dasha",
+  "dasha_chara": "Chara Dasha",
+
+  "dasha_tab_vimshottari": "Vimshottari",
+  "dasha_tab_phala": "Phala",
+  "dasha_tab_yogini": "Yogini",
+  "dasha_tab_char": "Char",
+
+  "dasha_now": "NOW",
+  "dasha_duration_years": "{years} y, {months} m, {days} d",
+  "dasha_duration_months": "{months} m, {days} d",
+  "dasha_duration_days": "{days} days",
+  "dasha_duration_days_hours": "{days} d, {hours} h",
+  "dasha_duration_hours": "{hours} hours",
+  "dasha_duration_hours_minutes": "{hours} h, {minutes} m",
+  "dasha_duration_minutes": "{minutes} min",
+  "dasha_duration_lessThanMinute": "< 1 min",
+
+  "vimshottari_nav_current": "Current",
+  "vimshottari_nav_birth": "Birth",
+  "vimshottari_nav_timeline": "Timeline",
+  "vimshottari_activePeriods": "Active Periods",
+  "vimshottari_birthConfiguration": "Birth Configuration",
+  "vimshottari_lifeTimeline": "Life Timeline",
+  "vimshottari_infoFooter": "Vimshottari Dasha is a 120-year cycle based on Moon's nakshatra at birth. Tap any period to see sub-periods.",
+  "vimshottari_active": "ACTIVE",
+  "vimshottari_planetMahadasha": "{planet} Mahadasha",
+  "vimshottari_journeyProgress": "Journey Progress",
+  "vimshottari_remaining": "Remaining",
+  "vimshottari_duration": "Duration",
+  "vimshottari_cycles": "Cycles",
+  "vimshottari_yearsAbbr": "{years} yrs",
+  "vimshottari_started": "Started",
+  "vimshottari_ends": "Ends",
+  "vimshottari_left": "{duration} left",
+  "vimshottari_nakshatraLord": "Nakshatra Lord",
+  "vimshottari_balanceAtBirth": "Balance at Birth",
+  "vimshottari_sookshma": "Sookshma",
+  "vimshottari_prana": "Prana",
+  "vimshottari_levelPeriods": "{level} Periods",
+  "vimshottari_loadingSubPeriods": "Loading sub-periods...",
+  "vimshottari_start": "Start",
+  "vimshottari_end": "End",
+  "vimshottari_desc_sun": "Period of authority and leadership",
+  "vimshottari_desc_moon": "Period of emotions and intuition",
+  "vimshottari_desc_mars": "Period of action and courage",
+  "vimshottari_desc_mercury": "Period of intellect and learning",
+  "vimshottari_desc_jupiter": "Period of wisdom and fortune",
+  "vimshottari_desc_venus": "Period of love and prosperity",
+  "vimshottari_desc_saturn": "Period of discipline and karma",
+  "vimshottari_desc_rahu": "Period of worldly desires",
+  "vimshottari_desc_ketu": "Period of spiritual growth",
+  "vimshottari_desc_default": "Planetary period of influence",
+
+  "yogini_nav_current": "Current",
+  "yogini_nav_yoginis": "Yoginis",
+  "yogini_nav_timeline": "Timeline",
+  "yogini_activeYoginiPeriods": "Active Yogini Periods",
+  "yogini_divineYoginis": "The 8 Divine Yoginis",
+  "yogini_timeline": "Yogini Timeline",
+  "yogini_infoFooter": "Yogini Dasha is a 36-year cycle based on 8 divine Yoginis representing cosmic feminine energies.",
+  "yogini_unavailableTitle": "Yogini Dasha Unavailable",
+  "yogini_unavailableMessage": "Unable to calculate Yogini Dasha for this chart.",
+  "yogini_active": "ACTIVE",
+  "yogini_dashaName": "{yogini} Dasha",
+  "yogini_journeyProgress": "Journey Progress",
+  "yogini_remaining": "Remaining",
+  "yogini_duration": "Duration",
+  "yogini_cycles": "Cycles",
+  "yogini_yearsAbbr": "{years} yrs",
+  "yogini_left": "{duration} left",
+  "yogini_ruledBy": "Ruled by {planet}",
+  "yogini_start": "Start",
+  "yogini_end": "End",
+  "yogini_subPeriods": "Sub-Periods ({count})",
+  "yogini_noSubPeriods": "No sub-periods available",
+
+  "phala_nav_theme": "Theme",
+  "phala_nav_effects": "Effects",
+  "phala_nav_lifeAreas": "Life Areas",
+  "phala_nav_remedies": "Remedies",
+  "phala_overallTheme": "Overall Theme",
+  "phala_keyEffects": "Key Effects",
+  "phala_lifeAreas": "Life Areas",
+  "phala_remediesRecommendations": "Remedies & Recommendations",
+  "phala_infoFooter": "Mahadasha Phala provides general predictions. Consult an astrologer for personalized guidance.",
+  "phala_unavailableTitle": "Interpretation Unavailable",
+  "phala_unavailableMessage": "Unable to load Mahadasha interpretation.",
+  "phala_badge": "PHALA",
+  "phala_mahadashaName": "{planet} Mahadasha",
+  "phala_remaining": "Remaining",
+  "phala_day": "Day",
+  "phala_color": "Color",
+  "phala_favorable": "Favorable",
+  "phala_challenges": "Challenges",
+  "phala_antardashaName": "{antardasha} Antardasha",
+  "phala_remaining_duration": "{duration} remaining",
+  "phala_gemstone": "Gemstone",
+  "phala_deity": "Deity",
+  "phala_mantra": "Mantra",
+  "phala_suggestedPractices": "Suggested Practices",
+  "phala_day_sunday": "Sunday",
+  "phala_day_monday": "Monday",
+  "phala_day_tuesday": "Tuesday",
+  "phala_day_wednesday": "Wednesday",
+  "phala_day_thursday": "Thursday",
+  "phala_day_friday": "Friday",
+  "phala_day_saturday": "Saturday",
+  "phala_day_sun_short": "Sun",
+  "phala_day_mon_short": "Mon",
+  "phala_day_tue_short": "Tue",
+  "phala_day_wed_short": "Wed",
+  "phala_day_thu_short": "Thu",
+  "phala_day_fri_short": "Fri",
+  "phala_day_sat_short": "Sat",
+
+  "dasha_insight_system": "Dasha System",
+  "dasha_insight_whatThisMeans": "What This Means",
+  "dasha_insight_significance": "Significance",
+  "dasha_insight_keyPoints": "Key Points",
+
+  "dasha_vimshottari_title": "Vimshottari",
+  "dasha_vimshottari_desc": "Vimshottari Dasha is the most widely used planetary period system in Vedic astrology. It's a 120-year cycle based on the Moon's Nakshatra (lunar mansion) at birth.",
+  "dasha_vimshottari_significance": "This system reveals the timing of life events by showing which planetary energies are active during specific periods of your life.",
+  "dasha_vimshottari_point1": "Based on Moon's birth Nakshatra",
+  "dasha_vimshottari_point2": "120-year complete cycle",
+  "dasha_vimshottari_point3": "9 planetary periods (Mahadasha)",
+  "dasha_vimshottari_point4": "Each period has sub-periods (Antardasha)",
+  "dasha_vimshottari_point5": "Most accurate for timing predictions",
+
+  "dasha_phala_title": "Mahadasha Phala",
+  "dasha_phala_desc": "Mahadasha Phala focuses on the results and effects of major planetary periods. It provides detailed predictions for each Mahadasha based on planetary positions.",
+  "dasha_phala_significance": "This analysis helps understand what specific results each Mahadasha will bring based on the planet's house placement and aspects.",
+  "dasha_phala_point1": "Focuses on period results",
+  "dasha_phala_point2": "House-based predictions",
+  "dasha_phala_point3": "Considers planetary aspects",
+  "dasha_phala_point4": "Shows favorable/unfavorable periods",
+  "dasha_phala_point5": "Helps in life planning",
+
+  "dasha_yogini_title": "Yogini",
+  "dasha_yogini_desc": "Yogini Dasha is a unique 36-year cycle named after 8 Yoginis (divine feminine energies). It's particularly useful for timing events and is known for its accuracy.",
+  "dasha_yogini_significance": "This shorter cycle system is excellent for precise timing and is said to give results that are more immediately noticeable.",
+  "dasha_yogini_point1": "36-year complete cycle",
+  "dasha_yogini_point2": "8 Yogini periods",
+  "dasha_yogini_point3": "Named after divine feminine",
+  "dasha_yogini_point4": "Excellent for timing events",
+  "dasha_yogini_point5": "Complementary to Vimshottari",
+
+  "dasha_char_title": "Chara (Jaimini)",
+  "dasha_char_desc": "Chara Dasha is from the Jaimini system of astrology. It uses zodiac signs rather than planets and is based on the Karakamsha (soul's desire).",
+  "dasha_char_significance": "This sign-based system provides a different perspective on life timing and is particularly useful for understanding soul-level desires and karmic patterns.",
+  "dasha_char_point1": "Jaimini astrology system",
+  "dasha_char_point2": "Sign-based periods",
+  "dasha_char_point3": "Based on Karakamsha",
+  "dasha_char_point4": "Shows karmic patterns",
+  "dasha_char_point5": "Complements planetary Dashas",
+
+  "yoga_rajaYoga": "Raja Yoga",
+  "yoga_dhanaYoga": "Dhana Yoga",
+  "yoga_gajaKesari": "Gaja Kesari Yoga",
+  "yoga_budhAditya": "Budh-Aditya Yoga",
+  "yoga_hamsa": "Hamsa Yoga",
+  "yoga_malavya": "Malavya Yoga",
+  "yoga_bhadra": "Bhadra Yoga",
+  "yoga_ruchaka": "Ruchaka Yoga",
+  "yoga_shasha": "Shasha Yoga",
+
+  "yogas_title": "Yogas & Doshas",
+  "yogas_beneficial": "Beneficial Yogas",
+  "yogas_challenging": "Challenging Doshas",
+  "yogas_planets": "Planets",
+  "yogas_strength": "Strength",
+  "yogas_excellent": "Excellent",
+  "yogas_veryFavorable": "Very Favorable",
+  "yogas_favorable": "Favorable",
+  "yogas_mixed": "Mixed",
+  "yogas_challenging_label": "Challenging",
+  "yogas_whatThisMeans": "What This Means",
+  "yogas_significance": "Significance",
+  "yogas_keyPoints": "Key Points",
+  "yogas_overview": "Yoga & Dosha Overview",
+
+  "dosha_manglik": "Manglik Dosha",
+  "dosha_kalaSarpa": "Kala Sarpa Dosha",
+  "dosha_pitruDosha": "Pitru Dosha",
+  "dosha_sadesati": "Sade Sati",
+  "dosha_dhaiya": "Shani Dhaiya",
+
+  "strength_shadbala": "Shadbala",
+  "strength_ashtakavarga": "Ashtakavarga",
+  "strength_digbala": "Dig Bala",
+  "strength_kalabala": "Kala Bala",
+  "strength_chestabala": "Chesta Bala",
+  "strength_naisargikabala": "Naisargika Bala",
+  "strength_drikbala": "Drik Bala",
+  "strength_sthanabala": "Sthana Bala",
+  "strength_total": "Total",
+  "strength_strong": "Strong",
+  "strength_average": "Average",
+  "strength_weak": "Weak",
+
+  "strength_nav_overview": "Overview",
+  "strength_nav_shadbala": "Shadbala",
+  "strength_nav_vimshopaka": "Vimshopaka",
+  "strength_nav_ashtaka": "Ashtaka",
+
+  "strength_excellent": "Excellent",
+  "strength_good": "Good",
+  "strength_needsSupport": "Needs Support",
+  "strength_medium": "Medium",
+
+  "strength_chartStrength": "Chart Strength",
+  "strength_chartStrength_desc": "Your overall chart strength is measured by averaging the Shadbala (six-fold strength) of all planets. This indicates how well the planets are positioned to deliver their results in your life.",
+  "strength_chartStrength_significance": "With {strongCount} strong planets and {weakCount} weak planets out of {totalPlanets}, your chart shows {result}.",
+  "@strength_chartStrength_significance": {
+    "placeholders": {
+      "strongCount": {"type": "int"},
+      "weakCount": {"type": "int"},
+      "totalPlanets": {"type": "int"},
+      "result": {"type": "String"}
+    }
+  },
+  "strength_goodOverallStrength": "good overall planetary strength",
+  "strength_needsRemedies": "areas that may benefit from remedial measures",
+  "strength_avgStrength": "Average Strength: {value}%",
+  "@strength_avgStrength": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "strength_strongPlanets": "Strong Planets: {count} (≥100% of required)",
+  "@strength_strongPlanets": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "strength_weakPlanets": "Weak Planets: {count} (<100% of required)",
+  "@strength_weakPlanets": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "strength_strengthLevel": "Strength Level: {level}",
+  "@strength_strengthLevel": {
+    "placeholders": {
+      "level": {"type": "String"}
+    }
+  },
+  "strength_excellentResult": "Excellent! Most planets can deliver strong results",
+  "strength_goodResult": "Good strength with minor areas to improve",
+  "strength_considerRemedies": "Consider remedies for weak planets",
+
+  "strength_shadbala_title": "Shadbala (षड्बल)",
+  "strength_shadbala_subtitle": "Six-fold planetary strength",
+  "strength_shadbala_desc": "Shadbala (षड्बल) means \"six-fold strength\" - the comprehensive Vedic system to calculate planetary power. A planet needs 100% of its required strength to give good results.",
+  "strength_shadbala_significance": "{planet} ranks #{rank} out of {total} planets with {bala} Rupas ({percentage}% of the {required} required). {status}",
+  "@strength_shadbala_significance": {
+    "placeholders": {
+      "planet": {"type": "String"},
+      "rank": {"type": "int"},
+      "total": {"type": "int"},
+      "bala": {"type": "String"},
+      "percentage": {"type": "String"},
+      "required": {"type": "String"},
+      "status": {"type": "String"}
+    }
+  },
+  "strength_shadbala_strongStatus": "This planet is strong and well-positioned to deliver positive results.",
+  "strength_shadbala_weakStatus": "This planet may need strengthening through remedies.",
+  "strength_totalShadbala": "Total Shadbala: {value} Rupas",
+  "@strength_totalShadbala": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "strength_required": "Required: {value} Rupas",
+  "@strength_required": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "strength_percentage": "Percentage: {value}%",
+  "@strength_percentage": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "strength_rank": "Rank: #{rank} of {total} planets",
+  "@strength_rank": {
+    "placeholders": {
+      "rank": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "strength_statusStrong": "Status: Strong ✓",
+  "strength_statusNeedsSupport": "Status: Needs Support ⚠",
+  "strength_sthanaBala": "Sthana Bala: {value} (Position)",
+  "@strength_sthanaBala": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "strength_digBala": "Dig Bala: {value} (Direction)",
+  "@strength_digBala": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "strength_kalaBala": "Kala Bala: {value} (Time)",
+  "@strength_kalaBala": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "strength_chestaBala": "Chesta Bala: {value} (Motion)",
+  "@strength_chestaBala": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "strength_naisargikaBala": "Naisargika Bala: {value} (Natural)",
+  "@strength_naisargikaBala": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "strength_drikBala": "Drik Bala: {value} (Aspect)",
+  "@strength_drikBala": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+
+  "strength_vimshopaka_title": "Vimshopaka Bala",
+  "strength_vimshopaka_subtitle": "Divisional chart strength (20-point scale)",
+  "strength_vimshopaka_desc": "Vimshopaka Bala (20-point strength) evaluates planetary strength across 16 divisional charts (Shodasavarga). Each planet is scored out of {maxScore} points based on its dignity (exalted, own sign, friendly, etc.) in each divisional chart.",
+  "@strength_vimshopaka_desc": {
+    "placeholders": {
+      "maxScore": {"type": "String"}
+    }
+  },
+  "strength_vimshopaka_significance": "{planet} scores {score}/{maxScore} ({percentage}%), classified as \"{strength}\". {result}",
+  "@strength_vimshopaka_significance": {
+    "placeholders": {
+      "planet": {"type": "String"},
+      "score": {"type": "String"},
+      "maxScore": {"type": "String"},
+      "percentage": {"type": "String"},
+      "strength": {"type": "String"},
+      "result": {"type": "String"}
+    }
+  },
+  "strength_vimshopaka_strongResult": "This planet has excellent dignity across divisional charts.",
+  "strength_vimshopaka_mediumResult": "This planet has moderate dignity.",
+  "strength_vimshopaka_weakResult": "This planet may need strengthening.",
+  "strength_vimshopakaScore": "Vimshopaka Score: {score}/{max}",
+  "@strength_vimshopakaScore": {
+    "placeholders": {
+      "score": {"type": "String"},
+      "max": {"type": "String"}
+    }
+  },
+  "strength_strengthCategory": "Strength Category: {category}",
+  "@strength_strengthCategory": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "strength_strongRange": "Strong: 75-100%",
+  "strength_mediumRange": "Medium: 50-75%",
+  "strength_weakRange": "Weak: 0-50%",
+  "strength_basedOnDivisional": "Based on dignity in 16 divisional charts",
+  "strength_vimshopakaSummary": "Summary",
+  "strength_vimshopakaSummary_desc": "Vimshopaka Bala (20-point strength) evaluates how well planets are placed across all 16 divisional charts (Shodasavarga). Each planet receives dignity points based on its placement in each divisional chart.",
+  "strength_vimshopakaSummary_significance": "Of {total} planets: {strong} are Strong (75-100%), {medium} are Medium (50-75%), and {weak} are Weak (<50%).",
+  "@strength_vimshopakaSummary_significance": {
+    "placeholders": {
+      "total": {"type": "int"},
+      "strong": {"type": "int"},
+      "medium": {"type": "int"},
+      "weak": {"type": "int"}
+    }
+  },
+  "strength_strongPlanetsCount": "Strong Planets: {count} (15-20 points)",
+  "@strength_strongPlanetsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "strength_mediumPlanetsCount": "Medium Planets: {count} (10-15 points)",
+  "@strength_mediumPlanetsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "strength_weakPlanetsCount": "Weak Planets: {count} (0-10 points)",
+  "@strength_weakPlanetsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "strength_basedOn16Charts": "Based on 16 divisional charts (D1 to D60)",
+  "strength_maxScorePlanet": "Max score: 20 points per planet",
+  "strength_strongVimshopakaGoodDignity": "Strong Vimshopaka = Good dignity across all charts",
+  "strength_tapForExplanation": "Tap for detailed explanation",
+  "strength_strengthFrom16Charts": "Strength from 16 divisional charts",
+  "strength_med": "Med",
+
+  "strength_ashtakavarga_title": "Ashtakavarga (अष्टकवर्ग)",
+  "strength_ashtakavarga_subtitle": "Transit strength by sign",
+  "strength_ashtakavarga_transitSystem": "Transit Strength System",
+  "strength_ashtakavarga_desc": "Ashtakavarga is a unique Vedic system to evaluate sign strength for transit predictions. Each of the 7 planets contributes 0-8 benefic points (bindus) to each sign. The Sarvashtakavarga (SAV) is the combined score of all planets for each sign.",
+  "strength_ashtakavarga_significance": "Your strongest sign for transits is {strongSign} ({strongPoints} points) and weakest is {weakSign} ({weakPoints} points). Total SAV across all signs is {total}.",
+  "@strength_ashtakavarga_significance": {
+    "placeholders": {
+      "strongSign": {"type": "String"},
+      "strongPoints": {"type": "int"},
+      "weakSign": {"type": "String"},
+      "weakPoints": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "strength_strongestSign": "Strongest Sign: {sign} ({points} pts)",
+  "@strength_strongestSign": {
+    "placeholders": {
+      "sign": {"type": "String"},
+      "points": {"type": "int"}
+    }
+  },
+  "strength_weakestSign": "Weakest Sign: {sign} ({points} pts)",
+  "@strength_weakestSign": {
+    "placeholders": {
+      "sign": {"type": "String"},
+      "points": {"type": "int"}
+    }
+  },
+  "strength_totalSav": "Total SAV: {points} points",
+  "@strength_totalSav": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "strength_individualBav": "Individual BAV: 0-8 points per planet-sign",
+  "strength_savCombined": "SAV: 0-56 points per sign (combined)",
+  "strength_goodBav": "Good BAV: ≥4 points",
+  "strength_strongSav": "Strong SAV: ≥28 points",
+
+  "strength_sarvashtakavarga": "Sarvashtakavarga",
+  "strength_sav_desc": "Sarvashtakavarga (SAV) is the combined Ashtakavarga points of all 7 planets for each sign. It shows the overall strength of each sign for transits and results. Maximum possible is 56 points (8 points × 7 planets).",
+  "strength_sav_signStrong": "{sign} has {points} SAV points. This sign is strong and transits through it generally give positive results.",
+  "@strength_sav_signStrong": {
+    "placeholders": {
+      "sign": {"type": "String"},
+      "points": {"type": "int"}
+    }
+  },
+  "strength_sav_signWeak": "{sign} has {points} SAV points. Transits through this sign may need more attention.",
+  "@strength_sav_signWeak": {
+    "placeholders": {
+      "sign": {"type": "String"},
+      "points": {"type": "int"}
+    }
+  },
+  "strength_bav_desc": "Ashtakavarga shows benefic points (0-8) each planet contributes to each sign. Points ≥4 are auspicious. This helps predict transit effects - planets transiting signs with higher points give better results.",
+  "strength_bav_signStrong": "{sign} has {points} bindus. Transits of this planet through {sign} are generally favorable.",
+  "@strength_bav_signStrong": {
+    "placeholders": {
+      "sign": {"type": "String"},
+      "points": {"type": "int"}
+    }
+  },
+  "strength_bav_signWeak": "{sign} has {points} bindus. Extra care needed during transits through this sign.",
+  "@strength_bav_signWeak": {
+    "placeholders": {
+      "sign": {"type": "String"},
+      "points": {"type": "int"}
+    }
+  },
+  "strength_sign": "Sign: {sign}",
+  "@strength_sign": {
+    "placeholders": {
+      "sign": {"type": "String"}
+    }
+  },
+  "strength_pointsSav": "Points: {points}/56",
+  "@strength_pointsSav": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "strength_pointsBav": "Points: {points}/8",
+  "@strength_pointsBav": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "strength_typeSav": "Type: Sarvashtakavarga (Combined)",
+  "strength_typeBav": "Type: Bhinna Ashtakavarga (Individual)",
+  "strength_strongSavThreshold": "Strong: ≥28 points",
+  "strength_auspiciousBavThreshold": "Auspicious: ≥4 points",
+  "strength_usedForTransit": "Used for transit predictions",
+
+  "strength_totalSarvashtakavarga": "Total Sarvashtakavarga",
+  "strength_totalSav_points": "{points} Points",
+  "@strength_totalSav_points": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "strength_totalSav_desc": "The Total SAV is the sum of all Sarvashtakavarga points across all 12 signs. Maximum possible is 337 points. A higher total indicates overall stronger chart for transits.",
+  "strength_totalSav_excellent": "Your total SAV of {points} points is excellent, indicating a strong overall chart.",
+  "@strength_totalSav_excellent": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "strength_totalSav_good": "Your total SAV of {points} points is good, showing balanced strength.",
+  "@strength_totalSav_good": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "strength_totalSav_focus": "Your total SAV of {points} points suggests focusing on beneficial transit periods.",
+  "@strength_totalSav_focus": {
+    "placeholders": {
+      "points": {"type": "int"}
+    }
+  },
+  "strength_maxPossible": "Maximum possible: 337 points",
+  "strength_calculationSum": "Calculation: Sum of all 12 sign SAV values",
+  "strength_higherBetter": "Higher = Better overall transit strength",
+
+  "strength_lagnaLord": "Lagna Lord",
+  "strength_lagnaLord_strength": "Lagna Lord Strength",
+  "strength_lagnaLord_desc": "The Lagna Lord (Ascendant Lord) is the most important planet in your chart. It rules your Ascendant sign and represents your overall life path, personality, and vitality. Its strength directly impacts your ability to achieve success.",
+  "strength_lagnaLord_significance": "{lagnaLord} rules {ascendantSign} (your Ascendant). {status}",
+  "@strength_lagnaLord_significance": {
+    "placeholders": {
+      "lagnaLord": {"type": "String"},
+      "ascendantSign": {"type": "String"},
+      "status": {"type": "String"}
+    }
+  },
+  "strength_lagnaLord_strong": "Your Lagna Lord is strong, indicating good vitality and ability to overcome obstacles.",
+  "strength_lagnaLord_weak": "Your Lagna Lord needs strengthening for better life results.",
+  "strength_lagnaLord_label": "Lagna Lord: {planet}",
+  "@strength_lagnaLord_label": {
+    "placeholders": {
+      "planet": {"type": "String"}
+    }
+  },
+  "strength_rules": "Rules: {sign} Ascendant",
+  "@strength_rules": {
+    "placeholders": {
+      "sign": {"type": "String"}
+    }
+  },
+  "strength_lagnaLordCondition": "The Lagna Lord's condition affects overall life success",
+
+  "strength_legend_sthana": "Sthana",
+  "strength_legend_sthana_hint": "Position",
+  "strength_legend_dig": "Dig",
+  "strength_legend_dig_hint": "Direction",
+  "strength_legend_kala": "Kala",
+  "strength_legend_kala_hint": "Time",
+  "strength_legend_chesta": "Chesta",
+  "strength_legend_chesta_hint": "Motion",
+  "strength_legend_naisarg": "Naisarg",
+  "strength_legend_naisarg_hint": "Natural",
+  "strength_legend_drik": "Drik",
+  "strength_legend_drik_hint": "Aspect",
+
+  "strength_rupas": "{value} / {required} Rupas",
+  "@strength_rupas": {
+    "placeholders": {
+      "value": {"type": "String"},
+      "required": {"type": "String"}
+    }
+  },
+  "strength_strongest": "Strongest",
+  "strength_weakest": "Weakest",
+  "strength_pointsPerSign": "Points 0-8 per sign",
+  "strength_goodThreshold": "≥4 Good",
+  "strength_savThreshold": "SAV ≥28 Strong",
+  "strength_points": "points",
+  "strength_pts": "pts",
+
+  "strength_vimshopakaStrength": "Vimshopaka Strength",
+  "strength_vimshopakaStrength_strong_desc": "Planets with 15-20 Vimshopaka points (75-100%). These planets have excellent dignity across divisional charts and give strong results.",
+  "strength_vimshopakaStrength_medium_desc": "Planets with 10-15 Vimshopaka points (50-75%). These planets have moderate dignity and give balanced results.",
+  "strength_vimshopakaStrength_weak_desc": "Planets with 0-10 Vimshopaka points (<50%). These planets may need strengthening through remedies.",
+  "strength_vimshopakaStrength_significance": "You have {count} {category} planet(s) based on Vimshopaka Bala scoring.",
+  "@strength_vimshopakaStrength_significance": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "category": {"type": "String"}
+    }
+  },
+  "strength_countPlanets": "Count: {count} planets",
+  "@strength_countPlanets": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "strength_category": "Category: {category}",
+  "@strength_category": {
+    "placeholders": {
+      "category": {"type": "String"}
+    }
+  },
+  "strength_scoreRangeStrong": "Score Range: 15-20 points (75-100%)",
+  "strength_scoreRangeMedium": "Score Range: 10-15 points (50-75%)",
+  "strength_scoreRangeWeak": "Score Range: 0-10 points (0-50%)",
+
+  "strength_planetsPlanets": "{label} Planets",
+  "@strength_planetsPlanets": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+  "strength_haveCount": "You have {value} {label} planets in your chart.",
+  "@strength_haveCount": {
+    "placeholders": {
+      "value": {"type": "String"},
+      "label": {"type": "String"}
+    }
+  },
+  "strength_countLabel": "Count: {value} planets",
+  "@strength_countLabel": {
+    "placeholders": {
+      "value": {"type": "String"}
+    }
+  },
+  "strength_statusLabel": "Status: {label}",
+  "@strength_statusLabel": {
+    "placeholders": {
+      "label": {"type": "String"}
+    }
+  },
+
+  "transit_current": "Current Transit",
+  "transit_effects": "Transit Effects",
+  "transit_planetaryPositions": "Planetary Positions",
+  "transit_aspects": "Aspects",
+  "transit_prediction": "Prediction",
+  "transit_favorable": "Favorable",
+  "transit_unfavorable": "Unfavorable",
+  "transit_neutral": "Neutral",
+
+  "panchang_tithi": "Tithi",
+  "panchang_nakshatra": "Nakshatra",
+  "panchang_yoga": "Yoga",
+  "panchang_karana": "Karana",
+  "panchang_vara": "Vara",
+  "panchang_sunrise": "Sunrise",
+  "panchang_sunset": "Sunset",
+  "panchang_moonrise": "Moonrise",
+  "panchang_moonset": "Moonset",
+  "panchang_rahuKalam": "Rahu Kalam",
+  "panchang_yamaGandam": "Yama Gandam",
+  "panchang_gulika": "Gulika Kalam",
+  "panchang_abhijit": "Abhijit Muhurta",
+  "panchang_auspicious": "Auspicious Times",
+  "panchang_inauspicious": "Inauspicious Times",
+  "panchang_moonPhase": "Moon Phase",
+
+  "details_birthDetails": "Birth Details",
+  "details_birthDate": "Birth Date",
+  "details_birthTime": "Birth Time",
+  "details_birthPlace": "Birth Place",
+  "details_latitude": "Latitude",
+  "details_longitude": "Longitude",
+  "details_timezone": "Timezone",
+  "details_ascendant": "Ascendant",
+  "details_moonSign": "Moon Sign",
+  "details_sunSign": "Sun Sign",
+  "details_birthNakshatra": "Birth Nakshatra",
+  "details_pada": "Pada",
+  "details_varna": "Varna",
+  "details_vashya": "Vashya",
+  "details_yoni": "Yoni",
+  "details_gan": "Gan",
+  "details_nadi": "Nadi",
+
+  "alert_sadeSati": "Shani Sade Sati",
+  "alert_sadeSatiActive": "Sade Sati Active",
+  "alert_sadeSatiDescription": "Saturn is transiting through your Moon sign, causing a 7.5 year challenging period",
+  "alert_risingPhase": "Rising Phase (1st)",
+  "alert_peakPhase": "Peak Phase",
+  "alert_settingPhase": "Setting Phase (3rd)",
+  "alert_shaniDhaiya": "Shani Dhaiya",
+  "alert_saturnIn": "Saturn in {house} from Moon",
+  "@alert_saturnIn": {
+    "placeholders": {
+      "house": {"type": "String"}
+    }
+  },
+  "alert_mahadasha": "{planet} Mahadasha",
+  "@alert_mahadasha": {
+    "placeholders": {
+      "planet": {"type": "String"}
+    }
+  },
+  "alert_currentMajorPeriod": "Current major period",
+  "alert_manglikDosha": "Manglik Dosha",
+  "alert_manglikDescription": "Mars is placed in houses that affect marriage prospects",
+  "alert_marsInHouse": "Mars in {house} house",
+  "@alert_marsInHouse": {
+    "placeholders": {
+      "house": {"type": "String"}
+    }
+  },
+  "alert_lunarSensitivity": "Lunar Sensitivity",
+  "alert_moonWith": "Moon with {planet}",
+  "@alert_moonWith": {
+    "placeholders": {
+      "planet": {"type": "String"}
+    }
+  },
+  "alert_moonInHouse": "Moon in {house} house",
+  "@alert_moonInHouse": {
+    "placeholders": {
+      "house": {"type": "String"}
+    }
+  },
+  "alert_beneficialYoga": "Beneficial Yoga",
+  "alert_kalaSarpa": "Kala Sarpa Dosha",
+  "alert_kalaSarpaDescription": "All planets are hemmed between Rahu and Ketu",
+  "alert_currentDasha": "Current Dasha Period",
+  "alert_remedy": "Remedies",
+  "alert_priority_high": "High Priority",
+  "alert_priority_medium": "Medium Priority",
+  "alert_priority_low": "Low Priority",
+  "alert_viewAll": "View all {count}",
+  "@alert_viewAll": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "details_nav_profile": "Profile",
+  "details_nav_star": "Star",
+  "details_nav_panchang": "Panchang",
+  "details_nav_dasha": "Dasha",
+  "details_nav_guna": "Guna",
+  "details_nav_lucky": "Lucky",
+  "details_nav_planets": "Planets",
+  
+  "details_section_coreElements": "Core Elements",
+  "details_section_birthStar": "Birth Star",
+  "details_section_panchang": "Panchang",
+  "details_section_currentPeriod": "Current Period",
+  "details_section_gunaFactors": "Guna Factors",
+  "details_section_favorableElements": "Favorable Elements",
+  "details_section_planetaryStatus": "Planetary Status",
+  
+  "details_risingSign": "Rising Sign",
+  "details_moonSign": "Moon Sign",
+  "details_sunSign": "Sun Sign",
+  "details_element": "Element",
+  "details_lagnaLord": "Lagna Lord",
+  "details_nakshatraLord": "Nakshatra Lord",
+  "details_chartRuler": "Chart ruler",
+  "details_starLord": "Star lord",
+  
+  "details_pada": "Pada {number}",
+  "@details_pada": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "details_lord": "Lord",
+  "details_deity": "Deity",
+  
+  "details_paksha": "{name} Paksha",
+  "@details_paksha": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  
+  "details_yoga": "Yoga",
+  "details_karana": "Karana",
+  "details_vara": "Vara",
+  "details_nakshatra": "Nakshatra",
+  "details_tithi": "Tithi",
+  "details_varaDay": "Vara (Day)",
+  
+  "details_mahadasha": "{planet} Mahadasha",
+  "@details_mahadasha": {
+    "placeholders": {
+      "planet": {"type": "String"}
+    }
+  },
+  "details_yearsRemaining": "{years} years remaining",
+  "@details_yearsRemaining": {
+    "placeholders": {
+      "years": {"type": "String"}
+    }
+  },
+  "details_upcoming": "UPCOMING",
+  
+  "details_gunaInfo": "Your Ashtakoot factors for compatibility matching",
+  
+  "details_primaryGemstone": "Primary Gemstone",
+  "details_wearOn": "Wear on {day}",
+  "@details_wearOn": {
+    "placeholders": {
+      "day": {"type": "String"}
+    }
+  },
+  "details_numbers": "Numbers",
+  "details_day": "Day",
+  "details_colors": "Colors",
+  "details_metal": "Metal",
+  
+  "details_exalted": "Exalted",
+  "details_debilitated": "Debilitated",
+  "details_retrograde": "Retrograde",
+  "details_combust": "Combust",
+  "details_none": "None",
+  
+  "details_whatThisMeans": "What This Means",
+  "details_significance": "Significance",
+  "details_keyPoints": "Key Points",
+  
+  "details_ascendant": "Ascendant",
+  "details_moon": "Moon",
+  "details_sun": "Sun",
+  
+  "details_vedicDisclaimer": "Based on Vedic planetary positions.",
+  "details_westernAstrology": "Western astrology:",
+  
+  "details_dynamic": "Dynamic",
+  "details_grounded": "Grounded",
+  "details_intellectual": "Intellectual",
+  "details_intuitive": "Intuitive",
+
+  "auth_welcome": "Welcome",
+  "auth_email": "Email",
+  "auth_password": "Password",
+  "auth_confirmPassword": "Confirm Password",
+  "auth_forgotPassword": "Forgot Password?",
+  "auth_continueWithGoogle": "Continue with Google",
+  "auth_continueWithFacebook": "Continue with Facebook",
+  "auth_guestMode": "Continue as Guest",
+  "auth_loginRequired": "Login Required",
+  "auth_loginToSave": "Please login to save your Kundali",
+
+  "home_dailyHoroscope": "Daily Horoscope",
+  "home_generateKundli": "Generate Kundli",
+  "home_panchangToday": "Panchang Today",
+  "home_talkToAstrologer": "Talk to Astrologer",
+  "home_kundliMatching": "Kundli Matching",
+  "home_savedKundalis": "Saved Kundalis",
+  "home_noKundalis": "No Kundalis saved yet",
+
+  "error_generic": "Something went wrong",
+  "error_network": "Network error. Please check your connection",
+  "error_locationNotFound": "Location not found",
+  "error_calculationFailed": "Kundali calculation failed",
+  "error_tryAgain": "Please try again",
+
+  "houses_nav_overview": "Overview",
+  "houses_nav_kendra": "Kendra",
+  "houses_nav_trikona": "Trikona",
+  "houses_nav_dusthana": "Dusthana",
+  "houses_nav_upachaya": "Upachaya",
+  "houses_nav_maraka": "Maraka",
+
+  "houses_bhavas": "12 BHAVAS",
+  "houses_lagna": "{ascendant} Lagna",
+  "@houses_lagna": {
+    "placeholders": {
+      "ascendant": {"type": "String"}
+    }
+  },
+  "houses_startingFrom": "Houses starting from {ascendant}",
+  "@houses_startingFrom": {
+    "placeholders": {
+      "ascendant": {"type": "String"}
+    }
+  },
+  "houses_occupied": "Occupied",
+  "houses_empty": "Empty",
+  "houses_planetsCount": "Planets",
+
+  "houses_kendra_title": "Kendra Houses",
+  "houses_kendra_subtitle": "Angular • 1, 4, 7, 10",
+  "houses_trikona_title": "Trikona Houses",
+  "houses_trikona_subtitle": "Trinal • 5, 9",
+  "houses_dusthana_title": "Dusthana Houses",
+  "houses_dusthana_subtitle": "Malefic • 6, 8, 12",
+  "houses_upachaya_title": "Upachaya Houses",
+  "houses_upachaya_subtitle": "Growth • 3, 11",
+  "houses_maraka_title": "Maraka Houses",
+  "houses_maraka_subtitle": "Death Inflicting • 2, 7",
+
+  "houses_houseNumber": "House {number}",
+  "@houses_houseNumber": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "houses_lagnaChip": "LAGNA",
+  "houses_houseBhava": "{name} • {sign}",
+  "@houses_houseBhava": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "sign": {"type": "String"}
+    }
+  },
+  "houses_inHouse": "in H{placement}",
+  "@houses_inHouse": {
+    "placeholders": {
+      "placement": {"type": "int"}
+    }
+  },
+  "houses_retrograde_abbr": "R",
+
+  "houses_insight_whatThisMeans": "What This Means",
+  "houses_insight_significance": "Significance",
+  "houses_insight_keyPoints": "Key Points",
+
+  "houses_houseCategory": "House Category",
+
+  "houses_kendra_value": "Kendra Houses",
+  "houses_kendra_desc": "Kendra houses (1, 4, 7, 10) are the angular or quadrant houses. They form the pillars of the horoscope and are considered the most powerful houses for planetary placement.",
+  "houses_kendra_significance": "Planets in Kendra houses gain strength and their results become prominent in life. Benefics here protect and promote, while malefics can cause significant challenges.",
+  "houses_kendra_point1": "1st House - Self, personality, physical body",
+  "houses_kendra_point2": "4th House - Home, mother, emotional peace",
+  "houses_kendra_point3": "7th House - Marriage, partnerships, others",
+  "houses_kendra_point4": "10th House - Career, status, public life",
+  "houses_kendra_point5": "Also called Vishnu Sthanas (seats of Vishnu)",
+
+  "houses_trikona_value": "Trikona Houses",
+  "houses_trikona_desc": "Trikona houses (1, 5, 9) are the trinal houses forming a triangle with the Ascendant. They are the most auspicious houses, representing dharma (purpose) and good fortune.",
+  "houses_trikona_significance": "Lords of Trikona houses become yogakarakas (auspicious) regardless of their natural nature. Planets here bring blessings, wisdom, and spiritual growth.",
+  "houses_trikona_point1": "1st House - Self and personality (also Kendra)",
+  "houses_trikona_point2": "5th House - Creativity, children, intelligence",
+  "houses_trikona_point3": "9th House - Fortune, dharma, higher learning",
+  "houses_trikona_point4": "Also called Lakshmi Sthanas (seats of Lakshmi)",
+  "houses_trikona_point5": "Best houses for benefic planets",
+
+  "houses_dusthana_value": "Dusthana Houses",
+  "houses_dusthana_desc": "Dusthana houses (6, 8, 12) are considered malefic or challenging houses. They represent difficulties, obstacles, and areas requiring transformation.",
+  "houses_dusthana_significance": "While often feared, these houses are essential for growth. They show where we face challenges that ultimately lead to strength, wisdom, and spiritual evolution.",
+  "houses_dusthana_point1": "6th House - Enemies, diseases, debts, service",
+  "houses_dusthana_point2": "8th House - Transformation, death, occult, inheritance",
+  "houses_dusthana_point3": "12th House - Losses, expenses, liberation, foreign",
+  "houses_dusthana_point4": "Malefics do well here (Vipreet Raja Yoga potential)",
+  "houses_dusthana_point5": "Lords of these houses can cause difficulties",
+
+  "houses_upachaya_value": "Upachaya Houses",
+  "houses_upachaya_desc": "Upachaya houses (3, 6, 10, 11) are growth houses where results improve over time. Malefic planets actually do well here, providing drive and competitive edge.",
+  "houses_upachaya_significance": "These houses show areas where effort leads to improvement. Unlike other houses, the challenges here decrease with age and experience.",
+  "houses_upachaya_point1": "3rd House - Courage, siblings, communication",
+  "houses_upachaya_point2": "6th House - Enemies, health issues, competition",
+  "houses_upachaya_point3": "10th House - Career, public standing, authority",
+  "houses_upachaya_point4": "11th House - Gains, friends, aspirations",
+  "houses_upachaya_point5": "Mars, Saturn, Rahu excel in Upachaya houses",
+
+  "houses_maraka_value": "Maraka Houses",
+  "houses_maraka_desc": "Maraka houses (2, 7) are death-inflicting houses in Vedic astrology. Their lords can cause health issues or endings during their planetary periods.",
+  "houses_maraka_significance": "The 2nd and 7th houses are 12th from the 3rd and 8th houses respectively, making them potential terminators of longevity factors.",
+  "houses_maraka_point1": "2nd House - Family, wealth, food, death",
+  "houses_maraka_point2": "7th House - Spouse, partnerships, death",
+  "houses_maraka_point3": "Maraka planets can cause illness in their periods",
+  "houses_maraka_point4": "2nd is stronger Maraka than 7th",
+  "houses_maraka_point5": "Effects modified by overall chart strength",
+
+  "houses_bhava_lagna": "Lagna",
+  "houses_bhava_dhana": "Dhana",
+  "houses_bhava_sahaja": "Sahaja",
+  "houses_bhava_sukha": "Sukha",
+  "houses_bhava_putra": "Putra",
+  "houses_bhava_ari": "Ari",
+  "houses_bhava_yuvati": "Yuvati",
+  "houses_bhava_mrityu": "Mrityu",
+  "houses_bhava_dharma": "Dharma",
+  "houses_bhava_karma": "Karma",
+  "houses_bhava_labha": "Labha",
+  "houses_bhava_vyaya": "Vyaya",
+
+  "houses_sign_key": "Sign: {sign} ({symbol})",
+  "@houses_sign_key": {
+    "placeholders": {
+      "sign": {"type": "String"},
+      "symbol": {"type": "String"}
+    }
+  },
+  "houses_lord_key": "Lord: {lord}",
+  "@houses_lord_key": {
+    "placeholders": {
+      "lord": {"type": "String"}
+    }
+  },
+  "houses_cusp_key": "Cusp: {degree}°",
+  "@houses_cusp_key": {
+    "placeholders": {
+      "degree": {"type": "String"}
+    }
+  },
+  "houses_karaka_key": "Karaka: {karaka}",
+  "@houses_karaka_key": {
+    "placeholders": {
+      "karaka": {"type": "String"}
+    }
+  },
+  "houses_significations_key": "Significations: {significations}",
+  "@houses_significations_key": {
+    "placeholders": {
+      "significations": {"type": "String"}
+    }
+  },
+
+  "houses_bhava_label": "{name} Bhava",
+  "@houses_bhava_label": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+
+  "houses_withSign": "With {sign} as the sign and {lord} as the lord, this house takes on the qualities of {sign} energy in your chart.",
+  "@houses_withSign": {
+    "placeholders": {
+      "sign": {"type": "String"},
+      "lord": {"type": "String"}
+    }
+  },
+
+  "houses_1_desc": "The First House, also known as the Ascendant or Lagna, represents your self, physical body, appearance, and how you present yourself to the world. It's the most personal house in the chart.",
+  "houses_2_desc": "The Second House governs wealth, family values, speech, and early childhood. It shows your relationship with money, possessions, and how you communicate.",
+  "houses_3_desc": "The Third House rules communication, short journeys, siblings, and courage. It represents your mental strength, skills, and ability to express yourself.",
+  "houses_4_desc": "The Fourth House represents your mother, home, emotional foundation, and inner peace. It shows your roots, domestic happiness, and property matters.",
+  "houses_5_desc": "The Fifth House governs creativity, children, romance, and intelligence. It represents your creative expression, speculative gains, and past life merits.",
+  "houses_6_desc": "The Sixth House deals with enemies, diseases, debts, and daily work. It shows challenges you must overcome and your capacity for service.",
+  "houses_7_desc": "The Seventh House rules marriage, partnerships, and business relationships. It represents your spouse, contracts, and how you relate to others.",
+  "houses_8_desc": "The Eighth House governs transformation, longevity, inheritance, and hidden matters. It represents deep changes, occult knowledge, and joint resources.",
+  "houses_9_desc": "The Ninth House represents higher learning, spirituality, luck, and long journeys. It shows your father, gurus, and philosophical outlook.",
+  "houses_10_desc": "The Tenth House rules career, status, reputation, and achievements. It represents your professional life, authority figures, and public standing.",
+  "houses_11_desc": "The Eleventh House governs gains, friendships, aspirations, and elder siblings. It represents your social network, hopes, and recurring income.",
+  "houses_12_desc": "The Twelfth House deals with losses, spirituality, foreign lands, and liberation. It represents expenses, isolation, and the journey towards moksha.",
+
+  "panchang_nav_moon": "Moon",
+  "panchang_nav_elements": "Elements",
+  "panchang_nav_hora": "Hora",
+  "panchang_nav_periods": "Periods",
+  "panchang_nav_varshphal": "Varshphal",
+
+  "panchang_fiveLimbs": "Five Limbs of Time",
+  "panchang_elementsAtBirth": "Panchang elements at birth",
+  "panchang_horaWeekday": "Hora & Weekday",
+  "panchang_horaSubtitle": "Planetary hour and day influences",
+  "panchang_inauspiciousPeriods": "Inauspicious Periods",
+  "panchang_onDay": "On {day}",
+  "@panchang_onDay": {
+    "placeholders": {
+      "day": {"type": "String"}
+    }
+  },
+  "panchang_varshphalYear": "Varshphal {year}",
+  "@panchang_varshphalYear": {
+    "placeholders": {
+      "year": {"type": "int"}
+    }
+  },
+  "panchang_solarReturnSubtitle": "Solar Return / Annual Horoscope",
+
+  "panchang_insight_whatThisMeans": "What This Means",
+  "panchang_insight_significance": "Significance",
+  "panchang_insight_keyPoints": "Key Points",
+
+  "panchang_tithi_title": "Tithi",
+  "panchang_tithi_desc": "Tithi is the lunar day in the Hindu calendar, representing the angle between the Sun and Moon. Each Tithi has its own energy and is ruled by a specific planet.",
+  "panchang_tithi_significance": "Your birth Tithi is {tithi} ({tithiNumber}/15 in {paksha} Paksha), ruled by {lord}. This influences your emotional nature and the lunar energy you carry.",
+  "@panchang_tithi_significance": {
+    "placeholders": {
+      "tithi": {"type": "String"},
+      "tithiNumber": {"type": "int"},
+      "paksha": {"type": "String"},
+      "lord": {"type": "String"}
+    }
+  },
+  "panchang_tithi_point1": "Tithi Number: {number} of 15",
+  "@panchang_tithi_point1": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "panchang_tithi_point2": "Paksha: {paksha} ({type} Moon)",
+  "@panchang_tithi_point2": {
+    "placeholders": {
+      "paksha": {"type": "String"},
+      "type": {"type": "String"}
+    }
+  },
+  "panchang_tithi_point3": "Tithi Lord: {lord}",
+  "@panchang_tithi_point3": {
+    "placeholders": {
+      "lord": {"type": "String"}
+    }
+  },
+  "panchang_tithi_point4": "Each Tithi spans approximately 12 degrees of Moon-Sun elongation",
+  "panchang_tithi_point5": "Tithis are used for muhurta (auspicious timing)",
+  "panchang_waxing": "Waxing",
+  "panchang_waning": "Waning",
+
+  "panchang_nakshatra_title": "Nakshatra",
+  "panchang_nakshatra_value": "{nakshatra} (Pada {pada})",
+  "@panchang_nakshatra_value": {
+    "placeholders": {
+      "nakshatra": {"type": "String"},
+      "pada": {"type": "int"}
+    }
+  },
+  "panchang_nakshatra_desc": "Nakshatra is the lunar mansion or star constellation where the Moon was positioned at birth. There are 27 Nakshatras, each spanning 13°20' of the zodiac. Each Nakshatra has 4 Padas (quarters) of 3°20' each.",
+  "panchang_nakshatra_significance": "The Moon in {nakshatra} Nakshatra, Pada {pada}, shapes your inner emotional nature, instincts, and subconscious patterns. The Nakshatra lord {lord} influences your Vimshottari Dasha sequence.",
+  "@panchang_nakshatra_significance": {
+    "placeholders": {
+      "nakshatra": {"type": "String"},
+      "pada": {"type": "int"},
+      "lord": {"type": "String"}
+    }
+  },
+  "panchang_nakshatra_point1": "Nakshatra: {nakshatra}",
+  "@panchang_nakshatra_point1": {
+    "placeholders": {
+      "nakshatra": {"type": "String"}
+    }
+  },
+  "panchang_nakshatra_point2": "Pada (Quarter): {pada} of 4",
+  "@panchang_nakshatra_point2": {
+    "placeholders": {
+      "pada": {"type": "int"}
+    }
+  },
+  "panchang_nakshatra_point3": "Nakshatra Lord: {lord}",
+  "@panchang_nakshatra_point3": {
+    "placeholders": {
+      "lord": {"type": "String"}
+    }
+  },
+  "panchang_nakshatra_point4": "Each Nakshatra has a presiding deity and specific qualities",
+  "panchang_nakshatra_point5": "Determines the starting Mahadasha in Vimshottari Dasha system",
+
+  "panchang_yoga_title": "Yoga",
+  "panchang_yoga_value": "{yoga} ({number}/27)",
+  "@panchang_yoga_value": {
+    "placeholders": {
+      "yoga": {"type": "String"},
+      "number": {"type": "int"}
+    }
+  },
+  "panchang_yoga_desc": "Yoga in Panchang is calculated from the combined longitude of the Sun and Moon. There are 27 Yogas, each spanning 13°20'.",
+  "panchang_yoga_significance": "Your birth Yoga is {yoga}, which is considered {type}. This cosmic combination of Sun and Moon energies influences your life path and the general fortune you carry.",
+  "@panchang_yoga_significance": {
+    "placeholders": {
+      "yoga": {"type": "String"},
+      "type": {"type": "String"}
+    }
+  },
+  "panchang_yoga_point1": "Yoga: {yoga}",
+  "@panchang_yoga_point1": {
+    "placeholders": {
+      "yoga": {"type": "String"}
+    }
+  },
+  "panchang_yoga_point2": "Number: {number} of 27",
+  "@panchang_yoga_point2": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "panchang_yoga_point3": "Type: {type}",
+  "@panchang_yoga_point3": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "panchang_yoga_point4": "Formula: (Sun longitude + Moon longitude) ÷ 13°20'",
+  "panchang_yoga_point5": "Affects overall auspiciousness of the birth moment",
+  "panchang_yoga_auspicious": "Auspicious",
+  "panchang_yoga_inauspicious": "Inauspicious",
+  "panchang_yoga_neutral": "Neutral",
+
+  "panchang_karana_title": "Karana",
+  "panchang_karana_desc": "Karana is half of a Tithi, with 11 Karanas repeating to make 60 half-Tithis in a lunar month. 7 are movable (Chara) and 4 are fixed (Sthira).",
+  "panchang_karana_significance": "Born in {karana} Karana, which is {type}. Karanas influence specific activities and the energy of the half-day period.",
+  "@panchang_karana_significance": {
+    "placeholders": {
+      "karana": {"type": "String"},
+      "type": {"type": "String"}
+    }
+  },
+  "panchang_karana_point1": "Karana: {karana}",
+  "@panchang_karana_point1": {
+    "placeholders": {
+      "karana": {"type": "String"}
+    }
+  },
+  "panchang_karana_point2": "Type: {type}",
+  "@panchang_karana_point2": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "panchang_karana_point3": "7 Movable (Chara): Bava to Vishti, repeat 8 times",
+  "panchang_karana_point4": "4 Fixed (Sthira): Shakuni, Chatushpada, Naga, Kimstughna",
+  "panchang_karana_point5": "Vishti (Bhadra) is considered inauspicious",
+  "panchang_karana_chara": "Chara (Movable)",
+  "panchang_karana_sthira": "Sthira (Fixed)",
+  "panchang_karana_bhadra": "Bhadra (Avoid)",
+
+  "panchang_vara_title": "Vara (Weekday)",
+  "panchang_vara_desc": "Vara is the weekday, one of the five limbs of Panchang. Each day is ruled by a planet, influencing the energy and suitable activities for that day.",
+  "panchang_vara_significance": "Born on {vara}, ruled by {lord}. This planetary influence colors your personality and the types of activities that come naturally to you.",
+  "@panchang_vara_significance": {
+    "placeholders": {
+      "vara": {"type": "String"},
+      "lord": {"type": "String"}
+    }
+  },
+  "panchang_vara_point1": "Vara: {vara}",
+  "@panchang_vara_point1": {
+    "placeholders": {
+      "vara": {"type": "String"}
+    }
+  },
+  "panchang_vara_point2": "Vara Lord: {lord}",
+  "@panchang_vara_point2": {
+    "placeholders": {
+      "lord": {"type": "String"}
+    }
+  },
+  "panchang_vara_point3": "Presiding Deity: {deity}",
+  "@panchang_vara_point3": {
+    "placeholders": {
+      "deity": {"type": "String"}
+    }
+  },
+  "panchang_vara_point4": "Each Vara has specific auspicious and inauspicious hours",
+  "panchang_vara_point5": "Vara lord placement in chart strengthens its effects",
+
+  "panchang_moonPhase_title": "Moon Phase",
+  "panchang_moonPhase_desc": "The Moon phase at birth indicates the relationship between the Sun and Moon, reflecting the interplay of consciousness (Sun) and mind (Moon).",
+  "panchang_moonPhase_significance": "Born during {paksha} Paksha with {illumination}% illumination. This indicates a {nature}.",
+  "@panchang_moonPhase_significance": {
+    "placeholders": {
+      "paksha": {"type": "String"},
+      "illumination": {"type": "String"},
+      "nature": {"type": "String"}
+    }
+  },
+  "panchang_moonPhase_nature_shukla": "more outgoing, action-oriented nature with growing vitality",
+  "panchang_moonPhase_nature_krishna": "more introspective, wisdom-seeking nature with releasing tendencies",
+  "panchang_moonPhase_point1": "Phase: {phase}",
+  "@panchang_moonPhase_point1": {
+    "placeholders": {
+      "phase": {"type": "String"}
+    }
+  },
+  "panchang_moonPhase_point2": "Paksha: {paksha} ({type})",
+  "@panchang_moonPhase_point2": {
+    "placeholders": {
+      "paksha": {"type": "String"},
+      "type": {"type": "String"}
+    }
+  },
+  "panchang_moonPhase_point3": "Illumination: {illumination}%",
+  "@panchang_moonPhase_point3": {
+    "placeholders": {
+      "illumination": {"type": "String"}
+    }
+  },
+  "panchang_moonPhase_point4": "Tithi: {tithi} ({number}/15)",
+  "@panchang_moonPhase_point4": {
+    "placeholders": {
+      "tithi": {"type": "String"},
+      "number": {"type": "int"}
+    }
+  },
+  "panchang_moonPhase_point5": "Moon phase affects emotional patterns and life cycles",
+  "panchang_phase_waxingCrescent": "Waxing Crescent",
+  "panchang_phase_firstQuarter": "First Quarter",
+  "panchang_phase_waxingGibbous": "Waxing Gibbous",
+  "panchang_phase_nearlyFull": "Nearly Full",
+  "panchang_phase_fullMoon": "Full Moon (Purnima)",
+  "panchang_phase_waningGibbous": "Waning Gibbous",
+  "panchang_phase_thirdQuarter": "Third Quarter",
+  "panchang_phase_waningCrescent": "Waning Crescent",
+  "panchang_phase_nearlyNew": "Nearly New",
+  "panchang_phase_newMoon": "New Moon (Amavasya)",
+
+  "panchang_hora_title": "Hora",
+  "panchang_hora_value": "{planet} Hora",
+  "@panchang_hora_value": {
+    "placeholders": {
+      "planet": {"type": "String"}
+    }
+  },
+  "panchang_hora_desc": "Hora divides each day into 24 planetary hours, with each hour ruled by a planet in a specific sequence. The Hora at birth indicates the planetary influence active at that moment.",
+  "panchang_hora_significance": "Born during {planet} Hora, you carry the energy of {planet} in your personality and approach to life. Activities related to {planet} come naturally to you.",
+  "@panchang_hora_significance": {
+    "placeholders": {
+      "planet": {"type": "String"}
+    }
+  },
+  "panchang_hora_point1": "Birth Hora: {planet}",
+  "@panchang_hora_point1": {
+    "placeholders": {
+      "planet": {"type": "String"}
+    }
+  },
+  "panchang_hora_point2": "Time: {time}",
+  "@panchang_hora_point2": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "panchang_hora_point3": "Hora sequence follows: Sun→Venus→Mercury→Moon→Saturn→Jupiter→Mars",
+  "panchang_hora_point4": "Each hora lasts approximately 1 hour",
+  "panchang_hora_point5": "Hora influences the energy available for activities",
+  "panchang_hora_desc_sun": "Authority, government work, leadership",
+  "panchang_hora_desc_moon": "Travel, emotions, public dealing",
+  "panchang_hora_desc_mars": "Courage, competition, action",
+  "panchang_hora_desc_mercury": "Communication, learning, business",
+  "panchang_hora_desc_jupiter": "Education, spirituality, expansion",
+  "panchang_hora_desc_venus": "Arts, relationships, pleasures",
+  "panchang_hora_desc_saturn": "Hard work, discipline, patience",
+  "panchang_birthHora": "Birth Hora",
+
+  "panchang_inauspicious_title": "Inauspicious Period",
+  "panchang_inauspicious_rahuKala_desc": "Rahu Kala is the most inauspicious period of the day, ruled by the shadow planet Rahu. Starting new ventures, important meetings, or auspicious activities should be avoided during this time.",
+  "panchang_inauspicious_yamaghanda_desc": "Yamaghanda, also called Yama Ghantaka, is ruled by Yama, the god of death. This period is considered inauspicious for starting journeys, especially in the direction governed by Yama that day.",
+  "panchang_inauspicious_gulika_desc": "Gulika Kala, ruled by Saturn's son Gulika (Mandi), is associated with poison and hidden dangers. While generally avoided for new beginnings, it's considered good for activities requiring secrecy.",
+  "panchang_inauspicious_significance": "Birth during {period} ({time}) suggests specific karmic lessons related to this period's ruler. Understanding this helps in timing important life decisions.",
+  "@panchang_inauspicious_significance": {
+    "placeholders": {
+      "period": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "panchang_inauspicious_point1": "Period: {period}",
+  "@panchang_inauspicious_point1": {
+    "placeholders": {
+      "period": {"type": "String"}
+    }
+  },
+  "panchang_inauspicious_point2": "Time: {time}",
+  "@panchang_inauspicious_point2": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "panchang_inauspicious_point3": "Duration: Approximately 1.5 hours",
+  "panchang_inauspicious_point4_rahu": "Most important inauspicious period",
+  "panchang_inauspicious_point4_yama": "Avoid travels and risky activities",
+  "panchang_inauspicious_point4_gulika": "Related to hidden matters and secrecy",
+  "panchang_inauspicious_point5": "Each weekday has different timings for these periods",
+  "panchang_birthDuring": "Birth during {period}",
+  "@panchang_birthDuring": {
+    "placeholders": {
+      "period": {"type": "String"}
+    }
+  },
+  "panchang_dayTimeline": "Day Timeline (6 AM - 6 PM)",
+  "panchang_birth": "Birth",
+
+  "panchang_varshphal_title": "Varshphal",
+  "panchang_varshphal_value": "Solar Return {year}",
+  "@panchang_varshphal_value": {
+    "placeholders": {
+      "year": {"type": "int"}
+    }
+  },
+  "panchang_varshphal_desc": "Varshphal (Annual Horoscope) is the chart cast for the exact moment when the Sun returns to its birth position each year. It provides insights into the themes, opportunities, and challenges for that specific year of life.",
+  "panchang_varshphal_significance": "At age {age}, your Muntha (progressed Ascendant) is in {munthaSign}, and the Year Lord is {yearLord}. These factors shape the major themes of this year.",
+  "@panchang_varshphal_significance": {
+    "placeholders": {
+      "age": {"type": "int"},
+      "munthaSign": {"type": "String"},
+      "yearLord": {"type": "String"}
+    }
+  },
+  "panchang_varshphal_point1": "Year: {year}",
+  "@panchang_varshphal_point1": {
+    "placeholders": {
+      "year": {"type": "int"}
+    }
+  },
+  "panchang_varshphal_point2": "Age: {age} years",
+  "@panchang_varshphal_point2": {
+    "placeholders": {
+      "age": {"type": "int"}
+    }
+  },
+  "panchang_varshphal_point3": "Solar Return: {date}",
+  "@panchang_varshphal_point3": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "panchang_varshphal_point4": "Muntha Sign: {sign}",
+  "@panchang_varshphal_point4": {
+    "placeholders": {
+      "sign": {"type": "String"}
+    }
+  },
+  "panchang_varshphal_point5": "Year Lord: {lord}",
+  "@panchang_varshphal_point5": {
+    "placeholders": {
+      "lord": {"type": "String"}
+    }
+  },
+  "panchang_years": "years",
+  "panchang_muntha": "Muntha",
+  "panchang_yearLord": "Year Lord",
+
+  "panchang_moonSign": "Moon Sign",
+  "panchang_degree": "Degree",
+  "panchang_elongation": "Elongation",
+  "panchang_percentLit": "{percent}% lit",
+  "@panchang_percentLit": {
+    "placeholders": {
+      "percent": {"type": "String"}
+    }
+  },
+  "panchang_paksha": "{paksha} PAKSHA",
+  "@panchang_paksha": {
+    "placeholders": {
+      "paksha": {"type": "String"}
+    }
+  },
+  "panchang_lord": "Lord",
+  "panchang_pada": "Pada {pada}",
+  "@panchang_pada": {
+    "placeholders": {
+      "pada": {"type": "int"}
+    }
+  },
+  "panchang_varaWeekday": "Vara (Weekday)",
+
+  "planets_nav_overview": "Overview",
+  "planets_overviewSubtitle": "Planetary positions summary",
+  "planets_grahaSthiti": "Graha Sthiti",
+  "planets_grahaSthitiDesc": "Planetary positions via Swiss Ephemeris",
+  "planets_grahaSthitiInsight": "Graha Sthiti shows the positions of all nine planets (Navagrahas) in your birth chart. These positions are calculated using the Swiss Ephemeris for astronomical precision and then mapped to the Vedic sidereal zodiac.",
+  "planets_grahaSthitiSignificance": "Your chart has {total} planets positioned across different signs and houses. {exalted} planet(s) are exalted (strongest), {debilitated} are debilitated, {retrograde} are retrograde, and {combust} are combust.",
+  "@planets_grahaSthitiSignificance": {
+    "placeholders": {
+      "total": {"type": "int"},
+      "exalted": {"type": "int"},
+      "debilitated": {"type": "int"},
+      "retrograde": {"type": "int"},
+      "combust": {"type": "int"}
+    }
+  },
+  "planets_totalPlanets": "Total Planets: {count}",
+  "@planets_totalPlanets": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "planets_exaltedCount": "Exalted: {count} (Maximum strength)",
+  "@planets_exaltedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "planets_debilitatedCount": "Debilitated: {count} (Need remedies)",
+  "@planets_debilitatedCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "planets_retrogradeCount": "Retrograde: {count} (Internal effects)",
+  "@planets_retrogradeCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "planets_combustCount": "Combust: {count} (Hidden energy)",
+  "@planets_combustCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "planets_calculations": "Calculations: Swiss Ephemeris + Lahiri Ayanamsa",
+  "planets_stat_exalt": "Exalt",
+  "planets_stat_debil": "Debil",
+  "planets_stat_retro": "Retro",
+  "planets_stat_comb": "Comb",
+  "planets_stat_exaltDesc": "Exalted planets are in their strongest position, giving maximum positive results.",
+  "planets_stat_debilDesc": "Debilitated planets are in their weakest position, requiring remedies for better results.",
+  "planets_stat_retroDesc": "Retrograde planets move backwards (apparent motion), intensifying internal effects.",
+  "planets_stat_combDesc": "Combust planets are too close to Sun, their energy gets hidden or weakened.",
+  "planets_statCount": "{count} {label}",
+  "@planets_statCount": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "label": {"type": "String"}
+    }
+  },
+  "planets_statInsight": "You have {count} planet(s) with this status in your birth chart.",
+  "@planets_statInsight": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "planets_dignities": "Planetary Dignities",
+  "planets_tapForDetails": "Tap planets for details",
+  "planets_dignityAffects": "Planetary dignity determines how strongly a planet can express its energy in your chart.",
+  "planets_dignity_exaltDesc": "Maximum strength - the planet gives its best results",
+  "planets_dignity_moolaDesc": "Second strongest position after exaltation",
+  "planets_dignity_ownDesc": "Planet in its own sign - comfortable and stable",
+  "planets_dignity_friendlyDesc": "Planet in a friendly sign - supportive environment",
+  "planets_dignity_neutralDesc": "Neither strong nor weak - balanced results",
+  "planets_dignity_enemyDesc": "Planet in an enemy sign - extra effort needed",
+  "planets_dignity_debilDesc": "Weakest position - may need remedial measures",
+  "planets_moolatrikona": "Moolatrikona",
+  "planets_moola": "Moola",
+  "planets_own": "Own",
+  "planets_friend": "Friend",
+  "planets_combustWarning": "Combust · Reduced planetary strength due to Sun proximity",
+  "planets_insight_planet": "Planet",
+  "planets_insight_signLabel": "Sign: {sign} ({symbol})",
+  "@planets_insight_signLabel": {
+    "placeholders": {
+      "sign": {"type": "String"},
+      "symbol": {"type": "String"}
+    }
+  },
+  "planets_insight_houseLabel": "House: {house}",
+  "@planets_insight_houseLabel": {
+    "placeholders": {
+      "house": {"type": "String"}
+    }
+  },
+  "planets_insight_degreeLabel": "Degree: {degree}°",
+  "@planets_insight_degreeLabel": {
+    "placeholders": {
+      "degree": {"type": "String"}
+    }
+  },
+  "planets_insight_nakshatraLabel": "Nakshatra: {nakshatra} (Pada {pada})",
+  "@planets_insight_nakshatraLabel": {
+    "placeholders": {
+      "nakshatra": {"type": "String"},
+      "pada": {"type": "int"}
+    }
+  },
+  "planets_insight_nakshatraLordLabel": "Nakshatra Lord: {lord}",
+  "@planets_insight_nakshatraLordLabel": {
+    "placeholders": {
+      "lord": {"type": "String"}
+    }
+  },
+  "planets_insight_dignityLabel": "Dignity: {dignity}",
+  "@planets_insight_dignityLabel": {
+    "placeholders": {
+      "dignity": {"type": "String"}
+    }
+  },
+  "planets_insight_statusRetrograde": "Status: Retrograde",
+  "planets_insight_statusCombust": "Status: Combust",
+  "planets_insight_natureLabel": "Nature: {nature}",
+  "@planets_insight_natureLabel": {
+    "placeholders": {
+      "nature": {"type": "String"}
+    }
+  },
+  "planets_insight_benefic": "Benefic",
+  "planets_insight_malefic": "Malefic",
+  "planets_insight_planetaryDignity": "Planetary Dignity",
+  "planets_dignity_exaltedFull": "The planet is exalted, meaning it's in its strongest possible position. Exalted planets give their best results and indicate areas of natural talent and blessing in your life.",
+  "planets_dignity_debilitatedFull": "The planet is debilitated, in its weakest position. While this can indicate challenges, it also shows areas for growth and spiritual development. The effects can be cancelled through various yogas.",
+  "planets_dignity_ownSignFull": "The planet is in its own sign, feeling comfortable and at home. This gives stability and consistency in the areas the planet governs.",
+  "planets_dignity_moolatrikonaFull": "The planet is in its Moolatrikona sign, its second-best position after exaltation. This is considered a very powerful placement.",
+  "planets_dignity_friendlyFull": "The planet is in a friendly sign, where it receives support from the sign lord. This generally gives favorable results.",
+  "planets_dignity_enemyFull": "The planet is in an enemy sign, creating some friction with the sign lord. This may require extra effort in related life areas.",
+  "planets_dignity_neutralFull": "The planet is in a neutral sign, giving balanced results based on other chart factors.",
+  "planets_dignitySignificance": "{planet} in {sign} is {dignity}. This affects the strength and quality of the planet's results in your life.",
+  "@planets_dignitySignificance": {
+    "placeholders": {
+      "planet": {"type": "String"},
+      "sign": {"type": "String"},
+      "dignity": {"type": "String"}
+    }
+  },
+  "planets_strength_max": "Strength: Maximum (100%)",
+  "planets_strength_veryHigh": "Strength: Very High (85%)",
+  "planets_strength_high": "Strength: High (75%)",
+  "planets_strength_good": "Strength: Good (60%)",
+  "planets_strength_moderate": "Strength: Moderate (50%)",
+  "planets_strength_reduced": "Strength: Reduced (35%)",
+  "planets_strength_low": "Strength: Low (25%)",
+  "planets_nakshatra_title": "Nakshatra",
+  "planets_nakshatra_value": "{nakshatra} (Pada {pada})",
+  "@planets_nakshatra_value": {
+    "placeholders": {
+      "nakshatra": {"type": "String"},
+      "pada": {"type": "int"}
+    }
+  },
+  "planets_nakshatra_desc": "{nakshatra} is one of the 27 lunar mansions in Vedic astrology. Its symbol is {symbol} and it embodies the quality of being {nature}. The presiding deity is {deity}.",
+  "@planets_nakshatra_desc": {
+    "placeholders": {
+      "nakshatra": {"type": "String"},
+      "symbol": {"type": "String"},
+      "nature": {"type": "String"},
+      "deity": {"type": "String"}
+    }
+  },
+  "planets_nakshatra_significance": "This Nakshatra is ruled by {lord}, which influences the Vimshottari Dasha sequence. Pada {pada} of {nakshatra} falls in the {sign} navamsa.",
+  "@planets_nakshatra_significance": {
+    "placeholders": {
+      "lord": {"type": "String"},
+      "pada": {"type": "int"},
+      "nakshatra": {"type": "String"},
+      "sign": {"type": "String"}
+    }
+  },
+  "planets_nakshatra_padaLabel": "Pada: {pada} of 4",
+  "@planets_nakshatra_padaLabel": {
+    "placeholders": {
+      "pada": {"type": "int"}
+    }
+  },
+  "planets_nakshatra_lordLabel": "Lord: {lord}",
+  "@planets_nakshatra_lordLabel": {
+    "placeholders": {
+      "lord": {"type": "String"}
+    }
+  },
+  "planets_nakshatra_deityLabel": "Deity: {deity}",
+  "@planets_nakshatra_deityLabel": {
+    "placeholders": {
+      "deity": {"type": "String"}
+    }
+  },
+  "planets_nakshatra_symbolLabel": "Symbol: {symbol}",
+  "@planets_nakshatra_symbolLabel": {
+    "placeholders": {
+      "symbol": {"type": "String"}
+    }
+  },
+  "planets_nakshatra_natureLabel": "Nature: {nature}",
+  "@planets_nakshatra_natureLabel": {
+    "placeholders": {
+      "nature": {"type": "String"}
+    }
+  },
+  "planets_sun_desc": "The Sun represents your soul, ego, vitality, and life force. It shows your core identity, self-expression, and relationship with authority. A strong Sun gives confidence, leadership qualities, and recognition.",
+  "planets_moon_desc": "The Moon represents your mind, emotions, and subconscious patterns. It shows your emotional nature, mental peace, and connection with the mother. A strong Moon gives emotional stability and intuition.",
+  "planets_mars_desc": "Mars represents courage, energy, aggression, and action. It shows your drive, competitive spirit, and how you assert yourself. A strong Mars gives determination, physical strength, and the ability to overcome obstacles.",
+  "planets_mercury_desc": "Mercury represents intellect, communication, and analytical ability. It shows your thinking patterns, speech, and business acumen. A strong Mercury gives sharp wit, good communication skills, and adaptability.",
+  "planets_jupiter_desc": "Jupiter represents wisdom, knowledge, expansion, and good fortune. It shows your philosophical outlook, teaching ability, and spiritual growth. A strong Jupiter brings blessings, optimism, and prosperity.",
+  "planets_venus_desc": "Venus represents love, beauty, pleasures, and relationships. It shows your romantic nature, artistic talents, and appreciation for luxury. A strong Venus gives charm, creativity, and harmonious relationships.",
+  "planets_saturn_desc": "Saturn represents discipline, responsibility, karma, and life lessons. It shows your endurance, work ethic, and areas of restriction. A strong Saturn gives perseverance, maturity, and long-lasting achievements.",
+  "planets_rahu_desc": "Rahu represents desires, obsessions, and worldly ambitions. It shows your unconventional side, foreign connections, and areas of intense focus. Rahu amplifies whatever it touches and drives material pursuits.",
+  "planets_ketu_desc": "Ketu represents spirituality, detachment, and past life karma. It shows your intuitive abilities, liberation tendencies, and areas where you seek transcendence. Ketu brings wisdom through letting go.",
+  "planets_currently": "Currently {dignity} in {sign}.",
+  "@planets_currently": {
+    "placeholders": {
+      "dignity": {"type": "String"},
+      "sign": {"type": "String"}
+    }
+  },
+  "planets_combustInfo": "This planet is combust (too close to Sun), which reduces its strength.",
+  "planets_retroInfo": "Currently retrograde, which intensifies its internal effects.",
+  "planets_planetSignificance": "{planet} is placed in {sign} at {degree}° in House {house}. The Nakshatra is {nakshatra} (Pada {pada}), ruled by {lord}. This is a {nature} planet.",
+  "@planets_planetSignificance": {
+    "placeholders": {
+      "planet": {"type": "String"},
+      "sign": {"type": "String"},
+      "degree": {"type": "String"},
+      "house": {"type": "int"},
+      "nakshatra": {"type": "String"},
+      "pada": {"type": "int"},
+      "lord": {"type": "String"},
+      "nature": {"type": "String"}
+    }
+  },
+  "planets_planetaryStatus": "Planetary Status",
+  "planets_statusCount": "Count: {count} planets",
+  "@planets_statusCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "planets_statusLabel": "Status: {status}",
+  "@planets_statusLabel": {
+    "placeholders": {
+      "status": {"type": "String"}
+    }
+  },
+  "planets_defaultDesc": "This planet influences specific life areas.",
+  "planet_sun_desc": "The Sun represents your soul, ego, vitality, and life force. It shows your core identity, self-expression, and relationship with authority. A strong Sun gives confidence, leadership qualities, and recognition.",
+  "planet_moon_desc": "The Moon represents your mind, emotions, and subconscious patterns. It shows your emotional nature, mental peace, and connection with the mother. A strong Moon gives emotional stability and intuition.",
+  "planet_mars_desc": "Mars represents courage, energy, aggression, and action. It shows your drive, competitive spirit, and how you assert yourself. A strong Mars gives determination, physical strength, and the ability to overcome obstacles.",
+  "planet_mercury_desc": "Mercury represents intellect, communication, and analytical ability. It shows your thinking patterns, speech, and business acumen. A strong Mercury gives sharp wit, good communication skills, and adaptability.",
+  "planet_jupiter_desc": "Jupiter represents wisdom, knowledge, expansion, and good fortune. It shows your philosophical outlook, teaching ability, and spiritual growth. A strong Jupiter brings blessings, optimism, and prosperity.",
+  "planet_venus_desc": "Venus represents love, beauty, pleasures, and relationships. It shows your romantic nature, artistic talents, and appreciation for luxury. A strong Venus gives charm, creativity, and harmonious relationships.",
+  "planet_saturn_desc": "Saturn represents discipline, responsibility, karma, and life lessons. It shows your endurance, work ethic, and areas of restriction. A strong Saturn gives perseverance, maturity, and long-lasting achievements.",
+  "planet_rahu_desc": "Rahu represents desires, obsessions, and worldly ambitions. It shows your unconventional side, foreign connections, and areas of intense focus. Rahu amplifies whatever it touches and drives material pursuits.",
+  "planet_ketu_desc": "Ketu represents spirituality, detachment, and past life karma. It shows your intuitive abilities, liberation tendencies, and areas where you seek transcendence. Ketu brings wisdom through letting go.",
+
+  "transit_nav_overview": "Overview",
+  "transit_nav_sky": "Sky",
+  "transit_nav_gochar": "Gochar",
+  "transit_nav_effects": "Effects",
+  "transit_nav_sadesati": "Sade Sati",
+
+  "transit_currentSky_title": "Current Sky Positions",
+  "transit_currentSky_subtitle": "Real-time planetary positions",
+  "transit_gochar_title": "Gochar (गोचर)",
+  "transit_gochar_subtitle": "Transit from {moonSign} (Janma Rashi)",
+  "transit_effects_title": "Transit Effects",
+  "transit_effects_subtitle": "Impact analysis on your chart",
+  "transit_sadesati_title": "Sade Sati (साढ़े साती)",
+  "transit_sadesati_subtitle": "Saturn's 7.5 year transit cycle",
+
+  "transit_live": "LIVE",
+  "transit_overview": "Transit Overview",
+  "transit_balance_excellent": "Excellent",
+  "transit_balance_good": "Good",
+  "transit_balance_mixed": "Mixed",
+  "transit_balance_tough": "Tough",
+  "transit_balance_difficult": "Difficult",
+  "transit_favorable": "Favorable",
+  "transit_challenging": "Challenging",
+
+  "transit_planet_header": "Planet",
+  "transit_current_header": "Current",
+  "transit_natal_header": "Natal",
+  "transit_major": "Major",
+  "transit_good": "Good",
+  "transit_alert": "Alert",
+
+  "transit_housesFrom": "Houses from {moonSign}",
+  "transit_moon_label": "Moon",
+
+  "transit_sadesati_active": "Sade Sati Active",
+  "transit_sadesati_notActive": "Sade Sati Not Active",
+  "transit_sadesati_clearPeriod": "Clear Period",
+  "transit_sadesati_notAffecting": "Saturn's 7.5-year cycle is not affecting you",
+  "transit_sadesati_learnMore": "Learn more",
+  "transit_saturn": "Saturn",
+
+  "transit_phase_rising": "Rising Phase",
+  "transit_phase_peak": "Peak Phase",
+  "transit_phase_setting": "Setting Phase",
+  "transit_phase_active": "Active",
+  "transit_phase_rising_subtitle": "12th from Moon · Expenses & Mental Stress",
+  "transit_phase_peak_subtitle": "Over Moon · Most Intense Period",
+  "transit_phase_setting_subtitle": "2nd from Moon · Family & Finances",
+
+  "transit_janmaRashi": "(Janma Rashi)",
+  "transit_12th": "12th",
+  "transit_1st": "1st",
+  "transit_2nd": "2nd",
+  "transit_on": "on",
+
+  "transit_insight_overview_title": "Transit Overview",
+  "transit_insight_overview_desc": "Planetary transits (Gochar) are the current positions of planets in the sky relative to your birth chart. They trigger events and influence your life based on their relationship with your natal planets, especially the Moon sign (Janma Rashi).",
+  "transit_insight_overview_significance": "Currently, {favorable} planets are in favorable positions and {challenging} are challenging. Your Janma Rashi is {moonSign}, which is the reference point for all transit calculations in Vedic astrology.",
+  "transit_insight_overview_keypoint1": "Favorable Transits: {count} planets",
+  "transit_insight_overview_keypoint2": "Challenging Transits: {count} planets",
+  "transit_insight_overview_keypoint3": "Overall Balance: {status}",
+  "transit_insight_overview_keypoint4": "Janma Rashi (Moon Sign): {moonSign}",
+  "transit_insight_overview_keypoint5": "Favorable houses from Moon: 3, 6, 10, 11",
+  "transit_insight_overview_keypoint6": "Transits are temporary influences that trigger natal potential",
+
+  "transit_insight_gochar_title": "Gochar (गोचर)",
+  "transit_insight_gochar_value": "Transit System",
+  "transit_insight_gochar_desc": "Gochar is the Vedic system of planetary transits calculated from the Moon sign. Unlike Western astrology which uses the Sun sign, Vedic astrology emphasizes the Moon as the seat of the mind and emotions, making it the primary reference for transit predictions.",
+  "transit_insight_gochar_significance": "Your transits are calculated from {moonSign}, your Janma Rashi. Planets transiting the 3rd, 6th, 10th, and 11th houses from Moon are generally favorable, while the 1st, 2nd, 4th, 5th, 7th, 8th, 9th, and 12th require careful attention.",
+  "transit_insight_gochar_keypoint1": "Reference Point: {moonSign} (Janma Rashi)",
+  "transit_insight_gochar_keypoint2": "Favorable Houses: 3, 6, 10, 11",
+  "transit_insight_gochar_keypoint3": "Challenging Houses: 1, 4, 5, 7, 8, 12",
+  "transit_insight_gochar_keypoint4": "Neutral Houses: 2, 9",
+  "transit_insight_gochar_keypoint5": "Each planet has specific favorable/unfavorable houses",
+  "transit_insight_gochar_keypoint6": "Slow planets (Saturn, Jupiter, Rahu/Ketu) have longer effects",
+
+  "transit_insight_planet_title": "Transit",
+  "transit_insight_planet_value": "{planet} in House {house}",
+  "transit_insight_planet_desc_favorable": "{planet} is currently transiting {sign} at {degree}°, which is the {house} house from your Moon sign. This is a favorable position.",
+  "transit_insight_planet_desc_challenging": "{planet} is currently transiting {sign} at {degree}°, which is the {house} house from your Moon sign. This position requires attention.",
+  "transit_insight_planet_significance_favorable": "{planet} in the {house} house supports growth and positive developments.",
+  "transit_insight_planet_significance_challenging": "{planet} in the {house} house may bring challenges that require patience and careful handling.",
+  "transit_insight_planet_keypoint1": "Planet: {planet}",
+  "transit_insight_planet_keypoint2": "Current Sign: {sign}",
+  "transit_insight_planet_keypoint3": "Degree: {degree}°",
+  "transit_insight_planet_keypoint4": "House from Moon: {house}",
+  "transit_insight_planet_keypoint5_favorable": "Status: Favorable ✓",
+  "transit_insight_planet_keypoint5_challenging": "Status: Challenging ⚠",
+  "transit_insight_planet_keypoint6": "Aspect to Natal: {aspect}",
+  "transit_insight_planet_keypoint7": "Major Transit: {planet} moves slowly, effects last {duration} per sign",
+
+  "transit_insight_house_title": "Gochar House",
+  "transit_insight_house_value": "House {house}",
+  "transit_insight_house_value_moon": "House {house} (Moon)",
+  "transit_insight_house_desc_moonHouse": "House {house} represents {significations}. This is your Janma Rashi house where the Moon was at birth.",
+  "transit_insight_house_desc_favorable": "House {house} represents {significations}. This is generally a favorable house for transits.",
+  "transit_insight_house_desc_challenging": "House {house} represents {significations}. Transits through this house require attention.",
+  "transit_insight_house_significance_empty": "No planets are currently transiting this house.",
+  "transit_insight_house_significance_planets": "Currently {planets} {verb} transiting this house, {action} matters related to {area}.",
+  "transit_insight_house_keypoint1": "House Number: {house}",
+  "transit_insight_house_keypoint2": "Significations: {significations}",
+  "transit_insight_house_keypoint3": "Type: Janma Rashi (Moon Sign House)",
+  "transit_insight_house_keypoint4_favorable": "Transit Quality: Favorable ★",
+  "transit_insight_house_keypoint4_challenging": "Transit Quality: Requires Attention",
+  "transit_insight_house_keypoint5": "Current Planets: {planets}",
+
+  "transit_insight_sadesati_title": "Sade Sati (साढ़े साती)",
+  "transit_insight_sadesati_value_active": "{phase}",
+  "transit_insight_sadesati_value_inactive": "Not Active",
+  "transit_insight_sadesati_desc": "Sade Sati is Saturn's 7.5-year transit cycle over three signs: the 12th, 1st, and 2nd from your Moon sign. Each sign takes approximately 2.5 years. This period is often associated with challenges, delays, and karmic lessons, but also brings maturity and spiritual growth.",
+  "transit_insight_sadesati_significance_active": "{description} Saturn is transiting {sign} at {degree}°.",
+  "transit_insight_sadesati_significance_inactive": "Saturn is not currently transiting the 12th, 1st, or 2nd house from your Moon sign ({moonSign}). Sade Sati is not active.",
+  "transit_insight_sadesati_keypoint1": "Duration: 7.5 years total (~2.5 years per phase)",
+  "transit_insight_sadesati_keypoint2": "Phase 1 (Rising): Saturn in 12th from Moon - expenses, travel, mental stress",
+  "transit_insight_sadesati_keypoint3": "Phase 2 (Peak): Saturn over Moon - most intense, health/emotional challenges",
+  "transit_insight_sadesati_keypoint4": "Phase 3 (Setting): Saturn in 2nd from Moon - family, finances, speech",
+  "transit_insight_sadesati_keypoint5": "Current Phase: {phase}",
+  "transit_insight_sadesati_keypoint6": "Saturn in: {sign}",
+  "transit_insight_sadesati_keypoint7": "Remedies: Saturn mantras, charity on Saturdays, patience",
+
+  "transit_insight_currentSky_title": "Current Sky",
+  "transit_insight_currentSky_value": "Live Planetary Positions",
+  "transit_insight_currentSky_desc": "These are the real-time positions of planets in the zodiac right now. The \"Current\" column shows where each planet is today, while \"Natal\" shows where it was at your birth. When these align or form aspects, significant transits occur.",
+  "transit_insight_currentSky_significance": "Comparing current positions to your natal chart reveals active transits. Pay special attention to slow-moving planets (Saturn, Jupiter, Rahu, Ketu) as their transits have longer-lasting effects.",
+  "transit_insight_currentSky_keypoint1": "Sun/Moon: Quick transits, daily/monthly influences",
+  "transit_insight_currentSky_keypoint2": "Mercury/Venus/Mars: Medium-speed, weeks to months",
+  "transit_insight_currentSky_keypoint3": "Jupiter: ~1 year per sign, major life themes",
+  "transit_insight_currentSky_keypoint4": "Saturn: ~2.5 years per sign, karmic lessons",
+  "transit_insight_currentSky_keypoint5": "Rahu/Ketu: ~1.5 years per sign, destiny points",
+  "transit_insight_currentSky_keypoint6": "Retrograde (℞): Planet appears to move backward, intensified effects",
+  "transit_insight_currentSky_keypoint7": "Sign Change (↔): Planet entering new sign, shift in energy",
+
+  "transit_insight_currentPosition_title": "Current Position",
+  "transit_insight_currentPosition_desc": "{planet} is currently at {degree}° in {sign}{retro}. {natalInfo}",
+  "transit_insight_currentPosition_retro": " (Retrograde)",
+  "transit_insight_currentPosition_natalInfo": "At your birth, {planet} was at {degree}° in {sign}.",
+  "transit_insight_currentPosition_significance_changed": "{planet} has moved to a different sign since your birth. This indicates the planet is in a new area of your chart.",
+  "transit_insight_currentPosition_significance_same": "{planet} is in the same sign as at birth.",
+  "transit_insight_currentPosition_significance_transiting": "{planet} is currently transiting.",
+  "transit_insight_currentPosition_significance_slow": " As a slow-moving planet, its transits have longer-lasting effects.",
+  "transit_insight_currentPosition_keypoint1": "Planet: {planet}",
+  "transit_insight_currentPosition_keypoint2": "Current: {sign} {degree}°",
+  "transit_insight_currentPosition_keypoint3": "Natal: {sign} {degree}°",
+  "transit_insight_currentPosition_keypoint4": "Status: Retrograde ℞",
+  "transit_insight_currentPosition_keypoint5": "Sign Changed: Yes",
+  "transit_insight_currentPosition_keypoint6": "Transit Speed: Slow ({duration}/sign)",
+
+  "transit_insight_transitCount_title": "{label} Transits",
+  "transit_insight_transitCount_value": "{count} Planets",
+  "transit_insight_transitCount_desc_favorable": "These planets are currently transiting houses that are generally supportive from your Moon sign. Favorable transits bring opportunities, success, and positive energy.",
+  "transit_insight_transitCount_desc_challenging": "These planets are currently in positions that may bring challenges or require extra attention. Challenging transits offer growth opportunities through overcoming obstacles.",
+  "transit_insight_transitCount_significance": "You have {count} {label} planetary transits currently active.",
+  "transit_insight_transitCount_keypoint1": "Count: {count} planets",
+  "transit_insight_transitCount_keypoint2": "Type: {label}",
+  "transit_insight_transitCount_keypoint3_favorable": "Houses 3, 6, 10, 11 are generally favorable",
+  "transit_insight_transitCount_keypoint3_challenging": "Other houses require more attention",
+  "transit_insight_transitCount_keypoint4": "Transits are calculated from your Moon sign (Janma Rashi)",
+
+  "transit_house_1_significations": "Self, personality, health, new beginnings",
+  "transit_house_2_significations": "Wealth, family, speech, accumulated resources",
+  "transit_house_3_significations": "Courage, siblings, communication, short journeys",
+  "transit_house_4_significations": "Home, mother, comfort, emotional well-being, property",
+  "transit_house_5_significations": "Intelligence, children, creativity, romance, speculation",
+  "transit_house_6_significations": "Enemies, diseases, debts, daily work, service",
+  "transit_house_7_significations": "Marriage, partnerships, business relationships",
+  "transit_house_8_significations": "Longevity, transformation, inheritance, hidden matters",
+  "transit_house_9_significations": "Fortune, higher learning, spirituality, father, long journeys",
+  "transit_house_10_significations": "Career, reputation, authority, public standing",
+  "transit_house_11_significations": "Gains, income, friends, fulfillment of desires",
+  "transit_house_12_significations": "Losses, expenses, foreign lands, liberation, isolation",
+
+  "transit_sadesati_phase1_desc": "Saturn transiting 12th from Moon. Beginning of 7.5 year cycle. Increased expenses, travel, and mental stress possible.",
+  "transit_sadesati_phase2_desc": "Saturn transiting over Moon sign. Most intense period. Health, emotions, and relationships may face challenges.",
+  "transit_sadesati_phase3_desc": "Saturn transiting 2nd from Moon. Final phase. Financial matters, family, and speech may be affected.",
+
+  "transit_veryFavorable": "Very Favorable",
+  "transit_none": "None",
+  "transit_tapForDetails": "Tap for details",
+  "transit_is": "is",
+  "transit_are": "are",
+  "transit_supporting": "supporting",
+  "transit_influencing": "influencing",
+
+  "transit_balance_excellent": "Excellent",
+  "transit_balance_good": "Good",
+  "transit_balance_mixed": "Mixed",
+  "transit_balance_tough": "Tough",
+  "transit_balance_difficult": "Difficult",
+  "transit_overview": "Transit Overview",
+  "transit_favorable": "Favorable",
+  "transit_challenging": "Challenging",
+  "transit_sadesati_active": "Sade Sati Active",
+  "transit_planet_header": "Planet",
+  "transit_current_header": "Current",
+  "transit_natal_header": "Natal",
+  "transit_currentPosition": "Current Position",
+  "transit_major": "Major",
+  "transit_good": "Good",
+  "transit_alert": "Alert",
+  "transit_changed": "Changed",
+  "transit_houseFromMoon": "House {house} from Moon",
+  "transit_currentSkyPositions": "Current Sky Positions",
+  "transit_currentSkyPositions_subtitle": "Real-time planetary transits",
+  "transit_houseTransits": "House Transits",
+  "transit_houseTransits_subtitle": "Effects from {moonSign}",
+  "transit_transitInHouse": "Transit in House {house}",
+  "transit_sadeSatiInfo": "Sade Sati Info",
+  "transit_phase": "Phase {phase}",
+  "transit_timeLeft": "{years}y {months}m left",
+  "transit_phaseDescription": "{phase} • Saturn transiting {sign}",
+  "transit_start": "Start",
+  "transit_end": "End",
+
+  "transit_currentSky_title": "Current Sky",
+  "transit_currentSky_value": "Live Planetary Positions",
+  "transit_currentSky_desc": "These are the real-time positions of planets in the zodiac right now. The 'Current' column shows where each planet is today, while 'Natal' shows where it was at your birth. When these align or form aspects, significant transits occur.",
+  "transit_currentSky_significance": "Comparing current positions to your natal chart reveals active transits. Pay special attention to slow-moving planets (Saturn, Jupiter, Rahu, Ketu) as their transits have longer-lasting effects.",
+  "transit_currentSky_keypoint1": "Sun/Moon: Quick transits, daily/monthly influences",
+  "transit_currentSky_keypoint2": "Mercury/Venus/Mars: Medium-speed, weeks to months",
+  "transit_currentSky_keypoint3": "Jupiter: ~1 year per sign, major life themes",
+  "transit_currentSky_keypoint4": "Saturn: ~2.5 years per sign, karmic lessons",
+  "transit_currentSky_keypoint5": "Rahu/Ketu: ~1.5 years per sign, destiny points",
+  "transit_currentSky_keypoint6": "Retrograde (℞): Planet appears to move backward, intensified effects",
+  "transit_currentSky_keypoint7": "Sign Change (↔): Planet entering new sign, shift in energy",
+
+  "transit_insight_planet_title": "Transit",
+  "transit_insight_planet_value": "{planet} in House {house}",
+  "transit_insight_favorable_position": "This is a favorable position.",
+  "transit_insight_attention_position": "This position requires attention.",
+  "transit_insight_supports_growth": "supports growth and positive developments",
+  "transit_insight_requires_patience": "may bring challenges that require patience and careful handling",
+  "transit_status_label": "Status",
+  "transit_aspectToNatal": "Aspect to Natal",
+  "transit_movesSlow": "moves slowly",
+  "transit_effectsLast": "effects last",
+  "transit_years": "years",
+  "transit_year": "year",
+  "transit_perSign": "per sign",
+  "transit_sign_label": "Sign",
+  "transit_planet_label": "Planet",
+  "transit_degree_label": "Degree",
+
+  "yogas_nav_overview": "Overview",
+  "yogas_nav_yogas": "Yogas",
+  "yogas_nav_doshas": "Doshas",
+  "yogas_nav_insights": "Insights",
+
+  "yogas_balance_excellent": "Excellent",
+  "yogas_balance_veryFavorable": "Very Favorable",
+  "yogas_balance_favorable": "Favorable",
+  "yogas_balance_mixed": "Mixed",
+  "yogas_balance_challenging": "Challenging",
+  "yogas_balance_veryGood": "Very Good",
+  "yogas_balance_good": "Good",
+  "yogas_balance_needsAttention": "Needs Attention",
+
+  "yogas_overview_title": "Yoga Overview",
+  "yogas_auspiciousYogas": "Auspicious Yogas",
+  "yogas_beneficialCombinations": "{count} beneficial combinations",
+  "yogas_doshasPresent": "Doshas Present",
+  "yogas_detected": "{count} detected",
+  "yogas_astrologicalInsights": "Astrological Insights",
+  "yogas_understandingYourChart": "Understanding your chart",
+
+  "yogas_noYogasDetected": "No Yogas Detected",
+  "yogas_noYogasMessage": "Standard chart configuration without special combinations.",
+  "yogas_noDoshasFound": "No Doshas Found",
+  "yogas_noDoshasMessage": "Your chart is free from major doshas.",
+
+  "yogas_yogas": "Yogas",
+  "yogas_doshas": "Doshas",
+  "yogas_strong": "Strong",
+  "yogas_moderate": "Moderate",
+  "yogas_severe": "Severe",
+  "yogas_mild": "Mild",
+  "yogas_low": "Low",
+  "yogas_high": "High",
+
+  "yogas_type_raja": "Raja",
+  "yogas_type_dhana": "Dhana",
+  "yogas_type_mahapurusha": "Mahapurusha",
+  "yogas_type_lunar": "Lunar",
+  "yogas_type_yoga": "Yoga",
+  "yogas_type_dosha": "Dosha",
+
+  "yogas_formation": "Formation",
+  "yogas_planetsInvolved": "Planets Involved",
+  "yogas_whatIs": "What is {name}?",
+  "yogas_potentialEffects": "Potential Effects",
+  "yogas_benefits": "Benefits",
+  "yogas_remedies": "Remedies",
+  "yogas_howToStrengthen": "How to Strengthen",
+
+  "yogas_insight_understanding": "Understanding",
+  "yogas_insight_activation": "Activation",
+  "yogas_insight_strength": "Strength",
+  "yogas_insight_remedies": "Remedies",
+
+  "yogas_insight_understanding_desc": "Yogas are beneficial combinations that enhance life areas.",
+  "yogas_insight_activation_desc": "Yogas manifest during their planetary Dasha periods.",
+  "yogas_insight_strength_desc": "Planet placement determines yoga manifestation level.",
+  "yogas_insight_remedies_desc": "Most doshas can be mitigated through proper remedies.",
+
+  "yogas_kaalSarpRemedy": "Kaal Sarp Remedy",
+  "yogas_kaalSarpRemedy_desc": "Trimbakeshwar Puja recommended. Chant Maha Mrityunjaya Mantra 108 times daily.",
+  "yogas_manglikRemedy": "Manglik Remedy",
+  "yogas_manglikRemedy_desc": "Perform Mangal Shanti Puja. Recite Hanuman Chalisa on Tuesdays.",
+
+  "yogas_doshaRemedy": "Dosha Remedy",
+  "yogas_noSpecialYogas": "No Special Yogas",
+  "yogas_doshaFreeChart": "Dosha-Free Chart",
+
+  "yogas_overview_insight_title": "Yoga & Dosha Overview",
+  "yogas_overview_insight_desc": "Yogas are auspicious planetary combinations that bestow specific benefits, while Doshas are challenging combinations that may create obstacles. The balance between them shapes your life experiences and opportunities.",
+  "yogas_overview_insight_significance": "Your chart has {yogaCount} yoga(s) and {doshaCount} dosha(s). {strongYogas} yoga(s) are strong, and {severeDoshas} dosha(s) are severe. With {ascendant} Lagna, the overall balance is {balanceStatus}.",
+  "yogas_overview_insight_keypoint1": "Total Yogas: {count} (Strong: {strong})",
+  "yogas_overview_insight_keypoint2": "Total Doshas: {count} (Severe: {severe})",
+  "yogas_overview_insight_keypoint3": "Ascendant: {ascendant}",
+  "yogas_overview_insight_keypoint4": "Overall Balance: {balance}",
+  "yogas_overview_insight_keypoint5": "Yogas manifest during their planetary Dasha periods",
+  "yogas_overview_insight_keypoint6": "Most doshas can be mitigated through proper remedies",
+
+  "yogas_typeInsight_rajaYoga_desc": "Raja Yogas are the most powerful combinations that bestow kingship, authority, power, and success. They are formed by the association of lords of Kendra (1, 4, 7, 10) and Trikona (1, 5, 9) houses.",
+  "yogas_typeInsight_rajaYoga_significance": "Success in career, rise to power, leadership, authority, fame",
+  "yogas_typeInsight_dhanaYoga_desc": "Dhana Yogas indicate wealth and prosperity. They are formed by the association of lords of wealth houses (2, 5, 9, 11) with each other or with benefics.",
+  "yogas_typeInsight_dhanaYoga_significance": "Financial prosperity, accumulation of wealth, material success",
+  "yogas_typeInsight_mahapurusha_desc": "These are five great yogas formed when Mars, Mercury, Jupiter, Venus, or Saturn are in their own or exaltation sign in a Kendra house. They create exceptional individuals.",
+  "yogas_typeInsight_mahapurusha_significance": "Outstanding personality, exceptional achievements, leadership in specific domains",
+  "yogas_typeInsight_lunarYoga_desc": "Lunar Yogas are formed based on the Moon's relationship with other planets. They primarily affect the mind, emotions, and mental abilities.",
+  "yogas_typeInsight_lunarYoga_significance": "Mental strength, emotional stability, intuition, memory",
+  "yogas_typeInsight_severeDosha_desc": "Severe doshas require immediate attention and remedial measures. They can significantly impact the areas they govern.",
+  "yogas_typeInsight_severeDosha_significance": "May cause significant challenges in specific life areas",
+  "yogas_typeInsight_moderateDosha_desc": "Moderate doshas have noticeable effects but are manageable with proper awareness and remedies.",
+  "yogas_typeInsight_moderateDosha_significance": "Some challenges that can be overcome with effort",
+  "yogas_typeInsight_mildDosha_desc": "Low severity doshas have minimal impact and may not require intensive remedial measures.",
+  "yogas_typeInsight_mildDosha_significance": "Minor influences that are easily managed",
+
+  "yogas_strengthInsight_strong_desc": "Strong yogas are fully activated and manifest their effects clearly in life. The planets involved are well-placed, dignified, and free from afflictions.",
+  "yogas_strengthInsight_moderate_desc": "Moderate strength indicates partial manifestation. The yoga is present but planets may have mixed dignity or receive both benefic and malefic influences.",
+  "yogas_strengthInsight_severe_desc": "Severe doshas have strong impact and require attention. Remedial measures are recommended to mitigate their effects.",
+
+  "yogas_insightCard_understanding_desc": "Yogas are beneficial planetary combinations formed by specific relationships between planets and houses. They indicate areas of life where you have special potential or blessings.",
+  "yogas_insightCard_understanding_significance": "Understanding your yogas helps you recognize your strengths and work with your natural talents.",
+  "yogas_insightCard_activation_desc": "Yogas don't always manifest constantly—they activate during the Dasha (planetary period) of the planets involved. The Dasha system in Vedic astrology determines when each yoga will give its results.",
+  "yogas_insightCard_activation_significance": "Knowing when your yogas activate helps in timing important life decisions.",
+  "yogas_insightCard_strength_desc": "The strength of a yoga depends on the dignity of planets involved (own sign, exaltation, debilitation), aspects from benefics or malefics, and placement in houses.",
+  "yogas_insightCard_strength_significance": "Strong yogas manifest clearly while weak ones need strengthening through remedies.",
+  "yogas_insightCard_remedies_desc": "Doshas can be mitigated through various remedies including mantras, gemstones, charity, fasting, and pujas. The right remedy depends on the specific dosha and your chart.",
+  "yogas_insightCard_remedies_significance": "Proper remedies performed with faith can significantly reduce dosha effects.",
+
+  "yogas_emptyState_noYogas_desc": "Your chart does not have any of the commonly recognized special yogas. This is normal and doesn't mean anything negative—many successful people have charts without named yogas. The strength of your chart comes from other factors like planet dignity, house placements, and aspects.",
+  "yogas_emptyState_noDoshas_desc": "Congratulations! Your chart is free from major doshas like Manglik, Kaal Sarp, or other challenging combinations. This indicates fewer karmic obstacles in the areas typically affected by these doshas.",
+
+  "yogas_kaalSarpDosha_desc": "Kaal Sarp Dosha occurs when all planets are hemmed between Rahu and Ketu. This can cause delays, obstacles, and sudden changes in life. However, with proper remedies, its effects can be significantly reduced.",
+  "yogas_manglikDosha_desc": "Manglik Dosha occurs when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. It primarily affects marriage and relationships but can be effectively remedied.",
+
+  "charDasha_nav_current": "Current",
+  "charDasha_nav_karakas": "Karakas",
+  "charDasha_nav_timeline": "Timeline",
+
+  "charDasha_activeRasiDasha": "Active Rasi Dasha",
+  "charDasha_jaiminiKarakas": "Jaimini Karakas",
+  "charDasha_rasiDashaTimeline": "Rasi Dasha Timeline",
+
+  "charDasha_infoFooter": "Char Dasha (Jaimini) is a sign-based system. Duration varies based on the lord's position.",
+
+  "charDasha_unavailable": "Char Dasha Unavailable",
+  "charDasha_unableToCalculate": "Unable to calculate Char Dasha for this chart.",
+
+  "charDasha_active": "ACTIVE",
+  "charDasha_rasiDasha": "Rasi Dasha",
+  "charDasha_signRasiDasha": "{sign} Rasi Dasha",
+
+  "charDasha_journeyProgress": "Journey Progress",
+  "charDasha_remaining": "Remaining",
+  "charDasha_duration": "Duration",
+  "charDasha_cycles": "Cycles",
+  "charDasha_yearsAbbr": "{years} yrs",
+
+  "charDasha_antardasha": "Antardasha",
+  "charDasha_left": "{duration} left",
+
+  "charDasha_dashaDirection": "Dasha Direction",
+  "charDasha_clockwise": "Clockwise",
+  "charDasha_antiClockwise": "Anti-clockwise",
+  "charDasha_fromSign": "from {sign}",
+
+  "charDasha_karaka_ak": "AK",
+  "charDasha_karaka_amk": "AmK",
+  "charDasha_karaka_bk": "BK",
+  "charDasha_karaka_mk": "MK",
+  "charDasha_karaka_pik": "PiK",
+  "charDasha_karaka_puk": "PuK",
+  "charDasha_karaka_gk": "GK",
+  "charDasha_karaka_dk": "DK",
+
+  "charDasha_karaka_atmakaraka": "Atmakaraka",
+  "charDasha_karaka_amatyakaraka": "Amatyakaraka",
+  "charDasha_karaka_bhratrikaraka": "Bhratrikaraka",
+  "charDasha_karaka_matrikaraka": "Matrikaraka",
+  "charDasha_karaka_pitrikaraka": "Pitrikaraka",
+  "charDasha_karaka_putrakaraka": "Putrakaraka",
+  "charDasha_karaka_gnatikaraka": "Gnatikaraka",
+  "charDasha_karaka_darakaraka": "Darakaraka",
+
+  "charDasha_karakamsa": "Karakamsa",
+  "charDasha_karakamsa_desc": "{sign} (AK in Navamsa)",
+
+  "charDasha_now": "NOW",
+
+  "charDasha_start": "Start",
+  "charDasha_end": "End",
+  "charDasha_subPeriods": "Sub-Periods ({count})",
+  "charDasha_noSubPeriods": "No sub-periods available",
+
+  "charDasha_signDesc_aries": "Initiative & leadership",
+  "charDasha_signDesc_taurus": "Stability & comfort",
+  "charDasha_signDesc_gemini": "Communication & learning",
+  "charDasha_signDesc_cancer": "Emotions & nurturing",
+  "charDasha_signDesc_leo": "Creativity & authority",
+  "charDasha_signDesc_virgo": "Service & analysis",
+  "charDasha_signDesc_libra": "Partnerships & balance",
+  "charDasha_signDesc_scorpio": "Transformation & depth",
+  "charDasha_signDesc_sagittarius": "Expansion & wisdom",
+  "charDasha_signDesc_capricorn": "Ambition & structure",
+  "charDasha_signDesc_aquarius": "Innovation & humanity",
+  "charDasha_signDesc_pisces": "Spirituality & intuition",
+  "charDasha_signDesc_default": "Cosmic influence"
+}
+

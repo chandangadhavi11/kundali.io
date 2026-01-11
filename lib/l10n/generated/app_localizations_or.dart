@@ -1,0 +1,5481 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Oriya (`or`).
+class AppLocalizationsOr extends AppLocalizations {
+  AppLocalizationsOr([String locale = 'or']) : super(locale);
+
+  @override
+  String get appName => 'କୁଣ୍ଡଳୀ';
+
+  @override
+  String get common_save => 'ସେଭ୍ କରନ୍ତୁ';
+
+  @override
+  String get common_cancel => 'ବାତିଲ କରନ୍ତୁ';
+
+  @override
+  String get common_delete => 'ଡିଲିଟ୍ କରନ୍ତୁ';
+
+  @override
+  String get common_share => 'ସେୟାର କରନ୍ତୁ';
+
+  @override
+  String get common_download => 'ଡାଉନଲୋଡ୍';
+
+  @override
+  String get common_loading => 'ଲୋଡ୍ ହେଉଛି...';
+
+  @override
+  String get common_error => 'ତ୍ରୁଟି';
+
+  @override
+  String get common_success => 'ସଫଳତା';
+
+  @override
+  String get common_ok => 'ଠିକ୍ ଅଛି';
+
+  @override
+  String get common_yes => 'ହଁ';
+
+  @override
+  String get common_no => 'ନା';
+
+  @override
+  String get common_close => 'ବନ୍ଦ କରନ୍ତୁ';
+
+  @override
+  String get common_back => 'ପଛକୁ';
+
+  @override
+  String get common_next => 'ପରବର୍ତ୍ତୀ';
+
+  @override
+  String get common_done => 'ହୋଇଗଲା';
+
+  @override
+  String get common_confirm => 'ନିଶ୍ଚିତ କରନ୍ତୁ';
+
+  @override
+  String get common_retry => 'ପୁନଃଚେଷ୍ଟା କରନ୍ତୁ';
+
+  @override
+  String get common_submit => 'ଜମା କରନ୍ତୁ';
+
+  @override
+  String get common_update => 'ଅପଡେଟ୍ କରନ୍ତୁ';
+
+  @override
+  String get common_reset => 'ରିସେଟ୍ କରନ୍ତୁ';
+
+  @override
+  String get common_apply => 'ଲାଗୁ କରନ୍ତୁ';
+
+  @override
+  String get common_search => 'ଖୋଜନ୍ତୁ';
+
+  @override
+  String get common_settings => 'ସେଟିଂସ୍';
+
+  @override
+  String get insight_whatThisMeans => 'What This Means';
+
+  @override
+  String get insight_significance => 'Significance';
+
+  @override
+  String get insight_keyPoints => 'Key Points';
+
+  @override
+  String get common_language => 'ଭାଷା';
+
+  @override
+  String get common_theme => 'ଥିମ୍';
+
+  @override
+  String get common_logout => 'ଲଗ୍ ଆଉଟ୍';
+
+  @override
+  String get common_login => 'ଲଗ୍ ଇନ୍';
+
+  @override
+  String get common_signup => 'ସାଇନ୍ ଅପ୍';
+
+  @override
+  String get nav_home => 'ହୋମ୍';
+
+  @override
+  String get nav_horoscope => 'ରାଶିଫଳ';
+
+  @override
+  String get nav_panchang => 'ପଞ୍ଚାଙ୍ଗ';
+
+  @override
+  String get nav_chat => 'ଚାଟ୍';
+
+  @override
+  String get nav_profile => 'ପ୍ରୋଫାଇଲ୍';
+
+  @override
+  String get display_tab_chart => 'ଚାର୍ଟ';
+
+  @override
+  String get display_tab_details => 'ବିବରଣୀ';
+
+  @override
+  String get display_tab_planets => 'ଗ୍ରହ';
+
+  @override
+  String get display_tab_houses => 'ଭାବ';
+
+  @override
+  String get display_tab_dasha => 'ଦଶା';
+
+  @override
+  String get display_tab_yogas => 'ଯୋଗ';
+
+  @override
+  String get display_tab_transit => 'ଗୋଚର';
+
+  @override
+  String get display_tab_panchang => 'ପଞ୍ଚାଙ୍ଗ';
+
+  @override
+  String get display_tab_strength => 'ବଳ';
+
+  @override
+  String get display_menu_exportPdf => 'PDF ଏକ୍ସପୋର୍ଟ';
+
+  @override
+  String get display_menu_setAsPrimary => 'ପ୍ରାଥମିକ ଭାବେ ସେଟ୍ କରନ୍ତୁ';
+
+  @override
+  String get display_menu_duplicate => 'ନକଲ';
+
+  @override
+  String get display_menu_delete => 'ଡିଲିଟ୍';
+
+  @override
+  String get display_menu_language => 'ଭାଷା';
+
+  @override
+  String get display_viewChartFor => 'ଚାର୍ଟ ଦେଖନ୍ତୁ';
+
+  @override
+  String get display_date => 'ତାରିଖ';
+
+  @override
+  String get display_time => 'ସମୟ';
+
+  @override
+  String get display_viewCurrentTimeChart => 'ବର୍ତ୍ତମାନ ସମୟ ଚାର୍ଟ ଦେଖନ୍ତୁ';
+
+  @override
+  String get display_chartTypes => 'ଚାର୍ଟ ପ୍ରକାର';
+
+  @override
+  String get display_divisionalCharts => 'ବର୍ଗ ଚାର୍ଟ';
+
+  @override
+  String get display_chartStyle => 'ଚାର୍ଟ ଶୈଳୀ';
+
+  @override
+  String get display_northIndian => 'ଉତ୍ତର ଭାରତୀୟ';
+
+  @override
+  String get display_southIndian => 'ଦକ୍ଷିଣ ଭାରତୀୟ';
+
+  @override
+  String get display_fullscreen => 'ପୂର୍ଣ୍ଣ ସ୍କ୍ରିନ୍';
+
+  @override
+  String get display_zoomIn => 'ଜୁମ୍ ଇନ୍';
+
+  @override
+  String get display_zoomOut => 'ଜୁମ୍ ଆଉଟ୍';
+
+  @override
+  String get display_selectChartType => 'ଚାର୍ଟ ପ୍ରକାର ବାଛନ୍ତୁ';
+
+  @override
+  String get display_learnMore => 'ଅଧିକ ଜାଣନ୍ତୁ';
+
+  @override
+  String get chart_lagna => 'ଲଗ୍ନ';
+
+  @override
+  String get chart_moon => 'ଚନ୍ଦ୍ର';
+
+  @override
+  String get chart_sun => 'ସୂର୍ଯ୍ୟ';
+
+  @override
+  String get chart_bhava => 'ଭାବ';
+
+  @override
+  String get chart_hora => 'ହୋରା';
+
+  @override
+  String get chart_drekkana => 'ଦ୍ରେକ୍କାଣ';
+
+  @override
+  String get chart_chaturthamsa => 'ଚତୁର୍ଥାଂଶ';
+
+  @override
+  String get chart_saptamsa => 'ସପ୍ତାଂଶ';
+
+  @override
+  String get chart_navamsa => 'ନବାଂଶ';
+
+  @override
+  String get chart_dasamsa => 'ଦଶାଂଶ';
+
+  @override
+  String get chart_dwadasamsa => 'ଦ୍ୱାଦଶାଂଶ';
+
+  @override
+  String get chart_shodasamsa => 'ଷୋଡଶାଂଶ';
+
+  @override
+  String get chart_vimsamsa => 'ବିଂଶାଂଶ';
+
+  @override
+  String get chart_chaturvimsamsa => 'ଚତୁର୍ବିଂଶାଂଶ';
+
+  @override
+  String get chart_bhamsa => 'ଭାଂଶ';
+
+  @override
+  String get chart_trimshamsa => 'ତ୍ରିଂଶାଂଶ';
+
+  @override
+  String get chart_khavedamsa => 'ଖବେଦାଂଶ';
+
+  @override
+  String get chart_akshavedamsa => 'ଅକ୍ଷବେଦାଂଶ';
+
+  @override
+  String get chart_shashtiamsa => 'ଷଷ୍ଟ୍ୟଂଶ';
+
+  @override
+  String get chart_sudarshan => 'ସୁଦର୍ଶନ';
+
+  @override
+  String get chart_ashtakavarga => 'ଅଷ୍ଟକବର୍ଗ';
+
+  @override
+  String get chart_category_primary => 'ପ୍ରାଥମିକ ଚାର୍ଟ';
+
+  @override
+  String get chart_category_primary_desc =>
+      'ସମଗ୍ର ଜୀବନ ବିଶ୍ଳେଷଣ ପାଇଁ ମୁଖ୍ୟ ଜନ୍ମ କୁଣ୍ଡଳୀ';
+
+  @override
+  String get chart_category_divisional => 'ବିଭାଗୀୟ ଚାର୍ଟ (ବର୍ଗ)';
+
+  @override
+  String get chart_category_divisional_desc =>
+      'ନିର୍ଦ୍ଦିଷ୍ଟ ଜୀବନ କ୍ଷେତ୍ର ପାଇଁ ବିଶେଷ ଚାର୍ଟ';
+
+  @override
+  String get chart_category_special => 'ବିଶେଷ ଚାର୍ଟ';
+
+  @override
+  String get chart_category_special_desc => 'ଅନନ୍ୟ ବିଶ୍ଳେଷଣାତ୍ମକ ପଦ୍ଧତି';
+
+  @override
+  String get display_shareComingSoon => 'ଶେୟାର ଶୀଘ୍ର ଆସୁଛି';
+
+  @override
+  String get display_am => 'ପ୍ରାତଃ';
+
+  @override
+  String get display_pm => 'ଅପରାହ୍ନ';
+
+  @override
+  String get language_title => 'ଭାଷା';
+
+  @override
+  String get language_subtitle => 'ଆପଣଙ୍କ ପସନ୍ଦର ଭାଷା ବାଛନ୍ତୁ';
+
+  @override
+  String language_changed(String language) {
+    return 'ଭାଷା $language କୁ ବଦଳିଗଲା';
+  }
+
+  @override
+  String get input_title => 'କୁଣ୍ଡଳୀ ତିଆରି କରନ୍ତୁ';
+
+  @override
+  String get input_name => 'ନାମ';
+
+  @override
+  String get input_namePlaceholder => 'ନାମ ଦିଅନ୍ତୁ';
+
+  @override
+  String get input_dateOfBirth => 'ଜନ୍ମ ତାରିଖ';
+
+  @override
+  String get input_timeOfBirth => 'ଜନ୍ମ ସମୟ';
+
+  @override
+  String get input_placeOfBirth => 'ଜନ୍ମ ସ୍ଥାନ';
+
+  @override
+  String get input_placePlaceholder => 'ସହର ନାମ ଦିଅନ୍ତୁ';
+
+  @override
+  String get input_gender => 'ଲିଙ୍ଗ';
+
+  @override
+  String get input_male => 'ପୁରୁଷ';
+
+  @override
+  String get input_female => 'ମହିଳା';
+
+  @override
+  String get input_other => 'ଅନ୍ୟ';
+
+  @override
+  String get input_generateKundali => 'କୁଣ୍ଡଳୀ ତିଆରି କରନ୍ତୁ';
+
+  @override
+  String get input_saveAndView => 'ସେଭ୍ କରନ୍ତୁ ଏବଂ ଦେଖନ୍ତୁ';
+
+  @override
+  String get input_advancedOptions => 'ଅଧିକ ବିକଳ୍ପ';
+
+  @override
+  String get input_chartStyle => 'ଚାର୍ଟ ଶୈଳୀ';
+
+  @override
+  String get input_timezone => 'ସମୟ କ୍ଷେତ୍ର';
+
+  @override
+  String get input_setPrimary => 'ପ୍ରାଥମିକ ଭାବେ ସେଟ୍ କରନ୍ତୁ';
+
+  @override
+  String get input_validationNameRequired => 'ନାମ ଆବଶ୍ୟକ';
+
+  @override
+  String get input_validationPlaceRequired => 'ଜନ୍ମ ସ୍ଥାନ ଆବଶ୍ୟକ';
+
+  @override
+  String get input_selectDate => 'ତାରିଖ ବାଛନ୍ତୁ';
+
+  @override
+  String get input_selectTime => 'ସମୟ ବାଛନ୍ତୁ';
+
+  @override
+  String get input_searchPlace => 'ସ୍ଥାନ ଖୋଜନ୍ତୁ...';
+
+  @override
+  String get input_recentSearches => 'ସାମ୍ପ୍ରତିକ ଖୋଜ';
+
+  @override
+  String get input_popularCities => 'ଲୋକପ୍ରିୟ ସହର';
+
+  @override
+  String get input_noResultsFound => 'କିଛି ଫଳାଫଳ ମିଳିଲା ନାହିଁ';
+
+  @override
+  String get input_generating => 'କୁଣ୍ଡଳୀ ତିଆରି ହେଉଛି...';
+
+  @override
+  String get planet_sun => 'ସୂର୍ଯ୍ୟ';
+
+  @override
+  String get planet_moon => 'ଚନ୍ଦ୍ର';
+
+  @override
+  String get planet_mars => 'ମଙ୍ଗଳ';
+
+  @override
+  String get planet_mercury => 'ବୁଧ';
+
+  @override
+  String get planet_jupiter => 'ବୃହସ୍ପତି';
+
+  @override
+  String get planet_venus => 'ଶୁକ୍ର';
+
+  @override
+  String get planet_saturn => 'ଶନି';
+
+  @override
+  String get planet_rahu => 'ରାହୁ';
+
+  @override
+  String get planet_ketu => 'କେତୁ';
+
+  @override
+  String get planet_uranus => 'Uranus';
+
+  @override
+  String get planet_neptune => 'Neptune';
+
+  @override
+  String get planet_pluto => 'Pluto';
+
+  @override
+  String get planet_sun_sanskrit => 'ସୂର୍ଯ୍ୟ';
+
+  @override
+  String get planet_moon_sanskrit => 'ଚନ୍ଦ୍ର';
+
+  @override
+  String get planet_mars_sanskrit => 'ମଙ୍ଗଳ';
+
+  @override
+  String get planet_mercury_sanskrit => 'ବୁଧ';
+
+  @override
+  String get planet_jupiter_sanskrit => 'ଗୁରୁ';
+
+  @override
+  String get planet_venus_sanskrit => 'ଶୁକ୍ର';
+
+  @override
+  String get planet_saturn_sanskrit => 'ଶନି';
+
+  @override
+  String get planet_rahu_sanskrit => 'ରାହୁ';
+
+  @override
+  String get planet_ketu_sanskrit => 'କେତୁ';
+
+  @override
+  String get planet_sun_abbr => 'ସୂର୍ଯ୍ୟ';
+
+  @override
+  String get planet_moon_abbr => 'ଚନ୍ଦ୍ର';
+
+  @override
+  String get planet_mars_abbr => 'ମଙ୍ଗଳ';
+
+  @override
+  String get planet_mercury_abbr => 'ବୁଧ';
+
+  @override
+  String get planet_jupiter_abbr => 'ଗୁରୁ';
+
+  @override
+  String get planet_venus_abbr => 'ଶୁକ୍ର';
+
+  @override
+  String get planet_saturn_abbr => 'ଶନି';
+
+  @override
+  String get planet_rahu_abbr => 'ରାହୁ';
+
+  @override
+  String get planet_ketu_abbr => 'କେତୁ';
+
+  @override
+  String get planet_uranus_abbr => 'ୟୁରାନାସ୍';
+
+  @override
+  String get planet_neptune_abbr => 'ନେପଚୁନ୍';
+
+  @override
+  String get planet_pluto_abbr => 'ପ୍ଲୁଟୋ';
+
+  @override
+  String get planets_overview => 'ଗ୍ରହ ସମୀକ୍ଷା';
+
+  @override
+  String get planets_position => 'ସ୍ଥିତି';
+
+  @override
+  String get planets_degree => 'ଡିଗ୍ରୀ';
+
+  @override
+  String get planets_sign => 'ରାଶି';
+
+  @override
+  String get planets_house => 'ଭାବ';
+
+  @override
+  String get planets_nakshatra => 'ନକ୍ଷତ୍ର';
+
+  @override
+  String get planets_retrograde => 'ବକ୍ର';
+
+  @override
+  String get planets_combust => 'ଅସ୍ତ';
+
+  @override
+  String get planets_exalted => 'ଉଚ୍ଚ';
+
+  @override
+  String get planets_debilitated => 'ନୀଚ';
+
+  @override
+  String get planets_ownSign => 'ସ୍ୱରାଶି';
+
+  @override
+  String get planets_friendly => 'ମିତ୍ର';
+
+  @override
+  String get planets_neutral => 'ସମ';
+
+  @override
+  String get planets_enemy => 'ଶତ୍ରୁ';
+
+  @override
+  String get zodiac_aries => 'ମେଷ';
+
+  @override
+  String get zodiac_taurus => 'ବୃଷଭ';
+
+  @override
+  String get zodiac_gemini => 'ମିଥୁନ';
+
+  @override
+  String get zodiac_cancer => 'କର୍କଟ';
+
+  @override
+  String get zodiac_leo => 'ସିଂହ';
+
+  @override
+  String get zodiac_virgo => 'କନ୍ୟା';
+
+  @override
+  String get zodiac_libra => 'ତୁଳା';
+
+  @override
+  String get zodiac_scorpio => 'ବୃଶ୍ଚିକ';
+
+  @override
+  String get zodiac_sagittarius => 'ଧନୁ';
+
+  @override
+  String get zodiac_capricorn => 'ମକର';
+
+  @override
+  String get zodiac_aquarius => 'କୁମ୍ଭ';
+
+  @override
+  String get zodiac_pisces => 'ମୀନ';
+
+  @override
+  String get zodiac_aries_abbr => 'ମେଷ';
+
+  @override
+  String get zodiac_taurus_abbr => 'ବୃଷ';
+
+  @override
+  String get zodiac_gemini_abbr => 'ମିଥୁନ';
+
+  @override
+  String get zodiac_cancer_abbr => 'କର୍କଟ';
+
+  @override
+  String get zodiac_leo_abbr => 'ସିଂହ';
+
+  @override
+  String get zodiac_virgo_abbr => 'କନ୍ୟା';
+
+  @override
+  String get zodiac_libra_abbr => 'ତୁଳା';
+
+  @override
+  String get zodiac_scorpio_abbr => 'ବୃଶ୍ଚିକ';
+
+  @override
+  String get zodiac_sagittarius_abbr => 'ଧନୁ';
+
+  @override
+  String get zodiac_capricorn_abbr => 'ମକର';
+
+  @override
+  String get zodiac_aquarius_abbr => 'କୁମ୍ଭ';
+
+  @override
+  String get zodiac_pisces_abbr => 'ମୀନ';
+
+  @override
+  String get zodiac_aries_sanskrit => 'ମେଷ';
+
+  @override
+  String get zodiac_taurus_sanskrit => 'ବୃଷଭ';
+
+  @override
+  String get zodiac_gemini_sanskrit => 'ମିଥୁନ';
+
+  @override
+  String get zodiac_cancer_sanskrit => 'କର୍କଟ';
+
+  @override
+  String get zodiac_leo_sanskrit => 'ସିଂହ';
+
+  @override
+  String get zodiac_virgo_sanskrit => 'କନ୍ୟା';
+
+  @override
+  String get zodiac_libra_sanskrit => 'ତୁଳା';
+
+  @override
+  String get zodiac_scorpio_sanskrit => 'ବୃଶ୍ଚିକ';
+
+  @override
+  String get zodiac_sagittarius_sanskrit => 'ଧନୁ';
+
+  @override
+  String get zodiac_capricorn_sanskrit => 'ମକର';
+
+  @override
+  String get zodiac_aquarius_sanskrit => 'କୁମ୍ଭ';
+
+  @override
+  String get zodiac_pisces_sanskrit => 'ମୀନ';
+
+  @override
+  String get nakshatra_ashwini => 'ଅଶ୍ୱିନୀ';
+
+  @override
+  String get nakshatra_bharani => 'ଭରଣୀ';
+
+  @override
+  String get nakshatra_krittika => 'କୃତ୍ତିକା';
+
+  @override
+  String get nakshatra_rohini => 'ରୋହିଣୀ';
+
+  @override
+  String get nakshatra_mrigashira => 'ମୃଗଶିରା';
+
+  @override
+  String get nakshatra_ardra => 'ଆର୍ଦ୍ରା';
+
+  @override
+  String get nakshatra_punarvasu => 'ପୁନର୍ବସୁ';
+
+  @override
+  String get nakshatra_pushya => 'ପୁଷ୍ୟ';
+
+  @override
+  String get nakshatra_ashlesha => 'ଆଶ୍ଲେଷା';
+
+  @override
+  String get nakshatra_magha => 'ମଘା';
+
+  @override
+  String get nakshatra_purvaphalguni => 'ପୂର୍ବା ଫାଲ୍ଗୁନୀ';
+
+  @override
+  String get nakshatra_uttaraphalguni => 'ଉତ୍ତରା ଫାଲ୍ଗୁନୀ';
+
+  @override
+  String get nakshatra_hasta => 'ହସ୍ତ';
+
+  @override
+  String get nakshatra_chitra => 'ଚିତ୍ରା';
+
+  @override
+  String get nakshatra_swati => 'ସ୍ୱାତୀ';
+
+  @override
+  String get nakshatra_vishakha => 'ବିଶାଖା';
+
+  @override
+  String get nakshatra_anuradha => 'ଅନୁରାଧା';
+
+  @override
+  String get nakshatra_jyeshtha => 'ଜ୍ୟେଷ୍ଠା';
+
+  @override
+  String get nakshatra_mula => 'ମୂଳ';
+
+  @override
+  String get nakshatra_purvashadha => 'ପୂର୍ବାଷାଢା';
+
+  @override
+  String get nakshatra_uttarashadha => 'ଉତ୍ତରାଷାଢା';
+
+  @override
+  String get nakshatra_shravana => 'ଶ୍ରବଣ';
+
+  @override
+  String get nakshatra_dhanishta => 'ଧନିଷ୍ଠା';
+
+  @override
+  String get nakshatra_shatabhisha => 'ଶତଭିଷା';
+
+  @override
+  String get nakshatra_purvabhadrapada => 'ପୂର୍ବା ଭାଦ୍ରପଦ';
+
+  @override
+  String get nakshatra_uttarabhadrapada => 'ଉତ୍ତରା ଭାଦ୍ରପଦ';
+
+  @override
+  String get nakshatra_revati => 'ରେବତୀ';
+
+  @override
+  String get element_fire => 'ଅଗ୍ନି';
+
+  @override
+  String get element_earth => 'ପୃଥିବୀ';
+
+  @override
+  String get element_air => 'ବାୟୁ';
+
+  @override
+  String get element_water => 'ଜଳ';
+
+  @override
+  String get element_fire_desc => 'ଗତିଶୀଳ';
+
+  @override
+  String get element_earth_desc => 'ସ୍ଥିର';
+
+  @override
+  String get element_air_desc => 'ବୌଦ୍ଧିକ';
+
+  @override
+  String get element_water_desc => 'ସହଜଜ୍ଞାନୀ';
+
+  @override
+  String get gana_deva => 'ଦେବ';
+
+  @override
+  String get gana_manushya => 'ମନୁଷ୍ୟ';
+
+  @override
+  String get gana_rakshasa => 'ରାକ୍ଷସ';
+
+  @override
+  String get varna_brahmin => 'ବ୍ରାହ୍ମଣ';
+
+  @override
+  String get varna_kshatriya => 'କ୍ଷତ୍ରିୟ';
+
+  @override
+  String get varna_vaishya => 'ବୈଶ୍ୟ';
+
+  @override
+  String get varna_shudra => 'ଶୂଦ୍ର';
+
+  @override
+  String get vashya_chatushpad => 'ଚତୁଷ୍ପଦ';
+
+  @override
+  String get vashya_vanchar => 'ବନଚର';
+
+  @override
+  String get vashya_nara => 'ନର';
+
+  @override
+  String get vashya_jalachara => 'ଜଳଚର';
+
+  @override
+  String get vashya_keeta => 'କୀଟ';
+
+  @override
+  String get nadi_aadi => 'ଆଦି';
+
+  @override
+  String get nadi_madhya => 'ମଧ୍ୟ';
+
+  @override
+  String get nadi_antya => 'ଅନ୍ତ୍ୟ';
+
+  @override
+  String get day_sunday => 'ରବିବାର';
+
+  @override
+  String get day_monday => 'ସୋମବାର';
+
+  @override
+  String get day_tuesday => 'ମଙ୍ଗଳବାର';
+
+  @override
+  String get day_wednesday => 'ବୁଧବାର';
+
+  @override
+  String get day_thursday => 'ଗୁରୁବାର';
+
+  @override
+  String get day_friday => 'ଶୁକ୍ରବାର';
+
+  @override
+  String get day_saturday => 'ଶନିବାର';
+
+  @override
+  String get metal_gold => 'ସୁନା';
+
+  @override
+  String get metal_silver => 'ରୂପା';
+
+  @override
+  String get metal_copper => 'ତାମ୍ବା';
+
+  @override
+  String get metal_iron => 'ଲୁହା';
+
+  @override
+  String get metal_brass => 'ପିତ୍ତଳ';
+
+  @override
+  String get metal_bronze => 'କାଂସ୍ୟ';
+
+  @override
+  String get metal_tin => 'ଟିନ୍';
+
+  @override
+  String get metal_lead => 'ସୀସା';
+
+  @override
+  String get gemstone_ruby => 'ମାଣିକ୍ୟ';
+
+  @override
+  String get gemstone_pearl => 'ମୋତି';
+
+  @override
+  String get gemstone_redcoral => 'ପ୍ରବାଳ';
+
+  @override
+  String get gemstone_emerald => 'ପାନ୍ନା';
+
+  @override
+  String get gemstone_yellowsapphire => 'ପୁଖରାଜ';
+
+  @override
+  String get gemstone_diamond => 'ହୀରା';
+
+  @override
+  String get gemstone_bluesapphire => 'ନୀଳମଣି';
+
+  @override
+  String get gemstone_hessonite => 'ଗୋମେଦ';
+
+  @override
+  String get gemstone_catseye => 'ବୈଦୂର୍ଯ୍ୟ';
+
+  @override
+  String get yoni_horse => 'ଘୋଡ଼ା';
+
+  @override
+  String get yoni_elephant => 'ହାତୀ';
+
+  @override
+  String get yoni_goat => 'ଛେଳି';
+
+  @override
+  String get yoni_serpent => 'ସାପ';
+
+  @override
+  String get yoni_dog => 'କୁକୁର';
+
+  @override
+  String get yoni_cat => 'ବିଲେଇ';
+
+  @override
+  String get yoni_rat => 'ମୂଷା';
+
+  @override
+  String get yoni_cow => 'ଗାଈ';
+
+  @override
+  String get yoni_buffalo => 'ମଇଁଷି';
+
+  @override
+  String get yoni_tiger => 'ବାଘ';
+
+  @override
+  String get yoni_deer => 'ହରିଣ';
+
+  @override
+  String get yoni_monkey => 'ମାଙ୍କଡ଼';
+
+  @override
+  String get yoni_mongoose => 'ନେଉଳ';
+
+  @override
+  String get yoni_lion => 'ସିଂହ';
+
+  @override
+  String get tara_janma => 'ଜନ୍ମ';
+
+  @override
+  String get tara_sampat => 'ସମ୍ପତ୍';
+
+  @override
+  String get tara_vipat => 'ବିପତ୍';
+
+  @override
+  String get tara_kshema => 'କ୍ଷେମ';
+
+  @override
+  String get tara_pratyak => 'ପ୍ରତ୍ୟକ୍';
+
+  @override
+  String get tara_sadhana => 'ସାଧନ';
+
+  @override
+  String get tara_naidhana => 'ନୈଧନ';
+
+  @override
+  String get tara_mitra => 'ମିତ୍ର';
+
+  @override
+  String get tara_paramamitra => 'ପରମ ମିତ୍ର';
+
+  @override
+  String get house_1 => 'ପ୍ରଥମ ଭାବ';
+
+  @override
+  String get house_2 => 'ଦ୍ୱିତୀୟ ଭାବ';
+
+  @override
+  String get house_3 => 'ତୃତୀୟ ଭାବ';
+
+  @override
+  String get house_4 => 'ଚତୁର୍ଥ ଭାବ';
+
+  @override
+  String get house_5 => 'ପଞ୍ଚମ ଭାବ';
+
+  @override
+  String get house_6 => 'ଷଷ୍ଠ ଭାବ';
+
+  @override
+  String get house_7 => 'ସପ୍ତମ ଭାବ';
+
+  @override
+  String get house_8 => 'ଅଷ୍ଟମ ଭାବ';
+
+  @override
+  String get house_9 => 'ନବମ ଭାବ';
+
+  @override
+  String get house_10 => 'ଦଶମ ଭାବ';
+
+  @override
+  String get house_11 => 'ଏକାଦଶ ଭାବ';
+
+  @override
+  String get house_12 => 'ଦ୍ୱାଦଶ ଭାବ';
+
+  @override
+  String get house_1_name => 'ଲଗ୍ନ';
+
+  @override
+  String get house_2_name => 'ଧନ';
+
+  @override
+  String get house_3_name => 'ସହଜ';
+
+  @override
+  String get house_4_name => 'ସୁଖ';
+
+  @override
+  String get house_5_name => 'ପୁତ୍ର';
+
+  @override
+  String get house_6_name => 'ରିପୁ';
+
+  @override
+  String get house_7_name => 'କଳତ୍ର';
+
+  @override
+  String get house_8_name => 'ଆୟୁ';
+
+  @override
+  String get house_9_name => 'ଧର୍ମ';
+
+  @override
+  String get house_10_name => 'କର୍ମ';
+
+  @override
+  String get house_11_name => 'ଲାଭ';
+
+  @override
+  String get house_12_name => 'ବ୍ୟୟ';
+
+  @override
+  String get house_1_meaning => 'ନିଜ, ବ୍ୟକ୍ତିତ୍ୱ, ଶରୀର, ସ୍ୱାସ୍ଥ୍ୟ';
+
+  @override
+  String get house_2_meaning => 'ଧନ, ପରିବାର, ବାକ୍ୟ, ମୂଲ୍ୟ';
+
+  @override
+  String get house_3_meaning => 'ଭାଇଭଉଣୀ, ସାହସ, ଯୋଗାଯୋଗ, ଛୋଟ ଯାତ୍ରା';
+
+  @override
+  String get house_4_meaning => 'ମାତା, ଘର, ସମ୍ପତ୍ତି, ସୁଖ, ଶିକ୍ଷା';
+
+  @override
+  String get house_5_meaning => 'ସନ୍ତାନ, ସୃଜନଶୀଳତା, ବୁଦ୍ଧି, ପ୍ରେମ';
+
+  @override
+  String get house_6_meaning => 'ଶତ୍ରୁ, ରୋଗ, ଋଣ, ଦୈନିକ କାର୍ଯ୍ୟ';
+
+  @override
+  String get house_7_meaning => 'ବିବାହ, ସାଝେଦାରୀ, ବ୍ୟବସାୟ, ଜୀବନସାଥୀ';
+
+  @override
+  String get house_8_meaning => 'ଆୟୁ, ପରିବର୍ତ୍ତନ, ଉତ୍ତରାଧିକାର, ଗୁପ୍ତ ବିଦ୍ୟା';
+
+  @override
+  String get house_9_meaning => 'ଭାଗ୍ୟ, ଧର୍ମ, ପିତା, ଉଚ୍ଚ ଶିକ୍ଷା';
+
+  @override
+  String get house_10_meaning => 'କ୍ୟାରିୟର, ପଦବୀ, ଯଶ, କର୍ତ୍ତୃତ୍ୱ';
+
+  @override
+  String get house_11_meaning => 'ଲାଭ, ଆୟ, ବନ୍ଧୁ, ଆକାଂକ୍ଷା';
+
+  @override
+  String get house_12_meaning => 'କ୍ଷତି, ଖର୍ଚ୍ଚ, ମୋକ୍ଷ, ବିଦେଶ';
+
+  @override
+  String get houses_significations => 'ସୂଚନା';
+
+  @override
+  String get houses_lord => 'ଅଧିପତି';
+
+  @override
+  String get houses_planets => 'ଗ୍ରହ';
+
+  @override
+  String get houses_aspects => 'ଦୃଷ୍ଟି';
+
+  @override
+  String get houses_strength => 'ବଳ';
+
+  @override
+  String get chartType_lagna => 'ଲଗ୍ନ';
+
+  @override
+  String get chartType_moon => 'ଚନ୍ଦ୍ର';
+
+  @override
+  String get chartType_sun => 'ସୂର୍ଯ୍ୟ';
+
+  @override
+  String get chartType_navamsa => 'ନବାଂଶ (D9)';
+
+  @override
+  String get chartType_hora => 'ହୋରା (D2)';
+
+  @override
+  String get chartType_drekkana => 'ଦ୍ରେଷ୍କାଣ (D3)';
+
+  @override
+  String get chartType_chaturthamsa => 'ଚତୁର୍ଥାଂଶ (D4)';
+
+  @override
+  String get chartType_saptamsa => 'ସପ୍ତାଂଶ (D7)';
+
+  @override
+  String get chartType_dasamsa => 'ଦଶାଂଶ (D10)';
+
+  @override
+  String get chartType_dwadasamsa => 'ଦ୍ୱାଦଶାଂଶ (D12)';
+
+  @override
+  String get chartType_shodasamsa => 'ଷୋଡଶାଂଶ (D16)';
+
+  @override
+  String get chartType_vimsamsa => 'ବିଂଶାଂଶ (D20)';
+
+  @override
+  String get chartType_chaturvimsamsa => 'ଚତୁର୍ବିଂଶାଂଶ (D24)';
+
+  @override
+  String get chartType_saptavimsamsa => 'ସପ୍ତବିଂଶାଂଶ (D27)';
+
+  @override
+  String get chartType_trimsamsa => 'ତ୍ରିଂଶାଂଶ (D30)';
+
+  @override
+  String get chartType_khavedamsa => 'ଖବେଦାଂଶ (D40)';
+
+  @override
+  String get chartType_akshavedamsa => 'ଅକ୍ଷବେଦାଂଶ (D45)';
+
+  @override
+  String get chartType_shashtiamsa => 'ଷଷ୍ଟ୍ୟାଂଶ (D60)';
+
+  @override
+  String get dasha_mahadasha => 'ମହାଦଶା';
+
+  @override
+  String get dasha_antardasha => 'ଅନ୍ତର୍ଦଶା';
+
+  @override
+  String get dasha_pratyantardasha => 'ପ୍ରତ୍ୟନ୍ତର୍ଦଶା';
+
+  @override
+  String get dasha_currentPeriod => 'ବର୍ତ୍ତମାନ ଅବଧି';
+
+  @override
+  String get dasha_startDate => 'ଆରମ୍ଭ ତାରିଖ';
+
+  @override
+  String get dasha_endDate => 'ଶେଷ ତାରିଖ';
+
+  @override
+  String get dasha_duration => 'ଅବଧି';
+
+  @override
+  String get dasha_years => 'ବର୍ଷ';
+
+  @override
+  String get dasha_months => 'ମାସ';
+
+  @override
+  String get dasha_days => 'ଦିନ';
+
+  @override
+  String get dasha_remaining => 'ବାକି';
+
+  @override
+  String get dasha_elapsed => 'ବିତିଗଲା';
+
+  @override
+  String get dasha_vimshottari => 'ବିଂଶୋତ୍ତରୀ ଦଶା';
+
+  @override
+  String get dasha_yogini => 'ଯୋଗିନୀ ଦଶା';
+
+  @override
+  String get dasha_chara => 'ଚର ଦଶା';
+
+  @override
+  String get dasha_tab_vimshottari => 'ବିଂଶୋତ୍ତରୀ';
+
+  @override
+  String get dasha_tab_phala => 'ଫଳ';
+
+  @override
+  String get dasha_tab_yogini => 'ଯୋଗିନୀ';
+
+  @override
+  String get dasha_tab_char => 'ଚର';
+
+  @override
+  String get dasha_now => 'NOW';
+
+  @override
+  String dasha_duration_years(Object days, Object months, Object years) {
+    return '$years y, $months m, $days d';
+  }
+
+  @override
+  String dasha_duration_months(Object days, Object months) {
+    return '$months m, $days d';
+  }
+
+  @override
+  String dasha_duration_days(Object days) {
+    return '$days days';
+  }
+
+  @override
+  String dasha_duration_days_hours(Object days, Object hours) {
+    return '$days d, $hours h';
+  }
+
+  @override
+  String dasha_duration_hours(Object hours) {
+    return '$hours hours';
+  }
+
+  @override
+  String dasha_duration_hours_minutes(Object hours, Object minutes) {
+    return '$hours h, $minutes m';
+  }
+
+  @override
+  String dasha_duration_minutes(Object minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get dasha_duration_lessThanMinute => '< 1 min';
+
+  @override
+  String get vimshottari_nav_current => 'ବର୍ତ୍ତମାନ';
+
+  @override
+  String get vimshottari_nav_birth => 'ଜନ୍ମ';
+
+  @override
+  String get vimshottari_nav_timeline => 'ସମୟରେଖା';
+
+  @override
+  String get vimshottari_activePeriods => 'ସକ୍ରିୟ ସମୟ';
+
+  @override
+  String get vimshottari_birthConfiguration => 'ଜନ୍ମ ସଂରଚନା';
+
+  @override
+  String get vimshottari_lifeTimeline => 'ଜୀବନ ସମୟରେଖା';
+
+  @override
+  String get vimshottari_infoFooter =>
+      'ବିମ୍ଶୋତ୍ତରୀ ଦଶା ଚନ୍ଦ୍ରର ନକ୍ଷତ୍ର ଉପରେ ଆଧାରିତ 120 ବର୍ଷର ଚକ୍ର। ଉପ-ସମୟ ଦେଖିବାକୁ ଯେକୌଣସି ସମୟରେ ଟ୍ୟାପ୍ କରନ୍ତୁ।';
+
+  @override
+  String get vimshottari_active => 'ସକ୍ରିୟ';
+
+  @override
+  String vimshottari_planetMahadasha(Object planet) {
+    return '$planet ମହାଦଶା';
+  }
+
+  @override
+  String get vimshottari_journeyProgress => 'ଯାତ୍ରା ଅଗ୍ରଗତି';
+
+  @override
+  String get vimshottari_remaining => 'ବାକି';
+
+  @override
+  String get vimshottari_duration => 'ଅବଧି';
+
+  @override
+  String get vimshottari_cycles => 'ଚକ୍ର';
+
+  @override
+  String vimshottari_yearsAbbr(Object years) {
+    return '$years ବର୍ଷ';
+  }
+
+  @override
+  String get vimshottari_started => 'ଆରମ୍ଭ';
+
+  @override
+  String get vimshottari_ends => 'ଶେଷ';
+
+  @override
+  String vimshottari_left(Object duration) {
+    return '$duration ବାକି';
+  }
+
+  @override
+  String get vimshottari_nakshatraLord => 'ନକ୍ଷତ୍ର ସ୍ୱାମୀ';
+
+  @override
+  String get vimshottari_balanceAtBirth => 'ଜନ୍ମରେ ବ୍ୟାଲେନ୍ସ';
+
+  @override
+  String get vimshottari_sookshma => 'ସୂକ୍ଷ୍ମ';
+
+  @override
+  String get vimshottari_prana => 'ପ୍ରାଣ';
+
+  @override
+  String vimshottari_levelPeriods(Object level) {
+    return '$level ସମୟ';
+  }
+
+  @override
+  String get vimshottari_loadingSubPeriods => 'ଉପ-ସମୟ ଲୋଡ୍ ହେଉଛି...';
+
+  @override
+  String get vimshottari_start => 'ଆରମ୍ଭ';
+
+  @override
+  String get vimshottari_end => 'ଶେଷ';
+
+  @override
+  String get vimshottari_desc_sun => 'ଅଧିକାର ଏବଂ ନେତୃତ୍ୱର ସମୟ';
+
+  @override
+  String get vimshottari_desc_moon => 'ଭାବନା ଏବଂ ଅନ୍ତର୍ଦୃଷ୍ଟିର ସମୟ';
+
+  @override
+  String get vimshottari_desc_mars => 'କ୍ରିୟା ଏବଂ ସାହସର ସମୟ';
+
+  @override
+  String get vimshottari_desc_mercury => 'ବୁଦ୍ଧି ଏବଂ ଶିକ୍ଷାର ସମୟ';
+
+  @override
+  String get vimshottari_desc_jupiter => 'ଜ୍ଞାନ ଏବଂ ଭାଗ୍ୟର ସମୟ';
+
+  @override
+  String get vimshottari_desc_venus => 'ପ୍ରେମ ଏବଂ ସମୃଦ୍ଧିର ସମୟ';
+
+  @override
+  String get vimshottari_desc_saturn => 'ଅନୁଶାସନ ଏବଂ କର୍ମର ସମୟ';
+
+  @override
+  String get vimshottari_desc_rahu => 'ସାଂସାରିକ ଇଚ୍ଛାର ସମୟ';
+
+  @override
+  String get vimshottari_desc_ketu => 'ଆଧ୍ୟାତ୍ମିକ ବିକାଶର ସମୟ';
+
+  @override
+  String get vimshottari_desc_default => 'ଗ୍ରହ ପ୍ରଭାବର ସମୟ';
+
+  @override
+  String get yogini_nav_current => 'ବର୍ତ୍ତମାନ';
+
+  @override
+  String get yogini_nav_yoginis => 'ଯୋଗିନୀ';
+
+  @override
+  String get yogini_nav_timeline => 'ସମୟରେଖା';
+
+  @override
+  String get yogini_activeYoginiPeriods => 'ସକ୍ରିୟ ଯୋଗିନୀ ସମୟ';
+
+  @override
+  String get yogini_divineYoginis => '8 ଦିବ୍ୟ ଯୋଗିନୀ';
+
+  @override
+  String get yogini_timeline => 'ଯୋଗିନୀ ସମୟରେଖା';
+
+  @override
+  String get yogini_infoFooter =>
+      'ଯୋଗିନୀ ଦଶା 8 ଦିବ୍ୟ ଯୋଗିନୀଙ୍କ ଉପରେ ଆଧାରିତ 36 ବର୍ଷର ଚକ୍ର ଯାହା ବ୍ରହ୍ମାଣ୍ଡୀୟ ମହିଳା ଶକ୍ତି ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String get yogini_unavailableTitle => 'ଯୋଗିନୀ ଦଶା ଉପಲବ୍ଧ ନୁହେଁ';
+
+  @override
+  String get yogini_unavailableMessage =>
+      'ଏହି ଚାର୍ଟ ପାଇଁ ଯୋଗିନୀ ଦଶା ଗଣନା କରିବାରେ ଅସମର୍ଥ।';
+
+  @override
+  String get yogini_active => 'ସକ୍ରିୟ';
+
+  @override
+  String yogini_dashaName(Object yogini) {
+    return '$yogini ଦଶା';
+  }
+
+  @override
+  String get yogini_journeyProgress => 'ଯାତ୍ରା ଅଗ୍ରଗତି';
+
+  @override
+  String get yogini_remaining => 'ବାକି';
+
+  @override
+  String get yogini_duration => 'ଅବଧି';
+
+  @override
+  String get yogini_cycles => 'ଚକ୍ର';
+
+  @override
+  String yogini_yearsAbbr(Object years) {
+    return '$years ବର୍ଷ';
+  }
+
+  @override
+  String yogini_left(Object duration) {
+    return '$duration ବାକି';
+  }
+
+  @override
+  String yogini_ruledBy(Object planet) {
+    return '$planet ଶାସିତ';
+  }
+
+  @override
+  String get yogini_start => 'ଆରମ୍ଭ';
+
+  @override
+  String get yogini_end => 'ଶେଷ';
+
+  @override
+  String yogini_subPeriods(Object count) {
+    return 'ଉପ-ସମୟ ($count)';
+  }
+
+  @override
+  String get yogini_noSubPeriods => 'କୌଣସି ଉପ-ସମୟ ଉପଲବ୍ଧ ନୁହେଁ';
+
+  @override
+  String get phala_nav_theme => 'ବିଷୟ';
+
+  @override
+  String get phala_nav_effects => 'ପ୍ରଭାବ';
+
+  @override
+  String get phala_nav_lifeAreas => 'ଜୀବନ କ୍ଷେତ୍ର';
+
+  @override
+  String get phala_nav_remedies => 'ଉପଚାର';
+
+  @override
+  String get phala_overallTheme => 'ସମଗ୍ର ବିଷୟ';
+
+  @override
+  String get phala_keyEffects => 'ମୁଖ୍ୟ ପ୍ରଭାବ';
+
+  @override
+  String get phala_lifeAreas => 'ଜୀବନ କ୍ଷେତ୍ର';
+
+  @override
+  String get phala_remediesRecommendations => 'ଉପଚାର ଏବଂ ସୁପାରିଶ';
+
+  @override
+  String get phala_infoFooter =>
+      'ମହାଦଶା ଫଳ ସାଧାରଣ ଭବିଷ୍ୟବାଣୀ ପ୍ରଦାନ କରେ। ବ୍ୟକ୍ତିଗତ ମାର୍ଗଦର୍ଶନ ପାଇଁ ଜ୍ୟୋତିଷୀଙ୍କ ସହ ପରାମର୍ଶ କରନ୍ତୁ।';
+
+  @override
+  String get phala_unavailableTitle => 'ବ୍ୟାଖ୍ୟା ଉପଲବ୍ଧ ନୁହେଁ';
+
+  @override
+  String get phala_unavailableMessage => 'ମହାଦଶା ବ୍ୟାଖ୍ୟା ଲୋଡ୍ କରିବାରେ ଅସମର୍ଥ।';
+
+  @override
+  String get phala_badge => 'ଫଳ';
+
+  @override
+  String phala_mahadashaName(Object planet) {
+    return '$planet ମହାଦଶା';
+  }
+
+  @override
+  String get phala_remaining => 'ବାକି';
+
+  @override
+  String get phala_day => 'ଦିନ';
+
+  @override
+  String get phala_color => 'ରଙ୍ଗ';
+
+  @override
+  String get phala_favorable => 'ଅନୁକୂଳ';
+
+  @override
+  String get phala_challenges => 'ଚ୍ୟାଲେଞ୍ଜ';
+
+  @override
+  String phala_antardashaName(Object antardasha) {
+    return '$antardasha ଅନ୍ତର୍ଦଶା';
+  }
+
+  @override
+  String phala_remaining_duration(Object duration) {
+    return '$duration ବାକି';
+  }
+
+  @override
+  String get phala_gemstone => 'ରତ୍ନ';
+
+  @override
+  String get phala_deity => 'ଦେବତା';
+
+  @override
+  String get phala_mantra => 'ମନ୍ତ୍ର';
+
+  @override
+  String get phala_suggestedPractices => 'ସୂଚିତ ଅଭ୍ୟାସ';
+
+  @override
+  String get phala_day_sunday => 'ରବିବାର';
+
+  @override
+  String get phala_day_monday => 'ସୋମବାର';
+
+  @override
+  String get phala_day_tuesday => 'ମଙ୍ଗଳବାର';
+
+  @override
+  String get phala_day_wednesday => 'ବୁଧବାର';
+
+  @override
+  String get phala_day_thursday => 'ଗୁରୁବାର';
+
+  @override
+  String get phala_day_friday => 'ଶୁକ୍ରବାର';
+
+  @override
+  String get phala_day_saturday => 'ଶନିବାର';
+
+  @override
+  String get phala_day_sun_short => 'ରବି';
+
+  @override
+  String get phala_day_mon_short => 'ସୋମ';
+
+  @override
+  String get phala_day_tue_short => 'ମଙ୍ଗଳ';
+
+  @override
+  String get phala_day_wed_short => 'ବୁଧ';
+
+  @override
+  String get phala_day_thu_short => 'ଗୁରୁ';
+
+  @override
+  String get phala_day_fri_short => 'ଶୁକ୍ର';
+
+  @override
+  String get phala_day_sat_short => 'ଶନି';
+
+  @override
+  String get dasha_insight_system => 'ଦଶା ପ୍ରଣାଳୀ';
+
+  @override
+  String get dasha_insight_whatThisMeans => 'ଏହାର ଅର୍ଥ';
+
+  @override
+  String get dasha_insight_significance => 'ମହତ୍ତ୍ୱ';
+
+  @override
+  String get dasha_insight_keyPoints => 'ମୁଖ୍ୟ ବିଷୟଗୁଡ଼ିକ';
+
+  @override
+  String get dasha_vimshottari_title => 'ବିଂଶୋତ୍ତରୀ';
+
+  @override
+  String get dasha_vimshottari_desc =>
+      'ବିଂଶୋତ୍ତରୀ ଦଶା ବୈଦିକ ଜ୍ୟୋତିଷରେ ସବୁଠୁ ବ୍ୟାପକ ଭାବେ ବ୍ୟବହୃତ ଗ୍ରହ କାଳ ପ୍ରଣାଳୀ। ଏହା ଜନ୍ମ ସମୟରେ ଚନ୍ଦ୍ରଙ୍କ ନକ୍ଷତ୍ର ସ୍ଥିତି ଉପରେ ଆଧାରିତ ୧୨୦ ବର୍ଷର ଚକ୍ର।';
+
+  @override
+  String get dasha_vimshottari_significance =>
+      'ଏହି ପ୍ରଣାଳୀ ଆପଣଙ୍କ ଜୀବନର ନିର୍ଦ୍ଦିଷ୍ଟ ସମୟରେ କେଉଁ ଗ୍ରହ ଶକ୍ତି ସକ୍ରିୟ ଅଛି ତାହା ଦେଖାଏ।';
+
+  @override
+  String get dasha_vimshottari_point1 => 'ଚନ୍ଦ୍ରଙ୍କ ଜନ୍ମ ନକ୍ଷତ୍ର ଉପରେ ଆଧାରିତ';
+
+  @override
+  String get dasha_vimshottari_point2 => '୧୨୦ ବର୍ଷର ସମ୍ପୂର୍ଣ୍ଣ ଚକ୍ର';
+
+  @override
+  String get dasha_vimshottari_point3 => '୯ ଗ୍ରହ କାଳ (ମହାଦଶା)';
+
+  @override
+  String get dasha_vimshottari_point4 => 'ପ୍ରତ୍ୟେକ କାଳରେ ଉପ-କାଳ (ଅନ୍ତର୍ଦଶା)';
+
+  @override
+  String get dasha_vimshottari_point5 => 'ସମୟ ଭବିଷ୍ୟବାଣୀ ପାଇଁ ସବୁଠୁ ସଠିକ୍';
+
+  @override
+  String get dasha_phala_title => 'ମହାଦଶା ଫଳ';
+
+  @override
+  String get dasha_phala_desc =>
+      'ମହାଦଶା ଫଳ ପ୍ରମୁଖ ଗ୍ରହ କାଳର ଫଳାଫଳ ଏବଂ ପ୍ରଭାବ ଉପରେ ଧ୍ୟାନ ଦିଏ। ଗ୍ରହ ସ୍ଥିତି ଆଧାରରେ ପ୍ରତ୍ୟେକ ମହାଦଶାର ବିସ୍ତୃତ ଭବିଷ୍ୟବାଣୀ ପ୍ରଦାନ କରେ।';
+
+  @override
+  String get dasha_phala_significance =>
+      'ଏହି ବିଶ୍ଳେଷଣ ବୁଝିବାରେ ସାହାଯ୍ୟ କରେ ଯେ ପ୍ରତ୍ୟେକ ମହାଦଶା ଗ୍ରହର ଭାବ ସ୍ଥିତି ଏବଂ ଦୃଷ୍ଟି ଆଧାରରେ କେଉଁ ନିର୍ଦ୍ଦିଷ୍ଟ ଫଳାଫଳ ଆଣିବ।';
+
+  @override
+  String get dasha_phala_point1 => 'କାଳ ଫଳାଫଳ ଉପରେ ଧ୍ୟାନ';
+
+  @override
+  String get dasha_phala_point2 => 'ଭାବ-ଆଧାରିତ ଭବିଷ୍ୟବାଣୀ';
+
+  @override
+  String get dasha_phala_point3 => 'ଗ୍ରହ ଦୃଷ୍ଟି ବିଚାର କରେ';
+
+  @override
+  String get dasha_phala_point4 => 'ଅନୁକୂଳ/ପ୍ରତିକୂଳ କାଳ ଦେଖାଏ';
+
+  @override
+  String get dasha_phala_point5 => 'ଜୀବନ ଯୋଜନାରେ ସହାୟକ';
+
+  @override
+  String get dasha_yogini_title => 'ଯୋଗିନୀ';
+
+  @override
+  String get dasha_yogini_desc =>
+      'ଯୋଗିନୀ ଦଶା ୮ ଯୋଗିନୀଙ୍କ (ଦୈବୀ ସ୍ତ୍ରୀ ଶକ୍ତି) ନାମରେ ଏକ ଅନନ୍ୟ ୩୬ ବର୍ଷର ଚକ୍ର। ଏହା ଘଟଣାର ସମୟ ପାଇଁ ବିଶେଷ ଭାବେ ଉପଯୋଗୀ।';
+
+  @override
+  String get dasha_yogini_significance =>
+      'ଏହି ଛୋଟ ଚକ୍ର ସଠିକ୍ ସମୟ ପାଇଁ ଉତ୍କୃଷ୍ଟ ଏବଂ ଏହାର ଫଳାଫଳ ତୁରନ୍ତ ଧ୍ୟାନଦେୟ ବୋଲି କୁହାଯାଏ।';
+
+  @override
+  String get dasha_yogini_point1 => '୩୬ ବର୍ଷର ସମ୍ପୂର୍ଣ୍ଣ ଚକ୍ର';
+
+  @override
+  String get dasha_yogini_point2 => '୮ ଯୋଗିନୀ କାଳ';
+
+  @override
+  String get dasha_yogini_point3 => 'ଦୈବୀ ସ୍ତ୍ରୀଙ୍କ ନାମରେ';
+
+  @override
+  String get dasha_yogini_point4 => 'ଘଟଣାର ସମୟ ପାଇଁ ଉତ୍କୃଷ୍ଟ';
+
+  @override
+  String get dasha_yogini_point5 => 'ବିଂଶୋତ୍ତରୀର ପରିପୂରକ';
+
+  @override
+  String get dasha_char_title => 'ଚର (ଜୈମିନୀ)';
+
+  @override
+  String get dasha_char_desc =>
+      'ଚର ଦଶା ଜୈମିନୀ ଜ୍ୟୋତିଷ ପ୍ରଣାଳୀରୁ। ଏହା ଗ୍ରହ ବଦଳରେ ରାଶି ବ୍ୟବହାର କରେ ଏବଂ କାରକାଂଶ (ଆତ୍ମାର ଇଚ୍ଛା) ଉପରେ ଆଧାରିତ।';
+
+  @override
+  String get dasha_char_significance =>
+      'ଏହି ରାଶି-ଆଧାରିତ ପ୍ରଣାଳୀ ଜୀବନ ସମୟ ଉପରେ ଏକ ଭିନ୍ନ ଦୃଷ୍ଟିକୋଣ ପ୍ରଦାନ କରେ ଏବଂ ଆତ୍ମା-ସ୍ତର ଇଚ୍ଛା ଏବଂ କର୍ମ ଧରଣ ବୁଝିବା ପାଇଁ ବିଶେଷ ଭାବେ ଉପଯୋଗୀ।';
+
+  @override
+  String get dasha_char_point1 => 'ଜୈମିନୀ ଜ୍ୟୋତିଷ ପ୍ରଣାଳୀ';
+
+  @override
+  String get dasha_char_point2 => 'ରାଶି-ଆଧାରିତ କାଳ';
+
+  @override
+  String get dasha_char_point3 => 'କାରକାଂଶ ଉପରେ ଆଧାରିତ';
+
+  @override
+  String get dasha_char_point4 => 'କର୍ମ ଧରଣ ଦେଖାଏ';
+
+  @override
+  String get dasha_char_point5 => 'ଗ୍ରହ ଦଶାର ପରିପୂରକ';
+
+  @override
+  String get yoga_rajaYoga => 'ରାଜଯୋଗ';
+
+  @override
+  String get yoga_dhanaYoga => 'ଧନଯୋଗ';
+
+  @override
+  String get yoga_gajaKesari => 'ଗଜକେସରୀ ଯୋଗ';
+
+  @override
+  String get yoga_budhAditya => 'ବୁଧ-ଆଦିତ୍ୟ ଯୋଗ';
+
+  @override
+  String get yoga_hamsa => 'ହଂସ ଯୋଗ';
+
+  @override
+  String get yoga_malavya => 'ମାଲବ୍ୟ ଯୋଗ';
+
+  @override
+  String get yoga_bhadra => 'ଭଦ୍ର ଯୋଗ';
+
+  @override
+  String get yoga_ruchaka => 'ରୁଚକ ଯୋଗ';
+
+  @override
+  String get yoga_shasha => 'ଶଶ ଯୋଗ';
+
+  @override
+  String get yogas_title => 'ଯୋଗ ଏବଂ ଦୋଷ';
+
+  @override
+  String get yogas_beneficial => 'ଶୁଭ ଯୋଗ';
+
+  @override
+  String get yogas_challenging => 'ଚ୍ୟାଲେଞ୍ଜିଙ୍ଗ ଦୋଷ';
+
+  @override
+  String get yogas_planets => 'ଗ୍ରହ';
+
+  @override
+  String get yogas_strength => 'ବଳ';
+
+  @override
+  String get yogas_excellent => 'ଉତ୍କୃଷ୍ଟ';
+
+  @override
+  String get yogas_veryFavorable => 'ଅତ୍ୟନ୍ତ ଶୁଭ';
+
+  @override
+  String get yogas_favorable => 'ଶୁଭ';
+
+  @override
+  String get yogas_mixed => 'ମିଶ୍ରିତ';
+
+  @override
+  String get yogas_challenging_label => 'ଚ୍ୟାଲେଞ୍ଜିଙ୍ଗ';
+
+  @override
+  String get yogas_whatThisMeans => 'ଏହାର ଅର୍ଥ';
+
+  @override
+  String get yogas_significance => 'ମହତ୍ତ୍ୱ';
+
+  @override
+  String get yogas_keyPoints => 'ମୁଖ୍ୟ ପଏଣ୍ଟ';
+
+  @override
+  String get yogas_overview => 'ଯୋଗ ଦୋଷ ସମୀକ୍ଷା';
+
+  @override
+  String get dosha_manglik => 'ମାଙ୍ଗଳିକ ଦୋଷ';
+
+  @override
+  String get dosha_kalaSarpa => 'କାଳ ସର୍ପ ଦୋଷ';
+
+  @override
+  String get dosha_pitruDosha => 'ପିତୃ ଦୋଷ';
+
+  @override
+  String get dosha_sadesati => 'ସାଢ଼େସାତି';
+
+  @override
+  String get dosha_dhaiya => 'ଶନି ଢୈଆ';
+
+  @override
+  String get strength_shadbala => 'ଷଡ୍ବଳ';
+
+  @override
+  String get strength_ashtakavarga => 'ଅଷ୍ଟକବର୍ଗ';
+
+  @override
+  String get strength_digbala => 'ଦିଗ୍ବଳ';
+
+  @override
+  String get strength_kalabala => 'କାଳବଳ';
+
+  @override
+  String get strength_chestabala => 'ଚେଷ୍ଟାବଳ';
+
+  @override
+  String get strength_naisargikabala => 'ନୈସର୍ଗିକବଳ';
+
+  @override
+  String get strength_drikbala => 'ଦୃକ୍ବଳ';
+
+  @override
+  String get strength_sthanabala => 'ସ୍ଥାନବଳ';
+
+  @override
+  String get strength_total => 'ମୋଟ';
+
+  @override
+  String get strength_strong => 'ବଳବାନ';
+
+  @override
+  String get strength_average => 'ସାଧାରଣ';
+
+  @override
+  String get strength_weak => 'ଦୁର୍ବଳ';
+
+  @override
+  String get strength_nav_overview => 'Overview';
+
+  @override
+  String get strength_nav_shadbala => 'Shadbala';
+
+  @override
+  String get strength_nav_vimshopaka => 'Vimshopaka';
+
+  @override
+  String get strength_nav_ashtaka => 'Ashtaka';
+
+  @override
+  String get strength_excellent => 'Excellent';
+
+  @override
+  String get strength_good => 'Good';
+
+  @override
+  String get strength_needsSupport => 'Needs Support';
+
+  @override
+  String get strength_medium => 'Medium';
+
+  @override
+  String get strength_chartStrength => 'Chart Strength';
+
+  @override
+  String get strength_chartStrength_desc =>
+      'Your overall chart strength is measured by averaging the Shadbala (six-fold strength) of all planets. This indicates how well the planets are positioned to deliver their results in your life.';
+
+  @override
+  String strength_chartStrength_significance(
+    int strongCount,
+    int weakCount,
+    int totalPlanets,
+    String result,
+  ) {
+    return 'With $strongCount strong planets and $weakCount weak planets out of $totalPlanets, your chart shows $result.';
+  }
+
+  @override
+  String get strength_goodOverallStrength => 'good overall planetary strength';
+
+  @override
+  String get strength_needsRemedies =>
+      'areas that may benefit from remedial measures';
+
+  @override
+  String strength_avgStrength(String value) {
+    return 'Average Strength: $value%';
+  }
+
+  @override
+  String strength_strongPlanets(int count) {
+    return 'Strong Planets: $count (≥100% of required)';
+  }
+
+  @override
+  String strength_weakPlanets(int count) {
+    return 'Weak Planets: $count (<100% of required)';
+  }
+
+  @override
+  String strength_strengthLevel(String level) {
+    return 'Strength Level: $level';
+  }
+
+  @override
+  String get strength_excellentResult =>
+      'Excellent! Most planets can deliver strong results';
+
+  @override
+  String get strength_goodResult => 'Good strength with minor areas to improve';
+
+  @override
+  String get strength_considerRemedies => 'Consider remedies for weak planets';
+
+  @override
+  String get strength_shadbala_title => 'Shadbala (षड्बल)';
+
+  @override
+  String get strength_shadbala_subtitle => 'Six-fold planetary strength';
+
+  @override
+  String get strength_shadbala_desc =>
+      'Shadbala (षड्बल) means \"six-fold strength\" - the comprehensive Vedic system to calculate planetary power. A planet needs 100% of its required strength to give good results.';
+
+  @override
+  String strength_shadbala_significance(
+    String planet,
+    int rank,
+    int total,
+    String bala,
+    String percentage,
+    String required,
+    String status,
+  ) {
+    return '$planet ranks #$rank out of $total planets with $bala Rupas ($percentage% of the $required required). $status';
+  }
+
+  @override
+  String get strength_shadbala_strongStatus =>
+      'This planet is strong and well-positioned to deliver positive results.';
+
+  @override
+  String get strength_shadbala_weakStatus =>
+      'This planet may need strengthening through remedies.';
+
+  @override
+  String strength_totalShadbala(String value) {
+    return 'Total Shadbala: $value Rupas';
+  }
+
+  @override
+  String strength_required(String value) {
+    return 'Required: $value Rupas';
+  }
+
+  @override
+  String strength_percentage(String value) {
+    return 'Percentage: $value%';
+  }
+
+  @override
+  String strength_rank(int rank, int total) {
+    return 'Rank: #$rank of $total planets';
+  }
+
+  @override
+  String get strength_statusStrong => 'Status: Strong ✓';
+
+  @override
+  String get strength_statusNeedsSupport => 'Status: Needs Support ⚠';
+
+  @override
+  String strength_sthanaBala(String value) {
+    return 'Sthana Bala: $value (Position)';
+  }
+
+  @override
+  String strength_digBala(String value) {
+    return 'Dig Bala: $value (Direction)';
+  }
+
+  @override
+  String strength_kalaBala(String value) {
+    return 'Kala Bala: $value (Time)';
+  }
+
+  @override
+  String strength_chestaBala(String value) {
+    return 'Chesta Bala: $value (Motion)';
+  }
+
+  @override
+  String strength_naisargikaBala(String value) {
+    return 'Naisargika Bala: $value (Natural)';
+  }
+
+  @override
+  String strength_drikBala(String value) {
+    return 'Drik Bala: $value (Aspect)';
+  }
+
+  @override
+  String get strength_vimshopaka_title => 'Vimshopaka Bala';
+
+  @override
+  String get strength_vimshopaka_subtitle =>
+      'Divisional chart strength (20-point scale)';
+
+  @override
+  String strength_vimshopaka_desc(String maxScore) {
+    return 'Vimshopaka Bala (20-point strength) evaluates planetary strength across 16 divisional charts (Shodasavarga). Each planet is scored out of $maxScore points based on its dignity (exalted, own sign, friendly, etc.) in each divisional chart.';
+  }
+
+  @override
+  String strength_vimshopaka_significance(
+    String planet,
+    String score,
+    String maxScore,
+    String percentage,
+    String strength,
+    String result,
+  ) {
+    return '$planet scores $score/$maxScore ($percentage%), classified as \"$strength\". $result';
+  }
+
+  @override
+  String get strength_vimshopaka_strongResult =>
+      'This planet has excellent dignity across divisional charts.';
+
+  @override
+  String get strength_vimshopaka_mediumResult =>
+      'This planet has moderate dignity.';
+
+  @override
+  String get strength_vimshopaka_weakResult =>
+      'This planet may need strengthening.';
+
+  @override
+  String strength_vimshopakaScore(String score, String max) {
+    return 'Vimshopaka Score: $score/$max';
+  }
+
+  @override
+  String strength_strengthCategory(String category) {
+    return 'Strength Category: $category';
+  }
+
+  @override
+  String get strength_strongRange => 'Strong: 75-100%';
+
+  @override
+  String get strength_mediumRange => 'Medium: 50-75%';
+
+  @override
+  String get strength_weakRange => 'Weak: 0-50%';
+
+  @override
+  String get strength_basedOnDivisional =>
+      'Based on dignity in 16 divisional charts';
+
+  @override
+  String get strength_vimshopakaSummary => 'Summary';
+
+  @override
+  String get strength_vimshopakaSummary_desc =>
+      'Vimshopaka Bala (20-point strength) evaluates how well planets are placed across all 16 divisional charts (Shodasavarga). Each planet receives dignity points based on its placement in each divisional chart.';
+
+  @override
+  String strength_vimshopakaSummary_significance(
+    int total,
+    int strong,
+    int medium,
+    int weak,
+  ) {
+    return 'Of $total planets: $strong are Strong (75-100%), $medium are Medium (50-75%), and $weak are Weak (<50%).';
+  }
+
+  @override
+  String strength_strongPlanetsCount(int count) {
+    return 'Strong Planets: $count (15-20 points)';
+  }
+
+  @override
+  String strength_mediumPlanetsCount(int count) {
+    return 'Medium Planets: $count (10-15 points)';
+  }
+
+  @override
+  String strength_weakPlanetsCount(int count) {
+    return 'Weak Planets: $count (0-10 points)';
+  }
+
+  @override
+  String get strength_basedOn16Charts =>
+      'Based on 16 divisional charts (D1 to D60)';
+
+  @override
+  String get strength_maxScorePlanet => 'Max score: 20 points per planet';
+
+  @override
+  String get strength_strongVimshopakaGoodDignity =>
+      'Strong Vimshopaka = Good dignity across all charts';
+
+  @override
+  String get strength_tapForExplanation => 'Tap for detailed explanation';
+
+  @override
+  String get strength_strengthFrom16Charts =>
+      'Strength from 16 divisional charts';
+
+  @override
+  String get strength_med => 'Med';
+
+  @override
+  String get strength_ashtakavarga_title => 'Ashtakavarga (अष्टकवर्ग)';
+
+  @override
+  String get strength_ashtakavarga_subtitle => 'Transit strength by sign';
+
+  @override
+  String get strength_ashtakavarga_transitSystem => 'Transit Strength System';
+
+  @override
+  String get strength_ashtakavarga_desc =>
+      'Ashtakavarga is a unique Vedic system to evaluate sign strength for transit predictions. Each of the 7 planets contributes 0-8 benefic points (bindus) to each sign. The Sarvashtakavarga (SAV) is the combined score of all planets for each sign.';
+
+  @override
+  String strength_ashtakavarga_significance(
+    String strongSign,
+    int strongPoints,
+    String weakSign,
+    int weakPoints,
+    int total,
+  ) {
+    return 'Your strongest sign for transits is $strongSign ($strongPoints points) and weakest is $weakSign ($weakPoints points). Total SAV across all signs is $total.';
+  }
+
+  @override
+  String strength_strongestSign(String sign, int points) {
+    return 'Strongest Sign: $sign ($points pts)';
+  }
+
+  @override
+  String strength_weakestSign(String sign, int points) {
+    return 'Weakest Sign: $sign ($points pts)';
+  }
+
+  @override
+  String strength_totalSav(int points) {
+    return 'Total SAV: $points points';
+  }
+
+  @override
+  String get strength_individualBav =>
+      'Individual BAV: 0-8 points per planet-sign';
+
+  @override
+  String get strength_savCombined => 'SAV: 0-56 points per sign (combined)';
+
+  @override
+  String get strength_goodBav => 'Good BAV: ≥4 points';
+
+  @override
+  String get strength_strongSav => 'Strong SAV: ≥28 points';
+
+  @override
+  String get strength_sarvashtakavarga => 'Sarvashtakavarga';
+
+  @override
+  String get strength_sav_desc =>
+      'Sarvashtakavarga (SAV) is the combined Ashtakavarga points of all 7 planets for each sign. It shows the overall strength of each sign for transits and results. Maximum possible is 56 points (8 points × 7 planets).';
+
+  @override
+  String strength_sav_signStrong(String sign, int points) {
+    return '$sign has $points SAV points. This sign is strong and transits through it generally give positive results.';
+  }
+
+  @override
+  String strength_sav_signWeak(String sign, int points) {
+    return '$sign has $points SAV points. Transits through this sign may need more attention.';
+  }
+
+  @override
+  String get strength_bav_desc =>
+      'Ashtakavarga shows benefic points (0-8) each planet contributes to each sign. Points ≥4 are auspicious. This helps predict transit effects - planets transiting signs with higher points give better results.';
+
+  @override
+  String strength_bav_signStrong(String sign, int points) {
+    return '$sign has $points bindus. Transits of this planet through $sign are generally favorable.';
+  }
+
+  @override
+  String strength_bav_signWeak(String sign, int points) {
+    return '$sign has $points bindus. Extra care needed during transits through this sign.';
+  }
+
+  @override
+  String strength_sign(String sign) {
+    return 'Sign: $sign';
+  }
+
+  @override
+  String strength_pointsSav(int points) {
+    return 'Points: $points/56';
+  }
+
+  @override
+  String strength_pointsBav(int points) {
+    return 'Points: $points/8';
+  }
+
+  @override
+  String get strength_typeSav => 'Type: Sarvashtakavarga (Combined)';
+
+  @override
+  String get strength_typeBav => 'Type: Bhinna Ashtakavarga (Individual)';
+
+  @override
+  String get strength_strongSavThreshold => 'Strong: ≥28 points';
+
+  @override
+  String get strength_auspiciousBavThreshold => 'Auspicious: ≥4 points';
+
+  @override
+  String get strength_usedForTransit => 'Used for transit predictions';
+
+  @override
+  String get strength_totalSarvashtakavarga => 'Total Sarvashtakavarga';
+
+  @override
+  String strength_totalSav_points(int points) {
+    return '$points Points';
+  }
+
+  @override
+  String get strength_totalSav_desc =>
+      'The Total SAV is the sum of all Sarvashtakavarga points across all 12 signs. Maximum possible is 337 points. A higher total indicates overall stronger chart for transits.';
+
+  @override
+  String strength_totalSav_excellent(int points) {
+    return 'Your total SAV of $points points is excellent, indicating a strong overall chart.';
+  }
+
+  @override
+  String strength_totalSav_good(int points) {
+    return 'Your total SAV of $points points is good, showing balanced strength.';
+  }
+
+  @override
+  String strength_totalSav_focus(int points) {
+    return 'Your total SAV of $points points suggests focusing on beneficial transit periods.';
+  }
+
+  @override
+  String get strength_maxPossible => 'Maximum possible: 337 points';
+
+  @override
+  String get strength_calculationSum =>
+      'Calculation: Sum of all 12 sign SAV values';
+
+  @override
+  String get strength_higherBetter =>
+      'Higher = Better overall transit strength';
+
+  @override
+  String get strength_lagnaLord => 'Lagna Lord';
+
+  @override
+  String get strength_lagnaLord_strength => 'Lagna Lord Strength';
+
+  @override
+  String get strength_lagnaLord_desc =>
+      'The Lagna Lord (Ascendant Lord) is the most important planet in your chart. It rules your Ascendant sign and represents your overall life path, personality, and vitality. Its strength directly impacts your ability to achieve success.';
+
+  @override
+  String strength_lagnaLord_significance(
+    String lagnaLord,
+    String ascendantSign,
+    String status,
+  ) {
+    return '$lagnaLord rules $ascendantSign (your Ascendant). $status';
+  }
+
+  @override
+  String get strength_lagnaLord_strong =>
+      'Your Lagna Lord is strong, indicating good vitality and ability to overcome obstacles.';
+
+  @override
+  String get strength_lagnaLord_weak =>
+      'Your Lagna Lord needs strengthening for better life results.';
+
+  @override
+  String strength_lagnaLord_label(String planet) {
+    return 'Lagna Lord: $planet';
+  }
+
+  @override
+  String strength_rules(String sign) {
+    return 'Rules: $sign Ascendant';
+  }
+
+  @override
+  String get strength_lagnaLordCondition =>
+      'The Lagna Lord\'s condition affects overall life success';
+
+  @override
+  String get strength_legend_sthana => 'Sthana';
+
+  @override
+  String get strength_legend_sthana_hint => 'Position';
+
+  @override
+  String get strength_legend_dig => 'Dig';
+
+  @override
+  String get strength_legend_dig_hint => 'Direction';
+
+  @override
+  String get strength_legend_kala => 'Kala';
+
+  @override
+  String get strength_legend_kala_hint => 'Time';
+
+  @override
+  String get strength_legend_chesta => 'Chesta';
+
+  @override
+  String get strength_legend_chesta_hint => 'Motion';
+
+  @override
+  String get strength_legend_naisarg => 'Naisarg';
+
+  @override
+  String get strength_legend_naisarg_hint => 'Natural';
+
+  @override
+  String get strength_legend_drik => 'Drik';
+
+  @override
+  String get strength_legend_drik_hint => 'Aspect';
+
+  @override
+  String strength_rupas(String value, String required) {
+    return '$value / $required Rupas';
+  }
+
+  @override
+  String get strength_strongest => 'Strongest';
+
+  @override
+  String get strength_weakest => 'Weakest';
+
+  @override
+  String get strength_pointsPerSign => 'Points 0-8 per sign';
+
+  @override
+  String get strength_goodThreshold => '≥4 Good';
+
+  @override
+  String get strength_savThreshold => 'SAV ≥28 Strong';
+
+  @override
+  String get strength_points => 'points';
+
+  @override
+  String get strength_pts => 'pts';
+
+  @override
+  String get strength_vimshopakaStrength => 'Vimshopaka Strength';
+
+  @override
+  String get strength_vimshopakaStrength_strong_desc =>
+      'Planets with 15-20 Vimshopaka points (75-100%). These planets have excellent dignity across divisional charts and give strong results.';
+
+  @override
+  String get strength_vimshopakaStrength_medium_desc =>
+      'Planets with 10-15 Vimshopaka points (50-75%). These planets have moderate dignity and give balanced results.';
+
+  @override
+  String get strength_vimshopakaStrength_weak_desc =>
+      'Planets with 0-10 Vimshopaka points (<50%). These planets may need strengthening through remedies.';
+
+  @override
+  String strength_vimshopakaStrength_significance(int count, String category) {
+    return 'You have $count $category planet(s) based on Vimshopaka Bala scoring.';
+  }
+
+  @override
+  String strength_countPlanets(int count) {
+    return 'Count: $count planets';
+  }
+
+  @override
+  String strength_category(String category) {
+    return 'Category: $category';
+  }
+
+  @override
+  String get strength_scoreRangeStrong => 'Score Range: 15-20 points (75-100%)';
+
+  @override
+  String get strength_scoreRangeMedium => 'Score Range: 10-15 points (50-75%)';
+
+  @override
+  String get strength_scoreRangeWeak => 'Score Range: 0-10 points (0-50%)';
+
+  @override
+  String strength_planetsPlanets(String label) {
+    return '$label Planets';
+  }
+
+  @override
+  String strength_haveCount(String value, String label) {
+    return 'You have $value $label planets in your chart.';
+  }
+
+  @override
+  String strength_countLabel(String value) {
+    return 'Count: $value planets';
+  }
+
+  @override
+  String strength_statusLabel(String label) {
+    return 'Status: $label';
+  }
+
+  @override
+  String get transit_current => 'ବର୍ତ୍ତମାନ ଗୋଚର';
+
+  @override
+  String get transit_effects => 'ଗୋଚର ପ୍ରଭାବ';
+
+  @override
+  String get transit_planetaryPositions => 'ଗ୍ରହ ସ୍ଥିତି';
+
+  @override
+  String get transit_aspects => 'ଦୃଷ୍ଟି';
+
+  @override
+  String get transit_prediction => 'ଭବିଷ୍ୟବାଣୀ';
+
+  @override
+  String get transit_favorable => 'ଅନୁକୂଳ';
+
+  @override
+  String get transit_unfavorable => 'ପ୍ରତିକୂଳ';
+
+  @override
+  String get transit_neutral => 'ନିରପେକ୍ଷ';
+
+  @override
+  String get panchang_tithi => 'ତିଥି';
+
+  @override
+  String get panchang_nakshatra => 'ନକ୍ଷତ୍ର';
+
+  @override
+  String get panchang_yoga => 'ଯୋଗ';
+
+  @override
+  String get panchang_karana => 'କରଣ';
+
+  @override
+  String get panchang_vara => 'ବାର';
+
+  @override
+  String get panchang_sunrise => 'ସୂର୍ଯ୍ୟୋଦୟ';
+
+  @override
+  String get panchang_sunset => 'ସୂର୍ଯ୍ୟାସ୍ତ';
+
+  @override
+  String get panchang_moonrise => 'ଚନ୍ଦ୍ରୋଦୟ';
+
+  @override
+  String get panchang_moonset => 'ଚନ୍ଦ୍ରାସ୍ତ';
+
+  @override
+  String get panchang_rahuKalam => 'ରାହୁ କାଳ';
+
+  @override
+  String get panchang_yamaGandam => 'ଯମଗଣ୍ଡମ';
+
+  @override
+  String get panchang_gulika => 'ଗୁଳିକା କାଳ';
+
+  @override
+  String get panchang_abhijit => 'ଅଭିଜିତ ମୁହୂର୍ତ୍ତ';
+
+  @override
+  String get panchang_auspicious => 'ଶୁଭ ସମୟ';
+
+  @override
+  String get panchang_inauspicious => 'ଅଶୁଭ ସମୟ';
+
+  @override
+  String get panchang_moonPhase => 'ଚନ୍ଦ୍ର କଳା';
+
+  @override
+  String get details_birthDetails => 'ଜନ୍ମ ବିବରଣୀ';
+
+  @override
+  String get details_birthDate => 'ଜନ୍ମ ତାରିଖ';
+
+  @override
+  String get details_birthTime => 'ଜନ୍ମ ସମୟ';
+
+  @override
+  String get details_birthPlace => 'ଜନ୍ମ ସ୍ଥାନ';
+
+  @override
+  String get details_latitude => 'ଅକ୍ଷାଂଶ';
+
+  @override
+  String get details_longitude => 'ଦ୍ରାଘିମାଂଶ';
+
+  @override
+  String get details_timezone => 'ସମୟ କ୍ଷେତ୍ର';
+
+  @override
+  String get details_ascendant => 'ଲଗ୍ନ';
+
+  @override
+  String get details_moonSign => 'ଚନ୍ଦ୍ର ରାଶି';
+
+  @override
+  String get details_sunSign => 'ସୂର୍ଯ୍ୟ ରାଶି';
+
+  @override
+  String get details_birthNakshatra => 'ଜନ୍ମ ନକ୍ଷତ୍ର';
+
+  @override
+  String details_pada(int number) {
+    return 'ପାଦ $number';
+  }
+
+  @override
+  String get details_varna => 'ବର୍ଣ୍ଣ';
+
+  @override
+  String get details_vashya => 'ବଶ୍ୟ';
+
+  @override
+  String get details_yoni => 'ଯୋନି';
+
+  @override
+  String get details_gan => 'ଗଣ';
+
+  @override
+  String get details_nadi => 'ନାଡ଼ୀ';
+
+  @override
+  String get alert_sadeSati => 'ଶନି ସାଢ଼େସାତି';
+
+  @override
+  String get alert_sadeSatiActive => 'ସାଢ଼େସାତି ସକ୍ରିୟ';
+
+  @override
+  String get alert_sadeSatiDescription =>
+      'ଶନି ଆପଣଙ୍କ ଚନ୍ଦ୍ର ରାଶିରେ ଗୋଚର କରୁଛି, ଏହା 7.5 ବର୍ଷର ଚ୍ୟାଲେଞ୍ଜିଙ୍ଗ ଅବଧି';
+
+  @override
+  String get alert_risingPhase => 'ଉଦୟ ପର୍ଯ୍ୟାୟ (ପ୍ରଥମ)';
+
+  @override
+  String get alert_peakPhase => 'ଶୀର୍ଷ ପର୍ଯ୍ୟାୟ';
+
+  @override
+  String get alert_settingPhase => 'ଅସ୍ତ ପର୍ଯ୍ୟାୟ (ତୃତୀୟ)';
+
+  @override
+  String get alert_shaniDhaiya => 'ଶନି ଢୈୟା';
+
+  @override
+  String alert_saturnIn(String house) {
+    return 'ଚନ୍ଦ୍ରଠାରୁ $houseରେ ଶନି';
+  }
+
+  @override
+  String alert_mahadasha(String planet) {
+    return '$planet ମହାଦଶା';
+  }
+
+  @override
+  String get alert_currentMajorPeriod => 'ବର୍ତ୍ତମାନ ମୁଖ୍ୟ ଦଶା';
+
+  @override
+  String get alert_manglikDosha => 'ମାଙ୍ଗଳିକ ଦୋଷ';
+
+  @override
+  String get alert_manglikDescription =>
+      'ମଙ୍ଗଳ ବିବାହକୁ ପ୍ରଭାବିତ କରୁଥିବା ଭାବରେ ଅଛି';
+
+  @override
+  String alert_marsInHouse(String house) {
+    return '$house ଭାବରେ ମଙ୍ଗଳ';
+  }
+
+  @override
+  String get alert_lunarSensitivity => 'ଚନ୍ଦ୍ର ସଂବେଦନଶୀଳତା';
+
+  @override
+  String alert_moonWith(String planet) {
+    return '$planet ସହ ଚନ୍ଦ୍ର';
+  }
+
+  @override
+  String alert_moonInHouse(String house) {
+    return '$house ଭାବରେ ଚନ୍ଦ୍ର';
+  }
+
+  @override
+  String get alert_beneficialYoga => 'ଶୁଭ ଯୋଗ';
+
+  @override
+  String get alert_kalaSarpa => 'କାଳ ସର୍ପ ଦୋଷ';
+
+  @override
+  String get alert_kalaSarpaDescription =>
+      'ସମସ୍ତ ଗ୍ରହ ରାହୁ ଏବଂ କେତୁ ମଧ୍ୟରେ ଅଛନ୍ତି';
+
+  @override
+  String get alert_currentDasha => 'ବର୍ତ୍ତମାନ ଦଶା ଅବଧି';
+
+  @override
+  String get alert_remedy => 'ଉପାୟ';
+
+  @override
+  String get alert_priority_high => 'ଉଚ୍ଚ ପ୍ରାଥମିକତା';
+
+  @override
+  String get alert_priority_medium => 'ମଧ୍ୟମ ପ୍ରାଥମିକତା';
+
+  @override
+  String get alert_priority_low => 'ନିମ୍ନ ପ୍ରାଥମିକତା';
+
+  @override
+  String alert_viewAll(int count) {
+    return 'ସମସ୍ତ $count ଦେଖନ୍ତୁ';
+  }
+
+  @override
+  String get details_nav_profile => 'ପ୍ରୋଫାଇଲ';
+
+  @override
+  String get details_nav_star => 'ନକ୍ଷତ୍ର';
+
+  @override
+  String get details_nav_panchang => 'ପଞ୍ଚାଙ୍ଗ';
+
+  @override
+  String get details_nav_dasha => 'ଦଶା';
+
+  @override
+  String get details_nav_guna => 'ଗୁଣ';
+
+  @override
+  String get details_nav_lucky => 'ଶୁଭ';
+
+  @override
+  String get details_nav_planets => 'ଗ୍ରହ';
+
+  @override
+  String get details_section_coreElements => 'ମୁଖ୍ୟ ଉପାଦାନ';
+
+  @override
+  String get details_section_birthStar => 'ଜନ୍ମ ନକ୍ଷତ୍ର';
+
+  @override
+  String get details_section_panchang => 'ପଞ୍ଚାଙ୍ଗ';
+
+  @override
+  String get details_section_currentPeriod => 'ବର୍ତ୍ତମାନ କାଳ';
+
+  @override
+  String get details_section_gunaFactors => 'ଗୁଣ କାରକ';
+
+  @override
+  String get details_section_favorableElements => 'ଶୁଭ ଉପାଦାନ';
+
+  @override
+  String get details_section_planetaryStatus => 'ଗ୍ରହ ସ୍ଥିତି';
+
+  @override
+  String get details_risingSign => 'ଲଗ୍ନ ରାଶି';
+
+  @override
+  String get details_element => 'ତତ୍ତ୍ୱ';
+
+  @override
+  String get details_lagnaLord => 'ଲଗ୍ନେଶ';
+
+  @override
+  String get details_nakshatraLord => 'ନକ୍ଷତ୍ର ସ୍ୱାମୀ';
+
+  @override
+  String get details_chartRuler => 'କୁଣ୍ଡଳୀ ସ୍ୱାମୀ';
+
+  @override
+  String get details_starLord => 'ତାରା ସ୍ୱାମୀ';
+
+  @override
+  String get details_lord => 'ସ୍ୱାମୀ';
+
+  @override
+  String get details_deity => 'ଦେବତା';
+
+  @override
+  String details_paksha(String name) {
+    return '$name ପକ୍ଷ';
+  }
+
+  @override
+  String get details_yoga => 'ଯୋଗ';
+
+  @override
+  String get details_karana => 'କରଣ';
+
+  @override
+  String get details_vara => 'ବାର';
+
+  @override
+  String get details_nakshatra => 'ନକ୍ଷତ୍ର';
+
+  @override
+  String get details_tithi => 'ତିଥି';
+
+  @override
+  String get details_varaDay => 'ବାର (ଦିନ)';
+
+  @override
+  String details_mahadasha(String planet) {
+    return '$planet ମହାଦଶା';
+  }
+
+  @override
+  String details_yearsRemaining(String years) {
+    return '$years ବର୍ଷ ବାକି';
+  }
+
+  @override
+  String get details_upcoming => 'ଆଗାମୀ';
+
+  @override
+  String get details_gunaInfo => 'ମିଳନ ପାଇଁ ଆପଣଙ୍କ ଅଷ୍ଟକୂଟ ଗୁଣ';
+
+  @override
+  String get details_primaryGemstone => 'ମୁଖ୍ୟ ରତ୍ନ';
+
+  @override
+  String details_wearOn(String day) {
+    return '$day ପିନ୍ଧନ୍ତୁ';
+  }
+
+  @override
+  String get details_numbers => 'ସଂଖ୍ୟା';
+
+  @override
+  String get details_day => 'ଦିନ';
+
+  @override
+  String get details_colors => 'ରଙ୍ଗ';
+
+  @override
+  String get details_metal => 'ଧାତୁ';
+
+  @override
+  String get details_exalted => 'ଉଚ୍ଚ';
+
+  @override
+  String get details_debilitated => 'ନୀଚ';
+
+  @override
+  String get details_retrograde => 'ବକ୍ରୀ';
+
+  @override
+  String get details_combust => 'ଅସ୍ତ';
+
+  @override
+  String get details_none => 'କିଛି ନାହିଁ';
+
+  @override
+  String get details_whatThisMeans => 'ଏହାର ଅର୍ଥ';
+
+  @override
+  String get details_significance => 'ମହତ୍ତ୍ୱ';
+
+  @override
+  String get details_keyPoints => 'ମୁଖ୍ୟ ବିଷୟ';
+
+  @override
+  String get details_moon => 'ଚନ୍ଦ୍ର';
+
+  @override
+  String get details_sun => 'ସୂର୍ଯ୍ୟ';
+
+  @override
+  String get details_vedicDisclaimer => 'ବୈଦିକ ଗ୍ରହ ସ୍ଥିତି ଉପରେ ଆଧାରିତ।';
+
+  @override
+  String get details_westernAstrology => 'ପାଶ୍ଚାତ୍ୟ ଜ୍ୟୋତିଷ:';
+
+  @override
+  String get details_dynamic => 'ଗତିଶୀଳ';
+
+  @override
+  String get details_grounded => 'ସ୍ଥିର';
+
+  @override
+  String get details_intellectual => 'ବୌଦ୍ଧିକ';
+
+  @override
+  String get details_intuitive => 'ଅନ୍ତର୍ଦୃଷ୍ଟିଶୀଳ';
+
+  @override
+  String get auth_welcome => 'ସ୍ୱାଗତ';
+
+  @override
+  String get auth_email => 'ଇମେଲ୍';
+
+  @override
+  String get auth_password => 'ପାସୱାର୍ଡ';
+
+  @override
+  String get auth_confirmPassword => 'ପାସୱାର୍ଡ ନିଶ୍ଚିତ କରନ୍ତୁ';
+
+  @override
+  String get auth_forgotPassword => 'ପାସୱାର୍ଡ ଭୁଲିଗଲେ?';
+
+  @override
+  String get auth_continueWithGoogle => 'Google ସହ ଜାରି ରଖନ୍ତୁ';
+
+  @override
+  String get auth_continueWithFacebook => 'Facebook ସହ ଜାରି ରଖନ୍ତୁ';
+
+  @override
+  String get auth_guestMode => 'ଅତିଥି ଭାବେ ଜାରି ରଖନ୍ତୁ';
+
+  @override
+  String get auth_loginRequired => 'ଲଗ୍ ଇନ୍ ଆବଶ୍ୟକ';
+
+  @override
+  String get auth_loginToSave => 'କୁଣ୍ଡଳୀ ସେଭ୍ କରିବାକୁ ଲଗ୍ ଇନ୍ କରନ୍ତୁ';
+
+  @override
+  String get home_dailyHoroscope => 'ଦୈନିକ ରାଶିଫଳ';
+
+  @override
+  String get home_generateKundli => 'କୁଣ୍ଡଳୀ ତିଆରି କରନ୍ତୁ';
+
+  @override
+  String get home_panchangToday => 'ଆଜିର ପଞ୍ଚାଙ୍ଗ';
+
+  @override
+  String get home_talkToAstrologer => 'ଜ୍ୟୋତିଷୀଙ୍କ ସହ କଥା ହୁଅନ୍ତୁ';
+
+  @override
+  String get home_kundliMatching => 'କୁଣ୍ଡଳୀ ମିଳନ';
+
+  @override
+  String get home_savedKundalis => 'ସେଭ୍ କରାଯାଇଥିବା କୁଣ୍ଡଳୀ';
+
+  @override
+  String get home_noKundalis => 'ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି କୁଣ୍ଡଳୀ ସେଭ୍ ହୋଇନାହିଁ';
+
+  @override
+  String get error_generic => 'କିଛି ଭୁଲ ହେଲା';
+
+  @override
+  String get error_network => 'ନେଟୱାର୍କ ତ୍ରୁଟି। ଆପଣଙ୍କ ସଂଯୋଗ ଯାଞ୍ଚ କରନ୍ତୁ';
+
+  @override
+  String get error_locationNotFound => 'ସ୍ଥାନ ମିଳିଲା ନାହିଁ';
+
+  @override
+  String get error_calculationFailed => 'କୁଣ୍ଡଳୀ ଗଣନା ବିଫଳ ହେଲା';
+
+  @override
+  String get error_tryAgain => 'ଦୟାକରି ପୁନଃଚେଷ୍ଟା କରନ୍ତୁ';
+
+  @override
+  String get houses_nav_overview => 'ସାରାଂଶ';
+
+  @override
+  String get houses_nav_kendra => 'କେନ୍ଦ୍ର';
+
+  @override
+  String get houses_nav_trikona => 'ତ୍ରିକୋଣ';
+
+  @override
+  String get houses_nav_dusthana => 'ଦୁଃସ୍ଥାନ';
+
+  @override
+  String get houses_nav_upachaya => 'ଉପଚୟ';
+
+  @override
+  String get houses_nav_maraka => 'ମାରକ';
+
+  @override
+  String get houses_bhavas => '12 ଭାବ';
+
+  @override
+  String houses_lagna(String ascendant) {
+    return '$ascendant ଲଗ୍ନ';
+  }
+
+  @override
+  String houses_startingFrom(String ascendant) {
+    return '$ascendant ଠାରୁ ଆରମ୍ଭ ଭାବ';
+  }
+
+  @override
+  String get houses_occupied => 'ପୂର୍ଣ୍ଣ';
+
+  @override
+  String get houses_empty => 'ଖାଲି';
+
+  @override
+  String get houses_planetsCount => 'ଗ୍ରହ';
+
+  @override
+  String get houses_kendra_title => 'କେନ୍ଦ୍ର ଭାବ';
+
+  @override
+  String get houses_kendra_subtitle => 'କୋଣୀୟ • 1, 4, 7, 10';
+
+  @override
+  String get houses_trikona_title => 'ତ୍ରିକୋଣ ଭାବ';
+
+  @override
+  String get houses_trikona_subtitle => 'ତ୍ରିଭୁଜାକାର • 5, 9';
+
+  @override
+  String get houses_dusthana_title => 'ଦୁଃସ୍ଥାନ ଭାବ';
+
+  @override
+  String get houses_dusthana_subtitle => 'ପାପ • 6, 8, 12';
+
+  @override
+  String get houses_upachaya_title => 'ଉପଚୟ ଭାବ';
+
+  @override
+  String get houses_upachaya_subtitle => 'ବୃଦ୍ଧି • 3, 11';
+
+  @override
+  String get houses_maraka_title => 'ମାରକ ଭାବ';
+
+  @override
+  String get houses_maraka_subtitle => 'ମୃତ୍ୟୁକାରକ • 2, 7';
+
+  @override
+  String houses_houseNumber(int number) {
+    return 'ଭାବ $number';
+  }
+
+  @override
+  String get houses_lagnaChip => 'ଲଗ୍ନ';
+
+  @override
+  String houses_houseBhava(String name, String sign) {
+    return '$name • $sign';
+  }
+
+  @override
+  String houses_inHouse(int placement) {
+    return 'ଭ$placement ରେ';
+  }
+
+  @override
+  String get houses_retrograde_abbr => 'ବ';
+
+  @override
+  String get houses_insight_whatThisMeans => 'ଏହାର ଅର୍ଥ';
+
+  @override
+  String get houses_insight_significance => 'ମହତ୍ତ୍ୱ';
+
+  @override
+  String get houses_insight_keyPoints => 'ମୁଖ୍ୟ ବିନ୍ଦୁ';
+
+  @override
+  String get houses_houseCategory => 'ଭାବ ଶ୍ରେଣୀ';
+
+  @override
+  String get houses_kendra_value => 'କେନ୍ଦ୍ର ଭାବ';
+
+  @override
+  String get houses_kendra_desc =>
+      'କେନ୍ଦ୍ର ଭାବ (1, 4, 7, 10) କୋଣୀୟ ବା ଚତୁର୍ଥାଂଶ ଭାବ।';
+
+  @override
+  String get houses_kendra_significance => 'କେନ୍ଦ୍ର ଭାବରେ ଗ୍ରହ ବଳ ପାଏ।';
+
+  @override
+  String get houses_kendra_point1 => '1ମ ଭାବ - ନିଜ, ବ୍ୟକ୍ତିତ୍ୱ, ଶରୀର';
+
+  @override
+  String get houses_kendra_point2 => '4ର୍ଥ ଭାବ - ଘର, ମାଆ, ଭାବନାତ୍ମକ ଶାନ୍ତି';
+
+  @override
+  String get houses_kendra_point3 => '7ମ ଭାବ - ବିବାହ, ଭାଗୀଦାରୀ';
+
+  @override
+  String get houses_kendra_point4 => '10ମ ଭାବ - କ୍ୟାରିୟର, ସ୍ଥିତି';
+
+  @override
+  String get houses_kendra_point5 => 'ବିଷ୍ଣୁ ସ୍ଥାନ ବୋଲି କୁହାଯାଏ';
+
+  @override
+  String get houses_trikona_value => 'ତ୍ରିକୋଣ ଭାବ';
+
+  @override
+  String get houses_trikona_desc =>
+      'ତ୍ରିକୋଣ ଭାବ (1, 5, 9) ଲଗ୍ନ ସହ ତ୍ରିଭୁଜ ଗଠନ କରେ।';
+
+  @override
+  String get houses_trikona_significance => 'ତ୍ରିକୋଣ ଭାବ ଅଧିପତି ଯୋଗକାରକ ହୁଏ।';
+
+  @override
+  String get houses_trikona_point1 => '1ମ ଭାବ - ନିଜ ଓ ବ୍ୟକ୍ତିତ୍ୱ';
+
+  @override
+  String get houses_trikona_point2 => '5ମ ଭାବ - ସୃଜନଶୀଳତା, ସନ୍ତାନ, ବୁଦ୍ଧି';
+
+  @override
+  String get houses_trikona_point3 => '9ମ ଭାବ - ଭାଗ୍ୟ, ଧର୍ମ, ଉଚ୍ଚ ଶିକ୍ଷା';
+
+  @override
+  String get houses_trikona_point4 => 'ଲକ୍ଷ୍ମୀ ସ୍ଥାନ ବୋଲି କୁହାଯାଏ';
+
+  @override
+  String get houses_trikona_point5 => 'ଶୁଭ ଗ୍ରହଙ୍କ ପାଇଁ ସର୍ବୋତ୍ତମ ଭାବ';
+
+  @override
+  String get houses_dusthana_value => 'ଦୁଃସ୍ଥାନ ଭାବ';
+
+  @override
+  String get houses_dusthana_desc =>
+      'ଦୁଃସ୍ଥାନ ଭାବ (6, 8, 12) ପାପ ବା ଚ୍ୟାଲେଞ୍ଜିଂ ଭାବ।';
+
+  @override
+  String get houses_dusthana_significance =>
+      'ଏହି ଭାବଗୁଡ଼ିକ ବୃଦ୍ଧି ପାଇଁ ଆବଶ୍ୟକ।';
+
+  @override
+  String get houses_dusthana_point1 => '6ଷ୍ଠ ଭାବ - ଶତ୍ରୁ, ରୋଗ, ଋଣ';
+
+  @override
+  String get houses_dusthana_point2 =>
+      '8ମ ଭାବ - ପରିବର୍ତ୍ତନ, ମୃତ୍ୟୁ, ଉତ୍ତରାଧିକାର';
+
+  @override
+  String get houses_dusthana_point3 => '12ଶ ଭାବ - କ୍ଷତି, ଖର୍ଚ୍ଚ, ମୋକ୍ଷ';
+
+  @override
+  String get houses_dusthana_point4 => 'ପାପ ଗ୍ରହ ଏଠି ଭଲ କରେ';
+
+  @override
+  String get houses_dusthana_point5 => 'ଏହି ଭାବ ଅଧିପତି କଷ୍ଟ ଦେଇପାରେ';
+
+  @override
+  String get houses_upachaya_value => 'ଉପଚୟ ଭାବ';
+
+  @override
+  String get houses_upachaya_desc => 'ଉପଚୟ ଭାବ (3, 6, 10, 11) ବୃଦ୍ଧି ଭାବ।';
+
+  @override
+  String get houses_upachaya_significance =>
+      'ଏହି ଭାବଗୁଡ଼ିକ ପ୍ରୟାସରେ ଉନ୍ନତି ଦେଖାଏ।';
+
+  @override
+  String get houses_upachaya_point1 => '3ୟ ଭାବ - ସାହସ, ଭାଇଭଉଣୀ, ଯୋଗାଯୋଗ';
+
+  @override
+  String get houses_upachaya_point2 => '6ଷ୍ଠ ଭାବ - ଶତ୍ରୁ, ସ୍ୱାସ୍ଥ୍ୟ ସମସ୍ୟା';
+
+  @override
+  String get houses_upachaya_point3 => '10ମ ଭାବ - କ୍ୟାରିୟର, ସ୍ଥିତି';
+
+  @override
+  String get houses_upachaya_point4 => '11ଶ ଭାବ - ଲାଭ, ବନ୍ଧୁ';
+
+  @override
+  String get houses_upachaya_point5 => 'ମଙ୍ଗଳ, ଶନି, ରାହୁ ଉପଚୟରେ ଉତ୍କୃଷ୍ଟ';
+
+  @override
+  String get houses_maraka_value => 'ମାରକ ଭାବ';
+
+  @override
+  String get houses_maraka_desc => 'ମାରକ ଭାବ (2, 7) ମୃତ୍ୟୁକାରକ ଭାବ।';
+
+  @override
+  String get houses_maraka_significance =>
+      '2ୟ ଓ 7ମ ଭାବ ଆୟୁଷ କାରକର ସମ୍ଭାବ୍ୟ ସମାପ୍ତିକାରୀ।';
+
+  @override
+  String get houses_maraka_point1 => '2ୟ ଭାବ - ପରିବାର, ଧନ, ଖାଦ୍ୟ';
+
+  @override
+  String get houses_maraka_point2 => '7ମ ଭାବ - ଜୀବନସାଥୀ, ଭାଗୀଦାରୀ';
+
+  @override
+  String get houses_maraka_point3 => 'ମାରକ ଗ୍ରହ ଅସୁସ୍ଥତା ଦେଇପାରେ';
+
+  @override
+  String get houses_maraka_point4 => '2ୟ 7ମ ଠାରୁ ଶକ୍ତିଶାଳୀ ମାରକ';
+
+  @override
+  String get houses_maraka_point5 => 'ପ୍ରଭାବ କୁଣ୍ଡଳୀ ବଳରେ ସଂଶୋଧିତ';
+
+  @override
+  String get houses_bhava_lagna => 'ଲଗ୍ନ';
+
+  @override
+  String get houses_bhava_dhana => 'ଧନ';
+
+  @override
+  String get houses_bhava_sahaja => 'ସହଜ';
+
+  @override
+  String get houses_bhava_sukha => 'ସୁଖ';
+
+  @override
+  String get houses_bhava_putra => 'ପୁତ୍ର';
+
+  @override
+  String get houses_bhava_ari => 'ଅରି';
+
+  @override
+  String get houses_bhava_yuvati => 'ଯୁବତୀ';
+
+  @override
+  String get houses_bhava_mrityu => 'ମୃତ୍ୟୁ';
+
+  @override
+  String get houses_bhava_dharma => 'ଧର୍ମ';
+
+  @override
+  String get houses_bhava_karma => 'କର୍ମ';
+
+  @override
+  String get houses_bhava_labha => 'ଲାଭ';
+
+  @override
+  String get houses_bhava_vyaya => 'ବ୍ୟୟ';
+
+  @override
+  String houses_sign_key(String sign, String symbol) {
+    return 'ରାଶି: $sign ($symbol)';
+  }
+
+  @override
+  String houses_lord_key(String lord) {
+    return 'ଅଧିପତି: $lord';
+  }
+
+  @override
+  String houses_cusp_key(String degree) {
+    return 'କସ୍ପ: $degree°';
+  }
+
+  @override
+  String houses_karaka_key(String karaka) {
+    return 'କାରକ: $karaka';
+  }
+
+  @override
+  String houses_significations_key(String significations) {
+    return 'କାରକତ୍ୱ: $significations';
+  }
+
+  @override
+  String houses_bhava_label(String name) {
+    return '$name ଭାବ';
+  }
+
+  @override
+  String houses_withSign(String sign, String lord) {
+    return '$sign ରାଶି ଓ $lord ଅଧିପତି ସହ, ଏହି ଭାବ ଆପଣଙ୍କ କୁଣ୍ଡଳୀରେ $sign ଶକ୍ତିର ଗୁଣ ଧାରଣ କରେ।';
+  }
+
+  @override
+  String get houses_1_desc =>
+      'ପ୍ରଥମ ଭାବ, ଲଗ୍ନ ବୋଲି ମଧ୍ୟ କୁହାଯାଏ, ଆପଣଙ୍କ ନିଜ, ଶରୀର ଓ ରୂପକୁ ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String get houses_2_desc =>
+      'ଦ୍ୱିତୀୟ ଭାବ ଧନ, ପାରିବାରିକ ମୂଲ୍ୟବୋଧ ଓ ବାକ୍ ନିୟନ୍ତ୍ରଣ କରେ।';
+
+  @override
+  String get houses_3_desc =>
+      'ତୃତୀୟ ଭାବ ଯୋଗାଯୋଗ, ଛୋଟ ଯାତ୍ରା ଓ ଭାଇଭଉଣୀ ନିୟନ୍ତ୍ରଣ କରେ।';
+
+  @override
+  String get houses_4_desc =>
+      'ଚତୁର୍ଥ ଭାବ ମାଆ, ଘର ଓ ଭାବନାତ୍ମକ ଭିତ୍ତିକୁ ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String get houses_5_desc =>
+      'ପଞ୍ଚମ ଭାବ ସୃଜନଶୀଳତା, ସନ୍ତାନ ଓ ପ୍ରେମ ନିୟନ୍ତ୍ରଣ କରେ।';
+
+  @override
+  String get houses_6_desc => 'ଷଷ୍ଠ ଭାବ ଶତ୍ରୁ, ରୋଗ ଓ ଋଣ ସହ ସମ୍ବନ୍ଧିତ।';
+
+  @override
+  String get houses_7_desc => 'ସପ୍ତମ ଭାବ ବିବାହ ଓ ଭାଗୀଦାରୀ ନିୟନ୍ତ୍ରଣ କରେ।';
+
+  @override
+  String get houses_8_desc =>
+      'ଅଷ୍ଟମ ଭାବ ପରିବର୍ତ୍ତନ, ଆୟୁଷ ଓ ଉତ୍ତରାଧିକାର ନିୟନ୍ତ୍ରଣ କରେ।';
+
+  @override
+  String get houses_9_desc =>
+      'ନବମ ଭାବ ଉଚ୍ଚ ଶିକ୍ଷା, ଆଧ୍ୟାତ୍ମିକତା ଓ ଭାଗ୍ୟକୁ ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String get houses_10_desc =>
+      'ଦଶମ ଭାବ କ୍ୟାରିୟର, ସ୍ଥିତି ଓ ଖ୍ୟାତି ନିୟନ୍ତ୍ରଣ କରେ।';
+
+  @override
+  String get houses_11_desc =>
+      'ଏକାଦଶ ଭାବ ଲାଭ, ବନ୍ଧୁତ୍ୱ ଓ ଆକାଂକ୍ଷା ନିୟନ୍ତ୍ରଣ କରେ।';
+
+  @override
+  String get houses_12_desc =>
+      'ଦ୍ୱାଦଶ ଭାବ କ୍ଷତି, ଆଧ୍ୟାତ୍ମିକତା ଓ ମୋକ୍ଷ ସହ ସମ୍ବନ୍ଧିତ।';
+
+  @override
+  String get panchang_nav_moon => 'Moon';
+
+  @override
+  String get panchang_nav_elements => 'Elements';
+
+  @override
+  String get panchang_nav_hora => 'Hora';
+
+  @override
+  String get panchang_nav_periods => 'Periods';
+
+  @override
+  String get panchang_nav_varshphal => 'Varshphal';
+
+  @override
+  String get panchang_fiveLimbs => 'Five Limbs of Time';
+
+  @override
+  String get panchang_elementsAtBirth => 'Panchang elements at birth';
+
+  @override
+  String get panchang_horaWeekday => 'Hora & Weekday';
+
+  @override
+  String get panchang_horaSubtitle => 'Planetary hour and day influences';
+
+  @override
+  String get panchang_inauspiciousPeriods => 'Inauspicious Periods';
+
+  @override
+  String panchang_onDay(String day) {
+    return 'On $day';
+  }
+
+  @override
+  String panchang_varshphalYear(int year) {
+    return 'Varshphal $year';
+  }
+
+  @override
+  String get panchang_solarReturnSubtitle => 'Solar Return / Annual Horoscope';
+
+  @override
+  String get panchang_insight_whatThisMeans => 'What This Means';
+
+  @override
+  String get panchang_insight_significance => 'Significance';
+
+  @override
+  String get panchang_insight_keyPoints => 'Key Points';
+
+  @override
+  String get panchang_tithi_title => 'Tithi';
+
+  @override
+  String get panchang_tithi_desc =>
+      'Tithi is the lunar day in the Hindu calendar, representing the angle between the Sun and Moon. Each Tithi has its own energy and is ruled by a specific planet.';
+
+  @override
+  String panchang_tithi_significance(
+    String tithi,
+    int tithiNumber,
+    String paksha,
+    String lord,
+  ) {
+    return 'Your birth Tithi is $tithi ($tithiNumber/15 in $paksha Paksha), ruled by $lord. This influences your emotional nature and the lunar energy you carry.';
+  }
+
+  @override
+  String panchang_tithi_point1(int number) {
+    return 'Tithi Number: $number of 15';
+  }
+
+  @override
+  String panchang_tithi_point2(String paksha, String type) {
+    return 'Paksha: $paksha ($type Moon)';
+  }
+
+  @override
+  String panchang_tithi_point3(String lord) {
+    return 'Tithi Lord: $lord';
+  }
+
+  @override
+  String get panchang_tithi_point4 =>
+      'Each Tithi spans approximately 12 degrees of Moon-Sun elongation';
+
+  @override
+  String get panchang_tithi_point5 =>
+      'Tithis are used for muhurta (auspicious timing)';
+
+  @override
+  String get panchang_waxing => 'Waxing';
+
+  @override
+  String get panchang_waning => 'Waning';
+
+  @override
+  String get panchang_nakshatra_title => 'Nakshatra';
+
+  @override
+  String panchang_nakshatra_value(String nakshatra, int pada) {
+    return '$nakshatra (Pada $pada)';
+  }
+
+  @override
+  String get panchang_nakshatra_desc =>
+      'Nakshatra is the lunar mansion or star constellation where the Moon was positioned at birth. There are 27 Nakshatras, each spanning 13°20\' of the zodiac. Each Nakshatra has 4 Padas (quarters) of 3°20\' each.';
+
+  @override
+  String panchang_nakshatra_significance(
+    String nakshatra,
+    int pada,
+    String lord,
+  ) {
+    return 'The Moon in $nakshatra Nakshatra, Pada $pada, shapes your inner emotional nature, instincts, and subconscious patterns. The Nakshatra lord $lord influences your Vimshottari Dasha sequence.';
+  }
+
+  @override
+  String panchang_nakshatra_point1(String nakshatra) {
+    return 'Nakshatra: $nakshatra';
+  }
+
+  @override
+  String panchang_nakshatra_point2(int pada) {
+    return 'Pada (Quarter): $pada of 4';
+  }
+
+  @override
+  String panchang_nakshatra_point3(String lord) {
+    return 'Nakshatra Lord: $lord';
+  }
+
+  @override
+  String get panchang_nakshatra_point4 =>
+      'Each Nakshatra has a presiding deity and specific qualities';
+
+  @override
+  String get panchang_nakshatra_point5 =>
+      'Determines the starting Mahadasha in Vimshottari Dasha system';
+
+  @override
+  String get panchang_yoga_title => 'Yoga';
+
+  @override
+  String panchang_yoga_value(String yoga, int number) {
+    return '$yoga ($number/27)';
+  }
+
+  @override
+  String get panchang_yoga_desc =>
+      'Yoga in Panchang is calculated from the combined longitude of the Sun and Moon. There are 27 Yogas, each spanning 13°20\'.';
+
+  @override
+  String panchang_yoga_significance(String yoga, String type) {
+    return 'Your birth Yoga is $yoga, which is considered $type. This cosmic combination of Sun and Moon energies influences your life path and the general fortune you carry.';
+  }
+
+  @override
+  String panchang_yoga_point1(String yoga) {
+    return 'Yoga: $yoga';
+  }
+
+  @override
+  String panchang_yoga_point2(int number) {
+    return 'Number: $number of 27';
+  }
+
+  @override
+  String panchang_yoga_point3(String type) {
+    return 'Type: $type';
+  }
+
+  @override
+  String get panchang_yoga_point4 =>
+      'Formula: (Sun longitude + Moon longitude) ÷ 13°20\'';
+
+  @override
+  String get panchang_yoga_point5 =>
+      'Affects overall auspiciousness of the birth moment';
+
+  @override
+  String get panchang_yoga_auspicious => 'Auspicious';
+
+  @override
+  String get panchang_yoga_inauspicious => 'Inauspicious';
+
+  @override
+  String get panchang_yoga_neutral => 'Neutral';
+
+  @override
+  String get panchang_karana_title => 'Karana';
+
+  @override
+  String get panchang_karana_desc =>
+      'Karana is half of a Tithi, with 11 Karanas repeating to make 60 half-Tithis in a lunar month. 7 are movable (Chara) and 4 are fixed (Sthira).';
+
+  @override
+  String panchang_karana_significance(String karana, String type) {
+    return 'Born in $karana Karana, which is $type. Karanas influence specific activities and the energy of the half-day period.';
+  }
+
+  @override
+  String panchang_karana_point1(String karana) {
+    return 'Karana: $karana';
+  }
+
+  @override
+  String panchang_karana_point2(String type) {
+    return 'Type: $type';
+  }
+
+  @override
+  String get panchang_karana_point3 =>
+      '7 Movable (Chara): Bava to Vishti, repeat 8 times';
+
+  @override
+  String get panchang_karana_point4 =>
+      '4 Fixed (Sthira): Shakuni, Chatushpada, Naga, Kimstughna';
+
+  @override
+  String get panchang_karana_point5 =>
+      'Vishti (Bhadra) is considered inauspicious';
+
+  @override
+  String get panchang_karana_chara => 'Chara (Movable)';
+
+  @override
+  String get panchang_karana_sthira => 'Sthira (Fixed)';
+
+  @override
+  String get panchang_karana_bhadra => 'Bhadra (Avoid)';
+
+  @override
+  String get panchang_vara_title => 'Vara (Weekday)';
+
+  @override
+  String get panchang_vara_desc =>
+      'Vara is the weekday, one of the five limbs of Panchang. Each day is ruled by a planet, influencing the energy and suitable activities for that day.';
+
+  @override
+  String panchang_vara_significance(String vara, String lord) {
+    return 'Born on $vara, ruled by $lord. This planetary influence colors your personality and the types of activities that come naturally to you.';
+  }
+
+  @override
+  String panchang_vara_point1(String vara) {
+    return 'Vara: $vara';
+  }
+
+  @override
+  String panchang_vara_point2(String lord) {
+    return 'Vara Lord: $lord';
+  }
+
+  @override
+  String panchang_vara_point3(String deity) {
+    return 'Presiding Deity: $deity';
+  }
+
+  @override
+  String get panchang_vara_point4 =>
+      'Each Vara has specific auspicious and inauspicious hours';
+
+  @override
+  String get panchang_vara_point5 =>
+      'Vara lord placement in chart strengthens its effects';
+
+  @override
+  String get panchang_moonPhase_title => 'Moon Phase';
+
+  @override
+  String get panchang_moonPhase_desc =>
+      'The Moon phase at birth indicates the relationship between the Sun and Moon, reflecting the interplay of consciousness (Sun) and mind (Moon).';
+
+  @override
+  String panchang_moonPhase_significance(
+    String paksha,
+    String illumination,
+    String nature,
+  ) {
+    return 'Born during $paksha Paksha with $illumination% illumination. This indicates a $nature.';
+  }
+
+  @override
+  String get panchang_moonPhase_nature_shukla =>
+      'more outgoing, action-oriented nature with growing vitality';
+
+  @override
+  String get panchang_moonPhase_nature_krishna =>
+      'more introspective, wisdom-seeking nature with releasing tendencies';
+
+  @override
+  String panchang_moonPhase_point1(String phase) {
+    return 'Phase: $phase';
+  }
+
+  @override
+  String panchang_moonPhase_point2(String paksha, String type) {
+    return 'Paksha: $paksha ($type)';
+  }
+
+  @override
+  String panchang_moonPhase_point3(String illumination) {
+    return 'Illumination: $illumination%';
+  }
+
+  @override
+  String panchang_moonPhase_point4(String tithi, int number) {
+    return 'Tithi: $tithi ($number/15)';
+  }
+
+  @override
+  String get panchang_moonPhase_point5 =>
+      'Moon phase affects emotional patterns and life cycles';
+
+  @override
+  String get panchang_phase_waxingCrescent => 'Waxing Crescent';
+
+  @override
+  String get panchang_phase_firstQuarter => 'First Quarter';
+
+  @override
+  String get panchang_phase_waxingGibbous => 'Waxing Gibbous';
+
+  @override
+  String get panchang_phase_nearlyFull => 'Nearly Full';
+
+  @override
+  String get panchang_phase_fullMoon => 'Full Moon (Purnima)';
+
+  @override
+  String get panchang_phase_waningGibbous => 'Waning Gibbous';
+
+  @override
+  String get panchang_phase_thirdQuarter => 'Third Quarter';
+
+  @override
+  String get panchang_phase_waningCrescent => 'Waning Crescent';
+
+  @override
+  String get panchang_phase_nearlyNew => 'Nearly New';
+
+  @override
+  String get panchang_phase_newMoon => 'New Moon (Amavasya)';
+
+  @override
+  String get panchang_hora_title => 'Hora';
+
+  @override
+  String panchang_hora_value(String planet) {
+    return '$planet Hora';
+  }
+
+  @override
+  String get panchang_hora_desc =>
+      'Hora divides each day into 24 planetary hours, with each hour ruled by a planet in a specific sequence. The Hora at birth indicates the planetary influence active at that moment.';
+
+  @override
+  String panchang_hora_significance(String planet) {
+    return 'Born during $planet Hora, you carry the energy of $planet in your personality and approach to life. Activities related to $planet come naturally to you.';
+  }
+
+  @override
+  String panchang_hora_point1(String planet) {
+    return 'Birth Hora: $planet';
+  }
+
+  @override
+  String panchang_hora_point2(String time) {
+    return 'Time: $time';
+  }
+
+  @override
+  String get panchang_hora_point3 =>
+      'Hora sequence follows: Sun→Venus→Mercury→Moon→Saturn→Jupiter→Mars';
+
+  @override
+  String get panchang_hora_point4 => 'Each hora lasts approximately 1 hour';
+
+  @override
+  String get panchang_hora_point5 =>
+      'Hora influences the energy available for activities';
+
+  @override
+  String get panchang_hora_desc_sun => 'ଅଧିକାର, ସରକାରୀ କାମ, ନେତୃତ୍ୱ';
+
+  @override
+  String get panchang_hora_desc_moon => 'ଯାତ୍ରା, ଭାବନା, ଜନସାଧାରଣ ବ୍ୟବହାର';
+
+  @override
+  String get panchang_hora_desc_mars => 'ସାହସ, ପ୍ରତିଯୋଗିତା, କ୍ରିୟା';
+
+  @override
+  String get panchang_hora_desc_mercury => 'ଯୋଗାଯୋଗ, ଶିକ୍ଷା, ବ୍ୟବସାୟ';
+
+  @override
+  String get panchang_hora_desc_jupiter => 'ଶିକ୍ଷା, ଆଧ୍ୟାତ୍ମିକତା, ବିସ୍ତାର';
+
+  @override
+  String get panchang_hora_desc_venus => 'କଳା, ସମ୍ପର୍କ, ଆନନ୍ଦ';
+
+  @override
+  String get panchang_hora_desc_saturn => 'କଠିନ ପରିଶ୍ରମ, ଅନୁଶାସନ, ଧୈର୍ଯ୍ୟ';
+
+  @override
+  String get panchang_birthHora => 'Birth Hora';
+
+  @override
+  String get panchang_inauspicious_title => 'Inauspicious Period';
+
+  @override
+  String get panchang_inauspicious_rahuKala_desc =>
+      'Rahu Kala is the most inauspicious period of the day, ruled by the shadow planet Rahu. Starting new ventures, important meetings, or auspicious activities should be avoided during this time.';
+
+  @override
+  String get panchang_inauspicious_yamaghanda_desc =>
+      'Yamaghanda, also called Yama Ghantaka, is ruled by Yama, the god of death. This period is considered inauspicious for starting journeys, especially in the direction governed by Yama that day.';
+
+  @override
+  String get panchang_inauspicious_gulika_desc =>
+      'Gulika Kala, ruled by Saturn\'s son Gulika (Mandi), is associated with poison and hidden dangers. While generally avoided for new beginnings, it\'s considered good for activities requiring secrecy.';
+
+  @override
+  String panchang_inauspicious_significance(String period, String time) {
+    return 'Birth during $period ($time) suggests specific karmic lessons related to this period\'s ruler. Understanding this helps in timing important life decisions.';
+  }
+
+  @override
+  String panchang_inauspicious_point1(String period) {
+    return 'Period: $period';
+  }
+
+  @override
+  String panchang_inauspicious_point2(String time) {
+    return 'Time: $time';
+  }
+
+  @override
+  String get panchang_inauspicious_point3 =>
+      'Duration: Approximately 1.5 hours';
+
+  @override
+  String get panchang_inauspicious_point4_rahu =>
+      'Most important inauspicious period';
+
+  @override
+  String get panchang_inauspicious_point4_yama =>
+      'Avoid travels and risky activities';
+
+  @override
+  String get panchang_inauspicious_point4_gulika =>
+      'Related to hidden matters and secrecy';
+
+  @override
+  String get panchang_inauspicious_point5 =>
+      'Each weekday has different timings for these periods';
+
+  @override
+  String panchang_birthDuring(String period) {
+    return 'Birth during $period';
+  }
+
+  @override
+  String get panchang_dayTimeline => 'Day Timeline (6 AM - 6 PM)';
+
+  @override
+  String get panchang_birth => 'Birth';
+
+  @override
+  String get panchang_varshphal_title => 'Varshphal';
+
+  @override
+  String panchang_varshphal_value(int year) {
+    return 'Solar Return $year';
+  }
+
+  @override
+  String get panchang_varshphal_desc =>
+      'Varshphal (Annual Horoscope) is the chart cast for the exact moment when the Sun returns to its birth position each year. It provides insights into the themes, opportunities, and challenges for that specific year of life.';
+
+  @override
+  String panchang_varshphal_significance(
+    int age,
+    String munthaSign,
+    String yearLord,
+  ) {
+    return 'At age $age, your Muntha (progressed Ascendant) is in $munthaSign, and the Year Lord is $yearLord. These factors shape the major themes of this year.';
+  }
+
+  @override
+  String panchang_varshphal_point1(int year) {
+    return 'Year: $year';
+  }
+
+  @override
+  String panchang_varshphal_point2(int age) {
+    return 'Age: $age years';
+  }
+
+  @override
+  String panchang_varshphal_point3(String date) {
+    return 'Solar Return: $date';
+  }
+
+  @override
+  String panchang_varshphal_point4(String sign) {
+    return 'Muntha Sign: $sign';
+  }
+
+  @override
+  String panchang_varshphal_point5(String lord) {
+    return 'Year Lord: $lord';
+  }
+
+  @override
+  String get panchang_years => 'years';
+
+  @override
+  String get panchang_muntha => 'Muntha';
+
+  @override
+  String get panchang_yearLord => 'Year Lord';
+
+  @override
+  String get panchang_moonSign => 'Moon Sign';
+
+  @override
+  String get panchang_degree => 'Degree';
+
+  @override
+  String get panchang_elongation => 'Elongation';
+
+  @override
+  String panchang_percentLit(String percent) {
+    return '$percent% lit';
+  }
+
+  @override
+  String panchang_paksha(String paksha) {
+    return '$paksha PAKSHA';
+  }
+
+  @override
+  String get panchang_lord => 'Lord';
+
+  @override
+  String panchang_pada(int pada) {
+    return 'Pada $pada';
+  }
+
+  @override
+  String get panchang_varaWeekday => 'Vara (Weekday)';
+
+  @override
+  String get planets_nav_overview => 'ଅବଲୋକନ';
+
+  @override
+  String get planets_overviewSubtitle => 'ଗ୍ରହ ସ୍ଥିତି ସାରାଂଶ';
+
+  @override
+  String get planets_grahaSthiti => 'ଗ୍ରହ ସ୍ଥିତି';
+
+  @override
+  String get planets_grahaSthitiDesc => 'ସୁଇସ୍ ଏଫେମେରିସ୍ ଦ୍ୱାରା ଗ୍ରହ ସ୍ଥାନ';
+
+  @override
+  String get planets_grahaSthitiInsight =>
+      'ଗ୍ରହ ସ୍ଥିତି ଆପଣଙ୍କ ଜନ୍ମ କୁଣ୍ଡଳୀରେ ସମସ୍ତ ନଅ ଗ୍ରହଙ୍କ (ନବଗ୍ରହ) ସ୍ଥାନ ଦେଖାଏ।';
+
+  @override
+  String planets_grahaSthitiSignificance(
+    int total,
+    int exalted,
+    int debilitated,
+    int retrograde,
+    int combust,
+  ) {
+    return 'ଆପଣଙ୍କ କୁଣ୍ଡଳୀରେ $total ଗ୍ରହ ବିଭିନ୍ନ ରାଶି ଓ ଭାବରେ ଅଛନ୍ତି। $exalted ଉଚ୍ଚ, $debilitated ନୀଚ, $retrograde ବକ୍ର, $combust ଅସ୍ତ।';
+  }
+
+  @override
+  String planets_totalPlanets(int count) {
+    return 'ମୋଟ ଗ୍ରହ: $count';
+  }
+
+  @override
+  String planets_exaltedCount(int count) {
+    return 'ଉଚ୍ଚ: $count (ସର୍ବାଧିକ ବଳ)';
+  }
+
+  @override
+  String planets_debilitatedCount(int count) {
+    return 'ନୀଚ: $count (ଉପଚାର ଆବଶ୍ୟକ)';
+  }
+
+  @override
+  String planets_retrogradeCount(int count) {
+    return 'ବକ୍ର: $count (ଆଭ୍ୟନ୍ତରୀଣ ପ୍ରଭାବ)';
+  }
+
+  @override
+  String planets_combustCount(int count) {
+    return 'ଅସ୍ତ: $count (ଲୁକ୍କାୟିତ ଶକ୍ତି)';
+  }
+
+  @override
+  String get planets_calculations => 'ଗଣନା: ସୁଇସ୍ ଏଫେମେରିସ୍ + ଲହିରି ଅୟନାଂଶ';
+
+  @override
+  String get planets_stat_exalt => 'ଉଚ୍ଚ';
+
+  @override
+  String get planets_stat_debil => 'ନୀଚ';
+
+  @override
+  String get planets_stat_retro => 'ବକ୍ର';
+
+  @override
+  String get planets_stat_comb => 'ଅସ୍ତ';
+
+  @override
+  String get planets_stat_exaltDesc =>
+      'ଉଚ୍ଚ ଗ୍ରହମାନେ ସବୁଠାରୁ ଶକ୍ତିଶାଳୀ ସ୍ଥାନରେ ଅଛନ୍ତି।';
+
+  @override
+  String get planets_stat_debilDesc =>
+      'ନୀଚ ଗ୍ରହମାନେ ସବୁଠାରୁ ଦୁର୍ବଳ ସ୍ଥାନରେ ଅଛନ୍ତି।';
+
+  @override
+  String get planets_stat_retroDesc => 'ବକ୍ର ଗ୍ରହମାନେ ପଛକୁ ଗତି କରନ୍ତି।';
+
+  @override
+  String get planets_stat_combDesc =>
+      'ଅସ୍ତ ଗ୍ରହମାନେ ସୂର୍ଯ୍ୟଙ୍କ ବହୁତ ନିକଟରେ ଅଛନ୍ତି।';
+
+  @override
+  String planets_statCount(int count, String label) {
+    return '$count $label';
+  }
+
+  @override
+  String planets_statInsight(int count) {
+    return 'ଆପଣଙ୍କ ଜନ୍ମ କୁଣ୍ଡଳୀରେ $count ଗ୍ରହ ଏହି ଅବସ୍ଥାରେ ଅଛନ୍ତି।';
+  }
+
+  @override
+  String get planets_dignities => 'ଗ୍ରହ ମର୍ଯ୍ୟାଦା';
+
+  @override
+  String get planets_tapForDetails => 'ବିବରଣୀ ପାଇଁ ଗ୍ରହ ଉପରେ ଟ୍ୟାପ୍ କରନ୍ତୁ';
+
+  @override
+  String get planets_dignityAffects =>
+      'ଗ୍ରହ ମର୍ଯ୍ୟାଦା ନିର୍ଦ୍ଧାରଣ କରେ ଯେ ଗ୍ରହ ଆପଣଙ୍କ କୁଣ୍ଡଳୀରେ କେତେ ଶକ୍ତିଶାଳୀ ଭାବରେ ଶକ୍ତି ପ୍ରକାଶ କରିପାରିବ।';
+
+  @override
+  String get planets_dignity_exaltDesc =>
+      'ସର୍ବାଧିକ ବଳ - ଗ୍ରହ ସର୍ବୋତ୍ତମ ଫଳାଫଳ ଦିଏ';
+
+  @override
+  String get planets_dignity_moolaDesc => 'ଉଚ୍ଚ ପରେ ଦ୍ୱିତୀୟ ଶକ୍ତିଶାଳୀ ସ୍ଥାନ';
+
+  @override
+  String get planets_dignity_ownDesc => 'ଗ୍ରହ ନିଜ ରାଶିରେ - ଆରାମଦାୟକ ଓ ସ୍ଥିର';
+
+  @override
+  String get planets_dignity_friendlyDesc => 'ଗ୍ରହ ମିତ୍ର ରାଶିରେ - ସହାୟକ ପରିବେଶ';
+
+  @override
+  String get planets_dignity_neutralDesc =>
+      'ଶକ୍ତିଶାଳୀ ନୁହେଁ ଦୁର୍ବଳ ନୁହେଁ - ସନ୍ତୁଳିତ ଫଳାଫଳ';
+
+  @override
+  String get planets_dignity_enemyDesc =>
+      'ଗ୍ରହ ଶତ୍ରୁ ରାଶିରେ - ଅତିରିକ୍ତ ପ୍ରୟାସ ଆବଶ୍ୟକ';
+
+  @override
+  String get planets_dignity_debilDesc =>
+      'ସବୁଠାରୁ ଦୁର୍ବଳ ସ୍ଥାନ - ଉପଚାରାତ୍ମକ ପଦକ୍ଷେପ ଆବଶ୍ୟକ';
+
+  @override
+  String get planets_moolatrikona => 'ମୂଳତ୍ରିକୋଣ';
+
+  @override
+  String get planets_moola => 'ମୂଳ';
+
+  @override
+  String get planets_own => 'ସ୍ୱ';
+
+  @override
+  String get planets_friend => 'ମିତ୍ର';
+
+  @override
+  String get planets_combustWarning =>
+      'ଅସ୍ତ · ସୂର୍ଯ୍ୟ ନିକଟତା ହେତୁ ଗ୍ରହ ବଳ ହ୍ରାସ';
+
+  @override
+  String get planets_insight_planet => 'ଗ୍ରହ';
+
+  @override
+  String planets_insight_signLabel(String sign, String symbol) {
+    return 'ରାଶି: $sign ($symbol)';
+  }
+
+  @override
+  String planets_insight_houseLabel(String house) {
+    return 'ଭାବ: $house';
+  }
+
+  @override
+  String planets_insight_degreeLabel(String degree) {
+    return 'ଡିଗ୍ରୀ: $degree°';
+  }
+
+  @override
+  String planets_insight_nakshatraLabel(String nakshatra, int pada) {
+    return 'ନକ୍ଷତ୍ର: $nakshatra (ପଦ $pada)';
+  }
+
+  @override
+  String planets_insight_nakshatraLordLabel(String lord) {
+    return 'ନକ୍ଷତ୍ର ସ୍ୱାମୀ: $lord';
+  }
+
+  @override
+  String planets_insight_dignityLabel(String dignity) {
+    return 'ମର୍ଯ୍ୟାଦା: $dignity';
+  }
+
+  @override
+  String get planets_insight_statusRetrograde => 'ଅବସ୍ଥା: ବକ୍ର';
+
+  @override
+  String get planets_insight_statusCombust => 'ଅବସ୍ଥା: ଅସ୍ତ';
+
+  @override
+  String planets_insight_natureLabel(String nature) {
+    return 'ସ୍ୱଭାବ: $nature';
+  }
+
+  @override
+  String get planets_insight_benefic => 'ଶୁଭ';
+
+  @override
+  String get planets_insight_malefic => 'ଅଶୁଭ';
+
+  @override
+  String get planets_insight_planetaryDignity => 'ଗ୍ରହ ମର୍ଯ୍ୟାଦା';
+
+  @override
+  String get planets_dignity_exaltedFull =>
+      'ଗ୍ରହ ଉଚ୍ଚ ଅବସ୍ଥାରେ ଅଛି, ଅର୍ଥାତ୍ ସବୁଠାରୁ ଶକ୍ତିଶାଳୀ ସ୍ଥାନରେ।';
+
+  @override
+  String get planets_dignity_debilitatedFull =>
+      'ଗ୍ରହ ନୀଚ ଅବସ୍ଥାରେ ଅଛି, ସବୁଠାରୁ ଦୁର୍ବଳ ସ୍ଥାନରେ।';
+
+  @override
+  String get planets_dignity_ownSignFull => 'ଗ୍ରହ ନିଜ ରାଶିରେ ଅଛି।';
+
+  @override
+  String get planets_dignity_moolatrikonaFull => 'ଗ୍ରହ ମୂଳତ୍ରିକୋଣ ରାଶିରେ ଅଛି।';
+
+  @override
+  String get planets_dignity_friendlyFull => 'ଗ୍ରହ ମିତ୍ର ରାଶିରେ ଅଛି।';
+
+  @override
+  String get planets_dignity_enemyFull => 'ଗ୍ରହ ଶତ୍ରୁ ରାଶିରେ ଅଛି।';
+
+  @override
+  String get planets_dignity_neutralFull => 'ଗ୍ରହ ନିରପେକ୍ଷ ରାଶିରେ ଅଛି।';
+
+  @override
+  String planets_dignitySignificance(
+    String planet,
+    String sign,
+    String dignity,
+  ) {
+    return '$planet $signରେ $dignity।';
+  }
+
+  @override
+  String get planets_strength_max => 'ବଳ: ସର୍ବାଧିକ (100%)';
+
+  @override
+  String get planets_strength_veryHigh => 'ବଳ: ଅତ୍ୟନ୍ତ ଉଚ୍ଚ (85%)';
+
+  @override
+  String get planets_strength_high => 'ବଳ: ଉଚ୍ଚ (75%)';
+
+  @override
+  String get planets_strength_good => 'ବଳ: ଭଲ (60%)';
+
+  @override
+  String get planets_strength_moderate => 'ବଳ: ମଧ୍ୟମ (50%)';
+
+  @override
+  String get planets_strength_reduced => 'ବଳ: କମ୍ (35%)';
+
+  @override
+  String get planets_strength_low => 'ବଳ: ନିମ୍ନ (25%)';
+
+  @override
+  String get planets_nakshatra_title => 'ନକ୍ଷତ୍ର';
+
+  @override
+  String planets_nakshatra_value(String nakshatra, int pada) {
+    return '$nakshatra (ପଦ $pada)';
+  }
+
+  @override
+  String planets_nakshatra_desc(
+    String nakshatra,
+    String symbol,
+    String nature,
+    String deity,
+  ) {
+    return '$nakshatra ବୈଦିକ ଜ୍ୟୋତିଷରେ 27 ଚନ୍ଦ୍ର ଭବନମାନଙ୍କ ମଧ୍ୟରୁ ଗୋଟିଏ।';
+  }
+
+  @override
+  String planets_nakshatra_significance(
+    String lord,
+    int pada,
+    String nakshatra,
+    String sign,
+  ) {
+    return 'ଏହି ନକ୍ଷତ୍ର $lord ଦ୍ୱାରା ଶାସିତ।';
+  }
+
+  @override
+  String planets_nakshatra_padaLabel(int pada) {
+    return 'ପଦ: $pada/4';
+  }
+
+  @override
+  String planets_nakshatra_lordLabel(String lord) {
+    return 'ସ୍ୱାମୀ: $lord';
+  }
+
+  @override
+  String planets_nakshatra_deityLabel(String deity) {
+    return 'ଦେବତା: $deity';
+  }
+
+  @override
+  String planets_nakshatra_symbolLabel(String symbol) {
+    return 'ପ୍ରତୀକ: $symbol';
+  }
+
+  @override
+  String planets_nakshatra_natureLabel(String nature) {
+    return 'ସ୍ୱଭାବ: $nature';
+  }
+
+  @override
+  String get planets_sun_desc =>
+      'ସୂର୍ଯ୍ୟ ଆପଣଙ୍କ ଆତ୍ମା, ଅହଂକାର ଓ ଜୀବନୀ ଶକ୍ତିକୁ ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String get planets_moon_desc =>
+      'ଚନ୍ଦ୍ର ଆପଣଙ୍କ ମନ ଓ ଭାବନାକୁ ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String get planets_mars_desc => 'ମଙ୍ଗଳ ସାହସ ଓ ଶକ୍ତିକୁ ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String get planets_mercury_desc => 'ବୁଧ ବୁଦ୍ଧି ଓ ଯୋଗାଯୋଗକୁ ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String get planets_jupiter_desc => 'ଗୁରୁ ଜ୍ଞାନ ଓ ସୌଭାଗ୍ୟକୁ ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String get planets_venus_desc =>
+      'ଶୁକ୍ର ପ୍ରେମ ଓ ସୌନ୍ଦର୍ଯ୍ୟକୁ ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String get planets_saturn_desc => 'ଶନି ଅନୁଶାସନ ଓ କର୍ମକୁ ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String get planets_rahu_desc =>
+      'ରାହୁ ଇଚ୍ଛା ଓ ମହତ୍ୱାକାଂକ୍ଷାକୁ ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String get planets_ketu_desc =>
+      'କେତୁ ଆଧ୍ୟାତ୍ମିକତା ଓ ବୈରାଗ୍ୟକୁ ପ୍ରତିନିଧିତ୍ୱ କରେ।';
+
+  @override
+  String planets_currently(String dignity, String sign) {
+    return 'ବର୍ତ୍ତମାନ $signରେ $dignity।';
+  }
+
+  @override
+  String get planets_combustInfo => 'ଏହି ଗ୍ରହ ଅସ୍ତ ଅବସ୍ଥାରେ ଅଛି।';
+
+  @override
+  String get planets_retroInfo => 'ବର୍ତ୍ତମାନ ବକ୍ର।';
+
+  @override
+  String planets_planetSignificance(
+    String planet,
+    String sign,
+    String degree,
+    int house,
+    String nakshatra,
+    int pada,
+    String lord,
+    String nature,
+  ) {
+    return '$planet $signରେ $degree° ଭାବ $houseରେ ଅଛି।';
+  }
+
+  @override
+  String get planets_planetaryStatus => 'ଗ୍ରହ ଅବସ୍ଥା';
+
+  @override
+  String planets_statusCount(int count) {
+    return 'ଗଣନା: $count ଗ୍ରହ';
+  }
+
+  @override
+  String planets_statusLabel(String status) {
+    return 'ଅବସ୍ଥା: $status';
+  }
+
+  @override
+  String get planets_defaultDesc =>
+      'This planet influences specific life areas.';
+
+  @override
+  String get planet_sun_desc =>
+      'The Sun represents your soul, ego, vitality, and life force. It shows your core identity, self-expression, and relationship with authority. A strong Sun gives confidence, leadership qualities, and recognition.';
+
+  @override
+  String get planet_moon_desc =>
+      'The Moon represents your mind, emotions, and subconscious patterns. It shows your emotional nature, mental peace, and connection with the mother. A strong Moon gives emotional stability and intuition.';
+
+  @override
+  String get planet_mars_desc =>
+      'Mars represents courage, energy, aggression, and action. It shows your drive, competitive spirit, and how you assert yourself. A strong Mars gives determination, physical strength, and the ability to overcome obstacles.';
+
+  @override
+  String get planet_mercury_desc =>
+      'Mercury represents intellect, communication, and analytical ability. It shows your thinking patterns, speech, and business acumen. A strong Mercury gives sharp wit, good communication skills, and adaptability.';
+
+  @override
+  String get planet_jupiter_desc =>
+      'Jupiter represents wisdom, knowledge, expansion, and good fortune. It shows your philosophical outlook, teaching ability, and spiritual growth. A strong Jupiter brings blessings, optimism, and prosperity.';
+
+  @override
+  String get planet_venus_desc =>
+      'Venus represents love, beauty, pleasures, and relationships. It shows your romantic nature, artistic talents, and appreciation for luxury. A strong Venus gives charm, creativity, and harmonious relationships.';
+
+  @override
+  String get planet_saturn_desc =>
+      'Saturn represents discipline, responsibility, karma, and life lessons. It shows your endurance, work ethic, and areas of restriction. A strong Saturn gives perseverance, maturity, and long-lasting achievements.';
+
+  @override
+  String get planet_rahu_desc =>
+      'Rahu represents desires, obsessions, and worldly ambitions. It shows your unconventional side, foreign connections, and areas of intense focus. Rahu amplifies whatever it touches and drives material pursuits.';
+
+  @override
+  String get planet_ketu_desc =>
+      'Ketu represents spirituality, detachment, and past life karma. It shows your intuitive abilities, liberation tendencies, and areas where you seek transcendence. Ketu brings wisdom through letting go.';
+
+  @override
+  String get transit_nav_overview => 'ଅବଲୋକନ';
+
+  @override
+  String get transit_nav_sky => 'ଆକାଶ';
+
+  @override
+  String get transit_nav_gochar => 'ଗୋଚର';
+
+  @override
+  String get transit_nav_effects => 'ପ୍ରଭାବ';
+
+  @override
+  String get transit_nav_sadesati => 'ସାଢ଼େ ସାତି';
+
+  @override
+  String get transit_currentSky_title => 'ବର୍ତ୍ତମାନ ଆକାଶ ସ୍ଥିତି';
+
+  @override
+  String get transit_currentSky_subtitle => 'ରିଅଲ-ଟାଇମ ଗ୍ରହ ସ୍ଥିତି';
+
+  @override
+  String get transit_gochar_title => 'ଗୋଚର (गोचर)';
+
+  @override
+  String transit_gochar_subtitle(Object moonSign) {
+    return '$moonSign (ଜନ୍ମ ରାଶି) ଠାରୁ ଗୋଚର';
+  }
+
+  @override
+  String get transit_effects_title => 'ଗୋଚର ପ୍ରଭାବ';
+
+  @override
+  String get transit_effects_subtitle => 'ଆପଣଙ୍କ କୁଣ୍ଡଳୀରେ ପ୍ରଭାବ ବିଶ୍ଳେଷଣ';
+
+  @override
+  String get transit_sadesati_title => 'ସାଢ଼େ ସାତି (साढ़े साती)';
+
+  @override
+  String get transit_sadesati_subtitle => 'ଶନିର 7.5 ବର୍ଷର ଚକ୍ର';
+
+  @override
+  String get transit_live => 'ଲାଇଭ';
+
+  @override
+  String get transit_overview => 'ଗୋଚର ଅବଲୋକନ';
+
+  @override
+  String get transit_balance_excellent => 'ଉତ୍କୃଷ୍ଟ';
+
+  @override
+  String get transit_balance_good => 'ଭଲ';
+
+  @override
+  String get transit_balance_mixed => 'ମିଶ୍ରିତ';
+
+  @override
+  String get transit_balance_tough => 'କଠିନ';
+
+  @override
+  String get transit_balance_difficult => 'କଷ୍ଟକର';
+
+  @override
+  String get transit_challenging => 'ଚ୍ୟାଲେଞ୍ଜିଂ';
+
+  @override
+  String get transit_planet_header => 'ଗ୍ରହ';
+
+  @override
+  String get transit_current_header => 'ବର୍ତ୍ତମାନ';
+
+  @override
+  String get transit_natal_header => 'ଜନ୍ମ';
+
+  @override
+  String get transit_major => 'ପ୍ରମୁଖ';
+
+  @override
+  String get transit_good => 'ଭଲ';
+
+  @override
+  String get transit_alert => 'ସତର୍କ';
+
+  @override
+  String transit_housesFrom(Object moonSign) {
+    return '$moonSign ଠାରୁ ଭାବ';
+  }
+
+  @override
+  String get transit_moon_label => 'ଚନ୍ଦ୍ର';
+
+  @override
+  String get transit_sadesati_active => 'ସାଢ଼େ ସାତି ସକ୍ରିୟ';
+
+  @override
+  String get transit_sadesati_notActive => 'ସାଢ଼େ ସାତି ସକ୍ରିୟ ନୁହେଁ';
+
+  @override
+  String get transit_sadesati_clearPeriod => 'ସ୍ପଷ୍ଟ ସମୟ';
+
+  @override
+  String get transit_sadesati_notAffecting =>
+      'ଶନିର 7.5 ବର୍ଷର ଚକ୍ର ଆପଣଙ୍କୁ ପ୍ରଭାବିତ କରୁନାହିଁ';
+
+  @override
+  String get transit_sadesati_learnMore => 'ଅଧିକ ଜାଣନ୍ତୁ';
+
+  @override
+  String get transit_saturn => 'ଶନି';
+
+  @override
+  String get transit_phase_rising => 'ଉଦୟ ପର୍ଯ୍ୟାୟ';
+
+  @override
+  String get transit_phase_peak => 'ଶିଖର ପର୍ଯ୍ୟାୟ';
+
+  @override
+  String get transit_phase_setting => 'ଅସ୍ତ ପର୍ଯ୍ୟାୟ';
+
+  @override
+  String get transit_phase_active => 'ସକ୍ରିୟ';
+
+  @override
+  String get transit_phase_rising_subtitle =>
+      'ଚନ୍ଦ୍ରରୁ 12ତମ · ଖର୍ଚ୍ଚ ଓ ମାନସିକ ଚାପ';
+
+  @override
+  String get transit_phase_peak_subtitle => 'ଚନ୍ଦ୍ର ଉପରେ · ସର୍ବାଧିକ ତୀବ୍ର ସମୟ';
+
+  @override
+  String get transit_phase_setting_subtitle => 'ଚନ୍ଦ୍ରରୁ 2ୟ · ପରିବାର ଓ ଅର୍ଥ';
+
+  @override
+  String get transit_janmaRashi => '(ଜନ୍ମ ରାଶି)';
+
+  @override
+  String get transit_12th => '12ତମ';
+
+  @override
+  String get transit_1st => '1ମ';
+
+  @override
+  String get transit_2nd => '2ୟ';
+
+  @override
+  String get transit_on => 'ଉପରେ';
+
+  @override
+  String get transit_insight_overview_title => 'Transit Overview';
+
+  @override
+  String get transit_insight_overview_desc =>
+      'Planetary transits (Gochar) are the current positions of planets in the sky relative to your birth chart. They trigger events and influence your life based on their relationship with your natal planets, especially the Moon sign (Janma Rashi).';
+
+  @override
+  String transit_insight_overview_significance(
+    Object challenging,
+    Object favorable,
+    Object moonSign,
+  ) {
+    return 'Currently, $favorable planets are in favorable positions and $challenging are challenging. Your Janma Rashi is $moonSign, which is the reference point for all transit calculations in Vedic astrology.';
+  }
+
+  @override
+  String transit_insight_overview_keypoint1(Object count) {
+    return 'Favorable Transits: $count planets';
+  }
+
+  @override
+  String transit_insight_overview_keypoint2(Object count) {
+    return 'Challenging Transits: $count planets';
+  }
+
+  @override
+  String transit_insight_overview_keypoint3(Object status) {
+    return 'Overall Balance: $status';
+  }
+
+  @override
+  String transit_insight_overview_keypoint4(Object moonSign) {
+    return 'Janma Rashi (Moon Sign): $moonSign';
+  }
+
+  @override
+  String get transit_insight_overview_keypoint5 =>
+      'Favorable houses from Moon: 3, 6, 10, 11';
+
+  @override
+  String get transit_insight_overview_keypoint6 =>
+      'Transits are temporary influences that trigger natal potential';
+
+  @override
+  String get transit_insight_gochar_title => 'Gochar (गोचर)';
+
+  @override
+  String get transit_insight_gochar_value => 'Transit System';
+
+  @override
+  String get transit_insight_gochar_desc =>
+      'Gochar is the Vedic system of planetary transits calculated from the Moon sign. Unlike Western astrology which uses the Sun sign, Vedic astrology emphasizes the Moon as the seat of the mind and emotions, making it the primary reference for transit predictions.';
+
+  @override
+  String transit_insight_gochar_significance(Object moonSign) {
+    return 'Your transits are calculated from $moonSign, your Janma Rashi. Planets transiting the 3rd, 6th, 10th, and 11th houses from Moon are generally favorable, while the 1st, 2nd, 4th, 5th, 7th, 8th, 9th, and 12th require careful attention.';
+  }
+
+  @override
+  String transit_insight_gochar_keypoint1(Object moonSign) {
+    return 'Reference Point: $moonSign (Janma Rashi)';
+  }
+
+  @override
+  String get transit_insight_gochar_keypoint2 =>
+      'Favorable Houses: 3, 6, 10, 11';
+
+  @override
+  String get transit_insight_gochar_keypoint3 =>
+      'Challenging Houses: 1, 4, 5, 7, 8, 12';
+
+  @override
+  String get transit_insight_gochar_keypoint4 => 'Neutral Houses: 2, 9';
+
+  @override
+  String get transit_insight_gochar_keypoint5 =>
+      'Each planet has specific favorable/unfavorable houses';
+
+  @override
+  String get transit_insight_gochar_keypoint6 =>
+      'Slow planets (Saturn, Jupiter, Rahu/Ketu) have longer effects';
+
+  @override
+  String get transit_insight_planet_title => 'Transit';
+
+  @override
+  String transit_insight_planet_value(Object house, Object planet) {
+    return '$planet in House $house';
+  }
+
+  @override
+  String transit_insight_planet_desc_favorable(
+    Object degree,
+    Object house,
+    Object planet,
+    Object sign,
+  ) {
+    return '$planet is currently transiting $sign at $degree°, which is the $house house from your Moon sign. This is a favorable position.';
+  }
+
+  @override
+  String transit_insight_planet_desc_challenging(
+    Object degree,
+    Object house,
+    Object planet,
+    Object sign,
+  ) {
+    return '$planet is currently transiting $sign at $degree°, which is the $house house from your Moon sign. This position requires attention.';
+  }
+
+  @override
+  String transit_insight_planet_significance_favorable(
+    Object house,
+    Object planet,
+  ) {
+    return '$planet in the $house house supports growth and positive developments.';
+  }
+
+  @override
+  String transit_insight_planet_significance_challenging(
+    Object house,
+    Object planet,
+  ) {
+    return '$planet in the $house house may bring challenges that require patience and careful handling.';
+  }
+
+  @override
+  String transit_insight_planet_keypoint1(Object planet) {
+    return 'Planet: $planet';
+  }
+
+  @override
+  String transit_insight_planet_keypoint2(Object sign) {
+    return 'Current Sign: $sign';
+  }
+
+  @override
+  String transit_insight_planet_keypoint3(Object degree) {
+    return 'Degree: $degree°';
+  }
+
+  @override
+  String transit_insight_planet_keypoint4(Object house) {
+    return 'House from Moon: $house';
+  }
+
+  @override
+  String get transit_insight_planet_keypoint5_favorable =>
+      'Status: Favorable ✓';
+
+  @override
+  String get transit_insight_planet_keypoint5_challenging =>
+      'Status: Challenging ⚠';
+
+  @override
+  String transit_insight_planet_keypoint6(Object aspect) {
+    return 'Aspect to Natal: $aspect';
+  }
+
+  @override
+  String transit_insight_planet_keypoint7(Object duration, Object planet) {
+    return 'Major Transit: $planet moves slowly, effects last $duration per sign';
+  }
+
+  @override
+  String get transit_insight_house_title => 'Gochar House';
+
+  @override
+  String transit_insight_house_value(Object house) {
+    return 'House $house';
+  }
+
+  @override
+  String transit_insight_house_value_moon(Object house) {
+    return 'House $house (Moon)';
+  }
+
+  @override
+  String transit_insight_house_desc_moonHouse(
+    Object house,
+    Object significations,
+  ) {
+    return 'House $house represents $significations. This is your Janma Rashi house where the Moon was at birth.';
+  }
+
+  @override
+  String transit_insight_house_desc_favorable(
+    Object house,
+    Object significations,
+  ) {
+    return 'House $house represents $significations. This is generally a favorable house for transits.';
+  }
+
+  @override
+  String transit_insight_house_desc_challenging(
+    Object house,
+    Object significations,
+  ) {
+    return 'House $house represents $significations. Transits through this house require attention.';
+  }
+
+  @override
+  String get transit_insight_house_significance_empty =>
+      'No planets are currently transiting this house.';
+
+  @override
+  String transit_insight_house_significance_planets(
+    Object action,
+    Object area,
+    Object planets,
+    Object verb,
+  ) {
+    return 'Currently $planets $verb transiting this house, $action matters related to $area.';
+  }
+
+  @override
+  String transit_insight_house_keypoint1(Object house) {
+    return 'House Number: $house';
+  }
+
+  @override
+  String transit_insight_house_keypoint2(Object significations) {
+    return 'Significations: $significations';
+  }
+
+  @override
+  String get transit_insight_house_keypoint3 =>
+      'Type: Janma Rashi (Moon Sign House)';
+
+  @override
+  String get transit_insight_house_keypoint4_favorable =>
+      'Transit Quality: Favorable ★';
+
+  @override
+  String get transit_insight_house_keypoint4_challenging =>
+      'Transit Quality: Requires Attention';
+
+  @override
+  String transit_insight_house_keypoint5(Object planets) {
+    return 'Current Planets: $planets';
+  }
+
+  @override
+  String get transit_insight_sadesati_title => 'Sade Sati (साढ़े साती)';
+
+  @override
+  String transit_insight_sadesati_value_active(Object phase) {
+    return '$phase';
+  }
+
+  @override
+  String get transit_insight_sadesati_value_inactive => 'Not Active';
+
+  @override
+  String get transit_insight_sadesati_desc =>
+      'Sade Sati is Saturn\'s 7.5-year transit cycle over three signs: the 12th, 1st, and 2nd from your Moon sign. Each sign takes approximately 2.5 years. This period is often associated with challenges, delays, and karmic lessons, but also brings maturity and spiritual growth.';
+
+  @override
+  String transit_insight_sadesati_significance_active(
+    Object degree,
+    Object description,
+    Object sign,
+  ) {
+    return '$description Saturn is transiting $sign at $degree°.';
+  }
+
+  @override
+  String transit_insight_sadesati_significance_inactive(Object moonSign) {
+    return 'Saturn is not currently transiting the 12th, 1st, or 2nd house from your Moon sign ($moonSign). Sade Sati is not active.';
+  }
+
+  @override
+  String get transit_insight_sadesati_keypoint1 =>
+      'Duration: 7.5 years total (~2.5 years per phase)';
+
+  @override
+  String get transit_insight_sadesati_keypoint2 =>
+      'Phase 1 (Rising): Saturn in 12th from Moon - expenses, travel, mental stress';
+
+  @override
+  String get transit_insight_sadesati_keypoint3 =>
+      'Phase 2 (Peak): Saturn over Moon - most intense, health/emotional challenges';
+
+  @override
+  String get transit_insight_sadesati_keypoint4 =>
+      'Phase 3 (Setting): Saturn in 2nd from Moon - family, finances, speech';
+
+  @override
+  String transit_insight_sadesati_keypoint5(Object phase) {
+    return 'Current Phase: $phase';
+  }
+
+  @override
+  String transit_insight_sadesati_keypoint6(Object sign) {
+    return 'Saturn in: $sign';
+  }
+
+  @override
+  String get transit_insight_sadesati_keypoint7 =>
+      'Remedies: Saturn mantras, charity on Saturdays, patience';
+
+  @override
+  String get transit_insight_currentSky_title => 'Current Sky';
+
+  @override
+  String get transit_insight_currentSky_value => 'Live Planetary Positions';
+
+  @override
+  String get transit_insight_currentSky_desc =>
+      'These are the real-time positions of planets in the zodiac right now. The \"Current\" column shows where each planet is today, while \"Natal\" shows where it was at your birth. When these align or form aspects, significant transits occur.';
+
+  @override
+  String get transit_insight_currentSky_significance =>
+      'Comparing current positions to your natal chart reveals active transits. Pay special attention to slow-moving planets (Saturn, Jupiter, Rahu, Ketu) as their transits have longer-lasting effects.';
+
+  @override
+  String get transit_insight_currentSky_keypoint1 =>
+      'Sun/Moon: Quick transits, daily/monthly influences';
+
+  @override
+  String get transit_insight_currentSky_keypoint2 =>
+      'Mercury/Venus/Mars: Medium-speed, weeks to months';
+
+  @override
+  String get transit_insight_currentSky_keypoint3 =>
+      'Jupiter: ~1 year per sign, major life themes';
+
+  @override
+  String get transit_insight_currentSky_keypoint4 =>
+      'Saturn: ~2.5 years per sign, karmic lessons';
+
+  @override
+  String get transit_insight_currentSky_keypoint5 =>
+      'Rahu/Ketu: ~1.5 years per sign, destiny points';
+
+  @override
+  String get transit_insight_currentSky_keypoint6 =>
+      'Retrograde (℞): Planet appears to move backward, intensified effects';
+
+  @override
+  String get transit_insight_currentSky_keypoint7 =>
+      'Sign Change (↔): Planet entering new sign, shift in energy';
+
+  @override
+  String get transit_insight_currentPosition_title => 'Current Position';
+
+  @override
+  String transit_insight_currentPosition_desc(
+    Object degree,
+    Object natalInfo,
+    Object planet,
+    Object retro,
+    Object sign,
+  ) {
+    return '$planet is currently at $degree° in $sign$retro. $natalInfo';
+  }
+
+  @override
+  String get transit_insight_currentPosition_retro => ' (Retrograde)';
+
+  @override
+  String transit_insight_currentPosition_natalInfo(
+    Object degree,
+    Object planet,
+    Object sign,
+  ) {
+    return 'At your birth, $planet was at $degree° in $sign.';
+  }
+
+  @override
+  String transit_insight_currentPosition_significance_changed(Object planet) {
+    return '$planet has moved to a different sign since your birth. This indicates the planet is in a new area of your chart.';
+  }
+
+  @override
+  String transit_insight_currentPosition_significance_same(Object planet) {
+    return '$planet is in the same sign as at birth.';
+  }
+
+  @override
+  String transit_insight_currentPosition_significance_transiting(
+    Object planet,
+  ) {
+    return '$planet is currently transiting.';
+  }
+
+  @override
+  String get transit_insight_currentPosition_significance_slow =>
+      ' As a slow-moving planet, its transits have longer-lasting effects.';
+
+  @override
+  String transit_insight_currentPosition_keypoint1(Object planet) {
+    return 'Planet: $planet';
+  }
+
+  @override
+  String transit_insight_currentPosition_keypoint2(Object degree, Object sign) {
+    return 'Current: $sign $degree°';
+  }
+
+  @override
+  String transit_insight_currentPosition_keypoint3(Object degree, Object sign) {
+    return 'Natal: $sign $degree°';
+  }
+
+  @override
+  String get transit_insight_currentPosition_keypoint4 =>
+      'Status: Retrograde ℞';
+
+  @override
+  String get transit_insight_currentPosition_keypoint5 => 'Sign Changed: Yes';
+
+  @override
+  String transit_insight_currentPosition_keypoint6(Object duration) {
+    return 'Transit Speed: Slow ($duration/sign)';
+  }
+
+  @override
+  String transit_insight_transitCount_title(Object label) {
+    return '$label Transits';
+  }
+
+  @override
+  String transit_insight_transitCount_value(Object count) {
+    return '$count Planets';
+  }
+
+  @override
+  String get transit_insight_transitCount_desc_favorable =>
+      'These planets are currently transiting houses that are generally supportive from your Moon sign. Favorable transits bring opportunities, success, and positive energy.';
+
+  @override
+  String get transit_insight_transitCount_desc_challenging =>
+      'These planets are currently in positions that may bring challenges or require extra attention. Challenging transits offer growth opportunities through overcoming obstacles.';
+
+  @override
+  String transit_insight_transitCount_significance(Object count, Object label) {
+    return 'You have $count $label planetary transits currently active.';
+  }
+
+  @override
+  String transit_insight_transitCount_keypoint1(Object count) {
+    return 'Count: $count planets';
+  }
+
+  @override
+  String transit_insight_transitCount_keypoint2(Object label) {
+    return 'Type: $label';
+  }
+
+  @override
+  String get transit_insight_transitCount_keypoint3_favorable =>
+      'Houses 3, 6, 10, 11 are generally favorable';
+
+  @override
+  String get transit_insight_transitCount_keypoint3_challenging =>
+      'Other houses require more attention';
+
+  @override
+  String get transit_insight_transitCount_keypoint4 =>
+      'Transits are calculated from your Moon sign (Janma Rashi)';
+
+  @override
+  String get transit_house_1_significations =>
+      'ନିଜ, ବ୍ୟକ୍ତିତ୍ୱ, ସ୍ୱାସ୍ଥ୍ୟ, ନୂଆ ଆରମ୍ଭ';
+
+  @override
+  String get transit_house_2_significations => 'ଧନ, ପରିବାର, ବାଣୀ, ସଂଚିତ ସମ୍ପଦ';
+
+  @override
+  String get transit_house_3_significations =>
+      'ସାହସ, ଭାଇଭଉଣୀ, ଯୋଗାଯୋଗ, ଛୋଟ ଯାତ୍ରା';
+
+  @override
+  String get transit_house_4_significations =>
+      'ଘର, ମା, ଆରାମ, ଭାବନାତ୍ମକ କଲ୍ୟାଣ, ସମ୍ପତ୍ତି';
+
+  @override
+  String get transit_house_5_significations =>
+      'ବୁଦ୍ଧି, ସନ୍ତାନ, ସୃଜନଶୀଳତା, ପ୍ରେମ, ଅନୁମାନ';
+
+  @override
+  String get transit_house_6_significations =>
+      'ଶତ୍ରୁ, ରୋଗ, ଋଣ, ଦୈନନ୍ଦିନ କାମ, ସେବା';
+
+  @override
+  String get transit_house_7_significations =>
+      'ବିବାହ, ସହଭାଗିତା, ବ୍ୟବସାୟ ସମ୍ପର୍କ';
+
+  @override
+  String get transit_house_8_significations =>
+      'ଆୟୁ, ପରିବର୍ତ୍ତନ, ଉତ୍ତରାଧିକାର, ଲୁକ୍କାୟିତ ବିଷୟ';
+
+  @override
+  String get transit_house_9_significations =>
+      'ଭାଗ୍ୟ, ଉଚ୍ଚ ଶିକ୍ଷା, ଆଧ୍ୟାତ୍ମିକତା, ପିତା, ଲମ୍ବା ଯାତ୍ରା';
+
+  @override
+  String get transit_house_10_significations =>
+      'କ୍ୟାରିଅର, ପ୍ରତିଷ୍ଠା, କର୍ତ୍ତୃତ୍ୱ, ସାର୍ବଜନିକ ସ୍ଥାନ';
+
+  @override
+  String get transit_house_11_significations => 'ଲାଭ, ଆୟ, ବନ୍ଧୁ, ଇଚ୍ଛା ପୂରଣ';
+
+  @override
+  String get transit_house_12_significations =>
+      'କ୍ଷତି, ଖର୍ଚ୍ଚ, ବିଦେଶ, ମୋକ୍ଷ, ଏକାନ୍ତ';
+
+  @override
+  String get transit_sadesati_phase1_desc =>
+      'Saturn transiting 12th from Moon. Beginning of 7.5 year cycle. Increased expenses, travel, and mental stress possible.';
+
+  @override
+  String get transit_sadesati_phase2_desc =>
+      'Saturn transiting over Moon sign. Most intense period. Health, emotions, and relationships may face challenges.';
+
+  @override
+  String get transit_sadesati_phase3_desc =>
+      'Saturn transiting 2nd from Moon. Final phase. Financial matters, family, and speech may be affected.';
+
+  @override
+  String get transit_veryFavorable => 'ବହୁତ ଅନୁକୂଳ';
+
+  @override
+  String get transit_none => 'କିଛି ନାହିଁ';
+
+  @override
+  String get transit_tapForDetails => 'ବିବରଣୀ ପାଇଁ ଟ୍ୟାପ୍ କରନ୍ତୁ';
+
+  @override
+  String get transit_is => 'ଅଛି';
+
+  @override
+  String get transit_are => 'ଅଛନ୍ତି';
+
+  @override
+  String get transit_supporting => 'ସମର୍ଥନ କରୁଛି';
+
+  @override
+  String get transit_influencing => 'ପ୍ରଭାବିତ କରୁଛି';
+
+  @override
+  String get transit_currentPosition => 'Current Position';
+
+  @override
+  String get transit_changed => 'Changed';
+
+  @override
+  String transit_houseFromMoon(Object house) {
+    return 'House $house from Moon';
+  }
+
+  @override
+  String get transit_currentSkyPositions => 'Current Sky Positions';
+
+  @override
+  String get transit_currentSkyPositions_subtitle =>
+      'Real-time planetary transits';
+
+  @override
+  String get transit_houseTransits => 'House Transits';
+
+  @override
+  String transit_houseTransits_subtitle(Object moonSign) {
+    return 'Effects from $moonSign';
+  }
+
+  @override
+  String transit_transitInHouse(Object house) {
+    return 'Transit in House $house';
+  }
+
+  @override
+  String get transit_sadeSatiInfo => 'Sade Sati Info';
+
+  @override
+  String transit_phase(Object phase) {
+    return 'Phase $phase';
+  }
+
+  @override
+  String transit_timeLeft(Object months, Object years) {
+    return '${years}y ${months}m left';
+  }
+
+  @override
+  String transit_phaseDescription(Object phase, Object sign) {
+    return '$phase • Saturn transiting $sign';
+  }
+
+  @override
+  String get transit_start => 'Start';
+
+  @override
+  String get transit_end => 'End';
+
+  @override
+  String get transit_currentSky_value => 'Live Planetary Positions';
+
+  @override
+  String get transit_currentSky_desc =>
+      'These are the real-time positions of planets in the zodiac right now. The \'Current\' column shows where each planet is today, while \'Natal\' shows where it was at your birth. When these align or form aspects, significant transits occur.';
+
+  @override
+  String get transit_currentSky_significance =>
+      'Comparing current positions to your natal chart reveals active transits. Pay special attention to slow-moving planets (Saturn, Jupiter, Rahu, Ketu) as their transits have longer-lasting effects.';
+
+  @override
+  String get transit_currentSky_keypoint1 =>
+      'Sun/Moon: Quick transits, daily/monthly influences';
+
+  @override
+  String get transit_currentSky_keypoint2 =>
+      'Mercury/Venus/Mars: Medium-speed, weeks to months';
+
+  @override
+  String get transit_currentSky_keypoint3 =>
+      'Jupiter: ~1 year per sign, major life themes';
+
+  @override
+  String get transit_currentSky_keypoint4 =>
+      'Saturn: ~2.5 years per sign, karmic lessons';
+
+  @override
+  String get transit_currentSky_keypoint5 =>
+      'Rahu/Ketu: ~1.5 years per sign, destiny points';
+
+  @override
+  String get transit_currentSky_keypoint6 =>
+      'Retrograde (℞): Planet appears to move backward, intensified effects';
+
+  @override
+  String get transit_currentSky_keypoint7 =>
+      'Sign Change (↔): Planet entering new sign, shift in energy';
+
+  @override
+  String get transit_insight_favorable_position =>
+      'This is a favorable position.';
+
+  @override
+  String get transit_insight_attention_position =>
+      'This position requires attention.';
+
+  @override
+  String get transit_insight_supports_growth =>
+      'supports growth and positive developments';
+
+  @override
+  String get transit_insight_requires_patience =>
+      'may bring challenges that require patience and careful handling';
+
+  @override
+  String get transit_status_label => 'Status';
+
+  @override
+  String get transit_aspectToNatal => 'Aspect to Natal';
+
+  @override
+  String get transit_movesSlow => 'moves slowly';
+
+  @override
+  String get transit_effectsLast => 'effects last';
+
+  @override
+  String get transit_years => 'years';
+
+  @override
+  String get transit_year => 'year';
+
+  @override
+  String get transit_perSign => 'per sign';
+
+  @override
+  String get transit_sign_label => 'Sign';
+
+  @override
+  String get transit_planet_label => 'Planet';
+
+  @override
+  String get transit_degree_label => 'Degree';
+
+  @override
+  String get yogas_nav_overview => 'Overview';
+
+  @override
+  String get yogas_nav_yogas => 'Yogas';
+
+  @override
+  String get yogas_nav_doshas => 'Doshas';
+
+  @override
+  String get yogas_nav_insights => 'Insights';
+
+  @override
+  String get yogas_balance_excellent => 'Excellent';
+
+  @override
+  String get yogas_balance_veryFavorable => 'Very Favorable';
+
+  @override
+  String get yogas_balance_favorable => 'Favorable';
+
+  @override
+  String get yogas_balance_mixed => 'Mixed';
+
+  @override
+  String get yogas_balance_challenging => 'Challenging';
+
+  @override
+  String get yogas_balance_veryGood => 'Very Good';
+
+  @override
+  String get yogas_balance_good => 'Good';
+
+  @override
+  String get yogas_balance_needsAttention => 'Needs Attention';
+
+  @override
+  String get yogas_overview_title => 'Yoga Overview';
+
+  @override
+  String get yogas_auspiciousYogas => 'Auspicious Yogas';
+
+  @override
+  String yogas_beneficialCombinations(Object count) {
+    return '$count beneficial combinations';
+  }
+
+  @override
+  String get yogas_doshasPresent => 'Doshas Present';
+
+  @override
+  String yogas_detected(Object count) {
+    return '$count detected';
+  }
+
+  @override
+  String get yogas_astrologicalInsights => 'Astrological Insights';
+
+  @override
+  String get yogas_understandingYourChart => 'Understanding your chart';
+
+  @override
+  String get yogas_noYogasDetected => 'No Yogas Detected';
+
+  @override
+  String get yogas_noYogasMessage =>
+      'Standard chart configuration without special combinations.';
+
+  @override
+  String get yogas_noDoshasFound => 'No Doshas Found';
+
+  @override
+  String get yogas_noDoshasMessage => 'Your chart is free from major doshas.';
+
+  @override
+  String get yogas_yogas => 'Yogas';
+
+  @override
+  String get yogas_doshas => 'Doshas';
+
+  @override
+  String get yogas_strong => 'Strong';
+
+  @override
+  String get yogas_moderate => 'Moderate';
+
+  @override
+  String get yogas_severe => 'Severe';
+
+  @override
+  String get yogas_mild => 'Mild';
+
+  @override
+  String get yogas_low => 'Low';
+
+  @override
+  String get yogas_high => 'High';
+
+  @override
+  String get yogas_type_raja => 'Raja';
+
+  @override
+  String get yogas_type_dhana => 'Dhana';
+
+  @override
+  String get yogas_type_mahapurusha => 'Mahapurusha';
+
+  @override
+  String get yogas_type_lunar => 'Lunar';
+
+  @override
+  String get yogas_type_yoga => 'Yoga';
+
+  @override
+  String get yogas_type_dosha => 'Dosha';
+
+  @override
+  String get yogas_formation => 'Formation';
+
+  @override
+  String get yogas_planetsInvolved => 'Planets Involved';
+
+  @override
+  String yogas_whatIs(Object name) {
+    return 'What is $name?';
+  }
+
+  @override
+  String get yogas_potentialEffects => 'Potential Effects';
+
+  @override
+  String get yogas_benefits => 'Benefits';
+
+  @override
+  String get yogas_remedies => 'Remedies';
+
+  @override
+  String get yogas_howToStrengthen => 'How to Strengthen';
+
+  @override
+  String get yogas_insight_understanding => 'Understanding';
+
+  @override
+  String get yogas_insight_activation => 'Activation';
+
+  @override
+  String get yogas_insight_strength => 'Strength';
+
+  @override
+  String get yogas_insight_remedies => 'Remedies';
+
+  @override
+  String get yogas_insight_understanding_desc =>
+      'Yogas are beneficial combinations that enhance life areas.';
+
+  @override
+  String get yogas_insight_activation_desc =>
+      'Yogas manifest during their planetary Dasha periods.';
+
+  @override
+  String get yogas_insight_strength_desc =>
+      'Planet placement determines yoga manifestation level.';
+
+  @override
+  String get yogas_insight_remedies_desc =>
+      'Most doshas can be mitigated through proper remedies.';
+
+  @override
+  String get yogas_kaalSarpRemedy => 'Kaal Sarp Remedy';
+
+  @override
+  String get yogas_kaalSarpRemedy_desc =>
+      'Trimbakeshwar Puja recommended. Chant Maha Mrityunjaya Mantra 108 times daily.';
+
+  @override
+  String get yogas_manglikRemedy => 'Manglik Remedy';
+
+  @override
+  String get yogas_manglikRemedy_desc =>
+      'Perform Mangal Shanti Puja. Recite Hanuman Chalisa on Tuesdays.';
+
+  @override
+  String get yogas_doshaRemedy => 'Dosha Remedy';
+
+  @override
+  String get yogas_noSpecialYogas => 'No Special Yogas';
+
+  @override
+  String get yogas_doshaFreeChart => 'Dosha-Free Chart';
+
+  @override
+  String get yogas_overview_insight_title => 'Yoga & Dosha Overview';
+
+  @override
+  String get yogas_overview_insight_desc =>
+      'Yogas are auspicious planetary combinations that bestow specific benefits, while Doshas are challenging combinations that may create obstacles. The balance between them shapes your life experiences and opportunities.';
+
+  @override
+  String yogas_overview_insight_significance(
+    Object ascendant,
+    Object balanceStatus,
+    Object doshaCount,
+    Object severeDoshas,
+    Object strongYogas,
+    Object yogaCount,
+  ) {
+    return 'Your chart has $yogaCount yoga(s) and $doshaCount dosha(s). $strongYogas yoga(s) are strong, and $severeDoshas dosha(s) are severe. With $ascendant Lagna, the overall balance is $balanceStatus.';
+  }
+
+  @override
+  String yogas_overview_insight_keypoint1(Object count, Object strong) {
+    return 'Total Yogas: $count (Strong: $strong)';
+  }
+
+  @override
+  String yogas_overview_insight_keypoint2(Object count, Object severe) {
+    return 'Total Doshas: $count (Severe: $severe)';
+  }
+
+  @override
+  String yogas_overview_insight_keypoint3(Object ascendant) {
+    return 'Ascendant: $ascendant';
+  }
+
+  @override
+  String yogas_overview_insight_keypoint4(Object balance) {
+    return 'Overall Balance: $balance';
+  }
+
+  @override
+  String get yogas_overview_insight_keypoint5 =>
+      'Yogas manifest during their planetary Dasha periods';
+
+  @override
+  String get yogas_overview_insight_keypoint6 =>
+      'Most doshas can be mitigated through proper remedies';
+
+  @override
+  String get yogas_typeInsight_rajaYoga_desc =>
+      'Raja Yogas are the most powerful combinations that bestow kingship, authority, power, and success. They are formed by the association of lords of Kendra (1, 4, 7, 10) and Trikona (1, 5, 9) houses.';
+
+  @override
+  String get yogas_typeInsight_rajaYoga_significance =>
+      'Success in career, rise to power, leadership, authority, fame';
+
+  @override
+  String get yogas_typeInsight_dhanaYoga_desc =>
+      'Dhana Yogas indicate wealth and prosperity. They are formed by the association of lords of wealth houses (2, 5, 9, 11) with each other or with benefics.';
+
+  @override
+  String get yogas_typeInsight_dhanaYoga_significance =>
+      'Financial prosperity, accumulation of wealth, material success';
+
+  @override
+  String get yogas_typeInsight_mahapurusha_desc =>
+      'These are five great yogas formed when Mars, Mercury, Jupiter, Venus, or Saturn are in their own or exaltation sign in a Kendra house. They create exceptional individuals.';
+
+  @override
+  String get yogas_typeInsight_mahapurusha_significance =>
+      'Outstanding personality, exceptional achievements, leadership in specific domains';
+
+  @override
+  String get yogas_typeInsight_lunarYoga_desc =>
+      'Lunar Yogas are formed based on the Moon\'s relationship with other planets. They primarily affect the mind, emotions, and mental abilities.';
+
+  @override
+  String get yogas_typeInsight_lunarYoga_significance =>
+      'Mental strength, emotional stability, intuition, memory';
+
+  @override
+  String get yogas_typeInsight_severeDosha_desc =>
+      'Severe doshas require immediate attention and remedial measures. They can significantly impact the areas they govern.';
+
+  @override
+  String get yogas_typeInsight_severeDosha_significance =>
+      'May cause significant challenges in specific life areas';
+
+  @override
+  String get yogas_typeInsight_moderateDosha_desc =>
+      'Moderate doshas have noticeable effects but are manageable with proper awareness and remedies.';
+
+  @override
+  String get yogas_typeInsight_moderateDosha_significance =>
+      'Some challenges that can be overcome with effort';
+
+  @override
+  String get yogas_typeInsight_mildDosha_desc =>
+      'Low severity doshas have minimal impact and may not require intensive remedial measures.';
+
+  @override
+  String get yogas_typeInsight_mildDosha_significance =>
+      'Minor influences that are easily managed';
+
+  @override
+  String get yogas_strengthInsight_strong_desc =>
+      'Strong yogas are fully activated and manifest their effects clearly in life. The planets involved are well-placed, dignified, and free from afflictions.';
+
+  @override
+  String get yogas_strengthInsight_moderate_desc =>
+      'Moderate strength indicates partial manifestation. The yoga is present but planets may have mixed dignity or receive both benefic and malefic influences.';
+
+  @override
+  String get yogas_strengthInsight_severe_desc =>
+      'Severe doshas have strong impact and require attention. Remedial measures are recommended to mitigate their effects.';
+
+  @override
+  String get yogas_insightCard_understanding_desc =>
+      'Yogas are beneficial planetary combinations formed by specific relationships between planets and houses. They indicate areas of life where you have special potential or blessings.';
+
+  @override
+  String get yogas_insightCard_understanding_significance =>
+      'Understanding your yogas helps you recognize your strengths and work with your natural talents.';
+
+  @override
+  String get yogas_insightCard_activation_desc =>
+      'Yogas don\'t always manifest constantly—they activate during the Dasha (planetary period) of the planets involved. The Dasha system in Vedic astrology determines when each yoga will give its results.';
+
+  @override
+  String get yogas_insightCard_activation_significance =>
+      'Knowing when your yogas activate helps in timing important life decisions.';
+
+  @override
+  String get yogas_insightCard_strength_desc =>
+      'The strength of a yoga depends on the dignity of planets involved (own sign, exaltation, debilitation), aspects from benefics or malefics, and placement in houses.';
+
+  @override
+  String get yogas_insightCard_strength_significance =>
+      'Strong yogas manifest clearly while weak ones need strengthening through remedies.';
+
+  @override
+  String get yogas_insightCard_remedies_desc =>
+      'Doshas can be mitigated through various remedies including mantras, gemstones, charity, fasting, and pujas. The right remedy depends on the specific dosha and your chart.';
+
+  @override
+  String get yogas_insightCard_remedies_significance =>
+      'Proper remedies performed with faith can significantly reduce dosha effects.';
+
+  @override
+  String get yogas_emptyState_noYogas_desc =>
+      'Your chart does not have any of the commonly recognized special yogas. This is normal and doesn\'t mean anything negative—many successful people have charts without named yogas. The strength of your chart comes from other factors like planet dignity, house placements, and aspects.';
+
+  @override
+  String get yogas_emptyState_noDoshas_desc =>
+      'Congratulations! Your chart is free from major doshas like Manglik, Kaal Sarp, or other challenging combinations. This indicates fewer karmic obstacles in the areas typically affected by these doshas.';
+
+  @override
+  String get yogas_kaalSarpDosha_desc =>
+      'Kaal Sarp Dosha occurs when all planets are hemmed between Rahu and Ketu. This can cause delays, obstacles, and sudden changes in life. However, with proper remedies, its effects can be significantly reduced.';
+
+  @override
+  String get yogas_manglikDosha_desc =>
+      'Manglik Dosha occurs when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. It primarily affects marriage and relationships but can be effectively remedied.';
+
+  @override
+  String get charDasha_nav_current => 'Current';
+
+  @override
+  String get charDasha_nav_karakas => 'Karakas';
+
+  @override
+  String get charDasha_nav_timeline => 'Timeline';
+
+  @override
+  String get charDasha_activeRasiDasha => 'Active Rasi Dasha';
+
+  @override
+  String get charDasha_jaiminiKarakas => 'Jaimini Karakas';
+
+  @override
+  String get charDasha_rasiDashaTimeline => 'Rasi Dasha Timeline';
+
+  @override
+  String get charDasha_infoFooter =>
+      'Char Dasha (Jaimini) is a sign-based system. Duration varies based on the lord\'s position.';
+
+  @override
+  String get charDasha_unavailable => 'Char Dasha Unavailable';
+
+  @override
+  String get charDasha_unableToCalculate =>
+      'Unable to calculate Char Dasha for this chart.';
+
+  @override
+  String get charDasha_active => 'ACTIVE';
+
+  @override
+  String get charDasha_rasiDasha => 'Rasi Dasha';
+
+  @override
+  String charDasha_signRasiDasha(Object sign) {
+    return '$sign Rasi Dasha';
+  }
+
+  @override
+  String get charDasha_journeyProgress => 'Journey Progress';
+
+  @override
+  String get charDasha_remaining => 'Remaining';
+
+  @override
+  String get charDasha_duration => 'Duration';
+
+  @override
+  String get charDasha_cycles => 'Cycles';
+
+  @override
+  String charDasha_yearsAbbr(Object years) {
+    return '$years yrs';
+  }
+
+  @override
+  String get charDasha_antardasha => 'Antardasha';
+
+  @override
+  String charDasha_left(Object duration) {
+    return '$duration left';
+  }
+
+  @override
+  String get charDasha_dashaDirection => 'Dasha Direction';
+
+  @override
+  String get charDasha_clockwise => 'Clockwise';
+
+  @override
+  String get charDasha_antiClockwise => 'Anti-clockwise';
+
+  @override
+  String charDasha_fromSign(Object sign) {
+    return 'from $sign';
+  }
+
+  @override
+  String get charDasha_karaka_ak => 'AK';
+
+  @override
+  String get charDasha_karaka_amk => 'AmK';
+
+  @override
+  String get charDasha_karaka_bk => 'BK';
+
+  @override
+  String get charDasha_karaka_mk => 'MK';
+
+  @override
+  String get charDasha_karaka_pik => 'PiK';
+
+  @override
+  String get charDasha_karaka_puk => 'PuK';
+
+  @override
+  String get charDasha_karaka_gk => 'GK';
+
+  @override
+  String get charDasha_karaka_dk => 'DK';
+
+  @override
+  String get charDasha_karaka_atmakaraka => 'Atmakaraka';
+
+  @override
+  String get charDasha_karaka_amatyakaraka => 'Amatyakaraka';
+
+  @override
+  String get charDasha_karaka_bhratrikaraka => 'Bhratrikaraka';
+
+  @override
+  String get charDasha_karaka_matrikaraka => 'Matrikaraka';
+
+  @override
+  String get charDasha_karaka_pitrikaraka => 'Pitrikaraka';
+
+  @override
+  String get charDasha_karaka_putrakaraka => 'Putrakaraka';
+
+  @override
+  String get charDasha_karaka_gnatikaraka => 'Gnatikaraka';
+
+  @override
+  String get charDasha_karaka_darakaraka => 'Darakaraka';
+
+  @override
+  String get charDasha_karakamsa => 'Karakamsa';
+
+  @override
+  String charDasha_karakamsa_desc(Object sign) {
+    return '$sign (AK in Navamsa)';
+  }
+
+  @override
+  String get charDasha_now => 'NOW';
+
+  @override
+  String get charDasha_start => 'Start';
+
+  @override
+  String get charDasha_end => 'End';
+
+  @override
+  String charDasha_subPeriods(Object count) {
+    return 'Sub-Periods ($count)';
+  }
+
+  @override
+  String get charDasha_noSubPeriods => 'No sub-periods available';
+
+  @override
+  String get charDasha_signDesc_aries => 'Initiative & leadership';
+
+  @override
+  String get charDasha_signDesc_taurus => 'Stability & comfort';
+
+  @override
+  String get charDasha_signDesc_gemini => 'Communication & learning';
+
+  @override
+  String get charDasha_signDesc_cancer => 'Emotions & nurturing';
+
+  @override
+  String get charDasha_signDesc_leo => 'Creativity & authority';
+
+  @override
+  String get charDasha_signDesc_virgo => 'Service & analysis';
+
+  @override
+  String get charDasha_signDesc_libra => 'Partnerships & balance';
+
+  @override
+  String get charDasha_signDesc_scorpio => 'Transformation & depth';
+
+  @override
+  String get charDasha_signDesc_sagittarius => 'Expansion & wisdom';
+
+  @override
+  String get charDasha_signDesc_capricorn => 'Ambition & structure';
+
+  @override
+  String get charDasha_signDesc_aquarius => 'Innovation & humanity';
+
+  @override
+  String get charDasha_signDesc_pisces => 'Spirituality & intuition';
+
+  @override
+  String get charDasha_signDesc_default => 'Cosmic influence';
+}

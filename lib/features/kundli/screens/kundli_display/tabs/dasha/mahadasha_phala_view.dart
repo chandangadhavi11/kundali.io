@@ -3,18 +3,22 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../../shared/constants.dart';
 import 'dasha_shared_widgets.dart' hide getPlanetImagePath;
 
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVIGATION SECTIONS
 // ═══════════════════════════════════════════════════════════════════════════
-const _sections = [
-  DashaNavSection(id: 'theme', label: 'Theme', color: DashaColors.phala),
-  DashaNavSection(id: 'effects', label: 'Effects', color: DashaColors.amber),
-  DashaNavSection(id: 'life', label: 'Life Areas', color: DashaColors.sky),
-  DashaNavSection(id: 'remedies', label: 'Remedies', color: DashaColors.yogini),
+List<DashaNavSection> _getSections(AppLocalizations l10n) => [
+  DashaNavSection(id: 'theme', label: l10n.phala_nav_theme, color: DashaColors.phala),
+  DashaNavSection(id: 'effects', label: l10n.phala_nav_effects, color: DashaColors.amber),
+  DashaNavSection(id: 'life', label: l10n.phala_nav_lifeAreas, color: DashaColors.sky),
+  DashaNavSection(id: 'remedies', label: l10n.phala_nav_remedies, color: DashaColors.yogini),
 ];
+
+// Static section IDs for initialization
+const _sectionIds = ['theme', 'effects', 'life', 'remedies'];
 
 /// Mahadasha Phala View - Premium interpretations and predictions
 class MahadashaPhalaView extends StatefulWidget {
@@ -39,9 +43,9 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
 
-    for (final section in _sections) {
-      _sectionKeys[section.id] = GlobalKey();
-      _animatedKeys[section.id] = GlobalKey<DashaAnimatedSectionWrapperState>();
+    for (final id in _sectionIds) {
+      _sectionKeys[id] = GlobalKey();
+      _animatedKeys[id] = GlobalKey<DashaAnimatedSectionWrapperState>();
     }
   }
 
@@ -60,8 +64,8 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
 
     int newActiveIndex = 0;
 
-    for (int i = 0; i < _sections.length; i++) {
-      final key = _sectionKeys[_sections[i].id];
+    for (int i = 0; i < _sectionIds.length; i++) {
+      final key = _sectionKeys[_sectionIds[i]];
       if (key?.currentContext != null) {
         final box = key!.currentContext!.findRenderObject() as RenderBox?;
         if (box != null) {
@@ -78,8 +82,8 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
     }
   }
 
-  Future<void> _scrollToSection(int index) async {
-    final section = _sections[index];
+  Future<void> _scrollToSection(int index, List<DashaNavSection> sections) async {
+    final section = sections[index];
     final key = _sectionKeys[section.id];
 
     if (key?.currentContext == null) return;
@@ -105,11 +109,13 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final sections = _getSections(l10n);
     final dasha = widget.kundaliData.dashaInfo;
     final interpretation = MahadashaInterpretations.getInterpretation(dasha.currentMahadasha);
 
     if (interpretation == null) {
-      return _buildNoDataView();
+      return _buildNoDataView(l10n);
     }
 
     final now = DateTime.now();
@@ -144,7 +150,7 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashaAnimatedSectionHeader(
-                      title: 'Overall Theme',
+                      title: l10n.phala_overallTheme,
                       accentColor: DashaColors.phala,
                       icon: Icons.format_quote_rounded,
                     ),
@@ -171,7 +177,7 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashaAnimatedSectionHeader(
-                      title: 'Key Effects',
+                      title: l10n.phala_keyEffects,
                       accentColor: DashaColors.amber,
                       icon: Icons.auto_awesome_rounded,
                     ),
@@ -200,7 +206,7 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
                         children: [
                           Expanded(
                             child: _AspectCard(
-                              title: 'Favorable',
+                              title: l10n.phala_favorable,
                               items: interpretation.favorableAspects,
                               color: DashaColors.emerald,
                               icon: Icons.check_circle_outline_rounded,
@@ -209,7 +215,7 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: _AspectCard(
-                              title: 'Challenges',
+                              title: l10n.phala_challenges,
                               items: interpretation.challenges,
                               color: DashaColors.coral,
                               icon: Icons.warning_amber_rounded,
@@ -233,7 +239,7 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashaAnimatedSectionHeader(
-                      title: 'Life Areas',
+                      title: l10n.phala_lifeAreas,
                       accentColor: DashaColors.sky,
                       icon: Icons.dashboard_rounded,
                     ),
@@ -257,7 +263,7 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     DashaAnimatedSectionHeader(
-                      title: 'Remedies & Recommendations',
+                      title: l10n.phala_remediesRecommendations,
                       accentColor: DashaColors.yogini,
                       icon: Icons.healing_rounded,
                     ),
@@ -279,8 +285,8 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
 
               const SizedBox(height: DashaDesignTokens.space16),
 
-              const DashaInfoFooter(
-                text: 'Mahadasha Phala provides general predictions. Consult an astrologer for personalized guidance.',
+              DashaInfoFooter(
+                text: l10n.phala_infoFooter,
               ),
             ],
           ),
@@ -292,16 +298,16 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
           right: 16,
           bottom: MediaQuery.of(context).padding.bottom + 16,
           child: DashaFloatingNavBar(
-            sections: _sections,
+            sections: sections,
             activeIndex: _activeIndex,
-            onTap: _scrollToSection,
+            onTap: (index) => _scrollToSection(index, sections),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildNoDataView() {
+  Widget _buildNoDataView(AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
@@ -323,7 +329,7 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Interpretation Unavailable',
+              l10n.phala_unavailableTitle,
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -332,7 +338,7 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Unable to load Mahadasha interpretation.',
+              l10n.phala_unavailableMessage,
               style: GoogleFonts.inter(
                 fontSize: 13,
                 color: DashaColors.textTertiary,
@@ -487,7 +493,7 @@ class _PhalaHeroCardState extends State<_PhalaHeroCard>
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  'PHALA',
+                  AppLocalizations.of(context).phala_badge,
                   style: GoogleFonts.inter(
                     fontSize: 9,
                     fontWeight: FontWeight.w600,
@@ -498,7 +504,7 @@ class _PhalaHeroCardState extends State<_PhalaHeroCard>
               ),
               const SizedBox(height: 6),
               Text(
-                '${widget.dasha.currentMahadasha} Mahadasha',
+                AppLocalizations.of(context).phala_mahadashaName(widget.dasha.currentMahadasha),
                 style: GoogleFonts.instrumentSans(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -564,21 +570,21 @@ class _PhalaHeroCardState extends State<_PhalaHeroCard>
           _PhalaInfoChip(
             icon: Icons.hourglass_top_rounded,
             value: formatDuration(widget.dynamicRemainingYears),
-            label: 'Remaining',
+            label: AppLocalizations.of(context).phala_remaining,
             iconColor: planetColor,
           ),
           _buildDivider(),
           _PhalaInfoChip(
             icon: Icons.calendar_today_rounded,
-            value: _getDayName(widget.interpretation.dayOfWeek),
-            label: 'Day',
+            value: _getDayName(widget.interpretation.dayOfWeek, AppLocalizations.of(context)),
+            label: AppLocalizations.of(context).phala_day,
             iconColor: DashaColors.phala,
           ),
           _buildDivider(),
           _PhalaInfoChip(
             icon: Icons.palette_rounded,
             value: widget.interpretation.color.split(',').first.trim(),
-            label: 'Color',
+            label: AppLocalizations.of(context).phala_color,
             iconColor: _getColorFromName(widget.interpretation.color),
           ),
         ],
@@ -616,8 +622,16 @@ class _PhalaHeroCardState extends State<_PhalaHeroCard>
     return colorMap[name] ?? DashaColors.phala;
   }
 
-  String _getDayName(int dayOfWeek) {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  String _getDayName(int dayOfWeek, AppLocalizations l10n) {
+    final days = [
+      l10n.phala_day_sunday,
+      l10n.phala_day_monday,
+      l10n.phala_day_tuesday,
+      l10n.phala_day_wednesday,
+      l10n.phala_day_thursday,
+      l10n.phala_day_friday,
+      l10n.phala_day_saturday,
+    ];
     return days[dayOfWeek % 7];
   }
 }
@@ -902,7 +916,7 @@ class _AntardashaCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '$antardasha Antardasha',
+                      AppLocalizations.of(context).phala_antardashaName(antardasha),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -911,7 +925,7 @@ class _AntardashaCard extends StatelessWidget {
                     ),
                     if (remainingYears != null)
                       Text(
-                        '${formatDuration(remainingYears!)} remaining',
+                        AppLocalizations.of(context).phala_remaining_duration(formatDuration(remainingYears!)),
                         style: GoogleFonts.jetBrainsMono(
                           fontSize: 10,
                           color: antarColor,
@@ -944,19 +958,19 @@ class _AntardashaCard extends StatelessWidget {
             Row(
               children: [
                 _MiniInfo(
-                  label: 'Gemstone',
+                  label: AppLocalizations.of(context).phala_gemstone,
                   value: antarData.gemstone.split(' ').first,
                   color: antarColor,
                 ),
                 const SizedBox(width: 8),
                 _MiniInfo(
-                  label: 'Day',
-                  value: _getDayShort(antarData.dayOfWeek),
+                  label: AppLocalizations.of(context).phala_day,
+                  value: _getDayShort(antarData.dayOfWeek, AppLocalizations.of(context)),
                   color: antarColor,
                 ),
                 const SizedBox(width: 8),
                 _MiniInfo(
-                  label: 'Deity',
+                  label: AppLocalizations.of(context).phala_deity,
                   value: antarData.deity.split('/').first.replaceAll('Lord ', '').replaceAll('Goddess ', ''),
                   color: antarColor,
                 ),
@@ -968,8 +982,16 @@ class _AntardashaCard extends StatelessWidget {
     );
   }
 
-  String _getDayShort(int dayOfWeek) {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  String _getDayShort(int dayOfWeek, AppLocalizations l10n) {
+    final days = [
+      l10n.phala_day_sun_short,
+      l10n.phala_day_mon_short,
+      l10n.phala_day_tue_short,
+      l10n.phala_day_wed_short,
+      l10n.phala_day_thu_short,
+      l10n.phala_day_fri_short,
+      l10n.phala_day_sat_short,
+    ];
     return days[dayOfWeek % 7];
   }
 }
@@ -1125,13 +1147,13 @@ class _RemediesCard extends StatelessWidget {
             children: [
               _RemedyInfo(
                 icon: Icons.diamond_outlined,
-                label: 'Gemstone',
+                label: AppLocalizations.of(context).phala_gemstone,
                 value: gemstone.split('(').first.trim(),
               ),
               const SizedBox(width: 8),
               _RemedyInfo(
                 icon: Icons.person_outline_rounded,
-                label: 'Deity',
+                label: AppLocalizations.of(context).phala_deity,
                 value: deity.split('/').first.trim(),
               ),
             ],
@@ -1159,7 +1181,7 @@ class _RemediesCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      'Mantra',
+                      AppLocalizations.of(context).phala_mantra,
                       style: GoogleFonts.inter(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -1185,7 +1207,7 @@ class _RemediesCard extends StatelessWidget {
 
           // Remedies List
           Text(
-            'Suggested Practices',
+            AppLocalizations.of(context).phala_suggestedPractices,
             style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart'
     show House;
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../shared/floating_nav_bar.dart';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -480,14 +481,17 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVIGATION SECTION DATA
 // ═══════════════════════════════════════════════════════════════════════════
-const _sections = [
-  NavSection(id: 'overview', label: 'Overview', color: _Colors.violet),
-  NavSection(id: 'kendra', label: 'Kendra', color: _Colors.emerald),
-  NavSection(id: 'trikona', label: 'Trikona', color: _Colors.amber),
-  NavSection(id: 'dusthana', label: 'Dusthana', color: _Colors.coral),
-  NavSection(id: 'upachaya', label: 'Upachaya', color: _Colors.sky),
-  NavSection(id: 'maraka', label: 'Maraka', color: _Colors.lavender),
+List<NavSection> _getSections(AppLocalizations l10n) => [
+  NavSection(id: 'overview', label: l10n.houses_nav_overview, color: _Colors.violet),
+  NavSection(id: 'kendra', label: l10n.houses_nav_kendra, color: _Colors.emerald),
+  NavSection(id: 'trikona', label: l10n.houses_nav_trikona, color: _Colors.amber),
+  NavSection(id: 'dusthana', label: l10n.houses_nav_dusthana, color: _Colors.coral),
+  NavSection(id: 'upachaya', label: l10n.houses_nav_upachaya, color: _Colors.sky),
+  NavSection(id: 'maraka', label: l10n.houses_nav_maraka, color: _Colors.lavender),
 ];
+
+// Section IDs for key management
+const _sectionIds = ['overview', 'kendra', 'trikona', 'dusthana', 'upachaya', 'maraka'];
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HOUSES TAB - Main Widget
@@ -514,9 +518,9 @@ class _HousesTabState extends State<HousesTab> {
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
 
-    for (final section in _sections) {
-      _sectionKeys[section.id] = GlobalKey();
-      _animatedKeys[section.id] = GlobalKey<_AnimatedSectionWrapperState>();
+    for (final sectionId in _sectionIds) {
+      _sectionKeys[sectionId] = GlobalKey();
+      _animatedKeys[sectionId] = GlobalKey<_AnimatedSectionWrapperState>();
     }
   }
 
@@ -535,8 +539,8 @@ class _HousesTabState extends State<HousesTab> {
 
     int newActiveIndex = 0;
 
-    for (int i = 0; i < _sections.length; i++) {
-      final key = _sectionKeys[_sections[i].id];
+    for (int i = 0; i < _sectionIds.length; i++) {
+      final key = _sectionKeys[_sectionIds[i]];
       if (key?.currentContext != null) {
         final box = key!.currentContext!.findRenderObject() as RenderBox?;
         if (box != null) {
@@ -554,8 +558,8 @@ class _HousesTabState extends State<HousesTab> {
   }
 
   Future<void> _scrollToSection(int index) async {
-    final section = _sections[index];
-    final key = _sectionKeys[section.id];
+    final sectionId = _sectionIds[index];
+    final key = _sectionKeys[sectionId];
 
     if (key?.currentContext == null) return;
 
@@ -573,7 +577,7 @@ class _HousesTabState extends State<HousesTab> {
       alignment: 0.08,
     );
 
-    _animatedKeys[section.id]?.currentState?.triggerHighlight();
+    _animatedKeys[sectionId]?.currentState?.triggerHighlight();
 
     setState(() => _isScrolling = false);
   }
@@ -605,7 +609,9 @@ class _HousesTabState extends State<HousesTab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final houseStats = _calculateHouseStats();
+    final sections = _getSections(l10n);
 
     return Stack(
       children: [
@@ -625,6 +631,7 @@ class _HousesTabState extends State<HousesTab> {
                   child: _OverviewCard(
                     ascendant: widget.kundaliData.ascendant.sign,
                     stats: houseStats,
+                    l10n: l10n,
                   ),
                 ),
               ),
@@ -640,12 +647,12 @@ class _HousesTabState extends State<HousesTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Kendra Houses',
-                      subtitle: 'Angular • 1, 4, 7, 10',
+                      title: l10n.houses_kendra_title,
+                      subtitle: l10n.houses_kendra_subtitle,
                       accentColor: _Colors.emerald,
                       onTap: () => _showInsightSheet(
                         context,
-                        _getHouseTypeInsight('Kendra'),
+                        _getHouseTypeInsight('Kendra', l10n),
                       ),
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -659,6 +666,7 @@ class _HousesTabState extends State<HousesTab> {
                           house: entry.value,
                           kundaliData: widget.kundaliData,
                           accentColor: _Colors.emerald,
+                          l10n: l10n,
                         ),
                       );
                     }),
@@ -677,12 +685,12 @@ class _HousesTabState extends State<HousesTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Trikona Houses',
-                      subtitle: 'Trinal • 5, 9',
+                      title: l10n.houses_trikona_title,
+                      subtitle: l10n.houses_trikona_subtitle,
                       accentColor: _Colors.amber,
                       onTap: () => _showInsightSheet(
                         context,
-                        _getHouseTypeInsight('Trikona'),
+                        _getHouseTypeInsight('Trikona', l10n),
                       ),
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -696,6 +704,7 @@ class _HousesTabState extends State<HousesTab> {
                           house: entry.value,
                           kundaliData: widget.kundaliData,
                           accentColor: _Colors.amber,
+                          l10n: l10n,
                         ),
                       );
                     }),
@@ -714,12 +723,12 @@ class _HousesTabState extends State<HousesTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Dusthana Houses',
-                      subtitle: 'Malefic • 6, 8, 12',
+                      title: l10n.houses_dusthana_title,
+                      subtitle: l10n.houses_dusthana_subtitle,
                       accentColor: _Colors.coral,
                       onTap: () => _showInsightSheet(
                         context,
-                        _getHouseTypeInsight('Dusthana'),
+                        _getHouseTypeInsight('Dusthana', l10n),
                       ),
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -733,6 +742,7 @@ class _HousesTabState extends State<HousesTab> {
                           house: entry.value,
                           kundaliData: widget.kundaliData,
                           accentColor: _Colors.coral,
+                          l10n: l10n,
                         ),
                       );
                     }),
@@ -751,12 +761,12 @@ class _HousesTabState extends State<HousesTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Upachaya Houses',
-                      subtitle: 'Growth • 3, 11',
+                      title: l10n.houses_upachaya_title,
+                      subtitle: l10n.houses_upachaya_subtitle,
                       accentColor: _Colors.sky,
                       onTap: () => _showInsightSheet(
                         context,
-                        _getHouseTypeInsight('Upachaya'),
+                        _getHouseTypeInsight('Upachaya', l10n),
                       ),
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -770,6 +780,7 @@ class _HousesTabState extends State<HousesTab> {
                           house: entry.value,
                           kundaliData: widget.kundaliData,
                           accentColor: _Colors.sky,
+                          l10n: l10n,
                         ),
                       );
                     }),
@@ -788,12 +799,12 @@ class _HousesTabState extends State<HousesTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _AnimatedSectionHeader(
-                      title: 'Maraka Houses',
-                      subtitle: 'Death Inflicting • 2, 7',
+                      title: l10n.houses_maraka_title,
+                      subtitle: l10n.houses_maraka_subtitle,
                       accentColor: _Colors.lavender,
                       onTap: () => _showInsightSheet(
                         context,
-                        _getHouseTypeInsight('Maraka'),
+                        _getHouseTypeInsight('Maraka', l10n),
                       ),
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -807,6 +818,7 @@ class _HousesTabState extends State<HousesTab> {
                           house: entry.value,
                           kundaliData: widget.kundaliData,
                           accentColor: _Colors.lavender,
+                          l10n: l10n,
                         ),
                       );
                     }),
@@ -823,7 +835,7 @@ class _HousesTabState extends State<HousesTab> {
           right: 16,
           bottom: MediaQuery.of(context).padding.bottom + 16,
           child: FloatingNavBar(
-            sections: _sections,
+            sections: sections,
             activeIndex: _activeIndex,
             onTap: _scrollToSection,
           ),
@@ -1182,8 +1194,9 @@ class _Card extends StatelessWidget {
 class _OverviewCard extends StatelessWidget {
   final String ascendant;
   final Map<String, int> stats;
+  final AppLocalizations l10n;
 
-  const _OverviewCard({required this.ascendant, required this.stats});
+  const _OverviewCard({required this.ascendant, required this.stats, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -1246,7 +1259,7 @@ class _OverviewCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        '12 BHAVAS',
+                        l10n.houses_bhavas,
                         style: GoogleFonts.jetBrainsMono(
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
@@ -1256,10 +1269,10 @@ class _OverviewCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: _DesignTokens.space6),
-                    Text('$ascendant Lagna', style: _DesignTokens.titleMd),
+                    Text(l10n.houses_lagna(ascendant), style: _DesignTokens.titleMd),
                     const SizedBox(height: _DesignTokens.space2),
                     Text(
-                      'Houses starting from $ascendant',
+                      l10n.houses_startingFrom(ascendant),
                       style: _DesignTokens.labelXs,
                     ),
                   ],
@@ -1281,19 +1294,19 @@ class _OverviewCard extends StatelessWidget {
               children: [
                 _StatItem(
                   value: '${stats['occupied']}',
-                  label: 'Occupied',
+                  label: l10n.houses_occupied,
                   color: _Colors.emerald,
                 ),
                 _StatDivider(),
                 _StatItem(
                   value: '${stats['empty']}',
-                  label: 'Empty',
+                  label: l10n.houses_empty,
                   color: _Colors.textTertiary,
                 ),
                 _StatDivider(),
                 _StatItem(
                   value: '${stats['planets']}',
-                  label: 'Planets',
+                  label: l10n.houses_planetsCount,
                   color: _Colors.amber,
                 ),
               ],
@@ -1350,11 +1363,13 @@ class _HouseCard extends StatefulWidget {
   final House house;
   final KundaliData kundaliData;
   final Color accentColor;
+  final AppLocalizations l10n;
 
   const _HouseCard({
     required this.house,
     required this.kundaliData,
     required this.accentColor,
+    required this.l10n,
   });
 
   @override
@@ -1394,7 +1409,7 @@ class _HouseCardState extends State<_HouseCard>
   void _onTapUp(TapUpDetails details) {
     setState(() => _isPressed = false);
     _controller.reverse();
-    _showInsightSheet(context, _getHouseInsight(widget.house));
+    _showInsightSheet(context, _getHouseInsight(widget.house, widget.l10n));
   }
 
   void _onTapCancel() {
@@ -1498,7 +1513,7 @@ class _HouseCardState extends State<_HouseCard>
                             Row(
                               children: [
                                 Text(
-                                  'House ${widget.house.number}',
+                                  widget.l10n.houses_houseNumber(widget.house.number),
                                   style: _DesignTokens.titleSm.copyWith(
                                     color: widget.accentColor,
                                   ),
@@ -1506,14 +1521,14 @@ class _HouseCardState extends State<_HouseCard>
                                 const SizedBox(width: _DesignTokens.space6),
                                 if (isFirstHouse)
                                   _StatusChip(
-                                    label: 'LAGNA',
+                                    label: widget.l10n.houses_lagnaChip,
                                     color: _Colors.violet,
                                   ),
                               ],
                             ),
                             const SizedBox(height: _DesignTokens.space4),
                             Text(
-                              '${_getHouseName(widget.house.number)} • ${widget.house.sign}',
+                              widget.l10n.houses_houseBhava(_getHouseName(widget.house.number, widget.l10n), widget.house.sign),
                               style: _DesignTokens.labelSm,
                             ),
                             const SizedBox(height: _DesignTokens.space2),
@@ -1826,39 +1841,40 @@ class _PlanetChip extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════════════════════
 // INSIGHT GENERATORS
 // ═══════════════════════════════════════════════════════════════════════════
-InsightData _getHouseInsight(House house) {
-  final houseName = _getHouseName(house.number);
+InsightData _getHouseInsight(House house, AppLocalizations l10n) {
+  final houseName = _getHouseName(house.number, l10n);
   final significations = _getHouseSignifications(house.number);
   final zodiacColor = _getZodiacColor(house.sign);
 
-  final descriptions = {
-    1: 'The First House, also known as the Ascendant or Lagna, represents your self, physical body, appearance, and how you present yourself to the world. It\'s the most personal house in the chart.',
-    2: 'The Second House governs wealth, family values, speech, and early childhood. It shows your relationship with money, possessions, and how you communicate.',
-    3: 'The Third House rules communication, short journeys, siblings, and courage. It represents your mental strength, skills, and ability to express yourself.',
-    4: 'The Fourth House represents your mother, home, emotional foundation, and inner peace. It shows your roots, domestic happiness, and property matters.',
-    5: 'The Fifth House governs creativity, children, romance, and intelligence. It represents your creative expression, speculative gains, and past life merits.',
-    6: 'The Sixth House deals with enemies, diseases, debts, and daily work. It shows challenges you must overcome and your capacity for service.',
-    7: 'The Seventh House rules marriage, partnerships, and business relationships. It represents your spouse, contracts, and how you relate to others.',
-    8: 'The Eighth House governs transformation, longevity, inheritance, and hidden matters. It represents deep changes, occult knowledge, and joint resources.',
-    9: 'The Ninth House represents higher learning, spirituality, luck, and long journeys. It shows your father, gurus, and philosophical outlook.',
-    10: 'The Tenth House rules career, status, reputation, and achievements. It represents your professional life, authority figures, and public standing.',
-    11: 'The Eleventh House governs gains, friendships, aspirations, and elder siblings. It represents your social network, hopes, and recurring income.',
-    12: 'The Twelfth House deals with losses, spirituality, foreign lands, and liberation. It represents expenses, isolation, and the journey towards moksha.',
-  };
+  String _getDescription(int number) {
+    switch (number) {
+      case 1: return l10n.houses_1_desc;
+      case 2: return l10n.houses_2_desc;
+      case 3: return l10n.houses_3_desc;
+      case 4: return l10n.houses_4_desc;
+      case 5: return l10n.houses_5_desc;
+      case 6: return l10n.houses_6_desc;
+      case 7: return l10n.houses_7_desc;
+      case 8: return l10n.houses_8_desc;
+      case 9: return l10n.houses_9_desc;
+      case 10: return l10n.houses_10_desc;
+      case 11: return l10n.houses_11_desc;
+      case 12: return l10n.houses_12_desc;
+      default: return '';
+    }
+  }
 
   return InsightData(
-    title: 'House ${house.number}',
-    value: '$houseName Bhava',
-    description: descriptions[house.number] ??
-        'This house represents important life areas.',
-    significance:
-        'With ${house.sign} as the sign and ${_getSignLord(house.sign)} as the lord, this house takes on the qualities of ${house.sign} energy in your chart.',
+    title: l10n.houses_houseNumber(house.number),
+    value: l10n.houses_bhava_label(houseName),
+    description: _getDescription(house.number),
+    significance: l10n.houses_withSign(house.sign, _getSignLord(house.sign)),
     keyPoints: [
-      'Sign: ${house.sign} (${_getSignSymbol(house.sign)})',
-      'Lord: ${_getSignLord(house.sign)}',
-      'Cusp: ${house.cuspDegree.toStringAsFixed(2)}°',
-      'Karaka: ${_getHouseKaraka(house.number)}',
-      'Significations: $significations',
+      l10n.houses_sign_key(house.sign, _getSignSymbol(house.sign)),
+      l10n.houses_lord_key(_getSignLord(house.sign)),
+      l10n.houses_cusp_key(house.cuspDegree.toStringAsFixed(2)),
+      l10n.houses_karaka_key(_getHouseKaraka(house.number)),
+      l10n.houses_significations_key(significations),
     ],
     accentColor: zodiacColor,
     icon: _getHouseIcon(house.number),
@@ -1866,105 +1882,94 @@ InsightData _getHouseInsight(House house) {
   );
 }
 
-InsightData _getHouseTypeInsight(String houseType) {
+InsightData _getHouseTypeInsight(String houseType, AppLocalizations l10n) {
   switch (houseType) {
     case 'Kendra':
       return InsightData(
-        title: 'House Category',
-        value: 'Kendra Houses',
-        description:
-            'Kendra houses (1, 4, 7, 10) are the angular or quadrant houses. They form the pillars of the horoscope and are considered the most powerful houses for planetary placement.',
-        significance:
-            'Planets in Kendra houses gain strength and their results become prominent in life. Benefics here protect and promote, while malefics can cause significant challenges.',
+        title: l10n.houses_houseCategory,
+        value: l10n.houses_kendra_value,
+        description: l10n.houses_kendra_desc,
+        significance: l10n.houses_kendra_significance,
         keyPoints: [
-          '1st House - Self, personality, physical body',
-          '4th House - Home, mother, emotional peace',
-          '7th House - Marriage, partnerships, others',
-          '10th House - Career, status, public life',
-          'Also called Vishnu Sthanas (seats of Vishnu)',
+          l10n.houses_kendra_point1,
+          l10n.houses_kendra_point2,
+          l10n.houses_kendra_point3,
+          l10n.houses_kendra_point4,
+          l10n.houses_kendra_point5,
         ],
         accentColor: _Colors.emerald,
         icon: Icons.grid_4x4_rounded,
       );
     case 'Trikona':
       return InsightData(
-        title: 'House Category',
-        value: 'Trikona Houses',
-        description:
-            'Trikona houses (1, 5, 9) are the trinal houses forming a triangle with the Ascendant. They are the most auspicious houses, representing dharma (purpose) and good fortune.',
-        significance:
-            'Lords of Trikona houses become yogakarakas (auspicious) regardless of their natural nature. Planets here bring blessings, wisdom, and spiritual growth.',
+        title: l10n.houses_houseCategory,
+        value: l10n.houses_trikona_value,
+        description: l10n.houses_trikona_desc,
+        significance: l10n.houses_trikona_significance,
         keyPoints: [
-          '1st House - Self and personality (also Kendra)',
-          '5th House - Creativity, children, intelligence',
-          '9th House - Fortune, dharma, higher learning',
-          'Also called Lakshmi Sthanas (seats of Lakshmi)',
-          'Best houses for benefic planets',
+          l10n.houses_trikona_point1,
+          l10n.houses_trikona_point2,
+          l10n.houses_trikona_point3,
+          l10n.houses_trikona_point4,
+          l10n.houses_trikona_point5,
         ],
         accentColor: _Colors.amber,
         icon: Icons.change_history_rounded,
       );
     case 'Dusthana':
       return InsightData(
-        title: 'House Category',
-        value: 'Dusthana Houses',
-        description:
-            'Dusthana houses (6, 8, 12) are considered malefic or challenging houses. They represent difficulties, obstacles, and areas requiring transformation.',
-        significance:
-            'While often feared, these houses are essential for growth. They show where we face challenges that ultimately lead to strength, wisdom, and spiritual evolution.',
+        title: l10n.houses_houseCategory,
+        value: l10n.houses_dusthana_value,
+        description: l10n.houses_dusthana_desc,
+        significance: l10n.houses_dusthana_significance,
         keyPoints: [
-          '6th House - Enemies, diseases, debts, service',
-          '8th House - Transformation, death, occult, inheritance',
-          '12th House - Losses, expenses, liberation, foreign',
-          'Malefics do well here (Vipreet Raja Yoga potential)',
-          'Lords of these houses can cause difficulties',
+          l10n.houses_dusthana_point1,
+          l10n.houses_dusthana_point2,
+          l10n.houses_dusthana_point3,
+          l10n.houses_dusthana_point4,
+          l10n.houses_dusthana_point5,
         ],
         accentColor: _Colors.coral,
         icon: Icons.warning_amber_rounded,
       );
     case 'Upachaya':
       return InsightData(
-        title: 'House Category',
-        value: 'Upachaya Houses',
-        description:
-            'Upachaya houses (3, 6, 10, 11) are growth houses where results improve over time. Malefic planets actually do well here, providing drive and competitive edge.',
-        significance:
-            'These houses show areas where effort leads to improvement. Unlike other houses, the challenges here decrease with age and experience.',
+        title: l10n.houses_houseCategory,
+        value: l10n.houses_upachaya_value,
+        description: l10n.houses_upachaya_desc,
+        significance: l10n.houses_upachaya_significance,
         keyPoints: [
-          '3rd House - Courage, siblings, communication',
-          '6th House - Enemies, health issues, competition',
-          '10th House - Career, public standing, authority',
-          '11th House - Gains, friends, aspirations',
-          'Mars, Saturn, Rahu excel in Upachaya houses',
+          l10n.houses_upachaya_point1,
+          l10n.houses_upachaya_point2,
+          l10n.houses_upachaya_point3,
+          l10n.houses_upachaya_point4,
+          l10n.houses_upachaya_point5,
         ],
         accentColor: _Colors.sky,
         icon: Icons.trending_up_rounded,
       );
     case 'Maraka':
       return InsightData(
-        title: 'House Category',
-        value: 'Maraka Houses',
-        description:
-            'Maraka houses (2, 7) are death-inflicting houses in Vedic astrology. Their lords can cause health issues or endings during their planetary periods.',
-        significance:
-            'The 2nd and 7th houses are 12th from the 3rd and 8th houses respectively, making them potential terminators of longevity factors.',
+        title: l10n.houses_houseCategory,
+        value: l10n.houses_maraka_value,
+        description: l10n.houses_maraka_desc,
+        significance: l10n.houses_maraka_significance,
         keyPoints: [
-          '2nd House - Family, wealth, food, death',
-          '7th House - Spouse, partnerships, death',
-          'Maraka planets can cause illness in their periods',
-          '2nd is stronger Maraka than 7th',
-          'Effects modified by overall chart strength',
+          l10n.houses_maraka_point1,
+          l10n.houses_maraka_point2,
+          l10n.houses_maraka_point3,
+          l10n.houses_maraka_point4,
+          l10n.houses_maraka_point5,
         ],
         accentColor: _Colors.lavender,
         icon: Icons.hourglass_bottom_rounded,
       );
     default:
       return InsightData(
-        title: 'House Category',
+        title: l10n.houses_houseCategory,
         value: houseType,
-        description:
-            'This house category has specific significations in Vedic astrology.',
-        significance: 'Understanding house categories helps in chart interpretation.',
+        description: '',
+        significance: '',
         keyPoints: [],
         accentColor: _Colors.violet,
         icon: Icons.home_rounded,
@@ -2047,20 +2052,20 @@ String _getHouseKaraka(int houseNumber) {
   return karakas[houseNumber] ?? 'Unknown';
 }
 
-String _getHouseName(int n) {
-  const names = [
-    'Lagna',
-    'Dhana',
-    'Sahaja',
-    'Sukha',
-    'Putra',
-    'Ari',
-    'Yuvati',
-    'Mrityu',
-    'Dharma',
-    'Karma',
-    'Labha',
-    'Vyaya',
+String _getHouseName(int n, AppLocalizations l10n) {
+  final names = [
+    l10n.houses_bhava_lagna,
+    l10n.houses_bhava_dhana,
+    l10n.houses_bhava_sahaja,
+    l10n.houses_bhava_sukha,
+    l10n.houses_bhava_putra,
+    l10n.houses_bhava_ari,
+    l10n.houses_bhava_yuvati,
+    l10n.houses_bhava_mrityu,
+    l10n.houses_bhava_dharma,
+    l10n.houses_bhava_karma,
+    l10n.houses_bhava_labha,
+    l10n.houses_bhava_vyaya,
   ];
   return names[(n - 1) % 12];
 }

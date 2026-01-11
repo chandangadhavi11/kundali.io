@@ -1,814 +1,638 @@
 import 'package:flutter/material.dart';
-import '../../../shared/models/kundali_data_model.dart';
-import '../../../core/services/sweph_service.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../models/astro_alert.dart';
+import '../../../shared/models/kundali_data_model.dart';
+import '../../../core/services/kundali_calculation_service.dart';
+import '../../../core/services/sweph_service.dart';
 
-/// Service for detecting and generating astrological alerts from Kundali data
+/// Service to detect and generate astrological alerts from Kundali data
 class AstroAlertService {
-  AstroAlertService._();
+  // Cache for transit Saturn sign (keyed by date)
+  static final Map<String, String> _saturnSignCache = {};
 
-  /// Zodiac signs in order for calculations
-  static const List<String> _zodiacSigns = [
-    'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
-    'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
-  ];
-
-  /// Get the index of a zodiac sign (0-11)
-  static int _getSignIndex(String sign) {
-    return _zodiacSigns.indexOf(sign);
-  }
-
-  /// Calculate house position from one sign to another
-  /// Returns 1-12 (1 = same sign, 2 = next sign, etc.)
-  static int _getHouseFrom(String fromSign, String toSign) {
-    final fromIndex = _getSignIndex(fromSign);
-    final toIndex = _getSignIndex(toSign);
-    if (fromIndex == -1 || toIndex == -1) return -1;
-    return ((toIndex - fromIndex + 12) % 12) + 1;
-  }
-
-  /// Generate all applicable alerts for a given Kundali
-  static List<AstroAlert> generateAlerts(KundaliData kundaliData) {
+  /// Generate all applicable alerts for the given Kundali data
+  /// [transitDate] - optional date for transit calculations (defaults to now)
+  /// [l10n] - optional localization for generating localized alert titles
+  static List<AstroAlert> generateAlerts(
+    KundaliData kundaliData, {
+    DateTime? transitDate,
+    AppLocalizations? l10n,
+  }) {
     final List<AstroAlert> alerts = [];
 
-    // 1. Check for Sade Sati
-    final sadeSatiAlert = _checkSadeSati(kundaliData);
-    if (sadeSatiAlert != null) {
-      alerts.add(sadeSatiAlert);
-    }
+    // Get transiting Saturn sign for Sade Sati / Dhaiya detection
+    final effectiveDate = transitDate ?? DateTime.now();
+    final transitSaturnSign = _getSaturnSignForDate(kundaliData, effectiveDate);
 
-    // 2. Check for Shani Dhaiya
-    final dhaiyaAlert = _checkDhaiya(kundaliData);
-    if (dhaiyaAlert != null) {
-      alerts.add(dhaiyaAlert);
-    }
+    // Detect various conditions
+    final sadeSati = _detectSadeSati(kundaliData, transitSaturnSign, l10n);
+    if (sadeSati != null) alerts.add(sadeSati);
 
-    // 3. Check for Major Dasha (Rahu/Ketu/Saturn)
-    final dashaAlert = _checkMajorDasha(kundaliData);
-    if (dashaAlert != null) {
-      alerts.add(dashaAlert);
-    }
+    final dhaiya = _detectShaniDhaiya(kundaliData, transitSaturnSign, l10n);
+    if (dhaiya != null) alerts.add(dhaiya);
 
-    // 4. Check for Manglik Dosha
-    final manglikAlert = _checkManglikDosha(kundaliData);
-    if (manglikAlert != null) {
-      alerts.add(manglikAlert);
-    }
+    final majorDasha = _detectMajorDasha(kundaliData, l10n);
+    if (majorDasha != null) alerts.add(majorDasha);
 
-    // 5. Check for Moon Affliction
-    final moonAfflictionAlert = _checkMoonAffliction(kundaliData);
-    if (moonAfflictionAlert != null) {
-      alerts.add(moonAfflictionAlert);
-    }
+    final manglik = _detectManglikDosha(kundaliData, l10n);
+    if (manglik != null) alerts.add(manglik);
 
-    // 6. Check for Positive Yogas
-    final positiveYogaAlerts = _checkPositiveYogas(kundaliData);
-    alerts.addAll(positiveYogaAlerts);
+    final moonAffliction = _detectMoonAffliction(kundaliData, l10n);
+    if (moonAffliction != null) alerts.add(moonAffliction);
+
+    alerts.addAll(_detectPositiveYogas(kundaliData, l10n));
 
     // Sort by priority
-    alerts.sort((a, b) => a.compareTo(b));
+    alerts.sort((a, b) => a.priorityIndex.compareTo(b.priorityIndex));
 
     return alerts;
   }
 
-  /// Check for Shani Sade Sati
-  /// Saturn transiting 12th, 1st, or 2nd from natal Moon
-  static AstroAlert? _checkSadeSati(KundaliData kundaliData) {
-    final moonSign = kundaliData.moonSign;
-    final currentSaturnSign = _getCurrentSaturnSign();
+  /// Get Saturn's sign for a specific date
+  /// Uses cache to avoid recalculating for the same day
+  static String _getSaturnSignForDate(KundaliData data, DateTime date) {
+    // Cache key is date only (YYYY-MM-DD) since Saturn moves slowly
+    final cacheKey = '${date.year}-${date.month}-${date.day}';
     
-    if (currentSaturnSign == null) return null;
+    if (_saturnSignCache.containsKey(cacheKey)) {
+      return _saturnSignCache[cacheKey]!;
+    }
 
-    final houseFromMoon = _getHouseFrom(moonSign, currentSaturnSign);
-    
+    // Try to calculate Saturn position using Swiss Ephemeris
+    try {
+      if (SwephService.nativeLibraryAvailable) {
+        final transitResult = KundaliCalculationService.calculateAll(
+          birthDateTime: date,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          timezone: data.timezone,
+        );
+        
+        final transitSaturn = transitResult.planetPositions['Saturn'];
+        if (transitSaturn != null) {
+          _saturnSignCache[cacheKey] = transitSaturn.sign;
+          // Keep cache size manageable
+          if (_saturnSignCache.length > 100) {
+            _saturnSignCache.remove(_saturnSignCache.keys.first);
+          }
+          return transitSaturn.sign;
+        }
+      }
+    } catch (e) {
+      debugPrint('AstroAlertService: Error calculating transit: $e');
+    }
+
+    // Fallback: Use hardcoded Saturn position based on known astronomy
+    final saturnSign = _getHardcodedSaturnSign(date);
+    _saturnSignCache[cacheKey] = saturnSign;
+    return saturnSign;
+  }
+
+  /// Get Saturn's sign based on known transit dates (fallback)
+  static String _getHardcodedSaturnSign(DateTime date) {
+    // Saturn transit dates (sidereal/Vedic)
+    // These are approximate - Saturn has brief retrogrades
+    if (date.isBefore(DateTime(2023, 1, 17))) {
+      return 'Capricorn';
+    } else if (date.isBefore(DateTime(2025, 3, 29))) {
+      return 'Aquarius';
+    } else if (date.isBefore(DateTime(2028, 2, 6))) {
+      // Saturn in Pisces with brief Aries excursion in 2027
+      if (date.isAfter(DateTime(2027, 6, 1)) && date.isBefore(DateTime(2027, 11, 1))) {
+        return 'Aries'; // Brief Aries transit
+      }
+      return 'Pisces';
+    } else if (date.isBefore(DateTime(2031, 4, 1))) {
+      return 'Aries';
+    } else if (date.isBefore(DateTime(2034, 7, 1))) {
+      return 'Taurus';
+    } else {
+      return 'Gemini';
+    }
+  }
+
+  /// Get the zodiac sign index (0-11) from sign name
+  static int _getSignIndex(String sign) {
+    const signs = [
+      'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
+      'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+    ];
+    return signs.indexOf(sign);
+  }
+
+  /// Calculate houses away (positive = forward in zodiac)
+  static int _getHousesAway(String fromSign, String toSign) {
+    final from = _getSignIndex(fromSign);
+    final to = _getSignIndex(toSign);
+    if (from == -1 || to == -1) return -1;
+    return (to - from + 12) % 12;
+  }
+
+  /// Detect Shani Sade Sati
+  /// Sade Sati occurs when Saturn TRANSITS 12th, 1st, or 2nd from Moon sign
+  static AstroAlert? _detectSadeSati(KundaliData data, String transitSaturnSign, AppLocalizations? l10n) {
+    final moonSign = data.moonSign;
+    final housesAway = _getHousesAway(moonSign, transitSaturnSign);
+
+    // Sade Sati: Saturn in 12th (11), 1st (0), or 2nd (1) from Moon
     SadeSatiPhase? phase;
-    if (houseFromMoon == 12) {
+    String phaseLabel = '';
+
+    if (housesAway == 11) {
       phase = SadeSatiPhase.first;
-    } else if (houseFromMoon == 1) {
+      phaseLabel = l10n?.alert_risingPhase ?? 'Rising Phase (1st)';
+    } else if (housesAway == 0) {
       phase = SadeSatiPhase.peak;
-    } else if (houseFromMoon == 2) {
+      phaseLabel = l10n?.alert_peakPhase ?? 'Peak Phase';
+    } else if (housesAway == 1) {
       phase = SadeSatiPhase.third;
+      phaseLabel = l10n?.alert_settingPhase ?? 'Setting Phase (3rd)';
     }
 
     if (phase == null) return null;
 
-    // Calculate approximate dates (Saturn spends ~2.5 years in each sign)
-    final (startDate, endDate) = _getSaturnTransitDates(currentSaturnSign);
+    final transitDates = _getSaturnTransitDates(transitSaturnSign);
 
     return AstroAlert(
       id: 'sade_sati_${phase.name}',
       type: AlertType.warning,
       priority: AlertPriority.sadeSati,
-      title: 'Shani Sade Sati',
-      subtitle: phase.displayName,
-      description: 'Saturn is transiting ${phase.position}, activating Sade Sati.',
-      startDate: startDate,
-      endDate: endDate,
+      title: l10n?.alert_sadeSati ?? 'Shani Sade Sati',
+      subtitle: phaseLabel,
+      description: 'Saturn is transiting through your $phaseLabel of Sade Sati. Moon sign: $moonSign, Saturn in: $transitSaturnSign.',
+      startDate: transitDates['start'],
+      endDate: transitDates['end'],
       iconSymbol: '♄',
-      planetName: 'Saturn',
       accentColor: AstroAlertColors.saturn,
-      themeSummary: 'A phase of increased responsibility and growth through discipline',
-      detailedExplanation: _getSadeSatiExplanation(phase),
-      formationLogic: 'Saturn (Shani) is currently transiting $currentSaturnSign, '
-          'which is the ${phase.position} relative to your natal Moon in $moonSign. '
-          'This activates the ${phase.displayName.toLowerCase()} of Sade Sati.',
-      effects: _getSadeSatiEffects(phase),
-      remedies: _getSaturnRemedies(),
-      sadeSatiPhase: phase,
+      themeSummary: 'A period of transformation, discipline, and inner growth.',
+      detailedExplanation: '''Sade Sati is a 7.5-year transit of Saturn through the 12th, 1st, and 2nd houses from your Moon sign ($moonSign). This is not a period of punishment, but rather a time when Saturn teaches important life lessons.
+
+During the $phaseLabel:
+${phase == SadeSatiPhase.first ? '• Focus shifts to introspection and releasing old patterns\n• Hidden matters may come to surface for resolution' : ''}
+${phase == SadeSatiPhase.peak ? '• Most intense period of transformation\n• Direct impact on emotional well-being and self-identity\n• Opportunities for significant personal growth' : ''}
+${phase == SadeSatiPhase.third ? '• Integration of lessons learned\n• Gradual easing of pressures\n• Building new foundations based on wisdom gained' : ''}
+
+This transit ultimately strengthens character and brings maturity.''',
+      effects: [
+        'Increased responsibilities and life restructuring',
+        'Deeper self-awareness and emotional maturity',
+        'Patience and perseverance are rewarded',
+        'Long-term foundations being established',
+      ],
+      remedies: [
+        'Chant "Om Sham Shanicharaya Namaha" on Saturdays',
+        'Donate black sesame seeds or mustard oil',
+        'Practice patience and avoid impulsive decisions',
+        'Serve the elderly and underprivileged',
+      ],
     );
   }
 
-  /// Check for Shani Dhaiya (Small Panoti)
-  /// Saturn transiting 4th or 8th from natal Moon
-  static AstroAlert? _checkDhaiya(KundaliData kundaliData) {
-    final moonSign = kundaliData.moonSign;
-    final currentSaturnSign = _getCurrentSaturnSign();
-    
-    if (currentSaturnSign == null) return null;
+  /// Detect Shani Dhaiya (Small Panoti)
+  /// Dhaiya occurs when Saturn TRANSITS 4th or 8th from Moon sign
+  static AstroAlert? _detectShaniDhaiya(KundaliData data, String transitSaturnSign, AppLocalizations? l10n) {
+    final moonSign = data.moonSign;
+    final housesAway = _getHousesAway(moonSign, transitSaturnSign);
 
-    final houseFromMoon = _getHouseFrom(moonSign, currentSaturnSign);
-    
+    // Dhaiya: Saturn in 4th (3) or 8th (7) from Moon
     DhaiyaPhase? phase;
-    if (houseFromMoon == 4) {
-      phase = DhaiyaPhase.fourth;
-    } else if (houseFromMoon == 8) {
-      phase = DhaiyaPhase.eighth;
+    String houseLabel = '';
+
+    if (housesAway == 3) {
+      phase = DhaiyaPhase.small;
+      houseLabel = '4th house';
+    } else if (housesAway == 7) {
+      phase = DhaiyaPhase.big;
+      houseLabel = '8th house';
     }
 
     if (phase == null) return null;
 
-    final (startDate, endDate) = _getSaturnTransitDates(currentSaturnSign);
-
     return AstroAlert(
       id: 'dhaiya_${phase.name}',
-      type: AlertType.warning,
+      type: AlertType.neutral,
       priority: AlertPriority.dhaiya,
-      title: 'Shani Dhaiya',
-      subtitle: phase.name,
-      description: 'Saturn is transiting ${phase.position} from your Moon sign.',
-      startDate: startDate,
-      endDate: endDate,
+      title: l10n?.alert_shaniDhaiya ?? 'Shani Dhaiya',
+      subtitle: l10n?.alert_saturnIn(houseLabel) ?? 'Saturn in $houseLabel from Moon',
+      description: 'Saturn is transiting your $houseLabel from Moon sign ($moonSign).',
       iconSymbol: '♄',
-      planetName: 'Saturn',
       accentColor: AstroAlertColors.saturn,
-      themeSummary: 'A period calling for patience and careful decision-making',
-      detailedExplanation: _getDhaiyaExplanation(phase),
-      formationLogic: 'Saturn (Shani) is currently transiting $currentSaturnSign, '
-          'which is the ${phase.position} from your natal Moon in $moonSign. '
-          'This creates ${phase.name}, also known as Small Panoti or Dhaiya.',
-      effects: _getDhaiyaEffects(phase),
-      remedies: _getSaturnRemedies(),
-      dhaiyaPhase: phase,
+      themeSummary: 'A 2.5-year period requiring patience in ${phase == DhaiyaPhase.small ? 'domestic and emotional matters' : 'transformations and changes'}.',
+      detailedExplanation: '''Shani Dhaiya, also known as Small Panoti, occurs when Saturn transits the 4th or 8th house from your Moon sign. This is a 2.5-year period that, while less intense than Sade Sati, still requires mindfulness.
+
+${phase == DhaiyaPhase.small ? '''When Saturn transits the 4th house:
+• Focus on home, property, and emotional security
+• Mother's health may need attention
+• Inner peace requires conscious effort
+• Good time to make long-term property decisions''' : '''When Saturn transits the 8th house:
+• Transformation and regeneration themes
+• Joint finances and shared resources in focus
+• Deep psychological insights possible
+• Research and investigation favored'''}''',
+      effects: [
+        phase == DhaiyaPhase.small
+            ? 'Domestic matters require attention'
+            : 'Transformation in shared resources',
+        'Patience needed in daily life',
+        'Good for introspection',
+      ],
+      remedies: [
+        'Recite Hanuman Chalisa on Saturdays',
+        'Light a sesame oil lamp on Saturday evenings',
+        'Practice mindfulness and stress management',
+      ],
     );
   }
 
-  /// Check for Major Dasha (Rahu, Ketu, or Saturn as Mahadasha lord)
-  static AstroAlert? _checkMajorDasha(KundaliData kundaliData) {
-    final currentMahadasha = kundaliData.dashaInfo.currentMahadasha;
-    
-    if (currentMahadasha != 'Rahu' && 
-        currentMahadasha != 'Ketu' && 
-        currentMahadasha != 'Saturn') {
-      return null;
-    }
+  /// Detect major Dasha (Rahu, Ketu, Saturn)
+  static AstroAlert? _detectMajorDasha(KundaliData data, AppLocalizations? l10n) {
+    final dashaInfo = data.dashaInfo;
 
-    final dashaInfo = kundaliData.dashaInfo;
-    final startDate = dashaInfo.mahadashaStartDate ?? dashaInfo.startDate;
-    final endDate = dashaInfo.mahadashaEndDate ?? dashaInfo.endDate;
+    final currentDasha = dashaInfo.currentMahadasha.toLowerCase();
+    final isRahu = currentDasha.contains('rahu');
+    final isKetu = currentDasha.contains('ketu');
+    final isSaturn = currentDasha.contains('saturn') || currentDasha.contains('shani');
 
-    Color accentColor;
-    String iconSymbol;
-    String themeSummary;
-    List<String> effects;
+    if (!isRahu && !isKetu && !isSaturn) return null;
 
-    switch (currentMahadasha) {
-      case 'Rahu':
-        accentColor = AstroAlertColors.rahu;
-        iconSymbol = '☊';
-        themeSummary = 'A period of intense ambition, unconventional paths, and material pursuits';
-        effects = [
-          'Strong desire for worldly success and recognition',
-          'Unconventional approaches and risk-taking tendencies',
-          'Foreign connections and overseas opportunities',
-          'Need for grounding and spiritual practices',
-          'Potential for sudden gains or unexpected changes',
-        ];
-        break;
-      case 'Ketu':
-        accentColor = AstroAlertColors.ketu;
-        iconSymbol = '☋';
-        themeSummary = 'A period of spiritual growth, detachment, and inner transformation';
-        effects = [
-          'Heightened spiritual awareness and intuition',
-          'Natural inclination towards meditation and introspection',
-          'Lessons in letting go and non-attachment',
-          'Possible sense of isolation or withdrawal',
-          'Deep karmic clearing and past-life influences',
-        ];
-        break;
-      case 'Saturn':
-      default:
-        accentColor = AstroAlertColors.saturn;
-        iconSymbol = '♄';
-        themeSummary = 'A period emphasizing hard work, discipline, and karmic lessons';
-        effects = [
-          'Rewards for consistent effort and perseverance',
-          'Lessons around responsibility and commitment',
-          'Building long-term foundations',
-          'Tests of patience and endurance',
-          'Maturity through challenges',
-        ];
-        break;
-    }
+    String planet = isRahu ? 'Rahu' : (isKetu ? 'Ketu' : 'Saturn');
+    String symbol = isRahu ? '☊' : (isKetu ? '☋' : '♄');
+    Color color = (isRahu || isKetu) ? AstroAlertColors.rahuKetu : AstroAlertColors.saturn;
 
     return AstroAlert(
-      id: 'mahadasha_$currentMahadasha',
-      type: currentMahadasha == 'Ketu' ? AlertType.neutral : AlertType.warning,
+      id: 'dasha_$planet',
+      type: AlertType.neutral,
       priority: AlertPriority.majorDasha,
-      title: '$currentMahadasha Mahadasha',
-      subtitle: 'Current Major Period',
-      description: 'You are in the $currentMahadasha planetary period.',
-      startDate: startDate,
-      endDate: endDate,
-      iconSymbol: iconSymbol,
-      planetName: currentMahadasha,
-      accentColor: accentColor,
-      themeSummary: themeSummary,
-      detailedExplanation: _getMahadashaExplanation(currentMahadasha),
-      formationLogic: 'Based on your Moon\'s nakshatra at birth, you are currently '
-          'running the $currentMahadasha Mahadasha (major planetary period) '
-          'in the Vimshottari Dasha system. This period lasts '
-          '${_getMahadashaDuration(currentMahadasha)} years.',
-      effects: effects,
-      remedies: _getMahadashaRemedies(currentMahadasha),
+      title: l10n?.alert_mahadasha(planet) ?? '$planet Mahadasha',
+      subtitle: l10n?.alert_currentMajorPeriod ?? 'Current major period',
+      description: 'You are in the $planet Mahadasha period.',
+      startDate: dashaInfo.mahadashaStartDate,
+      endDate: dashaInfo.mahadashaEndDate,
+      iconSymbol: symbol,
+      accentColor: color,
+      themeSummary: _getDashaSummary(planet),
+      detailedExplanation: _getDashaExplanation(planet),
+      effects: _getDashaEffects(planet),
+      remedies: _getDashaRemedies(planet),
     );
   }
 
-  /// Check for Manglik Dosha
-  static AstroAlert? _checkManglikDosha(KundaliData kundaliData) {
-    // Check if Manglik Dosha is already detected
-    if (!kundaliData.doshas.contains('Manglik Dosha')) {
-      return null;
-    }
-
-    // Get Mars position for additional details
-    final mars = kundaliData.planetPositions['Mars'];
-    final marsHouse = mars?.house ?? 0;
-
-    String houseDescription;
-    switch (marsHouse) {
-      case 1:
-        houseDescription = '1st House (Self/Personality)';
-        break;
-      case 4:
-        houseDescription = '4th House (Home/Happiness)';
-        break;
-      case 7:
-        houseDescription = '7th House (Marriage/Partnership)';
-        break;
-      case 8:
-        houseDescription = '8th House (Transformation)';
-        break;
-      case 12:
-        houseDescription = '12th House (Losses/Liberation)';
-        break;
+  static String _getDashaSummary(String planet) {
+    switch (planet) {
+      case 'Rahu':
+        return 'A period of worldly ambitions, unconventional paths, and material pursuits.';
+      case 'Ketu':
+        return 'A period of spiritual growth, detachment, and inner wisdom.';
+      case 'Saturn':
+        return 'A period of discipline, hard work, and karmic lessons.';
       default:
-        houseDescription = 'a significant house';
+        return '';
     }
+  }
+
+  static String _getDashaExplanation(String planet) {
+    switch (planet) {
+      case 'Rahu':
+        return '''Rahu Mahadasha is an 18-year period that amplifies desires and worldly ambitions. Rahu represents our unfulfilled desires and the areas where we seek growth.
+
+Key themes:
+• Strong drive for success and recognition
+• Unconventional approaches may bring results
+• Foreign connections and travel possible
+• Technology and innovation favored
+• Important to stay grounded and ethical''';
+      case 'Ketu':
+        return '''Ketu Mahadasha is a 7-year period of spiritual evolution and detachment. Ketu represents liberation from material attachments.
+
+Key themes:
+• Spiritual inclinations strengthen
+• Past-life talents may emerge
+• Detachment from worldly matters
+• Intuition and psychic abilities heightened
+• Research and occult studies favored''';
+      case 'Saturn':
+        return '''Saturn Mahadasha is a 19-year period of discipline, responsibility, and karmic settlements. Saturn teaches through experience.
+
+Key themes:
+• Hard work and perseverance rewarded
+• Slow but steady progress
+• Authority and structure important
+• Career building opportunities
+• Justice and fairness emphasized''';
+      default:
+        return '';
+    }
+  }
+
+  static List<String> _getDashaEffects(String planet) {
+    switch (planet) {
+      case 'Rahu':
+        return [
+          'Amplified ambitions and desires',
+          'Unconventional success paths',
+          'Foreign opportunities',
+          'Technology and innovation gains',
+        ];
+      case 'Ketu':
+        return [
+          'Spiritual awakening',
+          'Intuitive insights',
+          'Past karma resolution',
+          'Detachment and liberation',
+        ];
+      case 'Saturn':
+        return [
+          'Discipline brings rewards',
+          'Career responsibilities increase',
+          'Karmic lessons unfold',
+          'Long-term stability building',
+        ];
+      default:
+        return [];
+    }
+  }
+
+  static List<String> _getDashaRemedies(String planet) {
+    switch (planet) {
+      case 'Rahu':
+        return [
+          'Chant "Om Raam Rahave Namaha"',
+          'Donate to the underprivileged',
+          'Avoid intoxicants and unethical practices',
+          'Worship Lord Ganesha',
+        ];
+      case 'Ketu':
+        return [
+          'Chant "Om Kem Ketave Namaha"',
+          'Practice meditation regularly',
+          'Donate blankets to the needy',
+          'Worship Lord Ganesha',
+        ];
+      case 'Saturn':
+        return [
+          'Chant "Om Sham Shanicharaya Namaha"',
+          'Serve the elderly and workers',
+          'Practice patience and discipline',
+          'Donate black items on Saturdays',
+        ];
+      default:
+        return [];
+    }
+  }
+
+  /// Detect Manglik Dosha
+  static AstroAlert? _detectManglikDosha(KundaliData data, AppLocalizations? l10n) {
+    final marsPosition = data.planetPositions['Mars'];
+    if (marsPosition == null) return null;
+
+    // Check if Mars is in 1st, 4th, 7th, 8th, or 12th house
+    final manglikHouses = [1, 4, 7, 8, 12];
+    final marsInManglikHouse = manglikHouses.contains(marsPosition.house);
+
+    // Also check if it's already detected in doshas (doshas is List<String>)
+    final hasManglikDosha = data.doshas.any(
+      (d) => d.toLowerCase().contains('manglik') ||
+             d.toLowerCase().contains('mangal'),
+    );
+
+    if (!marsInManglikHouse && !hasManglikDosha) return null;
+
+    final houseToShow = marsInManglikHouse ? marsPosition.house : 
+        (hasManglikDosha ? _extractManglikHouse(data.doshas) : 7);
 
     return AstroAlert(
       id: 'manglik_dosha',
       type: AlertType.neutral,
       priority: AlertPriority.manglikDosha,
-      title: 'Manglik Dosha',
-      subtitle: 'Mars in $houseDescription',
-      description: 'Mars is placed in a Manglik-forming house in your chart.',
-      startDate: null, // Lifetime condition
-      endDate: null,
+      title: l10n?.alert_manglikDosha ?? 'Manglik Dosha',
+      subtitle: l10n?.alert_marsInHouse(_getOrdinal(houseToShow)) ?? 'Mars in ${_getOrdinal(houseToShow)} house',
+      description: 'Mars is placed in the ${_getOrdinal(houseToShow)} house of your birth chart.',
       iconSymbol: '♂',
-      planetName: 'Mars',
-      accentColor: AstroAlertColors.mars,
-      themeSummary: 'Consider Manglik matching for marriage compatibility',
-      detailedExplanation: '''
-Manglik Dosha (also known as Kuja Dosha or Mangal Dosha) is formed when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant.
+      accentColor: AstroAlertColors.generalWarning,
+      themeSummary: 'Mars energy influences relationships and requires understanding for harmony.',
+      detailedExplanation: '''Manglik Dosha occurs when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. This is one of the most discussed doshas in Vedic astrology, particularly regarding marriage compatibility.
 
-In your chart, Mars is placed in the $houseDescription, which creates this yoga.
+Important perspective:
+• Manglik Dosha is very common (approximately 50% of people have it)
+• Its effects vary based on Mars's sign, aspects, and conjunctions
+• Many natural cancellations exist (after age 28, if Mars is in own sign, etc.)
+• Both partners having Manglik Dosha is considered balancing
 
-It's important to note that many charts have this placement, and its effects are often mitigated by various factors including:
-• Mars in its own sign or exaltation
-• Beneficial aspects from Jupiter or Venus
-• Similar placement in partner's chart (Dosha cancellation)
-• Age (effects are said to reduce after 28 years)
-
-Traditional texts suggest considering Manglik matching during marriage, but many astrologers view this as just one of many factors in compatibility assessment.
-''',
-      formationLogic: 'Mars (Mangal) is positioned in the ${marsHouse}th house from '
-          'your Ascendant. Houses 1, 4, 7, 8, and 12 are considered Manglik-forming '
-          'positions as Mars brings its fiery, assertive energy to these sensitive '
-          'areas of life.',
+Mars in the ${_getOrdinal(houseToShow)} house specifically influences:
+${_getManglikHouseEffect(houseToShow)}''',
       effects: [
-        'Passion and assertiveness in relationships',
         'Strong willpower and determination',
-        'Importance of physical compatibility',
-        'Traditional recommendation for Manglik matching',
-        'Energy that can be channeled into sports or career',
+        'Passionate nature in relationships',
+        'Need for independence and space',
+        'Leadership qualities',
       ],
       remedies: [
-        'Recite Hanuman Chalisa on Tuesdays',
-        'Donate red lentils or jaggery',
-        'Wear a red coral after consultation',
-        'Kumbh Vivah ritual (symbolic marriage)',
-        'Practice patience and anger management',
+        'Chant "Om Angarakaya Namaha" on Tuesdays',
+        'Perform Kumbh Vivah if recommended',
+        'Donate red lentils on Tuesdays',
+        'Channel Mars energy through physical activities',
       ],
     );
   }
 
-  /// Check for Moon Affliction
-  static AstroAlert? _checkMoonAffliction(KundaliData kundaliData) {
-    final moon = kundaliData.planetPositions['Moon'];
-    if (moon == null) return null;
-
-    final List<String> afflictionReasons = [];
-
-    // Check if Moon is in 6th, 8th, or 12th house
-    if (moon.house == 6 || moon.house == 8 || moon.house == 12) {
-      afflictionReasons.add('Moon in ${moon.house}th house (Dusthana)');
-    }
-
-    // Check for conjunction with malefics
-    final saturn = kundaliData.planetPositions['Saturn'];
-    final rahu = kundaliData.planetPositions['Rahu'];
-    final ketu = kundaliData.planetPositions['Ketu'];
-
-    if (saturn != null && moon.sign == saturn.sign) {
-      afflictionReasons.add('Moon conjunct Saturn');
-    }
-    if (rahu != null && moon.sign == rahu.sign) {
-      afflictionReasons.add('Moon conjunct Rahu');
-    }
-    if (ketu != null && moon.sign == ketu.sign) {
-      afflictionReasons.add('Moon conjunct Ketu');
-    }
-
-    // Check for Saturn's aspect on Moon (Saturn aspects 3rd, 7th, and 10th from itself)
-    if (saturn != null) {
-      final saturnHouseFromMoon = _getHouseFrom(moon.sign, saturn.sign);
-      if (saturnHouseFromMoon == 3 || saturnHouseFromMoon == 7 || saturnHouseFromMoon == 10) {
-        afflictionReasons.add('Moon aspected by Saturn');
+  static int _extractManglikHouse(List<String> doshas) {
+    // Try to extract house number from dosha string
+    for (final d in doshas) {
+      if (d.toLowerCase().contains('manglik')) {
+        final regex = RegExp(r'(\d+)');
+        final match = regex.firstMatch(d);
+        if (match != null) {
+          return int.tryParse(match.group(1)!) ?? 7;
+        }
       }
     }
+    return 7; // Default
+  }
 
-    if (afflictionReasons.isEmpty) return null;
+  static String _getManglikHouseEffect(int house) {
+    switch (house) {
+      case 1:
+        return '• Strong personality and self-assertion\n• Natural leadership abilities';
+      case 4:
+        return '• Passionate about home and property\n• Strong attachment to family';
+      case 7:
+        return '• Intense approach to partnerships\n• Need for an equally strong partner';
+      case 8:
+        return '• Deep transformative energy\n• Interest in mysteries and research';
+      case 12:
+        return '• Expenses on good causes\n• Spiritual warrior energy';
+      default:
+        return '';
+    }
+  }
+
+  /// Detect Moon affliction
+  static AstroAlert? _detectMoonAffliction(KundaliData data, AppLocalizations? l10n) {
+    final moonPosition = data.planetPositions['Moon'];
+    if (moonPosition == null) return null;
+
+    final dusthanaHouses = [6, 8, 12];
+    final isInDusthana = dusthanaHouses.contains(moonPosition.house);
+
+    // Check for conjunction with malefics
+    final saturn = data.planetPositions['Saturn'];
+    final rahu = data.planetPositions['Rahu'];
+    final ketu = data.planetPositions['Ketu'];
+
+    bool isConjunctMalefic = false;
+    String conjunctPlanet = '';
+
+    if (saturn != null && saturn.sign == moonPosition.sign) {
+      isConjunctMalefic = true;
+      conjunctPlanet = 'Saturn';
+    } else if (rahu != null && rahu.sign == moonPosition.sign) {
+      isConjunctMalefic = true;
+      conjunctPlanet = 'Rahu';
+    } else if (ketu != null && ketu.sign == moonPosition.sign) {
+      isConjunctMalefic = true;
+      conjunctPlanet = 'Ketu';
+    }
+
+    if (!isInDusthana && !isConjunctMalefic) return null;
+
+    String subtitle = '';
+    if (isConjunctMalefic) {
+      subtitle = l10n?.alert_moonWith(conjunctPlanet) ?? 'Moon with $conjunctPlanet';
+    } else {
+      subtitle = l10n?.alert_moonInHouse(_getOrdinal(moonPosition.house)) ?? 'Moon in ${_getOrdinal(moonPosition.house)} house';
+    }
 
     return AstroAlert(
       id: 'moon_affliction',
       type: AlertType.neutral,
       priority: AlertPriority.moonAffliction,
-      title: 'Sensitive Moon Placement',
-      subtitle: afflictionReasons.first,
-      description: 'Your Moon has some challenging influences in the birth chart.',
-      startDate: null,
-      endDate: null,
+      title: l10n?.alert_lunarSensitivity ?? 'Lunar Sensitivity',
+      subtitle: subtitle,
+      description: 'Your Moon placement suggests heightened emotional sensitivity.',
       iconSymbol: '☽',
-      planetName: 'Moon',
-      accentColor: AstroAlertColors.moon,
-      themeSummary: 'Your emotional nature may benefit from grounding practices',
-      detailedExplanation: '''
-The Moon represents the mind, emotions, and inner peace in Vedic astrology. When the Moon receives challenging influences, it can affect emotional stability and mental peace.
+      accentColor: AstroAlertColors.moonAffliction,
+      themeSummary: 'Enhanced intuition and emotional depth that benefits from mindful practices.',
+      detailedExplanation: '''Your Moon placement indicates a sensitive and intuitive emotional nature. This is not a weakness but rather a gift that, when understood, provides deep insight and empathy.
 
-In your chart, the following factors are present:
-${afflictionReasons.map((r) => '• $r').join('\n')}
+${isConjunctMalefic ? '''Moon conjunct $conjunctPlanet:
+${conjunctPlanet == 'Saturn' ? '• Deep, serious emotional nature\n• Wisdom through emotional experiences\n• Strong sense of responsibility' : ''}
+${conjunctPlanet == 'Rahu' ? '• Intense emotional experiences\n• Strong desires and ambitions\n• Innovative thinking patterns' : ''}
+${conjunctPlanet == 'Ketu' ? '• Spiritual and intuitive nature\n• Detachment abilities\n• Past-life emotional wisdom' : ''}''' : '''Moon in ${_getOrdinal(moonPosition.house)} house:
+${moonPosition.house == 6 ? '• Service-oriented emotional fulfillment\n• Healing abilities' : ''}
+${moonPosition.house == 8 ? '• Deep psychological insight\n• Transformative emotional experiences' : ''}
+${moonPosition.house == 12 ? '• Rich inner life and spirituality\n• Compassion for all beings' : ''}'''}
 
-This doesn't indicate anything negative about you—rather, it suggests that emotional self-care and grounding practices may be especially beneficial.
-
-Many successful and spiritually evolved individuals have similar placements. The key is awareness and working consciously with this energy.
-''',
-      formationLogic: 'The Moon in your chart is influenced by: '
-          '${afflictionReasons.join(', ')}. '
-          'These combinations suggest a need for emotional awareness and self-care practices.',
+These placements often indicate old souls with much to offer the world.''',
       effects: [
-        'Deep emotional sensitivity and intuition',
-        'Benefit from regular meditation practice',
-        'Need for stable, nurturing environments',
-        'Strong inner life and introspective nature',
-        'Potential for profound emotional wisdom',
+        'Deep emotional intelligence',
+        'Strong intuitive abilities',
+        'Empathy and compassion',
+        'Need for emotional self-care',
       ],
       remedies: [
-        'Practice meditation, especially on Mondays',
-        'Wear pearls or moonstone (after consultation)',
-        'Maintain a regular sleep schedule',
-        'Connect with water bodies for peace',
-        'Honor your mother and feminine energy',
+        'Practice meditation and mindfulness',
+        'Spend time near water',
+        'Wear pearl or moonstone (if suitable)',
+        'Honor the Moon on Mondays',
       ],
     );
   }
 
-  /// Check for positive yogas
-  static List<AstroAlert> _checkPositiveYogas(KundaliData kundaliData) {
+  /// Detect positive yogas
+  static List<AstroAlert> _detectPositiveYogas(KundaliData data, AppLocalizations? l10n) {
     final List<AstroAlert> alerts = [];
-    final yogas = kundaliData.yogas;
 
-    // Priority yogas to highlight
-    final priorityYogas = <String, Map<String, dynamic>>{
-      'Gajakesari Yoga': {
-        'description': 'Jupiter in angular house from Moon brings wisdom and prosperity',
-        'effects': [
-          'Natural wisdom and good judgment',
-          'Respect and recognition in society',
-          'Success through ethical means',
-          'Good fortune through knowledge',
-          'Ability to inspire and guide others',
-        ],
-      },
-      'Raja Yoga': {
-        'description': 'Combination indicating leadership and authority',
-        'effects': [
-          'Leadership abilities and authority',
-          'Success in government or politics',
-          'Rise to prominent positions',
-          'Support from influential people',
-          'Kingly comforts and status',
-        ],
-      },
-      'Dhana Yoga': {
-        'description': 'Wealth-giving combination in your chart',
-        'effects': [
-          'Strong potential for wealth accumulation',
-          'Multiple income sources',
-          'Good financial judgment',
-          'Material prosperity and comfort',
-          'Generosity and ability to give',
-        ],
-      },
-      'Hamsa Yoga': {
-        'description': 'Jupiter in Kendra bestows wisdom and spirituality',
-        'effects': [
-          'Spiritual inclination and wisdom',
-          'Respected teacher or guide',
-          'Pure and ethical character',
-          'Success through righteousness',
-          'Divine protection and grace',
-        ],
-      },
-      'Malavya Yoga': {
-        'description': 'Venus in Kendra brings beauty, luxury and artistic talents',
-        'effects': [
-          'Artistic and creative abilities',
-          'Luxurious lifestyle and comforts',
-          'Attractive personality and charm',
-          'Success in arts or beauty industry',
-          'Happy married life',
-        ],
-      },
-      'Budhaditya Yoga': {
-        'description': 'Sun-Mercury conjunction enhances intellect and communication',
-        'effects': [
-          'Sharp intellect and analytical mind',
-          'Excellent communication skills',
-          'Success through knowledge and speech',
-          'Government or administrative success',
-          'Fame through intellectual pursuits',
-        ],
-      },
-      'Lakshmi Yoga': {
-        'description': 'Venus strong indicates blessings of Goddess Lakshmi',
-        'effects': [
-          'Wealth and material prosperity',
-          'Beautiful surroundings and aesthetics',
-          'Happiness in relationships',
-          'Luxurious and comfortable life',
-          'Artistic and creative success',
-        ],
-      },
-    };
+    for (final yogaString in data.yogas) {
+      final nameLower = yogaString.toLowerCase();
 
-    for (var yoga in yogas) {
-      if (priorityYogas.containsKey(yoga)) {
-        final yogaInfo = priorityYogas[yoga]!;
+      // Only highlight major beneficial yogas
+      if (nameLower.contains('raja') ||
+          nameLower.contains('dhana') ||
+          nameLower.contains('gajakesari') ||
+          nameLower.contains('budhaditya') ||
+          nameLower.contains('hamsa') ||
+          nameLower.contains('malavya') ||
+          nameLower.contains('ruchaka') ||
+          nameLower.contains('bhadra') ||
+          nameLower.contains('sasa')) {
+        
+        // Parse the yoga string - format is typically "Yoga Name: Description" or just "Yoga Name"
+        final parts = yogaString.split(':');
+        final yogaName = parts[0].trim();
+        final yogaDescription = parts.length > 1 ? parts[1].trim() : 'A beneficial yoga in your chart.';
+        
         alerts.add(AstroAlert(
-          id: 'yoga_${yoga.toLowerCase().replaceAll(' ', '_')}',
+          id: 'yoga_${yogaName.toLowerCase().replaceAll(' ', '_')}',
           type: AlertType.positive,
           priority: AlertPriority.positiveYoga,
-          title: yoga,
-          subtitle: 'Auspicious Yoga Present',
-          description: yogaInfo['description'] as String,
-          startDate: null,
-          endDate: null,
+          title: yogaName,
+          subtitle: l10n?.alert_beneficialYoga ?? 'Beneficial Yoga',
+          description: yogaDescription,
           iconSymbol: '✦',
-          planetName: null,
           accentColor: AstroAlertColors.positive,
-          themeSummary: 'A beneficial combination blessing your chart',
-          detailedExplanation: '''
-$yoga is one of the auspicious combinations in Vedic astrology that enhances the positive potential of your chart.
+          themeSummary: 'A powerful yoga bringing positive influences to your life.',
+          detailedExplanation: '''$yogaName is a beneficial yoga in your chart.
 
-${yogaInfo['description']}
+$yogaDescription
 
-This yoga is formed in your birth chart and remains a lifelong blessing. Its effects become more pronounced during favorable planetary periods (dashas) of the planets involved.
-''',
-          formationLogic: 'This yoga is formed based on specific planetary positions '
-              'and combinations in your birth chart. It represents a harmonious '
-              'alignment that enhances certain life areas.',
-          effects: yogaInfo['effects'] as List<String>,
-          remedies: null, // Positive yogas don't need remedies
+This yoga enhances specific areas of life and provides natural strengths that you can leverage for success and fulfillment.''',
+          effects: [
+            'Natural talents and abilities',
+            'Favorable circumstances in related areas',
+            'Positive karmic support',
+          ],
         ));
+
+        // Limit to 2 yoga alerts
+        if (alerts.length >= 2) break;
       }
     }
 
-    // Limit to max 2 positive yogas to avoid overwhelming
-    return alerts.take(2).toList();
+    return alerts;
   }
 
-  // ============ HELPER METHODS ============
-
-  /// Get current Saturn sign from current date transit
-  static String? _getCurrentSaturnSign() {
-    try {
-      final now = DateTime.now();
-      final result = SwephService.instance.calculateKundli(
-        birthDateTime: now,
-        latitude: 28.6139, // Default Delhi coordinates for transit
-        longitude: 77.2090,
-        timezoneOffsetHours: 5.5,
-        useAyanamsa: true,
-      );
-      return result.planets['Saturn']?.signName;
-    } catch (e) {
-      debugPrint('Error calculating current Saturn position: $e');
-      // Fallback: Saturn is in Pisces from March 2025 onwards
-      return 'Pisces';
+  /// Get ordinal string (1st, 2nd, 3rd, etc.)
+  static String _getOrdinal(int number) {
+    if (number >= 11 && number <= 13) {
+      return '${number}th';
     }
-  }
-
-  /// Get approximate Saturn transit dates for a sign
-  static (DateTime?, DateTime?) _getSaturnTransitDates(String sign) {
-    // Saturn transit dates (approximate)
-    // Saturn moves through each sign in ~2.5 years
-    switch (sign) {
-      case 'Aquarius':
-        return (DateTime(2023, 1, 17), DateTime(2025, 3, 29));
-      case 'Pisces':
-        return (DateTime(2025, 3, 29), DateTime(2028, 6, 1));
-      case 'Aries':
-        return (DateTime(2028, 6, 1), DateTime(2031, 8, 1));
+    switch (number % 10) {
+      case 1:
+        return '${number}st';
+      case 2:
+        return '${number}nd';
+      case 3:
+        return '${number}rd';
       default:
-        return (null, null);
+        return '${number}th';
     }
   }
 
-  static String _getSadeSatiExplanation(SadeSatiPhase phase) {
-    switch (phase) {
-      case SadeSatiPhase.first:
-        return '''
-The First Phase of Sade Sati begins when Saturn enters the 12th house from your natal Moon sign.
-
-This phase typically brings:
-• Increased expenses or unexpected outflows
-• Need to reassess priorities and values
-• Potential changes in living situation
-• Beginning of a period of self-reflection
-
-This is a preparatory phase where Saturn begins its lessons gradually. It's an excellent time for spiritual practices and reducing unnecessary attachments.
-
-Duration: Approximately 2.5 years
-Current transit: Saturn in ${phase.position}
-''';
-      case SadeSatiPhase.peak:
-        return '''
-The Peak Phase of Sade Sati occurs when Saturn transits over your natal Moon sign.
-
-This is considered the most significant phase, bringing:
-• Deep emotional processing and maturity
-• Tests of mental strength and resilience
-• Important life lessons and karmic clearing
-• Opportunity for profound personal growth
-
-While this phase can feel challenging, it's often when the most significant positive transformation occurs. Many people emerge from this phase with greater wisdom and clarity.
-
-Duration: Approximately 2.5 years
-Current transit: Saturn directly over your Moon sign
-''';
-      case SadeSatiPhase.third:
-        return '''
-The Third Phase of Sade Sati occurs when Saturn moves to the 2nd house from your natal Moon.
-
-This phase typically involves:
-• Financial restructuring and lessons about resources
-• Family matters coming into focus
-• Speech and communication becoming important
-• Gradual easing of Sade Sati's intensity
-
-This is the concluding phase where the lessons of Sade Sati begin to integrate. You may start seeing the fruits of the discipline and changes made during earlier phases.
-
-Duration: Approximately 2.5 years
-Current transit: Saturn in ${phase.position}
-''';
-    }
-  }
-
-  static List<String> _getSadeSatiEffects(SadeSatiPhase phase) {
-    switch (phase) {
-      case SadeSatiPhase.first:
-        return [
-          'Period of introspection and inner work',
-          'Releasing what no longer serves you',
-          'Potential increase in expenses',
-          'Changes in living situation possible',
-          'Opportunity for spiritual growth',
-        ];
-      case SadeSatiPhase.peak:
-        return [
-          'Deep emotional and mental processing',
-          'Tests of patience and endurance',
-          'Karmic lessons coming to surface',
-          'Opportunity for profound maturity',
-          'Building unshakeable inner strength',
-        ];
-      case SadeSatiPhase.third:
-        return [
-          'Focus on finances and resources',
-          'Family matters require attention',
-          'Learning value-based communication',
-          'Integration of lessons learned',
-          'Gradual return of stability',
-        ];
-    }
-  }
-
-  static List<String> _getSaturnRemedies() {
-    return [
-      'Recite Shani mantra or Hanuman Chalisa on Saturdays',
-      'Donate black sesame seeds, mustard oil, or iron items',
-      'Serve and respect elderly people',
-      'Feed crows or black dogs',
-      'Practice discipline and honest hard work',
-    ];
-  }
-
-  static String _getDhaiyaExplanation(DhaiyaPhase phase) {
-    switch (phase) {
-      case DhaiyaPhase.fourth:
-        return '''
-Kantak Shani occurs when Saturn transits the 4th house from your natal Moon sign.
-
-The 4th house governs:
-• Home, property, and domestic peace
-• Mother and maternal relationships
-• Mental peace and emotional comfort
-• Vehicles and conveyances
-
-During this transit, you may experience:
-• Challenges related to property or home
-• Need to address family responsibilities
-• Tests of emotional stability
-• Possible vehicle-related issues
-
-This period, lasting approximately 2.5 years, teaches lessons about inner security and true sources of happiness.
-''';
-      case DhaiyaPhase.eighth:
-        return '''
-Ashtama Shani occurs when Saturn transits the 8th house from your natal Moon sign.
-
-The 8th house governs:
-• Transformation and change
-• Hidden matters and secrets
-• Longevity and chronic health
-• Joint resources and inheritance
-
-During this transit, you may experience:
-• Unexpected changes or transformations
-• Health matters requiring attention
-• Financial restructuring
-• Deep psychological processing
-
-This powerful 2.5-year transit often brings profound transformation and can be a period of significant spiritual growth.
-''';
-    }
-  }
-
-  static List<String> _getDhaiyaEffects(DhaiyaPhase phase) {
-    switch (phase) {
-      case DhaiyaPhase.fourth:
-        return [
-          'Focus on home and property matters',
-          'Mother or family may need support',
-          'Mental peace requires conscious effort',
-          'Vehicle or property decisions',
-          'Building inner emotional security',
-        ];
-      case DhaiyaPhase.eighth:
-        return [
-          'Period of transformation and change',
-          'Hidden matters may surface',
-          'Health awareness becomes important',
-          'Financial restructuring possible',
-          'Deep psychological insights',
-        ];
-    }
-  }
-
-  static String _getMahadashaExplanation(String planet) {
-    switch (planet) {
-      case 'Rahu':
-        return '''
-Rahu Mahadasha is an 18-year period where the North Node of the Moon becomes the dominant planetary influence.
-
-Rahu represents:
-• Worldly desires and material ambitions
-• Innovation and unconventional approaches
-• Foreign lands and overseas connections
-• Breaking of boundaries and taboos
-• Technology and modern advancements
-
-This period often brings:
-• Intense focus on material achievement
-• Unconventional life paths and careers
-• Foreign travel or connections
-• Need for spiritual grounding
-• Lessons about desire and contentment
-
-Rahu is neither purely benefic nor malefic—it amplifies what it touches. Conscious living and ethical choices are especially important during this period.
-''';
-      case 'Ketu':
-        return '''
-Ketu Mahadasha is a 7-year period where the South Node of the Moon becomes the dominant planetary influence.
-
-Ketu represents:
-• Spiritual liberation and moksha
-• Past life karma and skills
-• Detachment and letting go
-• Intuition and psychic abilities
-• Completion and endings
-
-This period often brings:
-• Heightened spiritual awareness
-• Natural inclination toward meditation
-• Sense of detachment from material pursuits
-• Possible feelings of isolation
-• Completion of karmic cycles
-
-Ketu Mahadasha is excellent for spiritual practice but may feel confusing for purely material goals. Trust your intuition during this period.
-''';
-      case 'Saturn':
-      default:
-        return '''
-Saturn Mahadasha is a 19-year period where Saturn becomes the dominant planetary influence.
-
-Saturn represents:
-• Discipline, hard work, and perseverance
-• Karma and lessons from past actions
-• Structure, limitation, and responsibility
-• Elderly people and authority figures
-• Time, patience, and long-term results
-
-This period often brings:
-• Rewards for consistent effort
-• Important karmic lessons
-• Rise through hard work
-• Tests of patience and commitment
-• Building lasting foundations
-
-Saturn rewards genuine effort and punishes shortcuts. This period builds character and creates lasting achievements for those who embrace its lessons.
-''';
-    }
-  }
-
-  static int _getMahadashaDuration(String planet) {
-    const durations = {
-      'Sun': 6,
-      'Moon': 10,
-      'Mars': 7,
-      'Rahu': 18,
-      'Jupiter': 16,
-      'Saturn': 19,
-      'Mercury': 17,
-      'Ketu': 7,
-      'Venus': 20,
+  /// Get approximate Saturn transit dates (simplified)
+  static Map<String, DateTime> _getSaturnTransitDates(String sign) {
+    // Saturn spends approximately 2.5 years in each sign
+    // These are approximate transit periods
+    final now = DateTime.now();
+    final Map<String, Map<String, DateTime>> saturnTransits = {
+      'Capricorn': {'start': DateTime(2020, 1, 24), 'end': DateTime(2023, 1, 17)},
+      'Aquarius': {'start': DateTime(2023, 1, 17), 'end': DateTime(2025, 3, 29)},
+      'Pisces': {'start': DateTime(2025, 3, 29), 'end': DateTime(2028, 2, 6)},
+      'Aries': {'start': DateTime(2028, 2, 6), 'end': DateTime(2031, 4, 1)},
+      'Taurus': {'start': DateTime(2031, 4, 1), 'end': DateTime(2034, 7, 1)},
+      'Gemini': {'start': DateTime(2034, 7, 1), 'end': DateTime(2037, 9, 1)},
+      'Cancer': {'start': DateTime(2037, 9, 1), 'end': DateTime(2040, 11, 1)},
+      'Leo': {'start': DateTime(2040, 11, 1), 'end': DateTime(2044, 1, 1)},
+      'Virgo': {'start': DateTime(2044, 1, 1), 'end': DateTime(2047, 3, 1)},
+      'Libra': {'start': DateTime(2047, 3, 1), 'end': DateTime(2050, 5, 1)},
+      'Scorpio': {'start': DateTime(2050, 5, 1), 'end': DateTime(2053, 7, 1)},
+      'Sagittarius': {'start': DateTime(2053, 7, 1), 'end': DateTime(2056, 9, 1)},
     };
-    return durations[planet] ?? 0;
+
+    return saturnTransits[sign] ?? {'start': now, 'end': now.add(const Duration(days: 912))};
   }
 
-  static List<String> _getMahadashaRemedies(String planet) {
-    switch (planet) {
-      case 'Rahu':
-        return [
-          'Recite Rahu mantra or Durga Chalisa',
-          'Donate dark blue or black items on Saturdays',
-          'Feed birds, especially crows',
-          'Practice meditation and grounding',
-          'Avoid deception and maintain honesty',
-        ];
-      case 'Ketu':
-        return [
-          'Recite Ketu mantra or Ganesh mantra',
-          'Donate blankets to the needy',
-          'Feed dogs and practice compassion',
-          'Regular meditation practice',
-          'Pilgrimage to spiritual places',
-        ];
-      case 'Saturn':
-      default:
-        return _getSaturnRemedies();
-    }
+  /// Clear cached transit data
+  static void clearCache() {
+    _saturnSignCache.clear();
   }
 }
-

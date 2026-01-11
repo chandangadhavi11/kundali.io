@@ -6,8 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../shared/models/kundali_data_model.dart';
 import '../../../core/providers/kundli_provider.dart';
+import '../../../core/providers/language_provider.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/services/kundali_calculation_service.dart';
-import '../../../core/services/sweph_service.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../widgets/kundali_chart_painter.dart';
 import '../widgets/interactive_kundli_chart.dart';
 import '../widgets/interactive_south_indian_chart.dart';
@@ -20,7 +22,7 @@ import 'kundli_display/tabs/transit_tab.dart';
 import 'kundli_display/tabs/panchang_tab.dart';
 import 'kundli_display/tabs/dasha_tab.dart';
 import 'kundli_display/tabs/details_tab.dart';
-import 'kundli_display/widgets/astro_alerts_section.dart';
+import 'kundli_display/widgets/astro_alert_orb.dart';
 
 class KundliDisplayScreen extends StatefulWidget {
   final KundaliData? kundaliData;
@@ -65,9 +67,17 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
   // Custom date/time for chart viewing
   DateTime? _customDateTime;
   KundaliData? _recalculatedKundaliData;
+  bool _isRecalculating = false;
+
+  /// Returns recalculated data when custom date/time is set, otherwise original
+  KundaliData get _displayKundaliData =>
+      _recalculatedKundaliData ?? _kundaliData!;
 
   // Tap states for microinteractions
   final Map<String, bool> _pressedStates = {};
+
+  // Astro Alert controller for expand/collapse
+  final AstroAlertController _alertController = AstroAlertController();
 
   // Color palette - Refined cosmic theme
   static const _bgPrimary = Color(0xFF0D0B14);
@@ -161,6 +171,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
     _fadeController.dispose();
     _slideController.dispose();
     _pulseController.dispose();
+    _alertController.dispose();
     super.dispose();
   }
 
@@ -305,15 +316,15 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                         physics: const BouncingScrollPhysics(),
                         children: [
                           _buildChartTab(),
-                          // Using extracted tab components
-                          DetailsTab(kundaliData: _kundaliData!),
-                          PlanetsTab(kundaliData: _kundaliData!),
-                          HousesTab(kundaliData: _kundaliData!),
-                          DashaTab(kundaliData: _kundaliData!),
-                          StrengthTab(kundaliData: _kundaliData!),
-                          TransitTab(kundaliData: _kundaliData!),
-                          PanchangTab(kundaliData: _kundaliData!),
-                          YogasTab(kundaliData: _kundaliData!),
+                          // Using extracted tab components - use _displayKundaliData for date/time sync
+                          DetailsTab(kundaliData: _displayKundaliData),
+                          PlanetsTab(kundaliData: _displayKundaliData),
+                          HousesTab(kundaliData: _displayKundaliData),
+                          DashaTab(kundaliData: _displayKundaliData),
+                          StrengthTab(kundaliData: _displayKundaliData),
+                          TransitTab(kundaliData: _displayKundaliData),
+                          PanchangTab(kundaliData: _displayKundaliData),
+                          YogasTab(kundaliData: _displayKundaliData),
                         ],
                       ),
                     ),
@@ -322,6 +333,37 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
               ],
             ),
           ),
+          // Loading overlay during recalculation
+          if (_isRecalculating)
+            Positioned.fill(
+              child: Container(
+                color: _bgPrimary.withOpacity(0.7),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 32,
+                        height: 32,
+                        child: CircularProgressIndicator(
+                          color: _accentPrimary,
+                          strokeWidth: 2.5,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Recalculating...',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 13,
+                          color: _textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -404,7 +446,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                   children: [
                     Flexible(
                       child: Text(
-                        _kundaliData!.name,
+                        _displayKundaliData.name,
                         style: GoogleFonts.dmSans(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -415,7 +457,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (_kundaliData!.isPrimary) ...[
+                    if (_displayKundaliData.isPrimary) ...[
                       const SizedBox(width: 6),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -456,7 +498,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                     const SizedBox(width: 2),
                     Flexible(
                       child: Text(
-                        _kundaliData!.birthPlace,
+                        _displayKundaliData.birthPlace,
                         style: GoogleFonts.dmSans(
                           fontSize: 10,
                           color: _textMuted,
@@ -471,7 +513,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                     Text(
                       DateFormat(
                         'd MMM, h:mm a',
-                      ).format(_kundaliData!.birthDateTime),
+                      ).format(_displayKundaliData.birthDateTime),
                       style: GoogleFonts.dmSans(
                         fontSize: 10,
                         color: _textMuted,
@@ -530,16 +572,20 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
   }
 
   Widget _buildTabBar() {
+    final l10n = AppLocalizations.of(context);
     final tabs = [
-      {'icon': Icons.grid_view_rounded, 'label': 'Chart'},
-      {'icon': Icons.person_outline_rounded, 'label': 'Details'},
-      {'icon': Icons.public_rounded, 'label': 'Planets'},
-      {'icon': Icons.home_work_outlined, 'label': 'Houses'},
-      {'icon': Icons.timeline_rounded, 'label': 'Dasha'},
-      {'icon': Icons.analytics_rounded, 'label': 'Strength'},
-      {'icon': Icons.sync_rounded, 'label': 'Transit'},
-      {'icon': Icons.calendar_today_rounded, 'label': 'Panchang'},
-      {'icon': Icons.auto_awesome_rounded, 'label': 'Yogas'},
+      {'icon': Icons.grid_view_rounded, 'label': l10n.display_tab_chart},
+      {'icon': Icons.person_outline_rounded, 'label': l10n.display_tab_details},
+      {'icon': Icons.public_rounded, 'label': l10n.display_tab_planets},
+      {'icon': Icons.home_work_outlined, 'label': l10n.display_tab_houses},
+      {'icon': Icons.timeline_rounded, 'label': l10n.display_tab_dasha},
+      {'icon': Icons.analytics_rounded, 'label': l10n.display_tab_strength},
+      {'icon': Icons.sync_rounded, 'label': l10n.display_tab_transit},
+      {
+        'icon': Icons.calendar_today_rounded,
+        'label': l10n.display_tab_panchang,
+      },
+      {'icon': Icons.auto_awesome_rounded, 'label': l10n.display_tab_yogas},
     ];
 
     return SizedBox(
@@ -634,8 +680,6 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Astro Alerts Section (conditional - only shows if alerts exist)
-          AstroAlertsSection(kundaliData: _kundaliData!),
           _buildChartCard(),
           const SizedBox(height: 12),
           _buildDateTimeNavigator(),
@@ -804,7 +848,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'View Chart For',
+                    AppLocalizations.of(context).display_viewChartFor,
                     style: GoogleFonts.dmSans(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -817,7 +861,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                       Expanded(
                         child: _buildPickerOption(
                           icon: Icons.calendar_today_rounded,
-                          label: 'Date',
+                          label: AppLocalizations.of(context).display_date,
                           value: DateFormat(
                             'd MMM yyyy',
                           ).format(displayDateTime),
@@ -832,7 +876,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                       Expanded(
                         child: _buildPickerOption(
                           icon: Icons.schedule_rounded,
-                          label: 'Time',
+                          label: AppLocalizations.of(context).display_time,
                           value: DateFormat('h:mm a').format(displayDateTime),
                           color: const Color(0xFF6EE7B7),
                           onTap: () {
@@ -875,7 +919,9 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'View Current Time Chart',
+                            AppLocalizations.of(
+                              context,
+                            ).display_viewCurrentTimeChart,
                             style: GoogleFonts.dmSans(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -899,293 +945,337 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.85,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        builder: (context, scrollController) => Container(
-          decoration: BoxDecoration(
-            color: _bgSecondary,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            border: Border.all(
-              color: _accentSecondary.withOpacity(0.2),
-              width: 1,
-            ),
-          ),
-          child: Column(
-            children: [
-              // Handle & Header
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: _borderColor,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+      builder:
+          (context) => DraggableScrollableSheet(
+            initialChildSize: 0.85,
+            minChildSize: 0.5,
+            maxChildSize: 0.95,
+            builder:
+                (context, scrollController) => Container(
+                  decoration: BoxDecoration(
+                    color: _bgSecondary,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
                     ),
-                    const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                _accentSecondary.withOpacity(0.2),
-                                _accentSecondary.withOpacity(0.08),
+                    border: Border.all(
+                      color: _accentSecondary.withOpacity(0.2),
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      // Handle & Header
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: _borderColor,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        _accentSecondary.withOpacity(0.2),
+                                        _accentSecondary.withOpacity(0.08),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    Icons.auto_awesome_rounded,
+                                    size: 22,
+                                    color: _accentSecondary,
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Chart Types Guide',
+                                        style: GoogleFonts.dmSans(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                          color: _textPrimary,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'Understanding Vedic astrology charts',
+                                        style: GoogleFonts.dmSans(
+                                          fontSize: 12,
+                                          color: _textMuted,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () => Navigator.pop(context),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: _surfaceColor.withOpacity(0.6),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(
+                                      Icons.close_rounded,
+                                      size: 18,
+                                      color: _textMuted,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.auto_awesome_rounded,
-                            size: 22,
-                            color: _accentSecondary,
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Chart Types Guide',
-                                style: GoogleFonts.dmSans(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  color: _textPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Understanding Vedic astrology charts',
-                                style: GoogleFonts.dmSans(
-                                  fontSize: 12,
-                                  color: _textMuted,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () => Navigator.pop(context),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: _surfaceColor.withOpacity(0.6),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Icon(
-                              Icons.close_rounded,
-                              size: 18,
-                              color: _textMuted,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                ),
-              ),
-              // Chart types list
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                  children: [
-                    _buildChartCategorySection(
-                      title: 'Primary Charts',
-                      description: 'The main birth charts for overall life analysis',
-                      charts: [
-                        _ChartTypeInfo(
-                          type: KundaliType.lagna,
-                          icon: Icons.north_east_rounded,
-                          color: const Color(0xFFA78BFA),
-                          meaning: 'The foundation of Vedic astrology. Shows your overall life path, personality, physical body, and general tendencies based on the rising sign at birth.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.chandra,
-                          icon: Icons.nightlight_round,
-                          color: const Color(0xFF6EE7B7),
-                          meaning: 'Moon chart reveals your emotional nature, mind, mental patterns, and psychological tendencies. Essential for understanding inner feelings and reactions.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.surya,
-                          icon: Icons.wb_sunny_rounded,
-                          color: _accentPrimary,
-                          meaning: 'Sun chart shows your soul purpose, ego, vitality, father, authority figures, and career in government or leadership roles.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.bhavaChalit,
-                          icon: Icons.swap_horiz_rounded,
-                          color: const Color(0xFF60A5FA),
-                          meaning: 'Uses exact house cusps to show where planets actually influence. More accurate for predicting which house matters each planet truly affects.',
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    _buildChartCategorySection(
-                      title: 'Divisional Charts (Vargas)',
-                      description: 'Specialized charts for specific life areas',
-                      charts: [
-                        _ChartTypeInfo(
-                          type: KundaliType.navamsa,
-                          icon: Icons.favorite_rounded,
-                          color: const Color(0xFFF472B6),
-                          meaning: 'D9 - The most important divisional chart. Reveals marriage quality, spouse nature, dharma (life purpose), and the strength of planets. Shows the soul\'s deeper journey.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.dasamsa,
-                          icon: Icons.work_rounded,
-                          color: const Color(0xFF60A5FA),
-                          meaning: 'D10 - Career and profession chart. Shows professional success, status in society, recognition, and the type of work that brings fulfillment.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.saptamsa,
-                          icon: Icons.child_care_rounded,
-                          color: const Color(0xFFFBBF24),
-                          meaning: 'D7 - Children and progeny chart. Indicates fertility, number of children, relationship with children, and creative output.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.dwadasamsa,
-                          icon: Icons.people_rounded,
-                          color: const Color(0xFF34D399),
-                          meaning: 'D12 - Parents chart. Shows relationship with parents, ancestral karma, and family lineage influences.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.trimshamsa,
-                          icon: Icons.warning_amber_rounded,
-                          color: const Color(0xFFF87171),
-                          meaning: 'D30 - Misfortunes chart. Reveals potential challenges, health issues, accidents, and areas requiring caution.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.hora,
-                          icon: Icons.attach_money_rounded,
-                          color: const Color(0xFFFFD700),
-                          meaning: 'D2 - Wealth chart. Shows financial potential, earning capacity, and accumulation of material resources.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.drekkana,
-                          icon: Icons.fitness_center_rounded,
-                          color: const Color(0xFFFF6B6B),
-                          meaning: 'D3 - Siblings and courage chart. Reveals relationship with siblings, personal courage, and communication abilities.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.chaturthamsa,
-                          icon: Icons.home_rounded,
-                          color: const Color(0xFF4ECDC4),
-                          meaning: 'D4 - Property and fortune chart. Shows real estate luck, vehicles, fixed assets, and overall material fortune.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.shodasamsa,
-                          icon: Icons.directions_car_rounded,
-                          color: const Color(0xFF9B59B6),
-                          meaning: 'D16 - Vehicles and comforts chart. Indicates conveyances, luxuries, and physical pleasures.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.vimsamsa,
-                          icon: Icons.self_improvement_rounded,
-                          color: const Color(0xFF00CED1),
-                          meaning: 'D20 - Spiritual progress chart. Shows religious inclinations, meditation abilities, and spiritual evolution.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.chaturvimsamsa,
-                          icon: Icons.school_rounded,
-                          color: const Color(0xFFE91E63),
-                          meaning: 'D24 - Education chart. Reveals academic abilities, learning capacity, and success in studies.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.bhamsa,
-                          icon: Icons.stars_rounded,
-                          color: const Color(0xFF8E44AD),
-                          meaning: 'D27 - Strength chart (Nakshatramsa). Shows inherent strengths, weaknesses, and physical vitality.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.khavedamsa,
-                          icon: Icons.auto_awesome_rounded,
-                          color: const Color(0xFF27AE60),
-                          meaning: 'D40 - Auspicious effects chart. Indicates overall luck and positive karmic influences.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.akshavedamsa,
-                          icon: Icons.balance_rounded,
-                          color: const Color(0xFF3498DB),
-                          meaning: 'D45 - General indications chart. Provides additional confirmation for predictions.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.shashtiamsa,
-                          icon: Icons.history_rounded,
-                          color: const Color(0xFFE74C3C),
-                          meaning: 'D60 - Past life karma chart. The most subtle chart showing deep karmic patterns from previous lives.',
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    _buildChartCategorySection(
-                      title: 'Special Charts',
-                      description: 'Unique analytical methods',
-                      charts: [
-                        _ChartTypeInfo(
-                          type: KundaliType.sudarshan,
-                          icon: Icons.blur_circular_rounded,
-                          color: const Color(0xFFFF9800),
-                          meaning: 'Triple chart view combining Lagna, Moon, and Sun charts. Provides a holistic view of all three perspectives together.',
-                        ),
-                        _ChartTypeInfo(
-                          type: KundaliType.ashtakavarga,
-                          icon: Icons.grid_4x4_rounded,
-                          color: const Color(0xFF795548),
-                          meaning: 'Point-based strength analysis. Calculates bindus (points) for each planet to determine favorable transits and house strengths.',
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // Info tip at bottom
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: _surfaceColor.withOpacity(0.4),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: _accentPrimary.withOpacity(0.2),
-                          width: 0.5,
+                            const SizedBox(height: 20),
+                          ],
                         ),
                       ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.lightbulb_outline_rounded,
-                            size: 18,
-                            color: _accentPrimary,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Tap on any chart type in the selector to switch views and explore different aspects of your Kundali.',
-                              style: GoogleFonts.dmSans(
-                                fontSize: 11,
-                                color: _textSecondary,
-                                height: 1.4,
+                      // Chart types list
+                      Expanded(
+                        child: ListView(
+                          controller: scrollController,
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+                          children: [
+                            _buildChartCategorySection(
+                              title:
+                                  AppLocalizations.of(
+                                    context,
+                                  ).chart_category_primary,
+                              description:
+                                  AppLocalizations.of(
+                                    context,
+                                  ).chart_category_primary_desc,
+                              charts: [
+                                _ChartTypeInfo(
+                                  type: KundaliType.lagna,
+                                  icon: Icons.north_east_rounded,
+                                  color: const Color(0xFFA78BFA),
+                                  meaning:
+                                      'The foundation of Vedic astrology. Shows your overall life path, personality, physical body, and general tendencies based on the rising sign at birth.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.chandra,
+                                  icon: Icons.nightlight_round,
+                                  color: const Color(0xFF6EE7B7),
+                                  meaning:
+                                      'Moon chart reveals your emotional nature, mind, mental patterns, and psychological tendencies. Essential for understanding inner feelings and reactions.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.surya,
+                                  icon: Icons.wb_sunny_rounded,
+                                  color: _accentPrimary,
+                                  meaning:
+                                      'Sun chart shows your soul purpose, ego, vitality, father, authority figures, and career in government or leadership roles.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.bhavaChalit,
+                                  icon: Icons.swap_horiz_rounded,
+                                  color: const Color(0xFF60A5FA),
+                                  meaning:
+                                      'Uses exact house cusps to show where planets actually influence. More accurate for predicting which house matters each planet truly affects.',
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            _buildChartCategorySection(
+                              title:
+                                  AppLocalizations.of(
+                                    context,
+                                  ).chart_category_divisional,
+                              description:
+                                  AppLocalizations.of(
+                                    context,
+                                  ).chart_category_divisional_desc,
+                              charts: [
+                                _ChartTypeInfo(
+                                  type: KundaliType.navamsa,
+                                  icon: Icons.favorite_rounded,
+                                  color: const Color(0xFFF472B6),
+                                  meaning:
+                                      'D9 - The most important divisional chart. Reveals marriage quality, spouse nature, dharma (life purpose), and the strength of planets. Shows the soul\'s deeper journey.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.dasamsa,
+                                  icon: Icons.work_rounded,
+                                  color: const Color(0xFF60A5FA),
+                                  meaning:
+                                      'D10 - Career and profession chart. Shows professional success, status in society, recognition, and the type of work that brings fulfillment.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.saptamsa,
+                                  icon: Icons.child_care_rounded,
+                                  color: const Color(0xFFFBBF24),
+                                  meaning:
+                                      'D7 - Children and progeny chart. Indicates fertility, number of children, relationship with children, and creative output.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.dwadasamsa,
+                                  icon: Icons.people_rounded,
+                                  color: const Color(0xFF34D399),
+                                  meaning:
+                                      'D12 - Parents chart. Shows relationship with parents, ancestral karma, and family lineage influences.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.trimshamsa,
+                                  icon: Icons.warning_amber_rounded,
+                                  color: const Color(0xFFF87171),
+                                  meaning:
+                                      'D30 - Misfortunes chart. Reveals potential challenges, health issues, accidents, and areas requiring caution.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.hora,
+                                  icon: Icons.attach_money_rounded,
+                                  color: const Color(0xFFFFD700),
+                                  meaning:
+                                      'D2 - Wealth chart. Shows financial potential, earning capacity, and accumulation of material resources.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.drekkana,
+                                  icon: Icons.fitness_center_rounded,
+                                  color: const Color(0xFFFF6B6B),
+                                  meaning:
+                                      'D3 - Siblings and courage chart. Reveals relationship with siblings, personal courage, and communication abilities.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.chaturthamsa,
+                                  icon: Icons.home_rounded,
+                                  color: const Color(0xFF4ECDC4),
+                                  meaning:
+                                      'D4 - Property and fortune chart. Shows real estate luck, vehicles, fixed assets, and overall material fortune.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.shodasamsa,
+                                  icon: Icons.directions_car_rounded,
+                                  color: const Color(0xFF9B59B6),
+                                  meaning:
+                                      'D16 - Vehicles and comforts chart. Indicates conveyances, luxuries, and physical pleasures.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.vimsamsa,
+                                  icon: Icons.self_improvement_rounded,
+                                  color: const Color(0xFF00CED1),
+                                  meaning:
+                                      'D20 - Spiritual progress chart. Shows religious inclinations, meditation abilities, and spiritual evolution.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.chaturvimsamsa,
+                                  icon: Icons.school_rounded,
+                                  color: const Color(0xFFE91E63),
+                                  meaning:
+                                      'D24 - Education chart. Reveals academic abilities, learning capacity, and success in studies.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.bhamsa,
+                                  icon: Icons.stars_rounded,
+                                  color: const Color(0xFF8E44AD),
+                                  meaning:
+                                      'D27 - Strength chart (Nakshatramsa). Shows inherent strengths, weaknesses, and physical vitality.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.khavedamsa,
+                                  icon: Icons.auto_awesome_rounded,
+                                  color: const Color(0xFF27AE60),
+                                  meaning:
+                                      'D40 - Auspicious effects chart. Indicates overall luck and positive karmic influences.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.akshavedamsa,
+                                  icon: Icons.balance_rounded,
+                                  color: const Color(0xFF3498DB),
+                                  meaning:
+                                      'D45 - General indications chart. Provides additional confirmation for predictions.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.shashtiamsa,
+                                  icon: Icons.history_rounded,
+                                  color: const Color(0xFFE74C3C),
+                                  meaning:
+                                      'D60 - Past life karma chart. The most subtle chart showing deep karmic patterns from previous lives.',
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            _buildChartCategorySection(
+                              title:
+                                  AppLocalizations.of(
+                                    context,
+                                  ).chart_category_special,
+                              description:
+                                  AppLocalizations.of(
+                                    context,
+                                  ).chart_category_special_desc,
+                              charts: [
+                                _ChartTypeInfo(
+                                  type: KundaliType.sudarshan,
+                                  icon: Icons.blur_circular_rounded,
+                                  color: const Color(0xFFFF9800),
+                                  meaning:
+                                      'Triple chart view combining Lagna, Moon, and Sun charts. Provides a holistic view of all three perspectives together.',
+                                ),
+                                _ChartTypeInfo(
+                                  type: KundaliType.ashtakavarga,
+                                  icon: Icons.grid_4x4_rounded,
+                                  color: const Color(0xFF795548),
+                                  meaning:
+                                      'Point-based strength analysis. Calculates bindus (points) for each planet to determine favorable transits and house strengths.',
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            // Info tip at bottom
+                            Container(
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: _surfaceColor.withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: _accentPrimary.withOpacity(0.2),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.lightbulb_outline_rounded,
+                                    size: 18,
+                                    color: _accentPrimary,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      'Tap on any chart type in the selector to switch views and explore different aspects of your Kundali.',
+                                      style: GoogleFonts.dmSans(
+                                        fontSize: 11,
+                                        color: _textSecondary,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
           ),
-        ),
-      ),
     );
   }
 
@@ -1223,10 +1313,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
           padding: const EdgeInsets.only(left: 14),
           child: Text(
             description,
-            style: GoogleFonts.dmSans(
-              fontSize: 11,
-              color: _textMuted,
-            ),
+            style: GoogleFonts.dmSans(fontSize: 11, color: _textMuted),
           ),
         ),
         const SizedBox(height: 12),
@@ -1242,10 +1329,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       decoration: BoxDecoration(
         color: _surfaceColor.withOpacity(0.4),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: info.color.withOpacity(0.2),
-          width: 0.5,
-        ),
+        border: Border.all(color: info.color.withOpacity(0.2), width: 0.5),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1256,11 +1340,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
               color: info.color.withOpacity(0.12),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              info.icon,
-              size: 20,
-              color: info.color,
-            ),
+            child: Icon(info.icon, size: 20, color: info.color),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -1706,51 +1786,89 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
   }
 
   // User-friendly simple names for the horizontal selector
-  String _getChartTypeLabel(KundaliType type) {
+  String _getChartTypeLabel(KundaliType type, AppLocalizations l10n) {
     switch (type) {
       case KundaliType.lagna:
-        return 'Lagna';
+        return l10n.chart_lagna;
       case KundaliType.chandra:
-        return 'Moon';
+        return l10n.chart_moon;
       case KundaliType.surya:
-        return 'Sun';
+        return l10n.chart_sun;
       case KundaliType.bhavaChalit:
-        return 'Bhava';
+        return l10n.chart_bhava;
       case KundaliType.hora:
-        return 'Hora';
+        return l10n.chart_hora;
       case KundaliType.drekkana:
-        return 'Drekkana';
+        return l10n.chart_drekkana;
       case KundaliType.chaturthamsa:
-        return 'Chaturthamsa';
+        return l10n.chart_chaturthamsa;
       case KundaliType.saptamsa:
-        return 'Saptamsa';
+        return l10n.chart_saptamsa;
       case KundaliType.navamsa:
-        return 'Navamsa';
+        return l10n.chart_navamsa;
       case KundaliType.dasamsa:
-        return 'Dasamsa';
+        return l10n.chart_dasamsa;
       case KundaliType.dwadasamsa:
-        return 'Dwadasamsa';
+        return l10n.chart_dwadasamsa;
       case KundaliType.shodasamsa:
-        return 'Shodasamsa';
+        return l10n.chart_shodasamsa;
       case KundaliType.vimsamsa:
-        return 'Vimsamsa';
+        return l10n.chart_vimsamsa;
       case KundaliType.chaturvimsamsa:
-        return 'Chaturvimsamsa';
+        return l10n.chart_chaturvimsamsa;
       case KundaliType.bhamsa:
-        return 'Bhamsa';
+        return l10n.chart_bhamsa;
       case KundaliType.trimshamsa:
-        return 'Trimshamsa';
+        return l10n.chart_trimshamsa;
       case KundaliType.khavedamsa:
-        return 'Khavedamsa';
+        return l10n.chart_khavedamsa;
       case KundaliType.akshavedamsa:
-        return 'Akshavedamsa';
+        return l10n.chart_akshavedamsa;
       case KundaliType.shashtiamsa:
-        return 'Shashtiamsa';
+        return l10n.chart_shashtiamsa;
       case KundaliType.sudarshan:
-        return 'Sudarshan';
+        return l10n.chart_sudarshan;
       case KundaliType.ashtakavarga:
-        return 'Ashtakavarga';
+        return l10n.chart_ashtakavarga;
     }
+  }
+
+  // Get localized planet abbreviations map
+  Map<String, String> _getPlanetAbbreviations(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return {
+      'Sun': l10n.planet_sun_abbr,
+      'Moon': l10n.planet_moon_abbr,
+      'Mars': l10n.planet_mars_abbr,
+      'Mercury': l10n.planet_mercury_abbr,
+      'Jupiter': l10n.planet_jupiter_abbr,
+      'Venus': l10n.planet_venus_abbr,
+      'Saturn': l10n.planet_saturn_abbr,
+      'Rahu': l10n.planet_rahu_abbr,
+      'Ketu': l10n.planet_ketu_abbr,
+      'Uranus': l10n.planet_uranus_abbr,
+      'Neptune': l10n.planet_neptune_abbr,
+      'Pluto': l10n.planet_pluto_abbr,
+    };
+  }
+
+  // Get localized sign abbreviations map
+  Map<String, String> _getSignAbbreviations(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return {
+      'Aries': l10n.zodiac_aries_abbr,
+      'Taurus': l10n.zodiac_taurus_abbr,
+      'Gemini': l10n.zodiac_gemini_abbr,
+      'Cancer': l10n.zodiac_cancer_abbr,
+      'Leo': l10n.zodiac_leo_abbr,
+      'Virgo': l10n.zodiac_virgo_abbr,
+      'Libra': l10n.zodiac_libra_abbr,
+      'Scorpio': l10n.zodiac_scorpio_abbr,
+      'Sagittarius': l10n.zodiac_sagittarius_abbr,
+      'Capricorn': l10n.zodiac_capricorn_abbr,
+      'Aquarius': l10n.zodiac_aquarius_abbr,
+      'Pisces': l10n.zodiac_pisces_abbr,
+    };
   }
 
   Widget _buildCompactChartStyleSelector() {
@@ -1799,7 +1917,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                   ),
                   const SizedBox(width: 5),
                   Text(
-                    'North',
+                    AppLocalizations.of(context).display_northIndian,
                     style: GoogleFonts.dmSans(
                       fontSize: 10,
                       fontWeight: isNorth ? FontWeight.w600 : FontWeight.w400,
@@ -1843,7 +1961,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                   ),
                   const SizedBox(width: 5),
                   Text(
-                    'South',
+                    AppLocalizations.of(context).display_southIndian,
                     style: GoogleFonts.dmSans(
                       fontSize: 10,
                       fontWeight: !isNorth ? FontWeight.w600 : FontWeight.w400,
@@ -1861,9 +1979,10 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
 
   Widget _buildChartCard() {
     // Use calculated chart data or fallback to lagna
-    final houses = _currentHouses ?? _kundaliData!.houses;
-    final planets = _currentPlanetPositions ?? _kundaliData!.planetPositions;
-    final ascSign = _currentAscendantSign ?? _kundaliData!.ascendant.sign;
+    final houses = _currentHouses ?? _displayKundaliData.houses;
+    final planets =
+        _currentPlanetPositions ?? _displayKundaliData.planetPositions;
+    final ascSign = _currentAscendantSign ?? _displayKundaliData.ascendant.sign;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1874,40 +1993,57 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       ),
       child: Column(
         children: [
-          // Compact header with style selector and fullscreen button
+          // Compact header with style selector, alert orb, and fullscreen button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Chart Style Selector (North/South) - compact
               _buildCompactChartStyleSelector(),
-              // Fullscreen button - icon only
-              GestureDetector(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  _openFullscreenChart();
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: _accentPrimary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: _accentPrimary.withOpacity(0.2),
-                      width: 0.5,
+              // Right side: Alert Orb + Fullscreen button
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Astro Alert Orb - triggers expand/collapse of section below
+                  AstroAlertOrb(
+                    kundaliData: _displayKundaliData,
+                    controller: _alertController,
+                    transitDate: _customDateTime,
+                  ),
+                  const SizedBox(width: 8),
+                  // Fullscreen button - icon only
+                  GestureDetector(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      _openFullscreenChart();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: _accentPrimary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: _accentPrimary.withOpacity(0.2),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.fullscreen_rounded,
+                        size: 16,
+                        color: _accentPrimary,
+                      ),
                     ),
                   ),
-                  child: Icon(
-                    Icons.fullscreen_rounded,
-                    size: 16,
-                    color: _accentPrimary,
-                  ),
-                ),
+                ],
               ),
             ],
           ),
-          // Data mode indicator - shows if using real Swiss Ephemeris or sample data
-          // _buildDataModeIndicator(),
           const SizedBox(height: 12),
+          // Expandable alerts section - animates in/out between header and chart
+          AstroAlertExpandedSection(
+            kundaliData: _displayKundaliData,
+            controller: _alertController,
+            transitDate: _customDateTime,
+          ),
           AspectRatio(
             aspectRatio: 1,
             child: AnimatedSwitcher(
@@ -1923,6 +2059,8 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                         ascendantSign: ascSign,
                         chartStyle: _currentChartStyle,
                         isDarkMode: true,
+                        planetAbbreviations: _getPlanetAbbreviations(context),
+                        signAbbreviations: _getSignAbbreviations(context),
                       )
                       : _currentChartStyle == ChartStyle.southIndian
                       ? InteractiveSouthIndianChart(
@@ -1931,6 +2069,8 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                         planetPositions: planets,
                         ascendantSign: ascSign,
                         isDarkMode: true,
+                        planetAbbreviations: _getPlanetAbbreviations(context),
+                        signAbbreviations: _getSignAbbreviations(context),
                       )
                       : CustomPaint(
                         key: ValueKey('western_${_currentChartType.name}'),
@@ -1962,16 +2102,45 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
     });
   }
 
+  /// Check if a name looks like a date format (contains date patterns)
+  bool _isDateBasedName(String name) {
+    // Common date patterns: "9 Jan 2026", "Jan 9, 2026", "2026-01-09", etc.
+    // Check for month names
+    final monthPattern = RegExp(
+      r'\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b',
+      caseSensitive: false,
+    );
+    // Check for year pattern (4 digits)
+    final yearPattern = RegExp(r'\b(19|20)\d{2}\b');
+    // Check for time pattern (h:mm or hh:mm with AM/PM)
+    final timePattern = RegExp(r'\d{1,2}:\d{2}\s*(AM|PM|am|pm)?');
+
+    // If name contains month name + year, or time pattern, it's likely date-based
+    return (monthPattern.hasMatch(name) && yearPattern.hasMatch(name)) ||
+        (timePattern.hasMatch(name) && yearPattern.hasMatch(name));
+  }
+
   void _recalculateKundaliData() {
     if (_customDateTime == null) {
       _recalculatedKundaliData = null;
+      _isRecalculating = false;
       return;
+    }
+
+    // Show loading state briefly
+    _isRecalculating = true;
+
+    // Determine the name: if original name is date-based, update to new date
+    String displayName = _kundaliData!.name;
+    if (_isDateBasedName(displayName)) {
+      // Format the new date/time as the name
+      displayName = DateFormat('d MMM yyyy, h:mm a').format(_customDateTime!);
     }
 
     // Recalculate Kundali with custom date/time
     _recalculatedKundaliData = KundaliData.fromBirthDetails(
       id: 'temp_${_customDateTime!.millisecondsSinceEpoch}',
-      name: _kundaliData!.name,
+      name: displayName,
       birthDateTime: _customDateTime!,
       birthPlace: _kundaliData!.birthPlace,
       latitude: _kundaliData!.latitude,
@@ -1980,6 +2149,9 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
       gender: _kundaliData!.gender,
       chartStyle: _kundaliData!.chartStyle,
     );
+
+    // Hide loading state after calculation
+    _isRecalculating = false;
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -2036,31 +2208,6 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
               });
             },
           ),
-    );
-  }
-
-  /// Build the data mode indicator showing if using real Swiss Ephemeris or sample data
-  Widget _buildDataModeIndicator() {
-    final isUsingRealData = SwephService.nativeLibraryAvailable;
-    final indicatorColor = isUsingRealData ? Colors.green : Colors.orange;
-    final icon =
-        isUsingRealData
-            ? Icons.precision_manufacturing_rounded
-            : Icons.data_object_rounded;
-    final text =
-        isUsingRealData
-            ? '🔬 Swiss Ephemeris (Accurate)'
-            : '📊 Sample Data (Demo)';
-
-    return Container(
-      margin: const EdgeInsets.only(top: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-      decoration: BoxDecoration(
-        color: indicatorColor.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: indicatorColor.withOpacity(0.4), width: 0.5),
-      ),
-      
     );
   }
 
@@ -2164,7 +2311,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
             ),
             const SizedBox(width: 6),
             Text(
-              'Select Chart Type',
+              AppLocalizations.of(context).display_selectChartType,
               style: GoogleFonts.dmSans(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
@@ -2194,7 +2341,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Learn More',
+                      AppLocalizations.of(context).display_learnMore,
                       style: GoogleFonts.dmSans(
                         fontSize: 10,
                         fontWeight: FontWeight.w500,
@@ -2261,7 +2408,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        _getChartTypeLabel(type),
+                        _getChartTypeLabel(type, AppLocalizations.of(context)),
                         style: GoogleFonts.dmSans(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -2287,7 +2434,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
         reverseTransitionDuration: const Duration(milliseconds: 250),
         pageBuilder: (context, animation, secondaryAnimation) {
           return _FullscreenChartView(
-            kundaliData: _kundaliData!,
+            kundaliData: _displayKundaliData,
             initialChartStyle: _currentChartStyle,
             initialChartType: _currentChartType,
           );
@@ -2322,7 +2469,10 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
               ),
             ),
             const SizedBox(width: 10),
-            Text('Share coming soon', style: GoogleFonts.dmSans(fontSize: 13)),
+            Text(
+              AppLocalizations.of(context).display_shareComingSoon,
+              style: GoogleFonts.dmSans(fontSize: 13),
+            ),
           ],
         ),
         backgroundColor: const Color(0xFF3B82F6),
@@ -2344,6 +2494,7 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
   }
 
   Widget _buildOptionsSheet() {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       decoration: const BoxDecoration(
@@ -2363,24 +2514,77 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
               ),
             ),
             const SizedBox(height: 20),
-            _buildMenuItem(Icons.picture_as_pdf_outlined, 'Export PDF', () {}),
-            _buildMenuItem(Icons.star_outline_rounded, 'Set as Primary', () {
-              Navigator.pop(context);
-              context.read<KundliProvider>().setPrimaryKundali(
-                _kundaliData!.id,
-              );
-              HapticFeedback.mediumImpact();
-            }),
-            _buildMenuItem(Icons.copy_outlined, 'Duplicate', () {}),
+            _buildMenuItem(
+              Icons.picture_as_pdf_outlined,
+              l10n.display_menu_exportPdf,
+              () {},
+            ),
+            _buildMenuItem(
+              Icons.star_outline_rounded,
+              l10n.display_menu_setAsPrimary,
+              () {
+                Navigator.pop(context);
+                context.read<KundliProvider>().setPrimaryKundali(
+                  _kundaliData!.id,
+                );
+                HapticFeedback.mediumImpact();
+              },
+            ),
+            _buildMenuItem(
+              Icons.copy_outlined,
+              l10n.display_menu_duplicate,
+              () {},
+            ),
+            _buildMenuItem(
+              Icons.language_rounded,
+              l10n.display_menu_language,
+              () {
+                Navigator.pop(context);
+                _showLanguageSheet();
+              },
+            ),
             _buildMenuItem(
               Icons.delete_outline_rounded,
-              'Delete',
+              l10n.display_menu_delete,
               () {},
               isDestructive: true,
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _showLanguageSheet() {
+    HapticFeedback.lightImpact();
+    final languageProvider = context.read<LanguageProvider>();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder:
+          (_) => _LanguageSelectionSheet(
+            currentLanguageCode: languageProvider.currentLanguageCode,
+            onLanguageSelected: (languageCode) async {
+              Navigator.pop(context);
+              await languageProvider.changeLanguage(languageCode);
+              HapticFeedback.mediumImpact();
+              final languageName =
+                  AppConstants.supportedLanguages[languageCode] ?? languageCode;
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      AppLocalizations.of(
+                        context,
+                      ).language_changed(languageName),
+                    ),
+                    backgroundColor: _accentPrimary,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+          ),
     );
   }
 
@@ -2987,7 +3191,7 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    _getTypeLabel(type),
+                    _getTypeLabel(type, AppLocalizations.of(context)),
                     style: GoogleFonts.dmSans(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -3015,50 +3219,50 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
   }
 
   // User-friendly simple names for the horizontal selector
-  String _getTypeLabel(KundaliType type) {
+  String _getTypeLabel(KundaliType type, AppLocalizations l10n) {
     switch (type) {
       case KundaliType.lagna:
-        return 'Lagna';
+        return l10n.chart_lagna;
       case KundaliType.chandra:
-        return 'Moon';
+        return l10n.chart_moon;
       case KundaliType.surya:
-        return 'Sun';
+        return l10n.chart_sun;
       case KundaliType.bhavaChalit:
-        return 'Bhava';
+        return l10n.chart_bhava;
       case KundaliType.hora:
-        return 'Hora';
+        return l10n.chart_hora;
       case KundaliType.drekkana:
-        return 'Drekkana';
+        return l10n.chart_drekkana;
       case KundaliType.chaturthamsa:
-        return 'Chaturthamsa';
+        return l10n.chart_chaturthamsa;
       case KundaliType.saptamsa:
-        return 'Saptamsa';
+        return l10n.chart_saptamsa;
       case KundaliType.navamsa:
-        return 'Navamsa';
+        return l10n.chart_navamsa;
       case KundaliType.dasamsa:
-        return 'Dasamsa';
+        return l10n.chart_dasamsa;
       case KundaliType.dwadasamsa:
-        return 'Dwadasamsa';
+        return l10n.chart_dwadasamsa;
       case KundaliType.shodasamsa:
-        return 'Shodasamsa';
+        return l10n.chart_shodasamsa;
       case KundaliType.vimsamsa:
-        return 'Vimsamsa';
+        return l10n.chart_vimsamsa;
       case KundaliType.chaturvimsamsa:
-        return 'Chaturvimsamsa';
+        return l10n.chart_chaturvimsamsa;
       case KundaliType.bhamsa:
-        return 'Bhamsa';
+        return l10n.chart_bhamsa;
       case KundaliType.trimshamsa:
-        return 'Trimshamsa';
+        return l10n.chart_trimshamsa;
       case KundaliType.khavedamsa:
-        return 'Khavedamsa';
+        return l10n.chart_khavedamsa;
       case KundaliType.akshavedamsa:
-        return 'Akshavedamsa';
+        return l10n.chart_akshavedamsa;
       case KundaliType.shashtiamsa:
-        return 'Shashtiamsa';
+        return l10n.chart_shashtiamsa;
       case KundaliType.sudarshan:
-        return 'Sudarshan';
+        return l10n.chart_sudarshan;
       case KundaliType.ashtakavarga:
-        return 'Ashtakavarga';
+        return l10n.chart_ashtakavarga;
     }
   }
 
@@ -3215,6 +3419,44 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
     );
   }
 
+  // Get localized planet abbreviations map
+  Map<String, String> _getPlanetAbbreviations(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return {
+      'Sun': l10n.planet_sun_abbr,
+      'Moon': l10n.planet_moon_abbr,
+      'Mars': l10n.planet_mars_abbr,
+      'Mercury': l10n.planet_mercury_abbr,
+      'Jupiter': l10n.planet_jupiter_abbr,
+      'Venus': l10n.planet_venus_abbr,
+      'Saturn': l10n.planet_saturn_abbr,
+      'Rahu': l10n.planet_rahu_abbr,
+      'Ketu': l10n.planet_ketu_abbr,
+      'Uranus': l10n.planet_uranus_abbr,
+      'Neptune': l10n.planet_neptune_abbr,
+      'Pluto': l10n.planet_pluto_abbr,
+    };
+  }
+
+  // Get localized sign abbreviations map
+  Map<String, String> _getSignAbbreviations(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return {
+      'Aries': l10n.zodiac_aries_abbr,
+      'Taurus': l10n.zodiac_taurus_abbr,
+      'Gemini': l10n.zodiac_gemini_abbr,
+      'Cancer': l10n.zodiac_cancer_abbr,
+      'Leo': l10n.zodiac_leo_abbr,
+      'Virgo': l10n.zodiac_virgo_abbr,
+      'Libra': l10n.zodiac_libra_abbr,
+      'Scorpio': l10n.zodiac_scorpio_abbr,
+      'Sagittarius': l10n.zodiac_sagittarius_abbr,
+      'Capricorn': l10n.zodiac_capricorn_abbr,
+      'Aquarius': l10n.zodiac_aquarius_abbr,
+      'Pisces': l10n.zodiac_pisces_abbr,
+    };
+  }
+
   Widget _buildChart() {
     final houses = _houses ?? widget.kundaliData.houses;
     final planets = _planets ?? widget.kundaliData.planetPositions;
@@ -3229,6 +3471,8 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
           ascendantSign: ascSign,
           chartStyle: _currentStyle,
           isDarkMode: true,
+          planetAbbreviations: _getPlanetAbbreviations(context),
+          signAbbreviations: _getSignAbbreviations(context),
         );
       case ChartStyle.southIndian:
         return InteractiveSouthIndianChart(
@@ -3237,6 +3481,8 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
           planetPositions: planets,
           ascendantSign: ascSign,
           isDarkMode: true,
+          planetAbbreviations: _getPlanetAbbreviations(context),
+          signAbbreviations: _getSignAbbreviations(context),
         );
       case ChartStyle.western:
         return CustomPaint(
@@ -3625,7 +3871,7 @@ class _CustomDatePickerState extends State<_CustomDatePicker> {
                           ],
                         ),
                         child: Text(
-                          'Confirm',
+                          AppLocalizations.of(context).common_confirm,
                           style: GoogleFonts.dmSans(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -3998,8 +4244,9 @@ class _CustomTimePickerState extends State<_CustomTimePicker> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final timeString =
-        '${_selectedHour.toString().padLeft(2, '0')}:${_selectedMinute.toString().padLeft(2, '0')} ${_isAM ? 'AM' : 'PM'}';
+        '${_selectedHour.toString().padLeft(2, '0')}:${_selectedMinute.toString().padLeft(2, '0')} ${_isAM ? l10n.display_am : l10n.display_pm}';
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.48,
@@ -4165,7 +4412,7 @@ class _CustomTimePickerState extends State<_CustomTimePicker> {
                           ],
                         ),
                         child: Text(
-                          'Confirm',
+                          AppLocalizations.of(context).common_confirm,
                           style: GoogleFonts.dmSans(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -4523,4 +4770,228 @@ class _ChartTypeInfo {
     required this.color,
     required this.meaning,
   });
+}
+
+/// Language selection bottom sheet
+class _LanguageSelectionSheet extends StatefulWidget {
+  final String currentLanguageCode;
+  final void Function(String) onLanguageSelected;
+
+  const _LanguageSelectionSheet({
+    required this.currentLanguageCode,
+    required this.onLanguageSelected,
+  });
+
+  @override
+  State<_LanguageSelectionSheet> createState() =>
+      _LanguageSelectionSheetState();
+}
+
+class _LanguageSelectionSheetState extends State<_LanguageSelectionSheet>
+    with SingleTickerProviderStateMixin {
+  // Color palette
+  static const _bgSheet = Color(0xFF0F0D16);
+  static const _surfaceColor = Color(0xFF181522);
+  static const _borderColor = Color(0xFF252232);
+  static const _accentPrimary = Color(0xFFD4AF37);
+  static const _textPrimary = Color(0xFFF5F4F8);
+
+  // Get languages dynamically from AppConstants
+  List<Map<String, String>> get _languages {
+    return AppConstants.supportedLanguages.entries
+        .map((e) => {'code': e.key, 'native': e.value})
+        .toList();
+  }
+
+  String? _pressedItem;
+  late AnimationController _animController;
+  late Animation<double> _slideAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      duration: const Duration(milliseconds: 280),
+      vsync: this,
+    );
+    _slideAnimation = CurvedAnimation(
+      parent: _animController,
+      curve: Curves.easeOutCubic,
+    );
+    _animController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _slideAnimation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, 20 * (1 - _slideAnimation.value)),
+          child: Opacity(opacity: _slideAnimation.value, child: child),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: _bgSheet,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 10),
+              // Handle
+              Container(
+                width: 32,
+                height: 3,
+                decoration: BoxDecoration(
+                  color: _borderColor,
+                  borderRadius: BorderRadius.circular(1.5),
+                ),
+              ),
+              const SizedBox(height: 18),
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: _accentPrimary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      child: Icon(
+                        Icons.translate_rounded,
+                        size: 14,
+                        color: _accentPrimary.withOpacity(0.9),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      AppLocalizations.of(context).language_title,
+                      style: GoogleFonts.dmSans(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: _textPrimary,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              // Language grid
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: _surfaceColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    for (int i = 0; i < _languages.length; i += 2)
+                      Padding(
+                        padding: EdgeInsets.only(
+                          bottom: i < _languages.length - 2 ? 3 : 0,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(child: _buildLanguageTile(_languages[i])),
+                            const SizedBox(width: 3),
+                            Expanded(
+                              child:
+                                  i + 1 < _languages.length
+                                      ? _buildLanguageTile(_languages[i + 1])
+                                      : const SizedBox(),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageTile(Map<String, String> lang) {
+    final code = lang['code']!;
+    final native = lang['native']!;
+    final isSelected = widget.currentLanguageCode == code;
+    final isPressed = _pressedItem == code;
+
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressedItem = code),
+      onTapUp: (_) => setState(() => _pressedItem = null),
+      onTapCancel: () => setState(() => _pressedItem = null),
+      onTap: () {
+        HapticFeedback.selectionClick();
+        widget.onLanguageSelected(code);
+      },
+      child: AnimatedScale(
+        scale: isPressed ? 0.97 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOut,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+          decoration: BoxDecoration(
+            color:
+                isSelected
+                    ? _accentPrimary.withOpacity(0.08)
+                    : Colors.transparent,
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  native,
+                  style: GoogleFonts.notoSans(
+                    fontSize: 14,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected ? _accentPrimary : _textPrimary,
+                    height: 1.2,
+                  ),
+                ),
+              ),
+              AnimatedOpacity(
+                opacity: isSelected ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 150),
+                child: Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: _accentPrimary,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    size: 10,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

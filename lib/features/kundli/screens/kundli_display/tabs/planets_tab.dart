@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kundali_app/shared/models/kundali_data_model.dart';
 import 'package:kundali_app/core/services/kundali_calculation_service.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 import '../shared/floating_nav_bar.dart';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -360,7 +361,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
 
                     // Description
                     Text(
-                      'What This Means',
+                      AppLocalizations.of(context)!.insight_whatThisMeans,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -413,7 +414,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Significance',
+                                  AppLocalizations.of(context)!.insight_significance,
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -441,7 +442,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                     if (insight.keyPoints.isNotEmpty) ...[
                       const SizedBox(height: 24),
                       Text(
-                        'Key Points',
+                        AppLocalizations.of(context)!.insight_keyPoints,
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -507,61 +508,63 @@ InsightData _getPlanetInsight(
   bool isCombust,
   String nakshatraLord,
   int nakshatraPada,
+  AppLocalizations l10n,
 ) {
   final planetColor = _getPlanetColor(planet.planet);
+  final localizedPlanet = _getLocalizedPlanetName(planet.planet, l10n);
+  final localizedSign = _getLocalizedSignName(planet.sign, l10n);
+  final localizedDignity = dignity.isNotEmpty ? _getLocalizedDignity(dignity, l10n) : '';
+  final localizedNature = nature == 'Benefic' ? l10n.planets_insight_benefic : l10n.planets_insight_malefic;
 
   final planetDescriptions = {
-    'Sun':
-        'The Sun represents your soul, ego, vitality, and life force. It shows your core identity, self-expression, and relationship with authority. A strong Sun gives confidence, leadership qualities, and recognition.',
-    'Moon':
-        'The Moon represents your mind, emotions, and subconscious patterns. It shows your emotional nature, mental peace, and connection with the mother. A strong Moon gives emotional stability and intuition.',
-    'Mars':
-        'Mars represents courage, energy, aggression, and action. It shows your drive, competitive spirit, and how you assert yourself. A strong Mars gives determination, physical strength, and the ability to overcome obstacles.',
-    'Mercury':
-        'Mercury represents intellect, communication, and analytical ability. It shows your thinking patterns, speech, and business acumen. A strong Mercury gives sharp wit, good communication skills, and adaptability.',
-    'Jupiter':
-        'Jupiter represents wisdom, knowledge, expansion, and good fortune. It shows your philosophical outlook, teaching ability, and spiritual growth. A strong Jupiter brings blessings, optimism, and prosperity.',
-    'Venus':
-        'Venus represents love, beauty, pleasures, and relationships. It shows your romantic nature, artistic talents, and appreciation for luxury. A strong Venus gives charm, creativity, and harmonious relationships.',
-    'Saturn':
-        'Saturn represents discipline, responsibility, karma, and life lessons. It shows your endurance, work ethic, and areas of restriction. A strong Saturn gives perseverance, maturity, and long-lasting achievements.',
-    'Rahu':
-        'Rahu represents desires, obsessions, and worldly ambitions. It shows your unconventional side, foreign connections, and areas of intense focus. Rahu amplifies whatever it touches and drives material pursuits.',
-    'Ketu':
-        'Ketu represents spirituality, detachment, and past life karma. It shows your intuitive abilities, liberation tendencies, and areas where you seek transcendence. Ketu brings wisdom through letting go.',
+    'Sun': l10n.planet_sun_desc,
+    'Moon': l10n.planet_moon_desc,
+    'Mars': l10n.planet_mars_desc,
+    'Mercury': l10n.planet_mercury_desc,
+    'Jupiter': l10n.planet_jupiter_desc,
+    'Venus': l10n.planet_venus_desc,
+    'Saturn': l10n.planet_saturn_desc,
+    'Rahu': l10n.planet_rahu_desc,
+    'Ketu': l10n.planet_ketu_desc,
   };
 
   final dignityInfo =
-      dignity.isNotEmpty ? ' Currently $dignity in ${planet.sign}.' : '';
+      dignity.isNotEmpty ? ' ${l10n.planets_currently(localizedDignity, localizedSign)}' : '';
   final combustInfo =
-      isCombust
-          ? ' This planet is combust (too close to Sun), which reduces its strength.'
-          : '';
+      isCombust ? ' ${l10n.planets_combustInfo}' : '';
   final retroInfo =
       planet.isRetrograde && planet.planet != 'Rahu' && planet.planet != 'Ketu'
-          ? ' Currently retrograde, which intensifies its internal effects.'
+          ? ' ${l10n.planets_retroInfo}'
           : '';
 
   return InsightData(
-    title: 'Planet',
-    value: planet.planet,
+    title: l10n.planets_insight_planet,
+    value: localizedPlanet,
     description:
-        '${planetDescriptions[planet.planet] ?? "This planet influences specific life areas."}$dignityInfo$combustInfo$retroInfo',
-    significance:
-        '${planet.planet} is placed in ${planet.sign} at ${planet.signDegree.toStringAsFixed(2)}° in House ${planet.house}. The Nakshatra is ${planet.nakshatra} (Pada $nakshatraPada), ruled by $nakshatraLord. This is a $nature planet.',
+        '${planetDescriptions[planet.planet] ?? l10n.planets_defaultDesc}$dignityInfo$combustInfo$retroInfo',
+    significance: l10n.planets_planetSignificance(
+      localizedPlanet,
+      localizedSign,
+      planet.signDegree.toStringAsFixed(2),
+      planet.house,
+      planet.nakshatra,
+      nakshatraPada,
+      nakshatraLord,
+      localizedNature,
+    ),
     keyPoints: [
-      'Sign: ${planet.sign} (${_getSignSymbol(planet.sign)})',
-      'House: ${planet.house}${_getOrdinal(planet.house)}',
-      'Degree: ${planet.signDegree.toStringAsFixed(2)}°',
-      'Nakshatra: ${planet.nakshatra} (Pada $nakshatraPada)',
-      'Nakshatra Lord: $nakshatraLord',
-      if (dignity.isNotEmpty) 'Dignity: $dignity',
+      l10n.planets_insight_signLabel(localizedSign, _getSignSymbol(planet.sign)),
+      l10n.planets_insight_houseLabel('${planet.house}${_getOrdinal(planet.house)}'),
+      l10n.planets_insight_degreeLabel(planet.signDegree.toStringAsFixed(2)),
+      l10n.planets_insight_nakshatraLabel(planet.nakshatra, nakshatraPada),
+      l10n.planets_insight_nakshatraLordLabel(nakshatraLord),
+      if (dignity.isNotEmpty) l10n.planets_insight_dignityLabel(localizedDignity),
       if (planet.isRetrograde &&
           planet.planet != 'Rahu' &&
           planet.planet != 'Ketu')
-        'Status: Retrograde',
-      if (isCombust) 'Status: Combust',
-      'Nature: $nature',
+        l10n.planets_insight_statusRetrograde,
+      if (isCombust) l10n.planets_insight_statusCombust,
+      l10n.planets_insight_natureLabel(localizedNature),
     ],
     accentColor: planetColor,
     icon: Icons.blur_circular_rounded,
@@ -569,51 +572,54 @@ InsightData _getPlanetInsight(
   );
 }
 
-InsightData _getDignityInsight(String dignity, String planet, String sign) {
+InsightData _getDignityInsight(
+  String dignity,
+  String planet,
+  String sign,
+  AppLocalizations l10n,
+  String localizedPlanet,
+  String localizedSign,
+  String localizedDignity,
+) {
   final dignityDescriptions = {
-    'Exalted':
-        'The planet is exalted, meaning it\'s in its strongest possible position. Exalted planets give their best results and indicate areas of natural talent and blessing in your life.',
-    'Debilitated':
-        'The planet is debilitated, in its weakest position. While this can indicate challenges, it also shows areas for growth and spiritual development. The effects can be cancelled through various yogas.',
-    'Own Sign':
-        'The planet is in its own sign, feeling comfortable and at home. This gives stability and consistency in the areas the planet governs.',
-    'Moolatrikona':
-        'The planet is in its Moolatrikona sign, its second-best position after exaltation. This is considered a very powerful placement.',
-    'Friendly':
-        'The planet is in a friendly sign, where it receives support from the sign lord. This generally gives favorable results.',
-    'Enemy':
-        'The planet is in an enemy sign, creating some friction with the sign lord. This may require extra effort in related life areas.',
-    'Neutral':
-        'The planet is in a neutral sign, giving balanced results based on other chart factors.',
+    'Exalted': l10n.planets_dignity_exaltedFull,
+    'Debilitated': l10n.planets_dignity_debilitatedFull,
+    'Own Sign': l10n.planets_dignity_ownSignFull,
+    'Moolatrikona': l10n.planets_dignity_moolatrikonaFull,
+    'Friendly': l10n.planets_dignity_friendlyFull,
+    'Enemy': l10n.planets_dignity_enemyFull,
+    'Neutral': l10n.planets_dignity_neutralFull,
   };
 
   final dignityColor = _getDignityColor(dignity);
 
   return InsightData(
-    title: 'Planetary Dignity',
-    value: dignity,
+    title: l10n.planets_insight_planetaryDignity,
+    value: localizedDignity,
     description:
-        dignityDescriptions[dignity] ??
-        'This dignity status affects how the planet expresses its energy.',
-    significance:
-        '$planet in $sign is $dignity. This affects the strength and quality of the planet\'s results in your life.',
+        dignityDescriptions[dignity] ?? l10n.planets_dignityAffects,
+    significance: l10n.planets_dignitySignificance(
+      localizedPlanet,
+      localizedSign,
+      localizedDignity,
+    ),
     keyPoints: [
-      'Planet: $planet',
-      'Sign: $sign',
-      'Dignity: $dignity',
+      l10n.planets_insight_planet,
+      l10n.planets_insight_signLabel(localizedSign, _getSignSymbol(sign)),
+      l10n.planets_insight_dignityLabel(localizedDignity),
       dignity == 'Exalted'
-          ? 'Strength: Maximum (100%)'
+          ? l10n.planets_strength_max
           : dignity == 'Moolatrikona'
-          ? 'Strength: Very High (85%)'
+          ? l10n.planets_strength_veryHigh
           : dignity == 'Own Sign'
-          ? 'Strength: High (75%)'
+          ? l10n.planets_strength_high
           : dignity == 'Friendly'
-          ? 'Strength: Good (60%)'
+          ? l10n.planets_strength_good
           : dignity == 'Neutral'
-          ? 'Strength: Moderate (50%)'
+          ? l10n.planets_strength_moderate
           : dignity == 'Enemy'
-          ? 'Strength: Reduced (35%)'
-          : 'Strength: Low (25%)',
+          ? l10n.planets_strength_reduced
+          : l10n.planets_strength_low,
     ],
     accentColor: dignityColor,
     icon:
@@ -853,16 +859,16 @@ const _planetOrder = [
   'Ketu',
 ];
 
-List<NavSection> _buildSections(List<String> planetNames) {
+List<NavSection> _buildSections(List<String> planetNames, AppLocalizations l10n) {
   final sections = <NavSection>[
-    const NavSection(id: 'overview', label: 'Overview', color: _Colors.violet),
+    NavSection(id: 'overview', label: l10n.planets_nav_overview, color: _Colors.violet),
   ];
 
   for (final name in planetNames) {
     sections.add(
       NavSection(
         id: name.toLowerCase(),
-        label: name,
+        label: _getLocalizedPlanetName(name, l10n),
         color: _getPlanetColor(name),
       ),
     );
@@ -886,10 +892,11 @@ class _PlanetsTabState extends State<PlanetsTab> {
   late final ScrollController _scrollController;
   final Map<String, GlobalKey> _sectionKeys = {};
   final Map<String, GlobalKey<_AnimatedSectionWrapperState>> _animatedKeys = {};
-  late List<NavSection> _sections;
+  List<NavSection> _sections = [];
   late List<PlanetPosition> _sortedPlanets;
   int _activeIndex = 0;
   bool _isScrolling = false;
+  bool _sectionsInitialized = false;
 
   @override
   void initState() {
@@ -899,10 +906,21 @@ class _PlanetsTabState extends State<PlanetsTab> {
 
     // Sort planets in proper order
     _sortedPlanets = _getSortedPlanets();
+  }
 
-    // Build sections dynamically from actual planet data
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_sectionsInitialized) {
+      _initializeSections();
+      _sectionsInitialized = true;
+    }
+  }
+
+  void _initializeSections() {
+    final l10n = AppLocalizations.of(context)!;
     final planetNames = _sortedPlanets.map((p) => p.planet).toList();
-    _sections = _buildSections(planetNames);
+    _sections = _buildSections(planetNames, l10n);
 
     // Initialize keys for each section
     for (final section in _sections) {
@@ -1006,9 +1024,9 @@ class _PlanetsTabState extends State<PlanetsTab> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const _AnimatedSectionHeader(
-                      title: 'Overview',
-                      subtitle: 'Planetary positions summary',
+                    _AnimatedSectionHeader(
+                      title: AppLocalizations.of(context)!.planets_nav_overview,
+                      subtitle: AppLocalizations.of(context)!.planets_overviewSubtitle,
                       accentColor: _Colors.violet,
                     ),
                     const SizedBox(height: _DesignTokens.space12),
@@ -1668,22 +1686,27 @@ class _SummaryCardState extends State<_SummaryCard>
   void _onTapUp(TapUpDetails details) {
     setState(() => _isPressed = false);
     _controller.reverse();
+    final l10n = AppLocalizations.of(context)!;
     _showInsightSheet(
       context,
       InsightData(
-        title: 'Graha Sthiti',
-        value: 'Planetary Overview',
-        description:
-            'Graha Sthiti shows the positions of all nine planets (Navagrahas) in your birth chart. These positions are calculated using the Swiss Ephemeris for astronomical precision and then mapped to the Vedic sidereal zodiac.',
-        significance:
-            'Your chart has ${widget.totalPlanets} planets positioned across different signs and houses. ${widget.stats['exalted'] ?? 0} planet(s) are exalted (strongest), ${widget.stats['debilitated'] ?? 0} are debilitated, ${widget.stats['retrograde'] ?? 0} are retrograde, and ${widget.stats['combust'] ?? 0} are combust.',
+        title: l10n.planets_grahaSthiti,
+        value: l10n.planets_overview,
+        description: l10n.planets_grahaSthitiInsight,
+        significance: l10n.planets_grahaSthitiSignificance(
+          widget.totalPlanets,
+          widget.stats['exalted'] ?? 0,
+          widget.stats['debilitated'] ?? 0,
+          widget.stats['retrograde'] ?? 0,
+          widget.stats['combust'] ?? 0,
+        ),
         keyPoints: [
-          'Total Planets: ${widget.totalPlanets}',
-          'Exalted: ${widget.stats['exalted'] ?? 0} (Maximum strength)',
-          'Debilitated: ${widget.stats['debilitated'] ?? 0} (Need remedies)',
-          'Retrograde: ${widget.stats['retrograde'] ?? 0} (Internal effects)',
-          'Combust: ${widget.stats['combust'] ?? 0} (Hidden energy)',
-          'Calculations: Swiss Ephemeris + Lahiri Ayanamsa',
+          l10n.planets_totalPlanets(widget.totalPlanets),
+          l10n.planets_exaltedCount(widget.stats['exalted'] ?? 0),
+          l10n.planets_debilitatedCount(widget.stats['debilitated'] ?? 0),
+          l10n.planets_retrogradeCount(widget.stats['retrograde'] ?? 0),
+          l10n.planets_combustCount(widget.stats['combust'] ?? 0),
+          l10n.planets_calculations,
         ],
         accentColor: _Colors.violet,
         icon: Icons.blur_on_rounded,
@@ -1758,7 +1781,7 @@ class _SummaryCardState extends State<_SummaryCard>
                       Row(
                         children: [
                           Text(
-                            'Graha Sthiti',
+                            AppLocalizations.of(context)!.planets_grahaSthiti,
                             style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -1779,7 +1802,7 @@ class _SummaryCardState extends State<_SummaryCard>
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Planetary positions via Swiss Ephemeris',
+                        AppLocalizations.of(context)!.planets_grahaSthitiDesc,
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           color: _Colors.textTertiary,
@@ -1991,7 +2014,7 @@ class _DignityLegend extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Planetary Dignities',
+                AppLocalizations.of(context)!.planets_dignities,
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
@@ -2000,7 +2023,7 @@ class _DignityLegend extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                'Tap planets for details',
+                AppLocalizations.of(context)!.planets_tapForDetails,
                 style: GoogleFonts.inter(
                   fontSize: 9,
                   color: _Colors.textTertiary,
@@ -2015,49 +2038,53 @@ class _DignityLegend extends StatelessWidget {
             child: Row(
               children: [
                 _InteractiveLegendDot(
-                  label: 'Exalted',
-                  shortLabel: 'Exalt',
+                  label: AppLocalizations.of(context)!.planets_exalted,
+                  internalLabel: 'Exalted',
+                  shortLabel: AppLocalizations.of(context)!.planets_stat_exalt,
                   color: const Color(0xFF6EE7B7),
-                  description:
-                      'Maximum strength - the planet gives its best results',
+                  description: AppLocalizations.of(context)!.planets_dignity_exaltDesc,
                 ),
                 _InteractiveLegendDot(
-                  label: 'Moolatrikona',
-                  shortLabel: 'Moola',
+                  label: AppLocalizations.of(context)!.planets_moolatrikona,
+                  internalLabel: 'Moolatrikona',
+                  shortLabel: AppLocalizations.of(context)!.planets_moola,
                   color: const Color(0xFF22D3EE),
-                  description: 'Second strongest position after exaltation',
+                  description: AppLocalizations.of(context)!.planets_dignity_moolaDesc,
                 ),
                 _InteractiveLegendDot(
-                  label: 'Own Sign',
-                  shortLabel: 'Own',
+                  label: AppLocalizations.of(context)!.planets_ownSign,
+                  internalLabel: 'Own Sign',
+                  shortLabel: AppLocalizations.of(context)!.planets_own,
                   color: const Color(0xFF60A5FA),
-                  description:
-                      'Planet in its own sign - comfortable and stable',
+                  description: AppLocalizations.of(context)!.planets_dignity_ownDesc,
                 ),
                 _InteractiveLegendDot(
-                  label: 'Friendly',
-                  shortLabel: 'Friend',
+                  label: AppLocalizations.of(context)!.planets_friendly,
+                  internalLabel: 'Friendly',
+                  shortLabel: AppLocalizations.of(context)!.planets_friend,
                   color: const Color(0xFFA78BFA),
-                  description:
-                      'Planet in a friendly sign - supportive environment',
+                  description: AppLocalizations.of(context)!.planets_dignity_friendlyDesc,
                 ),
                 _InteractiveLegendDot(
-                  label: 'Neutral',
-                  shortLabel: 'Neutral',
+                  label: AppLocalizations.of(context)!.planets_neutral,
+                  internalLabel: 'Neutral',
+                  shortLabel: AppLocalizations.of(context)!.planets_neutral,
                   color: const Color(0xFF9CA3AF),
-                  description: 'Neither strong nor weak - balanced results',
+                  description: AppLocalizations.of(context)!.planets_dignity_neutralDesc,
                 ),
                 _InteractiveLegendDot(
-                  label: 'Enemy',
-                  shortLabel: 'Enemy',
+                  label: AppLocalizations.of(context)!.planets_enemy,
+                  internalLabel: 'Enemy',
+                  shortLabel: AppLocalizations.of(context)!.planets_enemy,
                   color: const Color(0xFFFBBF24),
-                  description: 'Planet in an enemy sign - extra effort needed',
+                  description: AppLocalizations.of(context)!.planets_dignity_enemyDesc,
                 ),
                 _InteractiveLegendDot(
-                  label: 'Debilitated',
-                  shortLabel: 'Debil',
+                  label: AppLocalizations.of(context)!.planets_debilitated,
+                  internalLabel: 'Debilitated',
+                  shortLabel: AppLocalizations.of(context)!.planets_stat_debil,
                   color: const Color(0xFFF87171),
-                  description: 'Weakest position - may need remedial measures',
+                  description: AppLocalizations.of(context)!.planets_dignity_debilDesc,
                 ),
               ],
             ),
@@ -2070,12 +2097,14 @@ class _DignityLegend extends StatelessWidget {
 
 class _InteractiveLegendDot extends StatefulWidget {
   final String label;
+  final String internalLabel;
   final String shortLabel;
   final Color color;
   final String description;
 
   const _InteractiveLegendDot({
     required this.label,
+    required this.internalLabel,
     required this.shortLabel,
     required this.color,
     required this.description,
@@ -2095,24 +2124,24 @@ class _InteractiveLegendDotState extends State<_InteractiveLegendDot> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
+        final l10n = AppLocalizations.of(context)!;
         _showInsightSheet(
           context,
           InsightData(
-            title: 'Planetary Dignity',
+            title: l10n.planets_insight_planetaryDignity,
             value: widget.label,
             description: widget.description,
-            significance:
-                'Planetary dignity determines how strongly a planet can express its energy in your chart.',
+            significance: l10n.planets_dignityAffects,
             keyPoints: [
-              'Dignity: ${widget.label}',
+              l10n.planets_insight_dignityLabel(widget.label),
               widget.description,
-              'Affects planetary strength and results',
+              l10n.planets_dignityAffects,
             ],
             accentColor: widget.color,
             icon:
-                widget.label == 'Exalted'
+                widget.internalLabel == 'Exalted'
                     ? Icons.arrow_upward_rounded
-                    : widget.label == 'Debilitated'
+                    : widget.internalLabel == 'Debilitated'
                     ? Icons.arrow_downward_rounded
                     : Icons.swap_vert_rounded,
           ),
@@ -2234,6 +2263,7 @@ class _PlanetCardState extends State<_PlanetCard>
         widget.isCombust,
         widget.nakshatraLord,
         widget.nakshatraPada,
+        AppLocalizations.of(context)!,
       ),
     );
   }
@@ -2397,7 +2427,7 @@ class _PlanetCardState extends State<_PlanetCard>
                                 Row(
                                   children: [
                                     Text(
-                                      widget.planet.planet,
+                                      _getLocalizedPlanetName(widget.planet.planet, AppLocalizations.of(context)!),
                                       style: GoogleFonts.inter(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w700,
@@ -2493,12 +2523,17 @@ class _PlanetCardState extends State<_PlanetCard>
                                         label: _shortenDignity(widget.dignity),
                                         color: dignityColor,
                                         onTap: () {
+                                          final l10n = AppLocalizations.of(context)!;
                                           _showInsightSheet(
                                             context,
                                             _getDignityInsight(
                                               widget.dignity,
                                               widget.planet.planet,
                                               widget.planet.sign,
+                                              l10n,
+                                              _getLocalizedPlanetName(widget.planet.planet, l10n),
+                                              _getLocalizedSignName(widget.planet.sign, l10n),
+                                              _getLocalizedDignity(widget.dignity, l10n),
                                             ),
                                           );
                                         },
@@ -2565,7 +2600,7 @@ class _PlanetCardState extends State<_PlanetCard>
                                     ),
                                     const SizedBox(width: 5),
                                     Text(
-                                      widget.planet.sign,
+                                      _getLocalizedSignName(widget.planet.sign, AppLocalizations.of(context)!),
                                       style: GoogleFonts.inter(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w500,
@@ -2819,6 +2854,55 @@ String _getSignSymbol(String sign) {
     'Pisces': '♓',
   };
   return symbols[sign] ?? '?';
+}
+
+String _getLocalizedPlanetName(String planet, AppLocalizations l10n) {
+  switch (planet) {
+    case 'Sun': return l10n.planet_sun;
+    case 'Moon': return l10n.planet_moon;
+    case 'Mars': return l10n.planet_mars;
+    case 'Mercury': return l10n.planet_mercury;
+    case 'Jupiter': return l10n.planet_jupiter;
+    case 'Venus': return l10n.planet_venus;
+    case 'Saturn': return l10n.planet_saturn;
+    case 'Rahu': return l10n.planet_rahu;
+    case 'Ketu': return l10n.planet_ketu;
+    case 'Uranus': return l10n.planet_uranus;
+    case 'Neptune': return l10n.planet_neptune;
+    case 'Pluto': return l10n.planet_pluto;
+    default: return planet;
+  }
+}
+
+String _getLocalizedSignName(String sign, AppLocalizations l10n) {
+  switch (sign) {
+    case 'Aries': return l10n.zodiac_aries;
+    case 'Taurus': return l10n.zodiac_taurus;
+    case 'Gemini': return l10n.zodiac_gemini;
+    case 'Cancer': return l10n.zodiac_cancer;
+    case 'Leo': return l10n.zodiac_leo;
+    case 'Virgo': return l10n.zodiac_virgo;
+    case 'Libra': return l10n.zodiac_libra;
+    case 'Scorpio': return l10n.zodiac_scorpio;
+    case 'Sagittarius': return l10n.zodiac_sagittarius;
+    case 'Capricorn': return l10n.zodiac_capricorn;
+    case 'Aquarius': return l10n.zodiac_aquarius;
+    case 'Pisces': return l10n.zodiac_pisces;
+    default: return sign;
+  }
+}
+
+String _getLocalizedDignity(String dignity, AppLocalizations l10n) {
+  switch (dignity) {
+    case 'Exalted': return l10n.planets_exalted;
+    case 'Debilitated': return l10n.planets_debilitated;
+    case 'Own Sign': return l10n.planets_ownSign;
+    case 'Moolatrikona': return l10n.planets_moolatrikona;
+    case 'Friendly': return l10n.planets_friendly;
+    case 'Neutral': return l10n.planets_neutral;
+    case 'Enemy': return l10n.planets_enemy;
+    default: return dignity;
+  }
 }
 
 /// Get zodiac sign color based on the visual palette from images

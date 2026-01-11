@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:math' as math;
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/providers/auth_provider.dart';
-import '../../../../l10n/app_localizations.dart';
+import 'package:kundali_app/l10n/generated/app_localizations.dart';
 
 // Responsive breakpoints
 class LoginBreakpoints {
@@ -419,7 +419,7 @@ class _LoginScreenState extends State<LoginScreen>
           ),
           const SizedBox(height: 20),
           Text(
-            l10n.welcome,
+            l10n.auth_welcome,
             style: TextStyle(
               fontSize: titleSize,
               fontWeight: FontWeight.bold,
@@ -456,7 +456,7 @@ class _LoginScreenState extends State<LoginScreen>
         textInputAction: TextInputAction.next,
         style: TextStyle(fontSize: fontSize),
         decoration: InputDecoration(
-          labelText: l10n.email,
+          labelText: l10n.auth_email,
           prefixIcon: Icon(Icons.email_outlined, size: fontSize * 1.3),
           contentPadding: EdgeInsets.symmetric(
             horizontal: 16,
@@ -495,7 +495,7 @@ class _LoginScreenState extends State<LoginScreen>
         textInputAction: TextInputAction.done,
         style: TextStyle(fontSize: fontSize),
         decoration: InputDecoration(
-          labelText: l10n.password,
+          labelText: l10n.auth_password,
           prefixIcon: Icon(Icons.lock_outline, size: fontSize * 1.3),
           suffixIcon: IconButton(
             icon: Icon(
@@ -541,7 +541,7 @@ class _LoginScreenState extends State<LoginScreen>
           minimumSize: const Size(48, 48),
         ),
         child: Text(
-          l10n.forgotPassword,
+          l10n.auth_forgotPassword,
           style: TextStyle(fontSize: fontSize * 0.9),
         ),
       ),
@@ -577,7 +577,7 @@ class _LoginScreenState extends State<LoginScreen>
                   ),
                 )
                 : Text(
-                  l10n.login,
+                  l10n.common_login,
                   style: TextStyle(
                     fontSize: fontSize,
                     fontWeight: FontWeight.bold,
@@ -622,7 +622,7 @@ class _LoginScreenState extends State<LoginScreen>
     final googleButton = _SocialLoginButton(
       onPressed: _isLoading ? null : _handleGoogleSignIn,
       icon: FaIcon(FontAwesomeIcons.google, size: iconSize),
-      label: isSmallScreen ? 'Google' : l10n.continueWithGoogle,
+      label: isSmallScreen ? 'Google' : l10n.auth_continueWithGoogle,
       height: buttonHeight,
       fontSize: fontSize,
       color: const Color(0xFFDB4437),
@@ -637,7 +637,7 @@ class _LoginScreenState extends State<LoginScreen>
                 // TODO: Implement Facebook sign in
               },
       icon: FaIcon(FontAwesomeIcons.facebook, size: iconSize),
-      label: isSmallScreen ? 'Facebook' : l10n.continueWithFacebook,
+      label: isSmallScreen ? 'Facebook' : l10n.auth_continueWithFacebook,
       height: buttonHeight,
       fontSize: fontSize,
       color: const Color(0xFF1877F2),
@@ -675,7 +675,7 @@ class _LoginScreenState extends State<LoginScreen>
             minimumSize: const Size(48, 48),
           ),
           child: Text(
-            l10n.guestMode,
+            l10n.auth_guestMode,
             style: TextStyle(
               fontSize: fontSize * 0.95,
               decoration: TextDecoration.underline,
@@ -704,7 +704,7 @@ class _LoginScreenState extends State<LoginScreen>
                 minimumSize: const Size(48, 48),
               ),
               child: Text(
-                l10n.signup,
+                l10n.common_signup,
                 style: TextStyle(
                   fontSize: fontSize * 0.9,
                   fontWeight: FontWeight.bold,
