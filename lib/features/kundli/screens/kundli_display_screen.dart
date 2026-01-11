@@ -2061,6 +2061,9 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                         isDarkMode: true,
                         planetAbbreviations: _getPlanetAbbreviations(context),
                         signAbbreviations: _getSignAbbreviations(context),
+                        useLetterSpacing:
+                            Localizations.localeOf(context).languageCode ==
+                            'en',
                       )
                       : _currentChartStyle == ChartStyle.southIndian
                       ? InteractiveSouthIndianChart(
@@ -3473,6 +3476,8 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
           isDarkMode: true,
           planetAbbreviations: _getPlanetAbbreviations(context),
           signAbbreviations: _getSignAbbreviations(context),
+          useLetterSpacing:
+              Localizations.localeOf(context).languageCode == 'en',
         );
       case ChartStyle.southIndian:
         return InteractiveSouthIndianChart(

@@ -15,6 +15,7 @@ class InteractiveKundliChart extends StatefulWidget {
   final bool isDarkMode;
   final Map<String, String>? planetAbbreviations;
   final Map<String, String>? signAbbreviations;
+  final bool useLetterSpacing;
 
   const InteractiveKundliChart({
     super.key,
@@ -25,6 +26,7 @@ class InteractiveKundliChart extends StatefulWidget {
     this.isDarkMode = true,
     this.planetAbbreviations,
     this.signAbbreviations,
+    this.useLetterSpacing = true,
   });
 
   @override
@@ -319,6 +321,7 @@ class _InteractiveKundliChartState extends State<InteractiveKundliChart>
                   housePaths: _housePaths,
                   planetAbbreviations: widget.planetAbbreviations,
                   signAbbreviations: widget.signAbbreviations,
+                  useLetterSpacing: widget.useLetterSpacing,
                 ),
               );
             },
@@ -368,6 +371,7 @@ class _GlowingChartPainter extends CustomPainter {
   final Map<int, Path> housePaths;
   final Map<String, String>? planetAbbreviations;
   final Map<String, String>? signAbbreviations;
+  final bool useLetterSpacing;
 
   _GlowingChartPainter({
     required this.houses,
@@ -379,6 +383,7 @@ class _GlowingChartPainter extends CustomPainter {
     required this.housePaths,
     this.planetAbbreviations,
     this.signAbbreviations,
+    this.useLetterSpacing = true,
   });
 
   // Colors
@@ -736,7 +741,7 @@ class _GlowingChartPainter extends CustomPainter {
       // Sizes: Planets are PRIMARY (bigger), Signs are SECONDARY (smaller)
       final houseNumSize = chartSize * 0.022;
       final signSize = chartSize * 0.028; // Signs are smaller
-      
+
       // Planet size based on count - stays readable for 1-3 planets
       final planetCount = house.planets.length;
       double planetSize;
@@ -786,9 +791,15 @@ class _GlowingChartPainter extends CustomPainter {
         if (planetCount > 4) {
           // Split planets into two lines for better fit
           final midPoint = (planetCount / 2).ceil();
-          final line1 = house.planets.sublist(0, midPoint).map(_getPlanetSymbol).join(' ');
-          final line2 = house.planets.sublist(midPoint).map(_getPlanetSymbol).join(' ');
-          
+          final line1 = house.planets
+              .sublist(0, midPoint)
+              .map(_getPlanetSymbol)
+              .join(' ');
+          final line2 = house.planets
+              .sublist(midPoint)
+              .map(_getPlanetSymbol)
+              .join(' ');
+
           // Draw first line
           textPainter.text = TextSpan(
             text: line1,
@@ -797,7 +808,7 @@ class _GlowingChartPainter extends CustomPainter {
               fontWeight: FontWeight.w700,
               height: lineHeight,
               color: isActive ? Colors.white : const Color(0xFF60A5FA),
-              letterSpacing: 0.8,
+              letterSpacing: useLetterSpacing ? 0.8 : 0,
             ),
           );
           textPainter.layout();
@@ -809,7 +820,7 @@ class _GlowingChartPainter extends CustomPainter {
               pos.dy - textPainter.height - lineSpacing * 0.3,
             ),
           );
-          
+
           // Draw second line
           textPainter.text = TextSpan(
             text: line2,
@@ -818,16 +829,13 @@ class _GlowingChartPainter extends CustomPainter {
               fontWeight: FontWeight.w700,
               height: lineHeight,
               color: isActive ? Colors.white : const Color(0xFF60A5FA),
-              letterSpacing: 0.8,
+              letterSpacing: useLetterSpacing ? 0.8 : 0,
             ),
           );
           textPainter.layout();
           textPainter.paint(
             canvas,
-            Offset(
-              pos.dx - textPainter.width / 2,
-              pos.dy + lineSpacing * 0.3,
-            ),
+            Offset(pos.dx - textPainter.width / 2, pos.dy + lineSpacing * 0.3),
           );
         } else {
           // Single line for 1-4 planets
@@ -839,7 +847,7 @@ class _GlowingChartPainter extends CustomPainter {
               fontWeight: FontWeight.w700,
               height: lineHeight,
               color: isActive ? Colors.white : const Color(0xFF60A5FA),
-              letterSpacing: 1.2,
+              letterSpacing: useLetterSpacing ? 1.2 : 0,
             ),
           );
           textPainter.layout();
@@ -853,7 +861,8 @@ class _GlowingChartPainter extends CustomPainter {
         }
 
         // 3. Draw zodiac sign BELOW planets (smaller, secondary)
-        final signOffsetY = planetCount > 4 ? planetSize * 1.2 : planetSize * 0.7;
+        final signOffsetY =
+            planetCount > 4 ? planetSize * 1.2 : planetSize * 0.7;
         textPainter.text = TextSpan(
           text: _getSignAbbreviation(house.sign),
           style: TextStyle(
@@ -915,7 +924,8 @@ class _GlowingChartPainter extends CustomPainter {
   // Dynamic abbreviation - uses localized map or takes first 2 chars of planet name
   String _getPlanetSymbol(String planet) {
     if (planet.isEmpty) return '';
-    if (planetAbbreviations != null && planetAbbreviations!.containsKey(planet)) {
+    if (planetAbbreviations != null &&
+        planetAbbreviations!.containsKey(planet)) {
       return planetAbbreviations![planet]!;
     }
     return planet.length > 2 ? planet.substring(0, 2) : planet;
@@ -1016,10 +1026,7 @@ class _HouseDetailModal extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: _bgPrimary,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: _borderColor,
-                          width: 1,
-                        ),
+                        border: Border.all(color: _borderColor, width: 1),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.5),
@@ -1067,7 +1074,7 @@ class _HouseDetailModal extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context, bool isAscendant) {
     final accentColor = isAscendant ? _accentPrimary : _accentSecondary;
-    
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -1079,10 +1086,7 @@ class _HouseDetailModal extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                accentColor,
-                accentColor.withOpacity(0.7),
-              ],
+              colors: [accentColor, accentColor.withOpacity(0.7)],
             ),
             borderRadius: BorderRadius.circular(12),
           ),
@@ -1117,7 +1121,10 @@ class _HouseDetailModal extends StatelessWidget {
                   if (isAscendant) ...[
                     const SizedBox(width: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1,
+                      ),
                       decoration: BoxDecoration(
                         color: _accentPrimary.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(4),
@@ -1342,10 +1349,7 @@ class _HouseDetailModal extends StatelessWidget {
             ),
             Text(
               position.nakshatra,
-              style: GoogleFonts.inter(
-                fontSize: 10,
-                color: _textMuted,
-              ),
+              style: GoogleFonts.inter(fontSize: 10, color: _textMuted),
             ),
           ],
         ],
@@ -1455,21 +1459,60 @@ class _HouseDetailModal extends StatelessWidget {
 
   Map<String, String> _getHouseSignificance(int index) {
     const significances = [
-      {'title': 'Lagna Bhava', 'description': 'Physical body, personality, vitality, and overall life path.'},
-      {'title': 'Dhana Bhava', 'description': 'Accumulated wealth, family, speech, and early childhood.'},
-      {'title': 'Sahaja Bhava', 'description': 'Siblings, courage, short journeys, and communication skills.'},
-      {'title': 'Sukha Bhava', 'description': 'Mother, home, emotional peace, and domestic happiness.'},
-      {'title': 'Putra Bhava', 'description': 'Children, creativity, intelligence, and romance.'},
-      {'title': 'Shatru Bhava', 'description': 'Enemies, health issues, debts, and daily work.'},
-      {'title': 'Kalatra Bhava', 'description': 'Marriage, partnerships, and business relationships.'},
-      {'title': 'Randhra Bhava', 'description': 'Longevity, inheritance, occult, and transformation.'},
-      {'title': 'Dharma Bhava', 'description': 'Fortune, higher learning, spirituality, and father.'},
-      {'title': 'Karma Bhava', 'description': 'Career, reputation, authority, and public image.'},
-      {'title': 'Labha Bhava', 'description': 'Gains, income, elder siblings, and social networks.'},
-      {'title': 'Vyaya Bhava', 'description': 'Losses, expenses, foreign lands, and liberation.'},
+      {
+        'title': 'Lagna Bhava',
+        'description':
+            'Physical body, personality, vitality, and overall life path.',
+      },
+      {
+        'title': 'Dhana Bhava',
+        'description':
+            'Accumulated wealth, family, speech, and early childhood.',
+      },
+      {
+        'title': 'Sahaja Bhava',
+        'description':
+            'Siblings, courage, short journeys, and communication skills.',
+      },
+      {
+        'title': 'Sukha Bhava',
+        'description': 'Mother, home, emotional peace, and domestic happiness.',
+      },
+      {
+        'title': 'Putra Bhava',
+        'description': 'Children, creativity, intelligence, and romance.',
+      },
+      {
+        'title': 'Shatru Bhava',
+        'description': 'Enemies, health issues, debts, and daily work.',
+      },
+      {
+        'title': 'Kalatra Bhava',
+        'description': 'Marriage, partnerships, and business relationships.',
+      },
+      {
+        'title': 'Randhra Bhava',
+        'description': 'Longevity, inheritance, occult, and transformation.',
+      },
+      {
+        'title': 'Dharma Bhava',
+        'description': 'Fortune, higher learning, spirituality, and father.',
+      },
+      {
+        'title': 'Karma Bhava',
+        'description': 'Career, reputation, authority, and public image.',
+      },
+      {
+        'title': 'Labha Bhava',
+        'description': 'Gains, income, elder siblings, and social networks.',
+      },
+      {
+        'title': 'Vyaya Bhava',
+        'description': 'Losses, expenses, foreign lands, and liberation.',
+      },
     ];
-    return index < significances.length 
-        ? significances[index] 
+    return index < significances.length
+        ? significances[index]
         : {'title': 'House ${index + 1}', 'description': ''};
   }
 }
