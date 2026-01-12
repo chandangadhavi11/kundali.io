@@ -515,7 +515,7 @@ class _YoginiHeroCardState extends State<_YoginiHeroCard>
               ),
               const SizedBox(height: 6),
               Text(
-                AppLocalizations.of(context).yogini_dashaName(widget.yogini.currentYogini.displayName),
+                AppLocalizations.of(context).yogini_dashaName(_getLocalizedYoginiName(widget.yogini.currentYogini, AppLocalizations.of(context))),
                 style: GoogleFonts.instrumentSans(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -644,7 +644,7 @@ class _YoginiHeroCardState extends State<_YoginiHeroCard>
             children: [
               _YoginiStatChip(
                 icon: Icons.hourglass_top_rounded,
-                value: formatDuration(widget.dynamicRemainingYears),
+                value: formatDurationLocalized(widget.dynamicRemainingYears, AppLocalizations.of(context)),
                 label: AppLocalizations.of(context).yogini_remaining,
                 iconColor: color,
               ),
@@ -949,7 +949,7 @@ class _CompactYoginiCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      yogini.displayName,
+                      _getLocalizedYoginiName(yogini, AppLocalizations.of(context)),
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -973,7 +973,7 @@ class _CompactYoginiCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            AppLocalizations.of(context).yogini_left(formatDuration(remainingYears)),
+            AppLocalizations.of(context).yogini_left(formatDurationLocalized(remainingYears, AppLocalizations.of(context))),
             style: GoogleFonts.jetBrainsMono(
               fontSize: 9,
               color: DashaColors.textTertiary,
@@ -1029,7 +1029,7 @@ class _YoginiWheelCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  yogini.displayName,
+                  _getLocalizedYoginiName(yogini, AppLocalizations.of(context)),
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w500,
@@ -1039,7 +1039,7 @@ class _YoginiWheelCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${yogini.years}y',
+                  AppLocalizations.of(context).dasha_year_suffix(yogini.years),
                   style: GoogleFonts.jetBrainsMono(
                     fontSize: 9,
                     color: isCurrent ? color : DashaColors.textTertiary,
@@ -1226,7 +1226,7 @@ class _YoginiTimelineItem extends StatelessWidget {
         const SizedBox(height: 6),
         // Yogini name
         Text(
-          _getShortYoginiName(yogini),
+          _getShortYoginiName(yogini, AppLocalizations.of(context)),
           style: GoogleFonts.inter(
             fontSize: 8,
             fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w500,
@@ -1242,19 +1242,8 @@ class _YoginiTimelineItem extends StatelessWidget {
     );
   }
 
-  String _getShortYoginiName(Yogini yogini) {
-    // Return short 3-letter abbreviations for compact display
-    const names = {
-      Yogini.mangala: 'MAN',
-      Yogini.pingala: 'PIN',
-      Yogini.dhanya: 'DHA',
-      Yogini.bhramari: 'BHR',
-      Yogini.bhadrika: 'BHA',
-      Yogini.ulka: 'ULK',
-      Yogini.siddha: 'SID',
-      Yogini.sankata: 'SAN',
-    };
-    return names[yogini] ?? yogini.displayName.substring(0, 3).toUpperCase();
+  String _getShortYoginiName(Yogini yogini, AppLocalizations l10n) {
+    return _getLocalizedYoginiAbbr(yogini, l10n);
   }
 }
 
@@ -1322,7 +1311,7 @@ class _YoginiPeriodItem extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        periodDetail.yogini.displayName,
+                        _getLocalizedYoginiName(periodDetail.yogini, AppLocalizations.of(context)),
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
@@ -1377,7 +1366,7 @@ class _YoginiPeriodItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                '${periodDetail.durationYears.round()}y',
+                AppLocalizations.of(context).dasha_year_suffix(periodDetail.durationYears.round()),
                 style: GoogleFonts.jetBrainsMono(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -1465,7 +1454,7 @@ class _YoginiPeriodItemFallback extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      period.yogini.displayName,
+                      _getLocalizedYoginiName(period.yogini, AppLocalizations.of(context)),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
@@ -1530,7 +1519,7 @@ void showYoginiPeriodBottomSheet(
 
   final levelColor = levelColors[period.level] ?? DashaColors.yogini;
   final yoginiColor = _getYoginiColor(period.yogini);
-  final newBreadcrumbs = [...breadcrumbs, period.yogini.displayName];
+  final newBreadcrumbs = [...breadcrumbs, _getLocalizedYoginiName(period.yogini, AppLocalizations.of(context))];
   final now = DateTime.now();
   final isCurrentPeriod = period.containsDate(now);
 
@@ -1640,7 +1629,7 @@ void showYoginiPeriodBottomSheet(
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${period.yogini.displayName} ${period.levelName}',
+                              '${_getLocalizedYoginiName(period.yogini, AppLocalizations.of(context))} ${period.levelName}',
                               style: GoogleFonts.inter(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w700,
@@ -1687,7 +1676,7 @@ void showYoginiPeriodBottomSheet(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(AppLocalizations.of(context).yogini_duration, style: GoogleFonts.inter(fontSize: 9, color: DashaColors.textTertiary)),
-                                Text(formatDuration(period.durationYears), style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.w600, color: yoginiColor)),
+                                Text(formatDurationLocalized(period.durationYears, AppLocalizations.of(context)), style: GoogleFonts.jetBrainsMono(fontSize: 11, fontWeight: FontWeight.w600, color: yoginiColor)),
                               ],
                             ),
                           ),
@@ -1772,7 +1761,7 @@ void showYoginiPeriodBottomSheet(
                                       Row(
                                         children: [
                                           Text(
-                                            subPeriod.yogini.displayName,
+                                            _getLocalizedYoginiName(subPeriod.yogini, AppLocalizations.of(context)),
                                             style: GoogleFonts.inter(
                                               fontSize: 13,
                                               fontWeight: isSubCurrent ? FontWeight.w600 : FontWeight.w500,
@@ -1797,7 +1786,7 @@ void showYoginiPeriodBottomSheet(
                                   ),
                                 ),
                                 Text(
-                                  formatDuration(subPeriod.durationYears),
+                                  formatDurationLocalized(subPeriod.durationYears, AppLocalizations.of(context)),
                                   style: GoogleFonts.jetBrainsMono(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w500,
@@ -1869,5 +1858,31 @@ YoginiLevel? _getNextYoginiLevel(YoginiLevel current) {
       return YoginiLevel.prana;
     case YoginiLevel.prana:
       return null;
+  }
+}
+
+String _getLocalizedYoginiName(Yogini yogini, AppLocalizations l10n) {
+  switch (yogini) {
+    case Yogini.mangala: return l10n.yogini_mangala;
+    case Yogini.pingala: return l10n.yogini_pingala;
+    case Yogini.dhanya: return l10n.yogini_dhanya;
+    case Yogini.bhramari: return l10n.yogini_bhramari;
+    case Yogini.bhadrika: return l10n.yogini_bhadrika;
+    case Yogini.ulka: return l10n.yogini_ulka;
+    case Yogini.siddha: return l10n.yogini_siddha;
+    case Yogini.sankata: return l10n.yogini_sankata;
+  }
+}
+
+String _getLocalizedYoginiAbbr(Yogini yogini, AppLocalizations l10n) {
+  switch (yogini) {
+    case Yogini.mangala: return l10n.yogini_mangala_abbr;
+    case Yogini.pingala: return l10n.yogini_pingala_abbr;
+    case Yogini.dhanya: return l10n.yogini_dhanya_abbr;
+    case Yogini.bhramari: return l10n.yogini_bhramari_abbr;
+    case Yogini.bhadrika: return l10n.yogini_bhadrika_abbr;
+    case Yogini.ulka: return l10n.yogini_ulka_abbr;
+    case Yogini.siddha: return l10n.yogini_siddha_abbr;
+    case Yogini.sankata: return l10n.yogini_sankata_abbr;
   }
 }

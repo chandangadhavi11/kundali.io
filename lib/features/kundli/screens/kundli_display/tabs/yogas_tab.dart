@@ -1806,7 +1806,7 @@ class _YogaHeroCardState extends State<_YogaHeroCard> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    widget.ascendant,
+                    _getLocalizedZodiacSign(widget.ascendant, l10n),
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -2293,6 +2293,7 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final yogaName = widget.yogaData['name'] as String;
     final planets = widget.yogaData['planets'] as List<String>? ?? [];
     final strength =
@@ -2301,6 +2302,10 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard> {
         'Moderate';
     final formationRule = widget.yogaData['formationRule'] as String? ?? '';
     final yogaInfo = _getYogaInfo(yogaName, widget.isDosha);
+    
+    final yogaTypeEnglish = yogaInfo['type'] ?? (widget.isDosha ? 'Dosha' : 'Yoga');
+    final localizedType = _getLocalizedYogaType(yogaTypeEnglish, l10n);
+    final localizedStrength = _getLocalizedStrength(strength, l10n);
 
     final strengthColor = _getStrengthColor(strength);
     final typeColor = _getTypeColor(yogaInfo['type'] ?? '');
@@ -2341,7 +2346,7 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard> {
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        yogaInfo['type'] ?? (widget.isDosha ? 'Dosha' : 'Yoga'),
+                        localizedType,
                         style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
@@ -2374,7 +2379,7 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        strength,
+                        localizedStrength,
                         style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.w500,
@@ -2407,7 +2412,7 @@ class _PremiumYogaCardState extends State<_PremiumYogaCard> {
                           const SizedBox(width: 4),
                           Text(
                             pos != null
-                                ? pos.sign.substring(0, 3)
+                                ? _getLocalizedZodiacAbbr(pos.sign, l10n)
                                 : planet.substring(0, 3),
                             style: GoogleFonts.inter(
                               fontSize: 10,
@@ -3288,6 +3293,7 @@ String _getSignSymbol(String sign) {
 }
 
 Map<String, String> _getYogaInfo(String yogaName, bool isDosha) {
+  // Returns English type keys that will be localized later
   final yogaInfoMap = {
     'Hamsa Yoga': {'type': 'Pancha Mahapurusha'},
     'Malavya Yoga': {'type': 'Pancha Mahapurusha'},
@@ -3301,6 +3307,7 @@ Map<String, String> _getYogaInfo(String yogaName, bool isDosha) {
     'Dhana Yoga': {'type': 'Dhana Yoga'},
     'Sunafa Yoga': {'type': 'Lunar Yoga'},
     'Anafa Yoga': {'type': 'Lunar Yoga'},
+    'Durudhura Yoga': {'type': 'Benefic Yoga'},
     'Manglik Dosha': {'type': 'Major Dosha'},
     'Kaal Sarp Dosha': {'type': 'Major Dosha'},
     'Pitra Dosha': {'type': 'Ancestral'},
@@ -3309,6 +3316,83 @@ Map<String, String> _getYogaInfo(String yogaName, bool isDosha) {
   };
 
   return yogaInfoMap[yogaName] ?? {'type': isDosha ? 'Dosha' : 'Benefic Yoga'};
+}
+
+String _getLocalizedYogaType(String englishType, AppLocalizations l10n) {
+  switch (englishType) {
+    case 'Raja Yoga': return l10n.yogas_type_rajaYoga;
+    case 'Dhana Yoga': return l10n.yogas_type_dhanaYoga;
+    case 'Lunar Yoga': return l10n.yogas_type_lunarYoga;
+    case 'Pancha Mahapurusha': return l10n.yogas_type_panchaMahapurusha;
+    case 'Benefic Yoga': return l10n.yogas_type_beneficYoga;
+    case 'Major Dosha': return l10n.yogas_type_majorDosha;
+    case 'Ancestral': return l10n.yogas_type_ancestral;
+    case 'Conjunction Dosha': return l10n.yogas_type_conjunctionDosha;
+    case 'Dosha': return l10n.yogas_type_dosha;
+    case 'Yoga': return l10n.yogas_type_yoga;
+    default: return englishType;
+  }
+}
+
+String _getLocalizedStrength(String englishStrength, AppLocalizations l10n) {
+  switch (englishStrength) {
+    case 'Strong': return l10n.yogas_strength_strong;
+    case 'Moderate': return l10n.yogas_strength_moderate;
+    case 'High': return l10n.yogas_strength_high;
+    case 'Low': return l10n.yogas_strength_low;
+    default: return englishStrength;
+  }
+}
+
+String _getLocalizedZodiacAbbr(String sign, AppLocalizations l10n) {
+  switch (sign) {
+    case 'Aries': return l10n.zodiac_aries.length > 3 ? l10n.zodiac_aries.substring(0, 3) : l10n.zodiac_aries;
+    case 'Taurus': return l10n.zodiac_taurus.length > 3 ? l10n.zodiac_taurus.substring(0, 3) : l10n.zodiac_taurus;
+    case 'Gemini': return l10n.zodiac_gemini.length > 3 ? l10n.zodiac_gemini.substring(0, 3) : l10n.zodiac_gemini;
+    case 'Cancer': return l10n.zodiac_cancer.length > 3 ? l10n.zodiac_cancer.substring(0, 3) : l10n.zodiac_cancer;
+    case 'Leo': return l10n.zodiac_leo.length > 3 ? l10n.zodiac_leo.substring(0, 3) : l10n.zodiac_leo;
+    case 'Virgo': return l10n.zodiac_virgo.length > 3 ? l10n.zodiac_virgo.substring(0, 3) : l10n.zodiac_virgo;
+    case 'Libra': return l10n.zodiac_libra.length > 3 ? l10n.zodiac_libra.substring(0, 3) : l10n.zodiac_libra;
+    case 'Scorpio': return l10n.zodiac_scorpio.length > 3 ? l10n.zodiac_scorpio.substring(0, 3) : l10n.zodiac_scorpio;
+    case 'Sagittarius': return l10n.zodiac_sagittarius.length > 3 ? l10n.zodiac_sagittarius.substring(0, 3) : l10n.zodiac_sagittarius;
+    case 'Capricorn': return l10n.zodiac_capricorn.length > 3 ? l10n.zodiac_capricorn.substring(0, 3) : l10n.zodiac_capricorn;
+    case 'Aquarius': return l10n.zodiac_aquarius.length > 3 ? l10n.zodiac_aquarius.substring(0, 3) : l10n.zodiac_aquarius;
+    case 'Pisces': return l10n.zodiac_pisces.length > 3 ? l10n.zodiac_pisces.substring(0, 3) : l10n.zodiac_pisces;
+    default: return sign.length > 3 ? sign.substring(0, 3) : sign;
+  }
+}
+
+String _getLocalizedPlanetName(String planet, AppLocalizations l10n) {
+  switch (planet) {
+    case 'Sun': return l10n.planet_sun;
+    case 'Moon': return l10n.planet_moon;
+    case 'Mars': return l10n.planet_mars;
+    case 'Mercury': return l10n.planet_mercury;
+    case 'Jupiter': return l10n.planet_jupiter;
+    case 'Venus': return l10n.planet_venus;
+    case 'Saturn': return l10n.planet_saturn;
+    case 'Rahu': return l10n.planet_rahu;
+    case 'Ketu': return l10n.planet_ketu;
+    default: return planet;
+  }
+}
+
+String _getLocalizedZodiacSign(String sign, AppLocalizations l10n) {
+  switch (sign) {
+    case 'Aries': return l10n.zodiac_aries;
+    case 'Taurus': return l10n.zodiac_taurus;
+    case 'Gemini': return l10n.zodiac_gemini;
+    case 'Cancer': return l10n.zodiac_cancer;
+    case 'Leo': return l10n.zodiac_leo;
+    case 'Virgo': return l10n.zodiac_virgo;
+    case 'Libra': return l10n.zodiac_libra;
+    case 'Scorpio': return l10n.zodiac_scorpio;
+    case 'Sagittarius': return l10n.zodiac_sagittarius;
+    case 'Capricorn': return l10n.zodiac_capricorn;
+    case 'Aquarius': return l10n.zodiac_aquarius;
+    case 'Pisces': return l10n.zodiac_pisces;
+    default: return sign;
+  }
 }
 
 Map<String, String> _getFullYogaDetails(String yogaName, bool isDosha, AppLocalizations l10n) {

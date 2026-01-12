@@ -38,21 +38,21 @@ class _Tokens {
   static const surface = Color(0xFF1A1625);
   static const border = Color(0xFF2A2438);
   static const borderSubtle = Color(0xFF231F2E);
-  
+
   static const textPrimary = Color(0xFFF5F3FF);
   static const textSecondary = Color(0xFFB8B3C8);
   static const textMuted = Color(0xFF6B6478);
-  
+
   static const accentGold = Color(0xFFD4AF37);
   static const accentGreen = Color(0xFF6EE7B7);
-  
+
   // Spacing
   static const double xs = 4;
   static const double sm = 8;
   static const double md = 12;
   static const double lg = 16;
   static const double xl = 20;
-  
+
   // Animation
   static const Duration fast = Duration(milliseconds: 150);
   static const Duration normal = Duration(milliseconds: 250);
@@ -65,6 +65,7 @@ class _Tokens {
 class AstroAlertOrb extends StatefulWidget {
   final KundaliData kundaliData;
   final AstroAlertController controller;
+
   /// Optional transit date for calculating transit-based alerts (Sade Sati, Dhaiya)
   /// If null, uses current date
   final DateTime? transitDate;
@@ -89,7 +90,8 @@ class _AstroAlertOrbState extends State<AstroAlertOrb>
   @override
   void initState() {
     super.initState();
-    _alerts = []; // Initialize empty, will be populated in didChangeDependencies
+    _alerts =
+        []; // Initialize empty, will be populated in didChangeDependencies
   }
 
   @override
@@ -171,14 +173,16 @@ class _AstroAlertOrbState extends State<AstroAlertOrb>
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: isExpanded 
-                    ? primaryColor.withOpacity(0.15)
-                    : _Tokens.surface.withOpacity(0.6),
+                color:
+                    isExpanded
+                        ? primaryColor.withOpacity(0.15)
+                        : _Tokens.surface.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: isExpanded 
-                      ? primaryColor.withOpacity(0.4)
-                      : _Tokens.border.withOpacity(0.4),
+                  color:
+                      isExpanded
+                          ? primaryColor.withOpacity(0.4)
+                          : _Tokens.border.withOpacity(0.4),
                   width: 0.5,
                 ),
               ),
@@ -188,19 +192,20 @@ class _AstroAlertOrbState extends State<AstroAlertOrb>
                   // Icon
                   AnimatedSwitcher(
                     duration: _Tokens.fast,
-                    child: isExpanded
-                        ? Icon(
-                            Icons.keyboard_arrow_up_rounded,
-                            key: const ValueKey('up'),
-                            size: 18,
-                            color: primaryColor,
-                          )
-                        : Icon(
-                            Icons.auto_awesome_rounded,
-                            key: const ValueKey('star'),
-                            size: 14,
-                            color: _Tokens.textSecondary,
-                          ),
+                    child:
+                        isExpanded
+                            ? Icon(
+                              Icons.keyboard_arrow_up_rounded,
+                              key: const ValueKey('up'),
+                              size: 18,
+                              color: primaryColor,
+                            )
+                            : Icon(
+                              Icons.auto_awesome_rounded,
+                              key: const ValueKey('star'),
+                              size: 14,
+                              color: _Tokens.textSecondary,
+                            ),
                   ),
                   // Count badge
                   if (_alerts.length > 1 && !isExpanded)
@@ -244,6 +249,7 @@ class AstroAlertExpandedSection extends StatefulWidget {
   final KundaliData kundaliData;
   final AstroAlertController controller;
   final Duration autoCollapseDuration;
+
   /// Optional transit date for calculating transit-based alerts (Sade Sati, Dhaiya)
   /// If null, uses current date
   final DateTime? transitDate;
@@ -257,7 +263,8 @@ class AstroAlertExpandedSection extends StatefulWidget {
   });
 
   @override
-  State<AstroAlertExpandedSection> createState() => _AstroAlertExpandedSectionState();
+  State<AstroAlertExpandedSection> createState() =>
+      _AstroAlertExpandedSectionState();
 }
 
 class _AstroAlertExpandedSectionState extends State<AstroAlertExpandedSection>
@@ -272,12 +279,10 @@ class _AstroAlertExpandedSectionState extends State<AstroAlertExpandedSection>
   @override
   void initState() {
     super.initState();
-    _alerts = []; // Initialize empty, will be populated in didChangeDependencies
+    _alerts =
+        []; // Initialize empty, will be populated in didChangeDependencies
 
-    _animController = AnimationController(
-      vsync: this,
-      duration: _Tokens.slow,
-    );
+    _animController = AnimationController(vsync: this, duration: _Tokens.slow);
     _expandAnimation = CurvedAnimation(
       parent: _animController,
       curve: Curves.easeOutCubic,
@@ -293,7 +298,7 @@ class _AstroAlertExpandedSectionState extends State<AstroAlertExpandedSection>
     final l10n = AppLocalizations.of(context);
     final needsUpdate = _cachedL10n != l10n || _alerts.isEmpty;
     _cachedL10n = l10n;
-    
+
     if (needsUpdate) {
       _updateAlerts(l10n);
       // Auto-expand on first load
@@ -432,11 +437,7 @@ class _AlertCard extends StatefulWidget {
   final VoidCallback onTap;
   final int delay;
 
-  const _AlertCard({
-    required this.alert,
-    required this.onTap,
-    this.delay = 0,
-  });
+  const _AlertCard({required this.alert, required this.onTap, this.delay = 0});
 
   @override
   State<_AlertCard> createState() => _AlertCardState();
@@ -471,10 +472,7 @@ class _AlertCardState extends State<_AlertCard> {
             decoration: BoxDecoration(
               color: _Tokens.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: _Tokens.borderSubtle,
-                width: 1,
-              ),
+              border: Border.all(color: _Tokens.borderSubtle, width: 1),
             ),
             child: Row(
               children: [
@@ -640,7 +638,7 @@ class _AlertsBottomSheet extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Astrological Influences',
+                            AppLocalizations.of(context)!.alert_astroInfluences,
                             style: GoogleFonts.inter(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
@@ -650,7 +648,9 @@ class _AlertsBottomSheet extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            '${alerts.length} active',
+                            AppLocalizations.of(
+                              context,
+                            )!.alert_activeCount(alerts.length),
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               color: _Tokens.textMuted,
@@ -683,7 +683,10 @@ class _AlertsBottomSheet extends StatelessWidget {
                 child: ListView.builder(
                   controller: scrollController,
                   padding: const EdgeInsets.fromLTRB(
-                    _Tokens.xl, 0, _Tokens.xl, _Tokens.xl,
+                    _Tokens.xl,
+                    0,
+                    _Tokens.xl,
+                    _Tokens.xl,
                   ),
                   itemCount: alerts.length,
                   itemBuilder: (context, index) {
@@ -1066,34 +1069,36 @@ class _AlertDetailSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: _Tokens.sm),
-          ...items.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: _Tokens.sm),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 6),
-                  width: 4,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.6),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: _Tokens.md),
-                Expanded(
-                  child: Text(
-                    item,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: _Tokens.textSecondary,
-                      height: 1.4,
+          ...items.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: _Tokens.sm),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 6),
+                    width: 4,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.6),
+                      shape: BoxShape.circle,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: _Tokens.md),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: _Tokens.textSecondary,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );

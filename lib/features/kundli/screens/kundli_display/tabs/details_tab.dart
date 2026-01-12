@@ -3844,7 +3844,7 @@ class _LuckyElementsCard extends StatelessWidget {
                 child: _LuckyTile(
                   icon: Icons.palette_outlined,
                   label: l10n.details_colors,
-                  value: _getLuckyColors(moonSign),
+                  value: getLocalizedColors(_getLuckyColors(moonSign), l10n),
                   onTap:
                       () => _showInsightSheet(
                         context,
@@ -3930,7 +3930,7 @@ class _InteractiveGemstoneRowState extends State<_InteractiveGemstoneRow>
           _getGemstoneInsight(
             widget.gemstone,
             widget.moonSign,
-            _getGemstoneRulingPlanet(widget.gemstone),
+            getLocalizedGemstoneRuler(widget.gemstone, l10n),
           ),
         );
       },
@@ -4041,7 +4041,7 @@ class _InteractiveGemstoneRowState extends State<_InteractiveGemstoneRow>
                   ),
                   const SizedBox(height: _DesignTokens.space4),
                   Text(
-                    _getGemstoneRulingPlanet(widget.gemstone),
+                    getLocalizedGemstoneRuler(widget.gemstone, l10n),
                     style: _DesignTokens.labelXs.copyWith(
                       color: _Colors.textTertiary,
                     ),
@@ -4905,22 +4905,6 @@ String _getGemstoneImagePath(String gemstone) {
   return paths[gemstone] ?? 'assets/images/gemstones/pearl.png';
 }
 
-/// Returns the ruling planet for a gemstone
-String _getGemstoneRulingPlanet(String gemstone) {
-  const planets = {
-    'Ruby': 'Ruled by Sun • Strengthens vitality',
-    'Pearl': 'Ruled by Moon • Enhances emotions',
-    'Emerald': 'Ruled by Mercury • Boosts intellect',
-    'Diamond': 'Ruled by Venus • Attracts love',
-    'Yellow Sapphire': 'Ruled by Jupiter • Brings wisdom',
-    'Blue Sapphire': 'Ruled by Saturn • Grants discipline',
-    'Red Coral': 'Ruled by Mars • Increases courage',
-    'Hessonite': 'Ruled by Rahu • Removes obstacles',
-    'Cat\'s Eye': 'Ruled by Ketu • Provides protection',
-  };
-  return planets[gemstone] ?? 'Ruled by celestial forces';
-}
-
 String _getLuckyColors(String moonSign) {
   const colors = {
     'Aries': 'Red, Orange',
@@ -5291,6 +5275,80 @@ String getLocalizedMetal(String englishMetal, AppLocalizations l10n) {
       return l10n.metal_lead;
     default:
       return englishMetal;
+  }
+}
+
+/// Get localized color name
+String getLocalizedColor(String englishColor, AppLocalizations l10n) {
+  switch (englishColor.trim()) {
+    case 'Red':
+      return l10n.color_red;
+    case 'Orange':
+      return l10n.color_orange;
+    case 'Yellow':
+      return l10n.color_yellow;
+    case 'Green':
+      return l10n.color_green;
+    case 'Blue':
+      return l10n.color_blue;
+    case 'Pink':
+      return l10n.color_pink;
+    case 'White':
+      return l10n.color_white;
+    case 'Silver':
+      return l10n.color_silver;
+    case 'Gold':
+      return l10n.color_gold;
+    case 'Brown':
+      return l10n.color_brown;
+    case 'Black':
+      return l10n.color_black;
+    case 'Maroon':
+      return l10n.color_maroon;
+    case 'Purple':
+      return l10n.color_purple;
+    case 'Electric':
+      return l10n.color_electric;
+    case 'Sea Green':
+      return l10n.color_seagreen;
+    case 'Lavender':
+      return l10n.color_lavender;
+    default:
+      return englishColor;
+  }
+}
+
+/// Get localized lucky colors (comma-separated)
+String getLocalizedColors(String englishColors, AppLocalizations l10n) {
+  final colorList = englishColors.split(',').map((c) => c.trim()).toList();
+  final localizedList =
+      colorList.map((c) => getLocalizedColor(c, l10n)).toList();
+  return localizedList.join(', ');
+}
+
+/// Get localized gemstone ruling planet description
+String getLocalizedGemstoneRuler(String gemstone, AppLocalizations l10n) {
+  switch (gemstone) {
+    case 'Ruby':
+      return l10n.gemstone_ruled_sun;
+    case 'Pearl':
+      return l10n.gemstone_ruled_moon;
+    case 'Red Coral':
+      return l10n.gemstone_ruled_mars;
+    case 'Emerald':
+      return l10n.gemstone_ruled_mercury;
+    case 'Yellow Sapphire':
+      return l10n.gemstone_ruled_jupiter;
+    case 'Diamond':
+      return l10n.gemstone_ruled_venus;
+    case 'Blue Sapphire':
+      return l10n.gemstone_ruled_saturn;
+    case 'Hessonite':
+      return l10n.gemstone_ruled_rahu;
+    case 'Cat\'s Eye':
+      return l10n.gemstone_ruled_ketu;
+    default:
+      return gemstone;
   }
 }
 

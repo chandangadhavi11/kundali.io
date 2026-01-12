@@ -1804,6 +1804,882 @@ abstract class AppLocalizations {
   /// **'Cat\'s Eye'**
   String get gemstone_catseye;
 
+  /// No description provided for @gemstone_ruled_sun.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruled by Sun • Strengthens vitality'**
+  String get gemstone_ruled_sun;
+
+  /// No description provided for @gemstone_ruled_moon.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruled by Moon • Enhances emotions'**
+  String get gemstone_ruled_moon;
+
+  /// No description provided for @gemstone_ruled_mars.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruled by Mars • Increases courage'**
+  String get gemstone_ruled_mars;
+
+  /// No description provided for @gemstone_ruled_mercury.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruled by Mercury • Boosts intellect'**
+  String get gemstone_ruled_mercury;
+
+  /// No description provided for @gemstone_ruled_jupiter.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruled by Jupiter • Brings wisdom'**
+  String get gemstone_ruled_jupiter;
+
+  /// No description provided for @gemstone_ruled_venus.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruled by Venus • Attracts love'**
+  String get gemstone_ruled_venus;
+
+  /// No description provided for @gemstone_ruled_saturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruled by Saturn • Grants discipline'**
+  String get gemstone_ruled_saturn;
+
+  /// No description provided for @gemstone_ruled_rahu.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruled by Rahu • Removes obstacles'**
+  String get gemstone_ruled_rahu;
+
+  /// No description provided for @gemstone_ruled_ketu.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruled by Ketu • Provides protection'**
+  String get gemstone_ruled_ketu;
+
+  /// No description provided for @deity_surya.
+  ///
+  /// In en, this message translates to:
+  /// **'Lord Surya'**
+  String get deity_surya;
+
+  /// No description provided for @deity_chandra.
+  ///
+  /// In en, this message translates to:
+  /// **'Lord Shiva / Goddess Parvati'**
+  String get deity_chandra;
+
+  /// No description provided for @deity_mangal.
+  ///
+  /// In en, this message translates to:
+  /// **'Lord Hanuman / Lord Kartikeya'**
+  String get deity_mangal;
+
+  /// No description provided for @deity_budh.
+  ///
+  /// In en, this message translates to:
+  /// **'Lord Vishnu / Lord Ganesha'**
+  String get deity_budh;
+
+  /// No description provided for @deity_guru.
+  ///
+  /// In en, this message translates to:
+  /// **'Lord Brihaspati / Lord Shiva'**
+  String get deity_guru;
+
+  /// No description provided for @deity_shukra.
+  ///
+  /// In en, this message translates to:
+  /// **'Goddess Lakshmi'**
+  String get deity_shukra;
+
+  /// No description provided for @deity_shani.
+  ///
+  /// In en, this message translates to:
+  /// **'Lord Shani / Lord Yama'**
+  String get deity_shani;
+
+  /// No description provided for @deity_rahu.
+  ///
+  /// In en, this message translates to:
+  /// **'Goddess Durga'**
+  String get deity_rahu;
+
+  /// No description provided for @deity_ketu.
+  ///
+  /// In en, this message translates to:
+  /// **'Lord Ganesha'**
+  String get deity_ketu;
+
+  /// No description provided for @phala_theme_sun.
+  ///
+  /// In en, this message translates to:
+  /// **'A period of self-realization, authority, and recognition. The soul seeks to express its true nature.'**
+  String get phala_theme_sun;
+
+  /// No description provided for @phala_theme_moon.
+  ///
+  /// In en, this message translates to:
+  /// **'A period of emotional growth, nurturing, and intuition. The mind seeks peace and maternal comfort.'**
+  String get phala_theme_moon;
+
+  /// No description provided for @phala_theme_mars.
+  ///
+  /// In en, this message translates to:
+  /// **'A period of energy, courage, and action. The warrior spirit awakens to conquer challenges.'**
+  String get phala_theme_mars;
+
+  /// No description provided for @phala_theme_mercury.
+  ///
+  /// In en, this message translates to:
+  /// **'A period of intellect, communication, and learning. The mind seeks knowledge and expression.'**
+  String get phala_theme_mercury;
+
+  /// No description provided for @phala_theme_jupiter.
+  ///
+  /// In en, this message translates to:
+  /// **'A period of wisdom, growth, and blessings. The soul seeks higher knowledge and dharma.'**
+  String get phala_theme_jupiter;
+
+  /// No description provided for @phala_theme_venus.
+  ///
+  /// In en, this message translates to:
+  /// **'A period of love, luxury, and creativity. The heart seeks beauty and harmonious relationships.'**
+  String get phala_theme_venus;
+
+  /// No description provided for @phala_theme_saturn.
+  ///
+  /// In en, this message translates to:
+  /// **'A period of karma, discipline, and transformation. Lessons come through patience and perseverance.'**
+  String get phala_theme_saturn;
+
+  /// No description provided for @phala_theme_rahu.
+  ///
+  /// In en, this message translates to:
+  /// **'A period of ambition, worldly desires, and unconventional growth. The soul seeks material expansion.'**
+  String get phala_theme_rahu;
+
+  /// No description provided for @phala_theme_ketu.
+  ///
+  /// In en, this message translates to:
+  /// **'A period of spirituality, detachment, and liberation. The soul seeks inner peace and moksha.'**
+  String get phala_theme_ketu;
+
+  /// No description provided for @phala_effect_sun_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Rise in status and authority'**
+  String get phala_effect_sun_1;
+
+  /// No description provided for @phala_effect_sun_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Government connections and favors'**
+  String get phala_effect_sun_2;
+
+  /// No description provided for @phala_effect_sun_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Father-related matters come into focus'**
+  String get phala_effect_sun_3;
+
+  /// No description provided for @phala_effect_sun_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Health consciousness increases'**
+  String get phala_effect_sun_4;
+
+  /// No description provided for @phala_effect_sun_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Leadership opportunities emerge'**
+  String get phala_effect_sun_5;
+
+  /// No description provided for @phala_effect_moon_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Emotional sensitivity increases'**
+  String get phala_effect_moon_1;
+
+  /// No description provided for @phala_effect_moon_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Mother-related matters highlighted'**
+  String get phala_effect_moon_2;
+
+  /// No description provided for @phala_effect_moon_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Travel and change of residence possible'**
+  String get phala_effect_moon_3;
+
+  /// No description provided for @phala_effect_moon_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Public dealings and popularity'**
+  String get phala_effect_moon_4;
+
+  /// No description provided for @phala_effect_moon_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Mental peace becomes priority'**
+  String get phala_effect_moon_5;
+
+  /// No description provided for @phala_effect_mars_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy and drive increase'**
+  String get phala_effect_mars_1;
+
+  /// No description provided for @phala_effect_mars_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Property and land matters'**
+  String get phala_effect_mars_2;
+
+  /// No description provided for @phala_effect_mars_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Sibling relationships highlighted'**
+  String get phala_effect_mars_3;
+
+  /// No description provided for @phala_effect_mars_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Technical skills develop'**
+  String get phala_effect_mars_4;
+
+  /// No description provided for @phala_effect_mars_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Courage to face challenges'**
+  String get phala_effect_mars_5;
+
+  /// No description provided for @phala_effect_mercury_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Intellectual growth and learning'**
+  String get phala_effect_mercury_1;
+
+  /// No description provided for @phala_effect_mercury_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Business and trade opportunities'**
+  String get phala_effect_mercury_2;
+
+  /// No description provided for @phala_effect_mercury_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Communication skills improve'**
+  String get phala_effect_mercury_3;
+
+  /// No description provided for @phala_effect_mercury_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Writing and speaking abilities'**
+  String get phala_effect_mercury_4;
+
+  /// No description provided for @phala_effect_mercury_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Youthful energy and adaptability'**
+  String get phala_effect_mercury_5;
+
+  /// No description provided for @phala_effect_jupiter_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Wisdom and knowledge expand'**
+  String get phala_effect_jupiter_1;
+
+  /// No description provided for @phala_effect_jupiter_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritual growth and dharma'**
+  String get phala_effect_jupiter_2;
+
+  /// No description provided for @phala_effect_jupiter_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Children-related blessings'**
+  String get phala_effect_jupiter_3;
+
+  /// No description provided for @phala_effect_jupiter_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Teaching and guidance roles'**
+  String get phala_effect_jupiter_4;
+
+  /// No description provided for @phala_effect_jupiter_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial prosperity through ethics'**
+  String get phala_effect_jupiter_5;
+
+  /// No description provided for @phala_effect_venus_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Love and romantic relationships'**
+  String get phala_effect_venus_1;
+
+  /// No description provided for @phala_effect_venus_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Artistic and creative pursuits'**
+  String get phala_effect_venus_2;
+
+  /// No description provided for @phala_effect_venus_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Luxury and material comforts'**
+  String get phala_effect_venus_3;
+
+  /// No description provided for @phala_effect_venus_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Beauty and aesthetics matter'**
+  String get phala_effect_venus_4;
+
+  /// No description provided for @phala_effect_venus_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Marriage and partnership harmony'**
+  String get phala_effect_venus_5;
+
+  /// No description provided for @phala_effect_saturn_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Karmic lessons and discipline'**
+  String get phala_effect_saturn_1;
+
+  /// No description provided for @phala_effect_saturn_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard work brings delayed results'**
+  String get phala_effect_saturn_2;
+
+  /// No description provided for @phala_effect_saturn_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Service to others emphasized'**
+  String get phala_effect_saturn_3;
+
+  /// No description provided for @phala_effect_saturn_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Longevity and persistence'**
+  String get phala_effect_saturn_4;
+
+  /// No description provided for @phala_effect_saturn_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Detachment from materialism'**
+  String get phala_effect_saturn_5;
+
+  /// No description provided for @phala_effect_rahu_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Worldly ambitions intensify'**
+  String get phala_effect_rahu_1;
+
+  /// No description provided for @phala_effect_rahu_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Foreign connections and travel'**
+  String get phala_effect_rahu_2;
+
+  /// No description provided for @phala_effect_rahu_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Unconventional approaches succeed'**
+  String get phala_effect_rahu_3;
+
+  /// No description provided for @phala_effect_rahu_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Technology and innovation'**
+  String get phala_effect_rahu_4;
+
+  /// No description provided for @phala_effect_rahu_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Desire for fame and recognition'**
+  String get phala_effect_rahu_5;
+
+  /// No description provided for @phala_effect_ketu_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritual awakening'**
+  String get phala_effect_ketu_1;
+
+  /// No description provided for @phala_effect_ketu_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Detachment from material world'**
+  String get phala_effect_ketu_2;
+
+  /// No description provided for @phala_effect_ketu_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Intuitive and psychic abilities'**
+  String get phala_effect_ketu_3;
+
+  /// No description provided for @phala_effect_ketu_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Past-life connections emerge'**
+  String get phala_effect_ketu_4;
+
+  /// No description provided for @phala_effect_ketu_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Liberation and moksha path'**
+  String get phala_effect_ketu_5;
+
+  /// No description provided for @yogini_mangala.
+  ///
+  /// In en, this message translates to:
+  /// **'Mangala'**
+  String get yogini_mangala;
+
+  /// No description provided for @yogini_pingala.
+  ///
+  /// In en, this message translates to:
+  /// **'Pingala'**
+  String get yogini_pingala;
+
+  /// No description provided for @yogini_dhanya.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhanya'**
+  String get yogini_dhanya;
+
+  /// No description provided for @yogini_bhramari.
+  ///
+  /// In en, this message translates to:
+  /// **'Bhramari'**
+  String get yogini_bhramari;
+
+  /// No description provided for @yogini_bhadrika.
+  ///
+  /// In en, this message translates to:
+  /// **'Bhadrika'**
+  String get yogini_bhadrika;
+
+  /// No description provided for @yogini_ulka.
+  ///
+  /// In en, this message translates to:
+  /// **'Ulka'**
+  String get yogini_ulka;
+
+  /// No description provided for @yogini_siddha.
+  ///
+  /// In en, this message translates to:
+  /// **'Siddha'**
+  String get yogini_siddha;
+
+  /// No description provided for @yogini_sankata.
+  ///
+  /// In en, this message translates to:
+  /// **'Sankata'**
+  String get yogini_sankata;
+
+  /// No description provided for @yogini_mangala_abbr.
+  ///
+  /// In en, this message translates to:
+  /// **'MAN'**
+  String get yogini_mangala_abbr;
+
+  /// No description provided for @yogini_pingala_abbr.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN'**
+  String get yogini_pingala_abbr;
+
+  /// No description provided for @yogini_dhanya_abbr.
+  ///
+  /// In en, this message translates to:
+  /// **'DHA'**
+  String get yogini_dhanya_abbr;
+
+  /// No description provided for @yogini_bhramari_abbr.
+  ///
+  /// In en, this message translates to:
+  /// **'BHR'**
+  String get yogini_bhramari_abbr;
+
+  /// No description provided for @yogini_bhadrika_abbr.
+  ///
+  /// In en, this message translates to:
+  /// **'BHA'**
+  String get yogini_bhadrika_abbr;
+
+  /// No description provided for @yogini_ulka_abbr.
+  ///
+  /// In en, this message translates to:
+  /// **'ULK'**
+  String get yogini_ulka_abbr;
+
+  /// No description provided for @yogini_siddha_abbr.
+  ///
+  /// In en, this message translates to:
+  /// **'SID'**
+  String get yogini_siddha_abbr;
+
+  /// No description provided for @yogini_sankata_abbr.
+  ///
+  /// In en, this message translates to:
+  /// **'SAN'**
+  String get yogini_sankata_abbr;
+
+  /// No description provided for @strength_avg.
+  ///
+  /// In en, this message translates to:
+  /// **'AVG'**
+  String get strength_avg;
+
+  /// No description provided for @strength_rupas.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} / {required} Rupas'**
+  String strength_rupas(String value, String required);
+
+  /// No description provided for @sadesati_active.
+  ///
+  /// In en, this message translates to:
+  /// **'Sade Sati Active'**
+  String get sadesati_active;
+
+  /// No description provided for @sadesati_not_active.
+  ///
+  /// In en, this message translates to:
+  /// **'Sade Sati Not Active'**
+  String get sadesati_not_active;
+
+  /// No description provided for @sadesati_peak_phase.
+  ///
+  /// In en, this message translates to:
+  /// **'Peak Phase'**
+  String get sadesati_peak_phase;
+
+  /// No description provided for @sadesati_rising_phase.
+  ///
+  /// In en, this message translates to:
+  /// **'Rising Phase'**
+  String get sadesati_rising_phase;
+
+  /// No description provided for @sadesati_setting_phase.
+  ///
+  /// In en, this message translates to:
+  /// **'Setting Phase'**
+  String get sadesati_setting_phase;
+
+  /// No description provided for @sadesati_clear_period.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Period'**
+  String get sadesati_clear_period;
+
+  /// No description provided for @sadesati_learn_more.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn more'**
+  String get sadesati_learn_more;
+
+  /// No description provided for @sadesati_over_moon.
+  ///
+  /// In en, this message translates to:
+  /// **'Over Moon · Most Intense Period'**
+  String get sadesati_over_moon;
+
+  /// No description provided for @sadesati_12th_from_moon.
+  ///
+  /// In en, this message translates to:
+  /// **'12th from Moon · Expenses & Mental Stress'**
+  String get sadesati_12th_from_moon;
+
+  /// No description provided for @sadesati_2nd_from_moon.
+  ///
+  /// In en, this message translates to:
+  /// **'2nd from Moon · Family & Finances'**
+  String get sadesati_2nd_from_moon;
+
+  /// No description provided for @sadesati_saturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturn'**
+  String get sadesati_saturn;
+
+  /// No description provided for @sadesati_moon.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon'**
+  String get sadesati_moon;
+
+  /// No description provided for @sadesati_not_affecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturn\'s 7.5-year cycle is not affecting you'**
+  String get sadesati_not_affecting;
+
+  /// No description provided for @sadesati_janma_rashi.
+  ///
+  /// In en, this message translates to:
+  /// **'Janma Rashi'**
+  String get sadesati_janma_rashi;
+
+  /// No description provided for @sadesati_phase_12th.
+  ///
+  /// In en, this message translates to:
+  /// **'12th'**
+  String get sadesati_phase_12th;
+
+  /// No description provided for @sadesati_phase_1st.
+  ///
+  /// In en, this message translates to:
+  /// **'1st'**
+  String get sadesati_phase_1st;
+
+  /// No description provided for @sadesati_phase_2nd.
+  ///
+  /// In en, this message translates to:
+  /// **'2nd'**
+  String get sadesati_phase_2nd;
+
+  /// No description provided for @transit_houses_from.
+  ///
+  /// In en, this message translates to:
+  /// **'Houses from {sign}'**
+  String transit_houses_from(String sign);
+
+  /// No description provided for @transit_legend_moon.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon'**
+  String get transit_legend_moon;
+
+  /// No description provided for @panchang_whatThisMeans.
+  ///
+  /// In en, this message translates to:
+  /// **'What This Means'**
+  String get panchang_whatThisMeans;
+
+  /// No description provided for @panchang_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Significance'**
+  String get panchang_significance;
+
+  /// No description provided for @panchang_keyPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Key Points'**
+  String get panchang_keyPoints;
+
+  /// No description provided for @weekday_sunday.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunday'**
+  String get weekday_sunday;
+
+  /// No description provided for @weekday_monday.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday'**
+  String get weekday_monday;
+
+  /// No description provided for @weekday_tuesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Tuesday'**
+  String get weekday_tuesday;
+
+  /// No description provided for @weekday_wednesday.
+  ///
+  /// In en, this message translates to:
+  /// **'Wednesday'**
+  String get weekday_wednesday;
+
+  /// No description provided for @weekday_thursday.
+  ///
+  /// In en, this message translates to:
+  /// **'Thursday'**
+  String get weekday_thursday;
+
+  /// No description provided for @weekday_friday.
+  ///
+  /// In en, this message translates to:
+  /// **'Friday'**
+  String get weekday_friday;
+
+  /// No description provided for @weekday_saturday.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturday'**
+  String get weekday_saturday;
+
+  /// No description provided for @panchang_period_rahukala.
+  ///
+  /// In en, this message translates to:
+  /// **'Rahukala'**
+  String get panchang_period_rahukala;
+
+  /// No description provided for @panchang_period_yamaghanda.
+  ///
+  /// In en, this message translates to:
+  /// **'Yamaghanda'**
+  String get panchang_period_yamaghanda;
+
+  /// No description provided for @panchang_period_gulika.
+  ///
+  /// In en, this message translates to:
+  /// **'Gulika'**
+  String get panchang_period_gulika;
+
+  /// No description provided for @panchang_period_rahukala_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruled by Rahu. Avoid starting new ventures.'**
+  String get panchang_period_rahukala_short;
+
+  /// No description provided for @panchang_period_yamaghanda_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Ruled by Yama. Avoid important decisions.'**
+  String get panchang_period_yamaghanda_short;
+
+  /// No description provided for @panchang_period_gulika_short.
+  ///
+  /// In en, this message translates to:
+  /// **'Saturn\'s son period. Avoid auspicious work.'**
+  String get panchang_period_gulika_short;
+
+  /// No description provided for @panchang_time_6am.
+  ///
+  /// In en, this message translates to:
+  /// **'6AM'**
+  String get panchang_time_6am;
+
+  /// No description provided for @panchang_time_9am.
+  ///
+  /// In en, this message translates to:
+  /// **'9AM'**
+  String get panchang_time_9am;
+
+  /// No description provided for @panchang_time_12pm.
+  ///
+  /// In en, this message translates to:
+  /// **'12PM'**
+  String get panchang_time_12pm;
+
+  /// No description provided for @panchang_time_3pm.
+  ///
+  /// In en, this message translates to:
+  /// **'3PM'**
+  String get panchang_time_3pm;
+
+  /// No description provided for @panchang_time_6pm.
+  ///
+  /// In en, this message translates to:
+  /// **'6PM'**
+  String get panchang_time_6pm;
+
+  /// No description provided for @color_red.
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get color_red;
+
+  /// No description provided for @color_orange.
+  ///
+  /// In en, this message translates to:
+  /// **'Orange'**
+  String get color_orange;
+
+  /// No description provided for @color_yellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow'**
+  String get color_yellow;
+
+  /// No description provided for @color_green.
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get color_green;
+
+  /// No description provided for @color_blue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get color_blue;
+
+  /// No description provided for @color_pink.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink'**
+  String get color_pink;
+
+  /// No description provided for @color_white.
+  ///
+  /// In en, this message translates to:
+  /// **'White'**
+  String get color_white;
+
+  /// No description provided for @color_silver.
+  ///
+  /// In en, this message translates to:
+  /// **'Silver'**
+  String get color_silver;
+
+  /// No description provided for @color_gold.
+  ///
+  /// In en, this message translates to:
+  /// **'Gold'**
+  String get color_gold;
+
+  /// No description provided for @color_brown.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown'**
+  String get color_brown;
+
+  /// No description provided for @color_black.
+  ///
+  /// In en, this message translates to:
+  /// **'Black'**
+  String get color_black;
+
+  /// No description provided for @color_maroon.
+  ///
+  /// In en, this message translates to:
+  /// **'Maroon'**
+  String get color_maroon;
+
+  /// No description provided for @color_purple.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple'**
+  String get color_purple;
+
+  /// No description provided for @color_electric.
+  ///
+  /// In en, this message translates to:
+  /// **'Electric Blue'**
+  String get color_electric;
+
+  /// No description provided for @color_seagreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Sea Green'**
+  String get color_seagreen;
+
+  /// No description provided for @color_lavender.
+  ///
+  /// In en, this message translates to:
+  /// **'Lavender'**
+  String get color_lavender;
+
   /// No description provided for @yoni_horse.
   ///
   /// In en, this message translates to:
@@ -2355,6 +3231,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'days'**
   String get dasha_days;
+
+  /// No description provided for @dasha_year_suffix.
+  ///
+  /// In en, this message translates to:
+  /// **'{years}y'**
+  String dasha_year_suffix(int years);
 
   /// No description provided for @dasha_remaining.
   ///
@@ -4245,12 +5127,6 @@ abstract class AppLocalizations {
   /// **'Aspect'**
   String get strength_legend_drik_hint;
 
-  /// No description provided for @strength_rupas.
-  ///
-  /// In en, this message translates to:
-  /// **'{value} / {required} Rupas'**
-  String strength_rupas(String value, String required);
-
   /// No description provided for @strength_strongest.
   ///
   /// In en, this message translates to:
@@ -4772,6 +5648,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'View all {count}'**
   String alert_viewAll(int count);
+
+  /// No description provided for @alert_astroInfluences.
+  ///
+  /// In en, this message translates to:
+  /// **'Astrological Influences'**
+  String get alert_astroInfluences;
+
+  /// No description provided for @alert_activeCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} active'**
+  String alert_activeCount(int count);
+
+  /// No description provided for @alert_theme_sadeSati.
+  ///
+  /// In en, this message translates to:
+  /// **'A period of transformation, discipline, and inner growth.'**
+  String get alert_theme_sadeSati;
+
+  /// No description provided for @alert_theme_dhaiyaDomestic.
+  ///
+  /// In en, this message translates to:
+  /// **'A 2.5-year period requiring patience in domestic and emotional matters.'**
+  String get alert_theme_dhaiyaDomestic;
+
+  /// No description provided for @alert_theme_dhaiyaTransform.
+  ///
+  /// In en, this message translates to:
+  /// **'A 2.5-year period requiring patience in transformations and changes.'**
+  String get alert_theme_dhaiyaTransform;
+
+  /// No description provided for @alert_theme_manglik.
+  ///
+  /// In en, this message translates to:
+  /// **'Mars energy influences relationships and requires understanding for harmony.'**
+  String get alert_theme_manglik;
+
+  /// No description provided for @alert_theme_lunar.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhanced intuition and emotional depth that benefits from mindful practices.'**
+  String get alert_theme_lunar;
+
+  /// No description provided for @alert_theme_yoga.
+  ///
+  /// In en, this message translates to:
+  /// **'A powerful yoga bringing positive influences to your life.'**
+  String get alert_theme_yoga;
+
+  /// No description provided for @alert_shubhYoga.
+  ///
+  /// In en, this message translates to:
+  /// **'Auspicious Yoga'**
+  String get alert_shubhYoga;
 
   /// No description provided for @details_nav_profile.
   ///
@@ -8790,6 +9720,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lunar'**
   String get yogas_type_lunar;
+
+  /// No description provided for @yogas_type_rajaYoga.
+  ///
+  /// In en, this message translates to:
+  /// **'Raja Yoga'**
+  String get yogas_type_rajaYoga;
+
+  /// No description provided for @yogas_type_dhanaYoga.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhana Yoga'**
+  String get yogas_type_dhanaYoga;
+
+  /// No description provided for @yogas_type_lunarYoga.
+  ///
+  /// In en, this message translates to:
+  /// **'Lunar Yoga'**
+  String get yogas_type_lunarYoga;
+
+  /// No description provided for @yogas_type_panchaMahapurusha.
+  ///
+  /// In en, this message translates to:
+  /// **'Pancha Mahapurusha'**
+  String get yogas_type_panchaMahapurusha;
+
+  /// No description provided for @yogas_type_beneficYoga.
+  ///
+  /// In en, this message translates to:
+  /// **'Benefic Yoga'**
+  String get yogas_type_beneficYoga;
+
+  /// No description provided for @yogas_type_majorDosha.
+  ///
+  /// In en, this message translates to:
+  /// **'Major Dosha'**
+  String get yogas_type_majorDosha;
+
+  /// No description provided for @yogas_type_ancestral.
+  ///
+  /// In en, this message translates to:
+  /// **'Ancestral'**
+  String get yogas_type_ancestral;
+
+  /// No description provided for @yogas_type_conjunctionDosha.
+  ///
+  /// In en, this message translates to:
+  /// **'Conjunction Dosha'**
+  String get yogas_type_conjunctionDosha;
+
+  /// No description provided for @yogas_strength_strong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get yogas_strength_strong;
+
+  /// No description provided for @yogas_strength_moderate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get yogas_strength_moderate;
+
+  /// No description provided for @yogas_strength_high.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get yogas_strength_high;
+
+  /// No description provided for @yogas_strength_low.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get yogas_strength_low;
+
+  /// No description provided for @yogas_inHouse.
+  ///
+  /// In en, this message translates to:
+  /// **'in H{house}'**
+  String yogas_inHouse(String house);
+
+  /// No description provided for @yogas_fromMoon.
+  ///
+  /// In en, this message translates to:
+  /// **'from Moon'**
+  String get yogas_fromMoon;
+
+  /// No description provided for @yogas_fromLagna.
+  ///
+  /// In en, this message translates to:
+  /// **'from Lagna'**
+  String get yogas_fromLagna;
+
+  /// No description provided for @yogas_conjunction.
+  ///
+  /// In en, this message translates to:
+  /// **'{planet1}-{planet2} conjunction in H{house}'**
+  String yogas_conjunction(String planet1, String planet2, String house);
+
+  /// No description provided for @yogas_planetInHouse.
+  ///
+  /// In en, this message translates to:
+  /// **'{planet} in H{house} ({sign})'**
+  String yogas_planetInHouse(String planet, String house, String sign);
+
+  /// No description provided for @yogas_planetaryCombo.
+  ///
+  /// In en, this message translates to:
+  /// **'Planetary combination forming {yoga}'**
+  String yogas_planetaryCombo(String yoga);
+
+  /// No description provided for @yogas_planetInHouseFromMoon.
+  ///
+  /// In en, this message translates to:
+  /// **'{planet} in H{house} from Moon'**
+  String yogas_planetInHouseFromMoon(String planet, String house);
 
   /// No description provided for @yogas_type_yoga.
   ///

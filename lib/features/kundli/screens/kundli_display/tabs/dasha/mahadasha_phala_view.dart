@@ -158,7 +158,7 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
                     DashaAnimatedCardWrapper(
                       delay: 50,
                       child: _ThemeCard(
-                        theme: interpretation.overallTheme,
+                        theme: _getLocalizedTheme(dasha.currentMahadasha, l10n),
                         planetColor: planetColor,
                       ),
                     ),
@@ -184,7 +184,7 @@ class _MahadashaPhalaViewState extends State<MahadashaPhalaView> {
                     const SizedBox(height: DashaDesignTokens.space12),
                     DashaAnimatedCardWrapper(
                       delay: 50,
-                      child: _KeyEffectsCard(effects: interpretation.keyEffects, color: planetColor),
+                      child: _KeyEffectsCard(effects: _getLocalizedEffects(dasha.currentMahadasha, l10n), color: planetColor),
                     ),
                     const SizedBox(height: DashaDesignTokens.space16),
                     // Current Antardasha
@@ -504,7 +504,7 @@ class _PhalaHeroCardState extends State<_PhalaHeroCard>
               ),
               const SizedBox(height: 6),
               Text(
-                AppLocalizations.of(context).phala_mahadashaName(widget.dasha.currentMahadasha),
+                AppLocalizations.of(context).phala_mahadashaName(_getLocalizedPlanetName(widget.dasha.currentMahadasha, AppLocalizations.of(context))),
                 style: GoogleFonts.instrumentSans(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -523,7 +523,7 @@ class _PhalaHeroCardState extends State<_PhalaHeroCard>
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    widget.interpretation.deity,
+                    _getLocalizedDeity(widget.dasha.currentMahadasha, AppLocalizations.of(context)),
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w400,
@@ -538,7 +538,7 @@ class _PhalaHeroCardState extends State<_PhalaHeroCard>
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    widget.interpretation.gemstone.split(' ').first,
+                    _getLocalizedGemstone(widget.dasha.currentMahadasha, AppLocalizations.of(context)),
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
@@ -569,7 +569,7 @@ class _PhalaHeroCardState extends State<_PhalaHeroCard>
         children: [
           _PhalaInfoChip(
             icon: Icons.hourglass_top_rounded,
-            value: formatDuration(widget.dynamicRemainingYears),
+            value: formatDurationLocalized(widget.dynamicRemainingYears, AppLocalizations.of(context)),
             label: AppLocalizations.of(context).phala_remaining,
             iconColor: planetColor,
           ),
@@ -583,7 +583,7 @@ class _PhalaHeroCardState extends State<_PhalaHeroCard>
           _buildDivider(),
           _PhalaInfoChip(
             icon: Icons.palette_rounded,
-            value: widget.interpretation.color.split(',').first.trim(),
+            value: _getLocalizedColor(widget.interpretation.color.split(',').first.trim(), AppLocalizations.of(context)),
             label: AppLocalizations.of(context).phala_color,
             iconColor: _getColorFromName(widget.interpretation.color),
           ),
@@ -916,7 +916,7 @@ class _AntardashaCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      AppLocalizations.of(context).phala_antardashaName(antardasha),
+                      AppLocalizations.of(context).phala_antardashaName(_getLocalizedPlanetName(antardasha, AppLocalizations.of(context))),
                       style: GoogleFonts.inter(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -925,7 +925,7 @@ class _AntardashaCard extends StatelessWidget {
                     ),
                     if (remainingYears != null)
                       Text(
-                        AppLocalizations.of(context).phala_remaining_duration(formatDuration(remainingYears!)),
+                        AppLocalizations.of(context).phala_remaining_duration(formatDurationLocalized(remainingYears!, AppLocalizations.of(context))),
                         style: GoogleFonts.jetBrainsMono(
                           fontSize: 10,
                           color: antarColor,
@@ -1297,5 +1297,102 @@ class _RemedyInfo extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+String _getLocalizedPlanetName(String planet, AppLocalizations l10n) {
+  switch (planet) {
+    case 'Sun': return l10n.planet_sun;
+    case 'Moon': return l10n.planet_moon;
+    case 'Mars': return l10n.planet_mars;
+    case 'Mercury': return l10n.planet_mercury;
+    case 'Jupiter': return l10n.planet_jupiter;
+    case 'Venus': return l10n.planet_venus;
+    case 'Saturn': return l10n.planet_saturn;
+    case 'Rahu': return l10n.planet_rahu;
+    case 'Ketu': return l10n.planet_ketu;
+    case 'Uranus': return l10n.planet_uranus;
+    case 'Neptune': return l10n.planet_neptune;
+    case 'Pluto': return l10n.planet_pluto;
+    default: return planet;
+  }
+}
+
+String _getLocalizedDeity(String planet, AppLocalizations l10n) {
+  switch (planet) {
+    case 'Sun': return l10n.deity_surya;
+    case 'Moon': return l10n.deity_chandra;
+    case 'Mars': return l10n.deity_mangal;
+    case 'Mercury': return l10n.deity_budh;
+    case 'Jupiter': return l10n.deity_guru;
+    case 'Venus': return l10n.deity_shukra;
+    case 'Saturn': return l10n.deity_shani;
+    case 'Rahu': return l10n.deity_rahu;
+    case 'Ketu': return l10n.deity_ketu;
+    default: return planet;
+  }
+}
+
+String _getLocalizedGemstone(String planet, AppLocalizations l10n) {
+  switch (planet) {
+    case 'Sun': return l10n.gemstone_ruby;
+    case 'Moon': return l10n.gemstone_pearl;
+    case 'Mars': return l10n.gemstone_redcoral;
+    case 'Mercury': return l10n.gemstone_emerald;
+    case 'Jupiter': return l10n.gemstone_yellowsapphire;
+    case 'Venus': return l10n.gemstone_diamond;
+    case 'Saturn': return l10n.gemstone_bluesapphire;
+    case 'Rahu': return l10n.gemstone_hessonite;
+    case 'Ketu': return l10n.gemstone_catseye;
+    default: return planet;
+  }
+}
+
+String _getLocalizedTheme(String planet, AppLocalizations l10n) {
+  switch (planet) {
+    case 'Sun': return l10n.phala_theme_sun;
+    case 'Moon': return l10n.phala_theme_moon;
+    case 'Mars': return l10n.phala_theme_mars;
+    case 'Mercury': return l10n.phala_theme_mercury;
+    case 'Jupiter': return l10n.phala_theme_jupiter;
+    case 'Venus': return l10n.phala_theme_venus;
+    case 'Saturn': return l10n.phala_theme_saturn;
+    case 'Rahu': return l10n.phala_theme_rahu;
+    case 'Ketu': return l10n.phala_theme_ketu;
+    default: return '';
+  }
+}
+
+List<String> _getLocalizedEffects(String planet, AppLocalizations l10n) {
+  switch (planet) {
+    case 'Sun': return [l10n.phala_effect_sun_1, l10n.phala_effect_sun_2, l10n.phala_effect_sun_3, l10n.phala_effect_sun_4, l10n.phala_effect_sun_5];
+    case 'Moon': return [l10n.phala_effect_moon_1, l10n.phala_effect_moon_2, l10n.phala_effect_moon_3, l10n.phala_effect_moon_4, l10n.phala_effect_moon_5];
+    case 'Mars': return [l10n.phala_effect_mars_1, l10n.phala_effect_mars_2, l10n.phala_effect_mars_3, l10n.phala_effect_mars_4, l10n.phala_effect_mars_5];
+    case 'Mercury': return [l10n.phala_effect_mercury_1, l10n.phala_effect_mercury_2, l10n.phala_effect_mercury_3, l10n.phala_effect_mercury_4, l10n.phala_effect_mercury_5];
+    case 'Jupiter': return [l10n.phala_effect_jupiter_1, l10n.phala_effect_jupiter_2, l10n.phala_effect_jupiter_3, l10n.phala_effect_jupiter_4, l10n.phala_effect_jupiter_5];
+    case 'Venus': return [l10n.phala_effect_venus_1, l10n.phala_effect_venus_2, l10n.phala_effect_venus_3, l10n.phala_effect_venus_4, l10n.phala_effect_venus_5];
+    case 'Saturn': return [l10n.phala_effect_saturn_1, l10n.phala_effect_saturn_2, l10n.phala_effect_saturn_3, l10n.phala_effect_saturn_4, l10n.phala_effect_saturn_5];
+    case 'Rahu': return [l10n.phala_effect_rahu_1, l10n.phala_effect_rahu_2, l10n.phala_effect_rahu_3, l10n.phala_effect_rahu_4, l10n.phala_effect_rahu_5];
+    case 'Ketu': return [l10n.phala_effect_ketu_1, l10n.phala_effect_ketu_2, l10n.phala_effect_ketu_3, l10n.phala_effect_ketu_4, l10n.phala_effect_ketu_5];
+    default: return [];
+  }
+}
+
+String _getLocalizedColor(String englishColor, AppLocalizations l10n) {
+  switch (englishColor.trim()) {
+    case 'Red': return l10n.color_red;
+    case 'Orange': return l10n.color_orange;
+    case 'Green': return l10n.color_green;
+    case 'Pink': return l10n.color_pink;
+    case 'Yellow': return l10n.color_yellow;
+    case 'White': return l10n.color_white;
+    case 'Silver': return l10n.color_silver;
+    case 'Gold': return l10n.color_gold;
+    case 'Blue': return l10n.color_blue;
+    case 'Brown': return l10n.color_brown;
+    case 'Black': return l10n.color_black;
+    case 'Maroon': return l10n.color_maroon;
+    case 'Purple': return l10n.color_purple;
+    default: return englishColor;
   }
 }

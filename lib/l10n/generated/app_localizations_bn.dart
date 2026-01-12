@@ -412,13 +412,13 @@ class AppLocalizationsBn extends AppLocalizations {
   String get planet_ketu => 'কেতু';
 
   @override
-  String get planet_uranus => 'Uranus';
+  String get planet_uranus => 'ইউরেনাস';
 
   @override
-  String get planet_neptune => 'Neptune';
+  String get planet_neptune => 'নেপচুন';
 
   @override
-  String get planet_pluto => 'Pluto';
+  String get planet_pluto => 'প্লুটো';
 
   @override
   String get planet_sun_sanskrit => 'সূর্য';
@@ -856,6 +856,462 @@ class AppLocalizationsBn extends AppLocalizations {
   String get gemstone_catseye => 'বৈদূর্য';
 
   @override
+  String get gemstone_ruled_sun => 'সূর্য দ্বারা শাসিত • জীবনীশক্তি বাড়ায়';
+
+  @override
+  String get gemstone_ruled_moon => 'চন্দ্র দ্বারা শাসিত • আবেগ সমৃদ্ধ করে';
+
+  @override
+  String get gemstone_ruled_mars => 'মঙ্গল দ্বারা শাসিত • সাহস বাড়ায়';
+
+  @override
+  String get gemstone_ruled_mercury => 'বুধ দ্বারা শাসিত • বুদ্ধি বাড়ায়';
+
+  @override
+  String get gemstone_ruled_jupiter => 'গুরু দ্বারা শাসিত • জ্ঞান আনে';
+
+  @override
+  String get gemstone_ruled_venus => 'শুক্র দ্বারা শাসিত • প্রেম আকর্ষণ করে';
+
+  @override
+  String get gemstone_ruled_saturn => 'শনি দ্বারা শাসিত • শৃঙ্খলা দেয়';
+
+  @override
+  String get gemstone_ruled_rahu => 'রাহু দ্বারা শাসিত • বাধা দূর করে';
+
+  @override
+  String get gemstone_ruled_ketu => 'কেতু দ্বারা শাসিত • সুরক্ষা প্রদান করে';
+
+  @override
+  String get deity_surya => 'Lord Surya';
+
+  @override
+  String get deity_chandra => 'Lord Shiva / Goddess Parvati';
+
+  @override
+  String get deity_mangal => 'Lord Hanuman / Lord Kartikeya';
+
+  @override
+  String get deity_budh => 'Lord Vishnu / Lord Ganesha';
+
+  @override
+  String get deity_guru => 'Lord Brihaspati / Lord Shiva';
+
+  @override
+  String get deity_shukra => 'Goddess Lakshmi';
+
+  @override
+  String get deity_shani => 'Lord Shani / Lord Yama';
+
+  @override
+  String get deity_rahu => 'Goddess Durga';
+
+  @override
+  String get deity_ketu => 'Lord Ganesha';
+
+  @override
+  String get phala_theme_sun =>
+      'A period of self-realization, authority, and recognition. The soul seeks to express its true nature.';
+
+  @override
+  String get phala_theme_moon =>
+      'A period of emotional growth, nurturing, and intuition. The mind seeks peace and maternal comfort.';
+
+  @override
+  String get phala_theme_mars =>
+      'A period of energy, courage, and action. The warrior spirit awakens to conquer challenges.';
+
+  @override
+  String get phala_theme_mercury =>
+      'A period of intellect, communication, and learning. The mind seeks knowledge and expression.';
+
+  @override
+  String get phala_theme_jupiter =>
+      'A period of wisdom, growth, and blessings. The soul seeks higher knowledge and dharma.';
+
+  @override
+  String get phala_theme_venus =>
+      'A period of love, luxury, and creativity. The heart seeks beauty and harmonious relationships.';
+
+  @override
+  String get phala_theme_saturn =>
+      'A period of karma, discipline, and transformation. Lessons come through patience and perseverance.';
+
+  @override
+  String get phala_theme_rahu =>
+      'A period of ambition, worldly desires, and unconventional growth. The soul seeks material expansion.';
+
+  @override
+  String get phala_theme_ketu =>
+      'A period of spirituality, detachment, and liberation. The soul seeks inner peace and moksha.';
+
+  @override
+  String get phala_effect_sun_1 => 'Rise in status and authority';
+
+  @override
+  String get phala_effect_sun_2 => 'Government connections and favors';
+
+  @override
+  String get phala_effect_sun_3 => 'Father-related matters come into focus';
+
+  @override
+  String get phala_effect_sun_4 => 'Health consciousness increases';
+
+  @override
+  String get phala_effect_sun_5 => 'Leadership opportunities emerge';
+
+  @override
+  String get phala_effect_moon_1 => 'Emotional sensitivity increases';
+
+  @override
+  String get phala_effect_moon_2 => 'Mother-related matters highlighted';
+
+  @override
+  String get phala_effect_moon_3 => 'Travel and change of residence possible';
+
+  @override
+  String get phala_effect_moon_4 => 'Public dealings and popularity';
+
+  @override
+  String get phala_effect_moon_5 => 'Mental peace becomes priority';
+
+  @override
+  String get phala_effect_mars_1 => 'Energy and drive increase';
+
+  @override
+  String get phala_effect_mars_2 => 'Property and land matters';
+
+  @override
+  String get phala_effect_mars_3 => 'Sibling relationships highlighted';
+
+  @override
+  String get phala_effect_mars_4 => 'Technical skills develop';
+
+  @override
+  String get phala_effect_mars_5 => 'Courage to face challenges';
+
+  @override
+  String get phala_effect_mercury_1 => 'Intellectual growth and learning';
+
+  @override
+  String get phala_effect_mercury_2 => 'Business and trade opportunities';
+
+  @override
+  String get phala_effect_mercury_3 => 'Communication skills improve';
+
+  @override
+  String get phala_effect_mercury_4 => 'Writing and speaking abilities';
+
+  @override
+  String get phala_effect_mercury_5 => 'Youthful energy and adaptability';
+
+  @override
+  String get phala_effect_jupiter_1 => 'Wisdom and knowledge expand';
+
+  @override
+  String get phala_effect_jupiter_2 => 'Spiritual growth and dharma';
+
+  @override
+  String get phala_effect_jupiter_3 => 'Children-related blessings';
+
+  @override
+  String get phala_effect_jupiter_4 => 'Teaching and guidance roles';
+
+  @override
+  String get phala_effect_jupiter_5 => 'Financial prosperity through ethics';
+
+  @override
+  String get phala_effect_venus_1 => 'Love and romantic relationships';
+
+  @override
+  String get phala_effect_venus_2 => 'Artistic and creative pursuits';
+
+  @override
+  String get phala_effect_venus_3 => 'Luxury and material comforts';
+
+  @override
+  String get phala_effect_venus_4 => 'Beauty and aesthetics matter';
+
+  @override
+  String get phala_effect_venus_5 => 'Marriage and partnership harmony';
+
+  @override
+  String get phala_effect_saturn_1 => 'Karmic lessons and discipline';
+
+  @override
+  String get phala_effect_saturn_2 => 'Hard work brings delayed results';
+
+  @override
+  String get phala_effect_saturn_3 => 'Service to others emphasized';
+
+  @override
+  String get phala_effect_saturn_4 => 'Longevity and persistence';
+
+  @override
+  String get phala_effect_saturn_5 => 'Detachment from materialism';
+
+  @override
+  String get phala_effect_rahu_1 => 'Worldly ambitions intensify';
+
+  @override
+  String get phala_effect_rahu_2 => 'Foreign connections and travel';
+
+  @override
+  String get phala_effect_rahu_3 => 'Unconventional approaches succeed';
+
+  @override
+  String get phala_effect_rahu_4 => 'Technology and innovation';
+
+  @override
+  String get phala_effect_rahu_5 => 'Desire for fame and recognition';
+
+  @override
+  String get phala_effect_ketu_1 => 'Spiritual awakening';
+
+  @override
+  String get phala_effect_ketu_2 => 'Detachment from material world';
+
+  @override
+  String get phala_effect_ketu_3 => 'Intuitive and psychic abilities';
+
+  @override
+  String get phala_effect_ketu_4 => 'Past-life connections emerge';
+
+  @override
+  String get phala_effect_ketu_5 => 'Liberation and moksha path';
+
+  @override
+  String get yogini_mangala => 'Mangala';
+
+  @override
+  String get yogini_pingala => 'Pingala';
+
+  @override
+  String get yogini_dhanya => 'Dhanya';
+
+  @override
+  String get yogini_bhramari => 'Bhramari';
+
+  @override
+  String get yogini_bhadrika => 'Bhadrika';
+
+  @override
+  String get yogini_ulka => 'Ulka';
+
+  @override
+  String get yogini_siddha => 'Siddha';
+
+  @override
+  String get yogini_sankata => 'Sankata';
+
+  @override
+  String get yogini_mangala_abbr => 'MAN';
+
+  @override
+  String get yogini_pingala_abbr => 'PIN';
+
+  @override
+  String get yogini_dhanya_abbr => 'DHA';
+
+  @override
+  String get yogini_bhramari_abbr => 'BHR';
+
+  @override
+  String get yogini_bhadrika_abbr => 'BHA';
+
+  @override
+  String get yogini_ulka_abbr => 'ULK';
+
+  @override
+  String get yogini_siddha_abbr => 'SID';
+
+  @override
+  String get yogini_sankata_abbr => 'SAN';
+
+  @override
+  String get strength_avg => 'AVG';
+
+  @override
+  String strength_rupas(String value, String required) {
+    return '$value / $required Rupas';
+  }
+
+  @override
+  String get sadesati_active => 'Sade Sati Active';
+
+  @override
+  String get sadesati_not_active => 'Sade Sati Not Active';
+
+  @override
+  String get sadesati_peak_phase => 'Peak Phase';
+
+  @override
+  String get sadesati_rising_phase => 'Rising Phase';
+
+  @override
+  String get sadesati_setting_phase => 'Setting Phase';
+
+  @override
+  String get sadesati_clear_period => 'Clear Period';
+
+  @override
+  String get sadesati_learn_more => 'Learn more';
+
+  @override
+  String get sadesati_over_moon => 'Over Moon · Most Intense Period';
+
+  @override
+  String get sadesati_12th_from_moon =>
+      '12th from Moon · Expenses & Mental Stress';
+
+  @override
+  String get sadesati_2nd_from_moon => '2nd from Moon · Family & Finances';
+
+  @override
+  String get sadesati_saturn => 'Saturn';
+
+  @override
+  String get sadesati_moon => 'Moon';
+
+  @override
+  String get sadesati_not_affecting =>
+      'Saturn\'s 7.5-year cycle is not affecting you';
+
+  @override
+  String get sadesati_janma_rashi => 'Janma Rashi';
+
+  @override
+  String get sadesati_phase_12th => '12th';
+
+  @override
+  String get sadesati_phase_1st => '1st';
+
+  @override
+  String get sadesati_phase_2nd => '2nd';
+
+  @override
+  String transit_houses_from(String sign) {
+    return 'Houses from $sign';
+  }
+
+  @override
+  String get transit_legend_moon => 'Moon';
+
+  @override
+  String get panchang_whatThisMeans => 'What This Means';
+
+  @override
+  String get panchang_significance => 'Significance';
+
+  @override
+  String get panchang_keyPoints => 'Key Points';
+
+  @override
+  String get weekday_sunday => 'Sunday';
+
+  @override
+  String get weekday_monday => 'Monday';
+
+  @override
+  String get weekday_tuesday => 'Tuesday';
+
+  @override
+  String get weekday_wednesday => 'Wednesday';
+
+  @override
+  String get weekday_thursday => 'Thursday';
+
+  @override
+  String get weekday_friday => 'Friday';
+
+  @override
+  String get weekday_saturday => 'Saturday';
+
+  @override
+  String get panchang_period_rahukala => 'Rahukala';
+
+  @override
+  String get panchang_period_yamaghanda => 'Yamaghanda';
+
+  @override
+  String get panchang_period_gulika => 'Gulika';
+
+  @override
+  String get panchang_period_rahukala_short =>
+      'Ruled by Rahu. Avoid starting new ventures.';
+
+  @override
+  String get panchang_period_yamaghanda_short =>
+      'Ruled by Yama. Avoid important decisions.';
+
+  @override
+  String get panchang_period_gulika_short =>
+      'Saturn\'s son period. Avoid auspicious work.';
+
+  @override
+  String get panchang_time_6am => '6AM';
+
+  @override
+  String get panchang_time_9am => '9AM';
+
+  @override
+  String get panchang_time_12pm => '12PM';
+
+  @override
+  String get panchang_time_3pm => '3PM';
+
+  @override
+  String get panchang_time_6pm => '6PM';
+
+  @override
+  String get color_red => 'লাল';
+
+  @override
+  String get color_orange => 'কমলা';
+
+  @override
+  String get color_yellow => 'হলুদ';
+
+  @override
+  String get color_green => 'সবুজ';
+
+  @override
+  String get color_blue => 'নীল';
+
+  @override
+  String get color_pink => 'গোলাপী';
+
+  @override
+  String get color_white => 'সাদা';
+
+  @override
+  String get color_silver => 'রূপালী';
+
+  @override
+  String get color_gold => 'সোনালী';
+
+  @override
+  String get color_brown => 'বাদামী';
+
+  @override
+  String get color_black => 'কালো';
+
+  @override
+  String get color_maroon => 'মেরুন';
+
+  @override
+  String get color_purple => 'বেগুনি';
+
+  @override
+  String get color_electric => 'ইলেকট্রিক নীল';
+
+  @override
+  String get color_seagreen => 'সমুদ্র সবুজ';
+
+  @override
+  String get color_lavender => 'ল্যাভেন্ডার';
+
+  @override
   String get yoni_horse => 'অশ্ব';
 
   @override
@@ -1131,6 +1587,11 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get dasha_days => 'দিন';
+
+  @override
+  String dasha_year_suffix(int years) {
+    return '${years}y';
+  }
 
   @override
   String get dasha_remaining => 'অবশিষ্ট';
@@ -2256,11 +2717,6 @@ class AppLocalizationsBn extends AppLocalizations {
   String get strength_legend_drik_hint => 'Aspect';
 
   @override
-  String strength_rupas(String value, String required) {
-    return '$value / $required Rupas';
-  }
-
-  @override
   String get strength_strongest => 'Strongest';
 
   @override
@@ -2552,6 +3008,41 @@ class AppLocalizationsBn extends AppLocalizations {
   String alert_viewAll(int count) {
     return 'সব $count দেখুন';
   }
+
+  @override
+  String get alert_astroInfluences => 'জ্যোতিষীয় প্রভাব';
+
+  @override
+  String alert_activeCount(int count) {
+    return '$count সক্রিয়';
+  }
+
+  @override
+  String get alert_theme_sadeSati =>
+      'রূপান্তর, শৃঙ্খলা এবং অভ্যন্তরীণ বৃদ্ধির সময়।';
+
+  @override
+  String get alert_theme_dhaiyaDomestic =>
+      'গৃহস্থালি এবং আবেগময় বিষয়ে ধৈর্যের প্রয়োজন হয় এমন 2.5 বছরের সময়।';
+
+  @override
+  String get alert_theme_dhaiyaTransform =>
+      'পরিবর্তনে ধৈর্যের প্রয়োজন হয় এমন 2.5 বছরের সময়।';
+
+  @override
+  String get alert_theme_manglik =>
+      'মঙ্গল শক্তি সম্পর্ককে প্রভাবিত করে এবং সামঞ্জস্যের জন্য বোঝাপড়া প্রয়োজন।';
+
+  @override
+  String get alert_theme_lunar =>
+      'উন্নত অন্তর্দৃষ্টি এবং আবেগময় গভীরতা যা মননশীল অনুশীলন থেকে উপকৃত হয়।';
+
+  @override
+  String get alert_theme_yoga =>
+      'আপনার জীবনে ইতিবাচক প্রভাব আনে এমন শক্তিশালী যোগ।';
+
+  @override
+  String get alert_shubhYoga => 'শুভ যোগ';
 
   @override
   String get details_nav_profile => 'প্রোফাইল';
@@ -5047,6 +5538,73 @@ class AppLocalizationsBn extends AppLocalizations {
 
   @override
   String get yogas_type_lunar => 'Lunar';
+
+  @override
+  String get yogas_type_rajaYoga => 'Raja Yoga';
+
+  @override
+  String get yogas_type_dhanaYoga => 'Dhana Yoga';
+
+  @override
+  String get yogas_type_lunarYoga => 'Lunar Yoga';
+
+  @override
+  String get yogas_type_panchaMahapurusha => 'Pancha Mahapurusha';
+
+  @override
+  String get yogas_type_beneficYoga => 'Benefic Yoga';
+
+  @override
+  String get yogas_type_majorDosha => 'Major Dosha';
+
+  @override
+  String get yogas_type_ancestral => 'Ancestral';
+
+  @override
+  String get yogas_type_conjunctionDosha => 'Conjunction Dosha';
+
+  @override
+  String get yogas_strength_strong => 'Strong';
+
+  @override
+  String get yogas_strength_moderate => 'Moderate';
+
+  @override
+  String get yogas_strength_high => 'High';
+
+  @override
+  String get yogas_strength_low => 'Low';
+
+  @override
+  String yogas_inHouse(String house) {
+    return 'in H$house';
+  }
+
+  @override
+  String get yogas_fromMoon => 'from Moon';
+
+  @override
+  String get yogas_fromLagna => 'from Lagna';
+
+  @override
+  String yogas_conjunction(String planet1, String planet2, String house) {
+    return '$planet1-$planet2 conjunction in H$house';
+  }
+
+  @override
+  String yogas_planetInHouse(String planet, String house, String sign) {
+    return '$planet in H$house ($sign)';
+  }
+
+  @override
+  String yogas_planetaryCombo(String yoga) {
+    return 'Planetary combination forming $yoga';
+  }
+
+  @override
+  String yogas_planetInHouseFromMoon(String planet, String house) {
+    return '$planet in H$house from Moon';
+  }
 
   @override
   String get yogas_type_yoga => 'Yoga';

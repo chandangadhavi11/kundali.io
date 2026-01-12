@@ -482,7 +482,7 @@ class _VimshottariHeroCardState extends State<_VimshottariHeroCard>
               ),
               const SizedBox(height: 6),
               Text(
-                AppLocalizations.of(context).vimshottari_planetMahadasha(widget.dasha.currentMahadasha),
+                AppLocalizations.of(context).vimshottari_planetMahadasha(_getLocalizedPlanetName(widget.dasha.currentMahadasha, AppLocalizations.of(context))),
                 style: GoogleFonts.instrumentSans(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -567,7 +567,7 @@ class _VimshottariHeroCardState extends State<_VimshottariHeroCard>
             children: [
               _StatChip(
                 icon: Icons.hourglass_top_rounded,
-                value: formatDuration(widget.dynamicRemainingYears),
+                value: formatDurationLocalized(widget.dynamicRemainingYears, AppLocalizations.of(context)),
                 label: AppLocalizations.of(context).vimshottari_remaining,
                 iconColor: color,
               ),
@@ -1004,7 +1004,7 @@ class _CompactPeriodCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      planet,
+                      _getLocalizedPlanetName(planet, AppLocalizations.of(context)),
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -1028,7 +1028,7 @@ class _CompactPeriodCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            AppLocalizations.of(context).vimshottari_left(formatDuration(remainingYears)),
+            AppLocalizations.of(context).vimshottari_left(formatDurationLocalized(remainingYears, AppLocalizations.of(context))),
             style: GoogleFonts.jetBrainsMono(
               fontSize: 9,
               color: DashaColors.textTertiary,
@@ -1076,7 +1076,7 @@ class _BirthConfigCard extends StatelessWidget {
               child: _ConfigItem(
                 icon: Icons.hourglass_top_rounded,
                 label: l10n.vimshottari_balanceAtBirth,
-                value: formatDuration(dasha.balanceYearsAtBirth!),
+                value: formatDurationLocalized(dasha.balanceYearsAtBirth!, AppLocalizations.of(context)),
                 color: DashaColors.amber,
               ),
             ),
@@ -1303,7 +1303,7 @@ class _TimelinePlanetItem extends StatelessWidget {
         const SizedBox(height: 6),
         // Planet name
         Text(
-          _getShortPlanetName(planet),
+          _getShortPlanetName(planet, AppLocalizations.of(context)),
           style: GoogleFonts.inter(
             fontSize: 8,
             fontWeight: isCurrent ? FontWeight.w600 : FontWeight.w500,
@@ -1319,20 +1319,19 @@ class _TimelinePlanetItem extends StatelessWidget {
     );
   }
 
-  String _getShortPlanetName(String planet) {
-    // Return short 3-letter abbreviations for compact display
-    const names = {
-      'Sun': 'SUN',
-      'Moon': 'MON',
-      'Mars': 'MAR',
-      'Mercury': 'MER',
-      'Jupiter': 'JUP',
-      'Venus': 'VEN',
-      'Saturn': 'SAT',
-      'Rahu': 'RAH',
-      'Ketu': 'KET',
-    };
-    return names[planet] ?? planet.substring(0, 3).toUpperCase();
+  String _getShortPlanetName(String planet, AppLocalizations l10n) {
+    switch (planet) {
+      case 'Sun': return l10n.planet_sun_abbr;
+      case 'Moon': return l10n.planet_moon_abbr;
+      case 'Mars': return l10n.planet_mars_abbr;
+      case 'Mercury': return l10n.planet_mercury_abbr;
+      case 'Jupiter': return l10n.planet_jupiter_abbr;
+      case 'Venus': return l10n.planet_venus_abbr;
+      case 'Saturn': return l10n.planet_saturn_abbr;
+      case 'Rahu': return l10n.planet_rahu_abbr;
+      case 'Ketu': return l10n.planet_ketu_abbr;
+      default: return planet.substring(0, 3).toUpperCase();
+    }
   }
 }
 
@@ -1391,7 +1390,7 @@ class _DashaPeriodItem extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        periodDetail.planet,
+                        _getLocalizedPlanetName(periodDetail.planet, AppLocalizations.of(context)),
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
@@ -1428,7 +1427,7 @@ class _DashaPeriodItem extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                '${periodDetail.durationYears.round()}y',
+                AppLocalizations.of(context).dasha_year_suffix(periodDetail.durationYears.round()),
                 style: GoogleFonts.jetBrainsMono(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -1509,7 +1508,7 @@ class _DashaPeriodItemFallback extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        period.planet,
+                        _getLocalizedPlanetName(period.planet, AppLocalizations.of(context)),
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w600,
@@ -1872,7 +1871,7 @@ class _VimshottariPeriodHeader extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          formatDuration(period.durationYears),
+                          formatDurationLocalized(period.durationYears, AppLocalizations.of(context)),
                           style: GoogleFonts.jetBrainsMono(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -2006,7 +2005,7 @@ class _SubPeriodItem extends StatelessWidget {
               ),
             ),
             Text(
-              formatDuration(subPeriod.durationYears),
+              formatDurationLocalized(subPeriod.durationYears, AppLocalizations.of(context)),
               style: GoogleFonts.jetBrainsMono(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
@@ -2056,3 +2055,20 @@ DashaPeriodDetail _ensureSubPeriods(DashaPeriodDetail period) {
   );
 }
 
+String _getLocalizedPlanetName(String planet, AppLocalizations l10n) {
+  switch (planet) {
+    case 'Sun': return l10n.planet_sun;
+    case 'Moon': return l10n.planet_moon;
+    case 'Mars': return l10n.planet_mars;
+    case 'Mercury': return l10n.planet_mercury;
+    case 'Jupiter': return l10n.planet_jupiter;
+    case 'Venus': return l10n.planet_venus;
+    case 'Saturn': return l10n.planet_saturn;
+    case 'Rahu': return l10n.planet_rahu;
+    case 'Ketu': return l10n.planet_ketu;
+    case 'Uranus': return l10n.planet_uranus;
+    case 'Neptune': return l10n.planet_neptune;
+    case 'Pluto': return l10n.planet_pluto;
+    default: return planet;
+  }
+}

@@ -672,7 +672,7 @@ class _CharHeroCardState extends State<_CharHeroCard>
             children: [
               _CharStatChip(
                 icon: Icons.hourglass_top_rounded,
-                value: formatDuration(widget.dynamicRemainingYears),
+                value: formatDurationLocalized(widget.dynamicRemainingYears, AppLocalizations.of(context)),
                 label: AppLocalizations.of(context).charDasha_remaining,
                 iconColor: color,
               ),
@@ -1051,7 +1051,7 @@ class _CompactSignCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            AppLocalizations.of(context).charDasha_left(formatDuration(remainingYears)),
+            AppLocalizations.of(context).charDasha_left(formatDurationLocalized(remainingYears, AppLocalizations.of(context))),
             style: GoogleFonts.jetBrainsMono(
               fontSize: 9,
               color: DashaColors.textTertiary,
@@ -1876,7 +1876,7 @@ class _CharPeriodItemState extends State<_CharPeriodItem> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                '${widget.periodDetail.durationYears.round()}y',
+                AppLocalizations.of(context).dasha_year_suffix(widget.periodDetail.durationYears.round()),
                 style: GoogleFonts.jetBrainsMono(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -2453,7 +2453,7 @@ void showCharPeriodBottomSheet(
                                           ),
                                         ),
                                         Text(
-                                          formatDuration(period.durationYears),
+                                          formatDurationLocalized(period.durationYears, AppLocalizations.of(context)),
                                           style: GoogleFonts.jetBrainsMono(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
@@ -2609,9 +2609,8 @@ void showCharPeriodBottomSheet(
                                             ),
                                           ),
                                           Text(
-                                            formatDuration(
-                                              subPeriod.durationYears,
-                                            ),
+                                            formatDurationLocalized(
+                                              subPeriod.durationYears, AppLocalizations.of(context)),
                                             style: GoogleFonts.jetBrainsMono(
                                               fontSize: 10,
                                               fontWeight: FontWeight.w500,

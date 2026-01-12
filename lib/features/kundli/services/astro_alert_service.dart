@@ -53,7 +53,7 @@ class AstroAlertService {
   static String _getSaturnSignForDate(KundaliData data, DateTime date) {
     // Cache key is date only (YYYY-MM-DD) since Saturn moves slowly
     final cacheKey = '${date.year}-${date.month}-${date.day}';
-    
+
     if (_saturnSignCache.containsKey(cacheKey)) {
       return _saturnSignCache[cacheKey]!;
     }
@@ -67,7 +67,7 @@ class AstroAlertService {
           longitude: data.longitude,
           timezone: data.timezone,
         );
-        
+
         final transitSaturn = transitResult.planetPositions['Saturn'];
         if (transitSaturn != null) {
           _saturnSignCache[cacheKey] = transitSaturn.sign;
@@ -98,7 +98,8 @@ class AstroAlertService {
       return 'Aquarius';
     } else if (date.isBefore(DateTime(2028, 2, 6))) {
       // Saturn in Pisces with brief Aries excursion in 2027
-      if (date.isAfter(DateTime(2027, 6, 1)) && date.isBefore(DateTime(2027, 11, 1))) {
+      if (date.isAfter(DateTime(2027, 6, 1)) &&
+          date.isBefore(DateTime(2027, 11, 1))) {
         return 'Aries'; // Brief Aries transit
       }
       return 'Pisces';
@@ -114,8 +115,18 @@ class AstroAlertService {
   /// Get the zodiac sign index (0-11) from sign name
   static int _getSignIndex(String sign) {
     const signs = [
-      'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
-      'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
+      'Aries',
+      'Taurus',
+      'Gemini',
+      'Cancer',
+      'Leo',
+      'Virgo',
+      'Libra',
+      'Scorpio',
+      'Sagittarius',
+      'Capricorn',
+      'Aquarius',
+      'Pisces',
     ];
     return signs.indexOf(sign);
   }
@@ -130,7 +141,11 @@ class AstroAlertService {
 
   /// Detect Shani Sade Sati
   /// Sade Sati occurs when Saturn TRANSITS 12th, 1st, or 2nd from Moon sign
-  static AstroAlert? _detectSadeSati(KundaliData data, String transitSaturnSign, AppLocalizations? l10n) {
+  static AstroAlert? _detectSadeSati(
+    KundaliData data,
+    String transitSaturnSign,
+    AppLocalizations? l10n,
+  ) {
     final moonSign = data.moonSign;
     final housesAway = _getHousesAway(moonSign, transitSaturnSign);
 
@@ -159,13 +174,17 @@ class AstroAlertService {
       priority: AlertPriority.sadeSati,
       title: l10n?.alert_sadeSati ?? 'Shani Sade Sati',
       subtitle: phaseLabel,
-      description: 'Saturn is transiting through your $phaseLabel of Sade Sati. Moon sign: $moonSign, Saturn in: $transitSaturnSign.',
+      description:
+          'Saturn is transiting through your $phaseLabel of Sade Sati. Moon sign: $moonSign, Saturn in: $transitSaturnSign.',
       startDate: transitDates['start'],
       endDate: transitDates['end'],
       iconSymbol: '♄',
       accentColor: AstroAlertColors.saturn,
-      themeSummary: 'A period of transformation, discipline, and inner growth.',
-      detailedExplanation: '''Sade Sati is a 7.5-year transit of Saturn through the 12th, 1st, and 2nd houses from your Moon sign ($moonSign). This is not a period of punishment, but rather a time when Saturn teaches important life lessons.
+      themeSummary:
+          l10n?.alert_theme_sadeSati ??
+          'A period of transformation, discipline, and inner growth.',
+      detailedExplanation:
+          '''Sade Sati is a 7.5-year transit of Saturn through the 12th, 1st, and 2nd houses from your Moon sign ($moonSign). This is not a period of punishment, but rather a time when Saturn teaches important life lessons.
 
 During the $phaseLabel:
 ${phase == SadeSatiPhase.first ? '• Focus shifts to introspection and releasing old patterns\n• Hidden matters may come to surface for resolution' : ''}
@@ -190,7 +209,11 @@ This transit ultimately strengthens character and brings maturity.''',
 
   /// Detect Shani Dhaiya (Small Panoti)
   /// Dhaiya occurs when Saturn TRANSITS 4th or 8th from Moon sign
-  static AstroAlert? _detectShaniDhaiya(KundaliData data, String transitSaturnSign, AppLocalizations? l10n) {
+  static AstroAlert? _detectShaniDhaiya(
+    KundaliData data,
+    String transitSaturnSign,
+    AppLocalizations? l10n,
+  ) {
     final moonSign = data.moonSign;
     final housesAway = _getHousesAway(moonSign, transitSaturnSign);
 
@@ -213,11 +236,18 @@ This transit ultimately strengthens character and brings maturity.''',
       type: AlertType.neutral,
       priority: AlertPriority.dhaiya,
       title: l10n?.alert_shaniDhaiya ?? 'Shani Dhaiya',
-      subtitle: l10n?.alert_saturnIn(houseLabel) ?? 'Saturn in $houseLabel from Moon',
-      description: 'Saturn is transiting your $houseLabel from Moon sign ($moonSign).',
+      subtitle:
+          l10n?.alert_saturnIn(houseLabel) ?? 'Saturn in $houseLabel from Moon',
+      description:
+          'Saturn is transiting your $houseLabel from Moon sign ($moonSign).',
       iconSymbol: '♄',
       accentColor: AstroAlertColors.saturn,
-      themeSummary: 'A 2.5-year period requiring patience in ${phase == DhaiyaPhase.small ? 'domestic and emotional matters' : 'transformations and changes'}.',
+      themeSummary:
+          phase == DhaiyaPhase.small
+              ? (l10n?.alert_theme_dhaiyaDomestic ??
+                  'A 2.5-year period requiring patience in domestic and emotional matters.')
+              : (l10n?.alert_theme_dhaiyaTransform ??
+                  'A 2.5-year period requiring patience in transformations and changes.'),
       detailedExplanation: '''Shani Dhaiya, also known as Small Panoti, occurs when Saturn transits the 4th or 8th house from your Moon sign. This is a 2.5-year period that, while less intense than Sade Sati, still requires mindfulness.
 
 ${phase == DhaiyaPhase.small ? '''When Saturn transits the 4th house:
@@ -245,19 +275,26 @@ ${phase == DhaiyaPhase.small ? '''When Saturn transits the 4th house:
   }
 
   /// Detect major Dasha (Rahu, Ketu, Saturn)
-  static AstroAlert? _detectMajorDasha(KundaliData data, AppLocalizations? l10n) {
+  static AstroAlert? _detectMajorDasha(
+    KundaliData data,
+    AppLocalizations? l10n,
+  ) {
     final dashaInfo = data.dashaInfo;
 
     final currentDasha = dashaInfo.currentMahadasha.toLowerCase();
     final isRahu = currentDasha.contains('rahu');
     final isKetu = currentDasha.contains('ketu');
-    final isSaturn = currentDasha.contains('saturn') || currentDasha.contains('shani');
+    final isSaturn =
+        currentDasha.contains('saturn') || currentDasha.contains('shani');
 
     if (!isRahu && !isKetu && !isSaturn) return null;
 
     String planet = isRahu ? 'Rahu' : (isKetu ? 'Ketu' : 'Saturn');
     String symbol = isRahu ? '☊' : (isKetu ? '☋' : '♄');
-    Color color = (isRahu || isKetu) ? AstroAlertColors.rahuKetu : AstroAlertColors.saturn;
+    Color color =
+        (isRahu || isKetu)
+            ? AstroAlertColors.rahuKetu
+            : AstroAlertColors.saturn;
 
     return AstroAlert(
       id: 'dasha_$planet',
@@ -381,7 +418,10 @@ Key themes:
   }
 
   /// Detect Manglik Dosha
-  static AstroAlert? _detectManglikDosha(KundaliData data, AppLocalizations? l10n) {
+  static AstroAlert? _detectManglikDosha(
+    KundaliData data,
+    AppLocalizations? l10n,
+  ) {
     final marsPosition = data.planetPositions['Mars'];
     if (marsPosition == null) return null;
 
@@ -391,26 +431,35 @@ Key themes:
 
     // Also check if it's already detected in doshas (doshas is List<String>)
     final hasManglikDosha = data.doshas.any(
-      (d) => d.toLowerCase().contains('manglik') ||
-             d.toLowerCase().contains('mangal'),
+      (d) =>
+          d.toLowerCase().contains('manglik') ||
+          d.toLowerCase().contains('mangal'),
     );
 
     if (!marsInManglikHouse && !hasManglikDosha) return null;
 
-    final houseToShow = marsInManglikHouse ? marsPosition.house : 
-        (hasManglikDosha ? _extractManglikHouse(data.doshas) : 7);
+    final houseToShow =
+        marsInManglikHouse
+            ? marsPosition.house
+            : (hasManglikDosha ? _extractManglikHouse(data.doshas) : 7);
 
     return AstroAlert(
       id: 'manglik_dosha',
       type: AlertType.neutral,
       priority: AlertPriority.manglikDosha,
       title: l10n?.alert_manglikDosha ?? 'Manglik Dosha',
-      subtitle: l10n?.alert_marsInHouse(_getOrdinal(houseToShow)) ?? 'Mars in ${_getOrdinal(houseToShow)} house',
-      description: 'Mars is placed in the ${_getOrdinal(houseToShow)} house of your birth chart.',
+      subtitle:
+          l10n?.alert_marsInHouse(_getOrdinal(houseToShow)) ??
+          'Mars in ${_getOrdinal(houseToShow)} house',
+      description:
+          'Mars is placed in the ${_getOrdinal(houseToShow)} house of your birth chart.',
       iconSymbol: '♂',
       accentColor: AstroAlertColors.generalWarning,
-      themeSummary: 'Mars energy influences relationships and requires understanding for harmony.',
-      detailedExplanation: '''Manglik Dosha occurs when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. This is one of the most discussed doshas in Vedic astrology, particularly regarding marriage compatibility.
+      themeSummary:
+          l10n?.alert_theme_manglik ??
+          'Mars energy influences relationships and requires understanding for harmony.',
+      detailedExplanation:
+          '''Manglik Dosha occurs when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. This is one of the most discussed doshas in Vedic astrology, particularly regarding marriage compatibility.
 
 Important perspective:
 • Manglik Dosha is very common (approximately 50% of people have it)
@@ -467,7 +516,10 @@ ${_getManglikHouseEffect(houseToShow)}''',
   }
 
   /// Detect Moon affliction
-  static AstroAlert? _detectMoonAffliction(KundaliData data, AppLocalizations? l10n) {
+  static AstroAlert? _detectMoonAffliction(
+    KundaliData data,
+    AppLocalizations? l10n,
+  ) {
     final moonPosition = data.planetPositions['Moon'];
     if (moonPosition == null) return null;
 
@@ -497,9 +549,12 @@ ${_getManglikHouseEffect(houseToShow)}''',
 
     String subtitle = '';
     if (isConjunctMalefic) {
-      subtitle = l10n?.alert_moonWith(conjunctPlanet) ?? 'Moon with $conjunctPlanet';
+      subtitle =
+          l10n?.alert_moonWith(conjunctPlanet) ?? 'Moon with $conjunctPlanet';
     } else {
-      subtitle = l10n?.alert_moonInHouse(_getOrdinal(moonPosition.house)) ?? 'Moon in ${_getOrdinal(moonPosition.house)} house';
+      subtitle =
+          l10n?.alert_moonInHouse(_getOrdinal(moonPosition.house)) ??
+          'Moon in ${_getOrdinal(moonPosition.house)} house';
     }
 
     return AstroAlert(
@@ -508,10 +563,13 @@ ${_getManglikHouseEffect(houseToShow)}''',
       priority: AlertPriority.moonAffliction,
       title: l10n?.alert_lunarSensitivity ?? 'Lunar Sensitivity',
       subtitle: subtitle,
-      description: 'Your Moon placement suggests heightened emotional sensitivity.',
+      description:
+          'Your Moon placement suggests heightened emotional sensitivity.',
       iconSymbol: '☽',
       accentColor: AstroAlertColors.moonAffliction,
-      themeSummary: 'Enhanced intuition and emotional depth that benefits from mindful practices.',
+      themeSummary:
+          l10n?.alert_theme_lunar ??
+          'Enhanced intuition and emotional depth that benefits from mindful practices.',
       detailedExplanation: '''Your Moon placement indicates a sensitive and intuitive emotional nature. This is not a weakness but rather a gift that, when understood, provides deep insight and empathy.
 
 ${isConjunctMalefic ? '''Moon conjunct $conjunctPlanet:
@@ -539,7 +597,10 @@ These placements often indicate old souls with much to offer the world.''',
   }
 
   /// Detect positive yogas
-  static List<AstroAlert> _detectPositiveYogas(KundaliData data, AppLocalizations? l10n) {
+  static List<AstroAlert> _detectPositiveYogas(
+    KundaliData data,
+    AppLocalizations? l10n,
+  ) {
     final List<AstroAlert> alerts = [];
 
     for (final yogaString in data.yogas) {
@@ -555,33 +616,40 @@ These placements often indicate old souls with much to offer the world.''',
           nameLower.contains('ruchaka') ||
           nameLower.contains('bhadra') ||
           nameLower.contains('sasa')) {
-        
         // Parse the yoga string - format is typically "Yoga Name: Description" or just "Yoga Name"
         final parts = yogaString.split(':');
         final yogaName = parts[0].trim();
-        final yogaDescription = parts.length > 1 ? parts[1].trim() : 'A beneficial yoga in your chart.';
-        
-        alerts.add(AstroAlert(
-          id: 'yoga_${yogaName.toLowerCase().replaceAll(' ', '_')}',
-          type: AlertType.positive,
-          priority: AlertPriority.positiveYoga,
-          title: yogaName,
-          subtitle: l10n?.alert_beneficialYoga ?? 'Beneficial Yoga',
-          description: yogaDescription,
-          iconSymbol: '✦',
-          accentColor: AstroAlertColors.positive,
-          themeSummary: 'A powerful yoga bringing positive influences to your life.',
-          detailedExplanation: '''$yogaName is a beneficial yoga in your chart.
+        final yogaDescription =
+            parts.length > 1
+                ? parts[1].trim()
+                : 'A beneficial yoga in your chart.';
+
+        alerts.add(
+          AstroAlert(
+            id: 'yoga_${yogaName.toLowerCase().replaceAll(' ', '_')}',
+            type: AlertType.positive,
+            priority: AlertPriority.positiveYoga,
+            title: yogaName,
+            subtitle: l10n?.alert_shubhYoga ?? 'Auspicious Yoga',
+            description: yogaDescription,
+            iconSymbol: '✦',
+            accentColor: AstroAlertColors.positive,
+            themeSummary:
+                l10n?.alert_theme_yoga ??
+                'A powerful yoga bringing positive influences to your life.',
+            detailedExplanation:
+                '''$yogaName is a beneficial yoga in your chart.
 
 $yogaDescription
 
 This yoga enhances specific areas of life and provides natural strengths that you can leverage for success and fulfillment.''',
-          effects: [
-            'Natural talents and abilities',
-            'Favorable circumstances in related areas',
-            'Positive karmic support',
-          ],
-        ));
+            effects: [
+              'Natural talents and abilities',
+              'Favorable circumstances in related areas',
+              'Positive karmic support',
+            ],
+          ),
+        );
 
         // Limit to 2 yoga alerts
         if (alerts.length >= 2) break;
@@ -614,8 +682,14 @@ This yoga enhances specific areas of life and provides natural strengths that yo
     // These are approximate transit periods
     final now = DateTime.now();
     final Map<String, Map<String, DateTime>> saturnTransits = {
-      'Capricorn': {'start': DateTime(2020, 1, 24), 'end': DateTime(2023, 1, 17)},
-      'Aquarius': {'start': DateTime(2023, 1, 17), 'end': DateTime(2025, 3, 29)},
+      'Capricorn': {
+        'start': DateTime(2020, 1, 24),
+        'end': DateTime(2023, 1, 17),
+      },
+      'Aquarius': {
+        'start': DateTime(2023, 1, 17),
+        'end': DateTime(2025, 3, 29),
+      },
       'Pisces': {'start': DateTime(2025, 3, 29), 'end': DateTime(2028, 2, 6)},
       'Aries': {'start': DateTime(2028, 2, 6), 'end': DateTime(2031, 4, 1)},
       'Taurus': {'start': DateTime(2031, 4, 1), 'end': DateTime(2034, 7, 1)},
@@ -625,10 +699,14 @@ This yoga enhances specific areas of life and provides natural strengths that yo
       'Virgo': {'start': DateTime(2044, 1, 1), 'end': DateTime(2047, 3, 1)},
       'Libra': {'start': DateTime(2047, 3, 1), 'end': DateTime(2050, 5, 1)},
       'Scorpio': {'start': DateTime(2050, 5, 1), 'end': DateTime(2053, 7, 1)},
-      'Sagittarius': {'start': DateTime(2053, 7, 1), 'end': DateTime(2056, 9, 1)},
+      'Sagittarius': {
+        'start': DateTime(2053, 7, 1),
+        'end': DateTime(2056, 9, 1),
+      },
     };
 
-    return saturnTransits[sign] ?? {'start': now, 'end': now.add(const Duration(days: 912))};
+    return saturnTransits[sign] ??
+        {'start': now, 'end': now.add(const Duration(days: 912))};
   }
 
   /// Clear cached transit data

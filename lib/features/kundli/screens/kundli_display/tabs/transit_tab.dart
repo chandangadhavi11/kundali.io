@@ -1641,7 +1641,7 @@ class _TransitHeroCardState extends State<_TransitHeroCard> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    widget.moonSign,
+                    _getLocalizedZodiacSign(widget.moonSign, l10n),
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -2841,7 +2841,9 @@ class _GocharLegendState extends State<_GocharLegend> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final moonSignColor = _getZodiacColor(widget.moonSign);
+    final localizedMoonSign = _getLocalizedZodiacSign(widget.moonSign, l10n);
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -2902,7 +2904,7 @@ class _GocharLegendState extends State<_GocharLegend> {
             // Legend text
             Expanded(
               child: Text(
-                'Houses from ${widget.moonSign}',
+                l10n.transit_houses_from(localizedMoonSign),
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
@@ -2942,7 +2944,7 @@ class _GocharLegendState extends State<_GocharLegend> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'Moon',
+                  l10n.transit_legend_moon,
                   style: GoogleFonts.inter(
                     fontSize: 9,
                     color: const Color(0xFF6A6778),
@@ -3634,27 +3636,27 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
     super.dispose();
   }
 
-  String _getPhaseTitle(int phase) {
+  String _getPhaseTitle(int phase, AppLocalizations l10n) {
     switch (phase) {
       case 1:
-        return 'Rising Phase';
+        return l10n.sadesati_rising_phase;
       case 2:
-        return 'Peak Phase';
+        return l10n.sadesati_peak_phase;
       case 3:
-        return 'Setting Phase';
+        return l10n.sadesati_setting_phase;
       default:
-        return 'Active';
+        return l10n.sadesati_active;
     }
   }
 
-  String _getPhaseSubtitle(int phase) {
+  String _getPhaseSubtitle(int phase, AppLocalizations l10n) {
     switch (phase) {
       case 1:
-        return '12th from Moon · Expenses & Mental Stress';
+        return l10n.sadesati_12th_from_moon;
       case 2:
-        return 'Over Moon · Most Intense Period';
+        return l10n.sadesati_over_moon;
       case 3:
-        return '2nd from Moon · Family & Finances';
+        return l10n.sadesati_2nd_from_moon;
       default:
         return '';
     }
@@ -3662,6 +3664,7 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final phase = widget.sadeSatiInfo['phaseNumber'] ?? 0;
     final saturnColor = const Color(0xFFE57373);
     final saturnSign = widget.sadeSatiInfo['saturnSign'] ?? '';
@@ -3711,7 +3714,7 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        _getPhaseTitle(phase),
+                        _getPhaseTitle(phase, l10n),
                         style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -3730,7 +3733,7 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Learn more',
+                        l10n.sadesati_learn_more,
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           color: const Color(0xFF6A6778),
@@ -3855,7 +3858,7 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
 
             // Title
             Text(
-              'Sade Sati Active',
+              l10n.sadesati_active,
               style: GoogleFonts.instrumentSans(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -3868,7 +3871,7 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
 
             // Phase subtitle
             Text(
-              _getPhaseSubtitle(phase),
+              _getPhaseSubtitle(phase, l10n),
               style: GoogleFonts.inter(
                 fontSize: 11,
                 color: const Color(0xFF7A7786),
@@ -3929,14 +3932,14 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Saturn',
+                        l10n.sadesati_saturn,
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           color: const Color(0xFF6A6778),
                         ),
                       ),
                       Text(
-                        saturnSign,
+                        _getLocalizedZodiacSign(saturnSign, l10n),
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -3959,10 +3962,10 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
                         const SizedBox(height: 4),
                         Text(
                           '${phase == 1
-                              ? "12th"
+                              ? l10n.sadesati_phase_12th
                               : phase == 2
-                              ? "on"
-                              : "2nd"}',
+                              ? l10n.sadesati_phase_1st
+                              : l10n.sadesati_phase_2nd}',
                           style: GoogleFonts.jetBrainsMono(
                             fontSize: 9,
                             color: saturnColor,
@@ -4013,14 +4016,14 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Moon',
+                        l10n.sadesati_moon,
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           color: const Color(0xFF6A6778),
                         ),
                       ),
                       Text(
-                        moonSign,
+                        _getLocalizedZodiacSign(moonSign, l10n),
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -4040,7 +4043,7 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _SadeSatiPhaseChip(
-                  label: '12th',
+                  label: l10n.sadesati_phase_12th,
                   isActive: phase >= 1,
                   isCurrent: phase == 1,
                   color: saturnColor,
@@ -4055,7 +4058,7 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
                   ),
                 ),
                 _SadeSatiPhaseChip(
-                  label: '1st',
+                  label: l10n.sadesati_phase_1st,
                   isActive: phase >= 2,
                   isCurrent: phase == 2,
                   color: saturnColor,
@@ -4070,7 +4073,7 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
                   ),
                 ),
                 _SadeSatiPhaseChip(
-                  label: '2nd',
+                  label: l10n.sadesati_phase_2nd,
                   isActive: phase >= 3,
                   isCurrent: phase == 3,
                   color: saturnColor,
@@ -4148,6 +4151,7 @@ class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final saturnColor = const Color(0xFF5C7AEA);
     final moonSignColor = _getZodiacColor(widget.moonSign);
 
@@ -4196,7 +4200,7 @@ class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard>
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        'Clear Period',
+                        l10n.sadesati_clear_period,
                         style: GoogleFonts.inter(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,
@@ -4215,7 +4219,7 @@ class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Learn more',
+                        l10n.sadesati_learn_more,
                         style: GoogleFonts.inter(
                           fontSize: 9,
                           color: const Color(0xFF6A6778),
@@ -4335,7 +4339,7 @@ class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard>
 
             // Title
             Text(
-              'Sade Sati Not Active',
+              l10n.sadesati_not_active,
               style: GoogleFonts.instrumentSans(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -4348,7 +4352,7 @@ class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard>
 
             // Subtitle
             Text(
-              'Saturn\'s 7.5-year cycle is not affecting you',
+              l10n.sadesati_not_affecting,
               style: GoogleFonts.inter(
                 fontSize: 11,
                 color: const Color(0xFF7A7786),
@@ -4377,7 +4381,7 @@ class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard>
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    'Saturn',
+                    l10n.sadesati_saturn,
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       color: const Color(0xFF8A8798),
@@ -4428,7 +4432,7 @@ class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard>
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    widget.moonSign,
+                    _getLocalizedZodiacSign(widget.moonSign, l10n),
                     style: GoogleFonts.inter(
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
@@ -4437,7 +4441,7 @@ class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard>
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '(Janma Rashi)',
+                    '(${l10n.sadesati_janma_rashi})',
                     style: GoogleFonts.inter(
                       fontSize: 9,
                       color: const Color(0xFF6A6778),
@@ -4454,7 +4458,7 @@ class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _SadeSatiPhaseChip(
-                  label: '12th',
+                  label: l10n.sadesati_phase_12th,
                   isActive: false,
                   color: saturnColor,
                 ),
@@ -4465,7 +4469,7 @@ class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard>
                   color: const Color(0xFF2A2838),
                 ),
                 _SadeSatiPhaseChip(
-                  label: '1st',
+                  label: l10n.sadesati_phase_1st,
                   isActive: false,
                   color: saturnColor,
                 ),
@@ -4476,7 +4480,7 @@ class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard>
                   color: const Color(0xFF2A2838),
                 ),
                 _SadeSatiPhaseChip(
-                  label: '2nd',
+                  label: l10n.sadesati_phase_2nd,
                   isActive: false,
                   color: saturnColor,
                 ),

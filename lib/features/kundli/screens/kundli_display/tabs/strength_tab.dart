@@ -317,7 +317,9 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  AppLocalizations.of(context).insight_significance,
+                                  AppLocalizations.of(
+                                    context,
+                                  ).insight_significance,
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -429,9 +431,10 @@ InsightData _getChartStrengthInsight(
           ? _Colors.amber
           : _Colors.coral;
 
-  final result = avgStrength >= 75
-      ? l10n.strength_goodOverallStrength
-      : l10n.strength_needsRemedies;
+  final result =
+      avgStrength >= 75
+          ? l10n.strength_goodOverallStrength
+          : l10n.strength_needsRemedies;
 
   return InsightData(
     title: l10n.strength_chartStrength,
@@ -468,13 +471,15 @@ InsightData _getShadbalaInsight(
 ) {
   final planetColor = _getPlanetColor(data.planet);
   final isStrong = data.isStrong;
-  final status = isStrong
-      ? l10n.strength_shadbala_strongStatus
-      : l10n.strength_shadbala_weakStatus;
+  final status =
+      isStrong
+          ? l10n.strength_shadbala_strongStatus
+          : l10n.strength_shadbala_weakStatus;
 
   return InsightData(
     title: l10n.strength_shadbala,
-    value: '$localizedPlanet - ${data.percentageOfRequired.toStringAsFixed(0)}%',
+    value:
+        '$localizedPlanet - ${data.percentageOfRequired.toStringAsFixed(0)}%',
     description: l10n.strength_shadbala_desc,
     significance: l10n.strength_shadbala_significance(
       localizedPlanet,
@@ -513,11 +518,12 @@ InsightData _getVimshopakaBalaInsight(
   final score = data.totalPoints;
   final maxScore = data.maxPoints;
 
-  final result = data.strength == "Strong"
-      ? l10n.strength_vimshopaka_strongResult
-      : data.strength == "Medium"
-      ? l10n.strength_vimshopaka_mediumResult
-      : l10n.strength_vimshopaka_weakResult;
+  final result =
+      data.strength == "Strong"
+          ? l10n.strength_vimshopaka_strongResult
+          : data.strength == "Medium"
+          ? l10n.strength_vimshopaka_mediumResult
+          : l10n.strength_vimshopaka_weakResult;
 
   return InsightData(
     title: l10n.strength_vimshopaka_title,
@@ -532,7 +538,10 @@ InsightData _getVimshopakaBalaInsight(
       result,
     ),
     keyPoints: [
-      l10n.strength_vimshopakaScore(score.toStringAsFixed(2), maxScore.toStringAsFixed(0)),
+      l10n.strength_vimshopakaScore(
+        score.toStringAsFixed(2),
+        maxScore.toStringAsFixed(0),
+      ),
       l10n.strength_percentage(data.percentage.toStringAsFixed(1)),
       l10n.strength_strengthCategory(localizedStrength),
       l10n.strength_strongRange,
@@ -559,28 +568,35 @@ InsightData _getAshtakavargaInsight(
           ? _Colors.amber
           : _Colors.coral;
 
-  final description = type == 'SAV'
-      ? l10n.strength_sav_desc
-      : l10n.strength_bav_desc;
+  final description =
+      type == 'SAV' ? l10n.strength_sav_desc : l10n.strength_bav_desc;
 
-  final significance = type == 'SAV'
-      ? (points >= 28
-          ? l10n.strength_sav_signStrong(sign, points)
-          : l10n.strength_sav_signWeak(sign, points))
-      : (points >= 4
-          ? l10n.strength_bav_signStrong(sign, points)
-          : l10n.strength_bav_signWeak(sign, points));
+  final significance =
+      type == 'SAV'
+          ? (points >= 28
+              ? l10n.strength_sav_signStrong(sign, points)
+              : l10n.strength_sav_signWeak(sign, points))
+          : (points >= 4
+              ? l10n.strength_bav_signStrong(sign, points)
+              : l10n.strength_bav_signWeak(sign, points));
 
   return InsightData(
-    title: type == 'SAV' ? l10n.strength_sarvashtakavarga : l10n.strength_ashtakavarga,
+    title:
+        type == 'SAV'
+            ? l10n.strength_sarvashtakavarga
+            : l10n.strength_ashtakavarga,
     value: '$sign - $points ${l10n.strength_points}',
     description: description,
     significance: significance,
     keyPoints: [
       l10n.strength_sign(sign),
-      type == 'SAV' ? l10n.strength_pointsSav(points) : l10n.strength_pointsBav(points),
+      type == 'SAV'
+          ? l10n.strength_pointsSav(points)
+          : l10n.strength_pointsBav(points),
       type == 'SAV' ? l10n.strength_typeSav : l10n.strength_typeBav,
-      type == 'SAV' ? l10n.strength_strongSavThreshold : l10n.strength_auspiciousBavThreshold,
+      type == 'SAV'
+          ? l10n.strength_strongSavThreshold
+          : l10n.strength_auspiciousBavThreshold,
       l10n.strength_usedForTransit,
     ],
     accentColor: color,
@@ -597,23 +613,35 @@ InsightData _getLagnaLordStrengthInsight(
   String localizedSign,
 ) {
   final planetColor = _getPlanetColor(lagnaLord);
-  final status = strength != null
-      ? (strength.isStrong ? l10n.strength_lagnaLord_strong : l10n.strength_lagnaLord_weak)
-      : '';
+  final status =
+      strength != null
+          ? (strength.isStrong
+              ? l10n.strength_lagnaLord_strong
+              : l10n.strength_lagnaLord_weak)
+          : '';
 
   return InsightData(
     title: l10n.strength_lagnaLord_strength,
-    value: '$localizedPlanet (${strength?.percentageOfRequired.toStringAsFixed(0) ?? "N/A"}%)',
+    value:
+        '$localizedPlanet (${strength?.percentageOfRequired.toStringAsFixed(0) ?? "N/A"}%)',
     description: l10n.strength_lagnaLord_desc,
-    significance: l10n.strength_lagnaLord_significance(localizedPlanet, localizedSign, status),
+    significance: l10n.strength_lagnaLord_significance(
+      localizedPlanet,
+      localizedSign,
+      status,
+    ),
     keyPoints: [
       l10n.strength_lagnaLord_label(localizedPlanet),
       l10n.strength_rules(localizedSign),
       if (strength != null) ...[
         l10n.strength_totalShadbala(strength.totalBala.toStringAsFixed(1)),
         l10n.strength_required(strength.requiredBala.toStringAsFixed(0)),
-        l10n.strength_percentage(strength.percentageOfRequired.toStringAsFixed(1)),
-        strength.isStrong ? l10n.strength_statusStrong : l10n.strength_statusNeedsSupport,
+        l10n.strength_percentage(
+          strength.percentageOfRequired.toStringAsFixed(1),
+        ),
+        strength.isStrong
+            ? l10n.strength_statusStrong
+            : l10n.strength_statusNeedsSupport,
       ],
       l10n.strength_lagnaLordCondition,
     ],
@@ -626,10 +654,26 @@ InsightData _getLagnaLordStrengthInsight(
 // NAVIGATION SECTION DATA
 // ═══════════════════════════════════════════════════════════════════════════
 List<NavSection> _buildSections(AppLocalizations l10n) => [
-  NavSection(id: 'overview', label: l10n.strength_nav_overview, color: _Colors.violet),
-  NavSection(id: 'shadbala', label: l10n.strength_nav_shadbala, color: _Colors.rose),
-  NavSection(id: 'vimshopaka', label: l10n.strength_nav_vimshopaka, color: _Colors.sky),
-  NavSection(id: 'ashtakavarga', label: l10n.strength_nav_ashtaka, color: _Colors.emerald),
+  NavSection(
+    id: 'overview',
+    label: l10n.strength_nav_overview,
+    color: _Colors.violet,
+  ),
+  NavSection(
+    id: 'shadbala',
+    label: l10n.strength_nav_shadbala,
+    color: _Colors.rose,
+  ),
+  NavSection(
+    id: 'vimshopaka',
+    label: l10n.strength_nav_vimshopaka,
+    color: _Colors.sky,
+  ),
+  NavSection(
+    id: 'ashtakavarga',
+    label: l10n.strength_nav_ashtaka,
+    color: _Colors.emerald,
+  ),
 ];
 
 /// Strength Tab - Shows Shadbala, Vimshopaka, and Ashtakavarga
@@ -734,7 +778,7 @@ class _StrengthTabState extends State<StrengthTab> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    
+
     // Calculate all strength data
     final shadbala = KundaliCalculationService.calculateShadbala(
       widget.kundaliData.planetPositions,
@@ -1357,9 +1401,12 @@ class _StrengthHeroCardState extends State<_StrengthHeroCard>
     final lagnaLord = _getLagnaLord(widget.ascendantSign);
     final lagnaLordStrength = widget.shadbala[lagnaLord];
     final strengthColor = _getStrengthColor(avgStrength);
-    
+
     final l10n = AppLocalizations.of(context);
-    final localizedStrengthLevel = _getLocalizedStrengthLevelFromValue(avgStrength, l10n);
+    final localizedStrengthLevel = _getLocalizedStrengthLevelFromValue(
+      avgStrength,
+      l10n,
+    );
 
     return GestureDetector(
       onTapDown: _onTapDown,
@@ -1482,7 +1529,10 @@ class _StrengthHeroCardState extends State<_StrengthHeroCard>
                                 1,
                                 widget.shadbala.length,
                                 l10n,
-                                _getLocalizedPlanetName(widget.strongestPlanet!, l10n),
+                                _getLocalizedPlanetName(
+                                  widget.strongestPlanet!,
+                                  l10n,
+                                ),
                               ),
                             );
                           }
@@ -1512,7 +1562,10 @@ class _StrengthHeroCardState extends State<_StrengthHeroCard>
                                 widget.shadbala.length,
                                 widget.shadbala.length,
                                 l10n,
-                                _getLocalizedPlanetName(widget.weakestPlanet!, l10n),
+                                _getLocalizedPlanetName(
+                                  widget.weakestPlanet!,
+                                  l10n,
+                                ),
                               ),
                             );
                           }
@@ -1631,7 +1684,7 @@ class _CompactStrengthGaugeState extends State<_CompactStrengthGauge>
                     ),
                   ),
                   Text(
-                    'AVG',
+                    AppLocalizations.of(context).strength_avg,
                     style: GoogleFonts.inter(
                       fontSize: 8,
                       fontWeight: FontWeight.w500,
@@ -1814,7 +1867,10 @@ class _CompactPlanetCardState extends State<_CompactPlanetCard> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    widget.planet,
+                    _getLocalizedPlanetName(
+                      widget.planet,
+                      AppLocalizations.of(context),
+                    ),
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -1994,7 +2050,10 @@ class _CompactLagnaLordRowState extends State<_CompactLagnaLordRow> {
                   Row(
                     children: [
                       Text(
-                        widget.lagnaLord,
+                        _getLocalizedPlanetName(
+                          widget.lagnaLord,
+                          AppLocalizations.of(context),
+                        ),
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -2012,7 +2071,10 @@ class _CompactLagnaLordRowState extends State<_CompactLagnaLordRow> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          widget.ascendantSign,
+                          _getLocalizedSignName(
+                            widget.ascendantSign,
+                            AppLocalizations.of(context),
+                          ),
                           style: GoogleFonts.inter(
                             fontSize: 8,
                             fontWeight: FontWeight.w500,
@@ -2295,7 +2357,10 @@ class _InteractivePlanetHighlightState
                     ],
                   ),
                   Text(
-                    widget.planet,
+                    _getLocalizedPlanetName(
+                      widget.planet,
+                      AppLocalizations.of(context),
+                    ),
                     style: GoogleFonts.inter(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -2485,7 +2550,10 @@ class _InteractiveLagnaLordCardState extends State<_InteractiveLagnaLordCard> {
                   Row(
                     children: [
                       Text(
-                        widget.lagnaLord,
+                        _getLocalizedPlanetName(
+                          widget.lagnaLord,
+                          AppLocalizations.of(context),
+                        ),
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -2503,7 +2571,10 @@ class _InteractiveLagnaLordCardState extends State<_InteractiveLagnaLordCard> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          widget.ascendantSign,
+                          _getLocalizedSignName(
+                            widget.ascendantSign,
+                            AppLocalizations.of(context),
+                          ),
                           style: GoogleFonts.inter(
                             fontSize: 8,
                             fontWeight: FontWeight.w500,
@@ -2633,7 +2704,7 @@ class _StrengthGaugeState extends State<_StrengthGauge>
                   ),
                 ),
                 Text(
-                  'AVG',
+                  AppLocalizations.of(context).strength_avg,
                   style: GoogleFonts.jetBrainsMono(
                     fontSize: 9,
                     color: _Colors.textTertiary,
@@ -2977,7 +3048,10 @@ class _PremiumShadbalaCardState extends State<_PremiumShadbalaCard>
                           Row(
                             children: [
                               Text(
-                                widget.data.planet,
+                                _getLocalizedPlanetName(
+                                  widget.data.planet,
+                                  AppLocalizations.of(context),
+                                ),
                                 style: GoogleFonts.instrumentSans(
                                   fontSize: 17,
                                   fontWeight: FontWeight.w600,
@@ -3008,7 +3082,7 @@ class _PremiumShadbalaCardState extends State<_PremiumShadbalaCard>
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              '${widget.data.totalBala.toStringAsFixed(1)} / ${widget.data.requiredBala.toStringAsFixed(0)} Rupas',
+                              '${widget.data.totalBala.toStringAsFixed(1)} / ${widget.data.requiredBala.toStringAsFixed(0)} ${AppLocalizations.of(context).strength_rupas}',
                               style: GoogleFonts.jetBrainsMono(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w500,
@@ -3059,7 +3133,13 @@ class _PremiumShadbalaCardState extends State<_PremiumShadbalaCard>
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                isStrong ? AppLocalizations.of(context).strength_strong : AppLocalizations.of(context).strength_weak,
+                                isStrong
+                                    ? AppLocalizations.of(
+                                      context,
+                                    ).strength_strong
+                                    : AppLocalizations.of(
+                                      context,
+                                    ).strength_weak,
                                 style: GoogleFonts.inter(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,
@@ -3773,16 +3853,18 @@ class _InteractiveVimshopakaPlanetRowState
             const SizedBox(width: 12),
             // Planet name
             SizedBox(
-              width: 40,
+              width: 50,
               child: Text(
-                data.planet.length > 4
-                    ? data.planet.substring(0, 4)
-                    : data.planet,
+                _getLocalizedPlanetName(
+                  data.planet,
+                  AppLocalizations.of(context),
+                ),
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: _isPressed ? planetColor : _Colors.textPrimary,
                 ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             const SizedBox(width: 10),
@@ -4159,7 +4241,10 @@ class _MinimalSavStatState extends State<_MinimalSavStat> {
                 const SizedBox(width: 6),
                 Flexible(
                   child: Text(
-                    widget.sign,
+                    _getLocalizedSignName(
+                      widget.sign,
+                      AppLocalizations.of(context),
+                    ),
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -4382,7 +4467,10 @@ class _InteractiveSavHighlightState extends State<_InteractiveSavHighlight> {
                 const SizedBox(width: 4),
                 Flexible(
                   child: Text(
-                    widget.sign,
+                    _getLocalizedSignName(
+                      widget.sign,
+                      AppLocalizations.of(context),
+                    ),
                     style: GoogleFonts.inter(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -5117,50 +5205,80 @@ String _getPlanetSymbol(String planet) {
 /// Get localized planet name
 String _getLocalizedPlanetName(String planet, AppLocalizations l10n) {
   switch (planet) {
-    case 'Sun': return l10n.planet_sun;
-    case 'Moon': return l10n.planet_moon;
-    case 'Mars': return l10n.planet_mars;
-    case 'Mercury': return l10n.planet_mercury;
-    case 'Jupiter': return l10n.planet_jupiter;
-    case 'Venus': return l10n.planet_venus;
-    case 'Saturn': return l10n.planet_saturn;
-    case 'Rahu': return l10n.planet_rahu;
-    case 'Ketu': return l10n.planet_ketu;
-    default: return planet;
+    case 'Sun':
+      return l10n.planet_sun;
+    case 'Moon':
+      return l10n.planet_moon;
+    case 'Mars':
+      return l10n.planet_mars;
+    case 'Mercury':
+      return l10n.planet_mercury;
+    case 'Jupiter':
+      return l10n.planet_jupiter;
+    case 'Venus':
+      return l10n.planet_venus;
+    case 'Saturn':
+      return l10n.planet_saturn;
+    case 'Rahu':
+      return l10n.planet_rahu;
+    case 'Ketu':
+      return l10n.planet_ketu;
+    default:
+      return planet;
   }
 }
 
 /// Get localized sign name
 String _getLocalizedSignName(String sign, AppLocalizations l10n) {
   switch (sign) {
-    case 'Aries': return l10n.zodiac_aries;
-    case 'Taurus': return l10n.zodiac_taurus;
-    case 'Gemini': return l10n.zodiac_gemini;
-    case 'Cancer': return l10n.zodiac_cancer;
-    case 'Leo': return l10n.zodiac_leo;
-    case 'Virgo': return l10n.zodiac_virgo;
-    case 'Libra': return l10n.zodiac_libra;
-    case 'Scorpio': return l10n.zodiac_scorpio;
-    case 'Sagittarius': return l10n.zodiac_sagittarius;
-    case 'Capricorn': return l10n.zodiac_capricorn;
-    case 'Aquarius': return l10n.zodiac_aquarius;
-    case 'Pisces': return l10n.zodiac_pisces;
-    default: return sign;
+    case 'Aries':
+      return l10n.zodiac_aries;
+    case 'Taurus':
+      return l10n.zodiac_taurus;
+    case 'Gemini':
+      return l10n.zodiac_gemini;
+    case 'Cancer':
+      return l10n.zodiac_cancer;
+    case 'Leo':
+      return l10n.zodiac_leo;
+    case 'Virgo':
+      return l10n.zodiac_virgo;
+    case 'Libra':
+      return l10n.zodiac_libra;
+    case 'Scorpio':
+      return l10n.zodiac_scorpio;
+    case 'Sagittarius':
+      return l10n.zodiac_sagittarius;
+    case 'Capricorn':
+      return l10n.zodiac_capricorn;
+    case 'Aquarius':
+      return l10n.zodiac_aquarius;
+    case 'Pisces':
+      return l10n.zodiac_pisces;
+    default:
+      return sign;
   }
 }
 
 /// Get localized strength level from string
 String _getLocalizedStrengthLevel(String strength, AppLocalizations l10n) {
   switch (strength) {
-    case 'Strong': return l10n.strength_strong;
-    case 'Medium': return l10n.strength_medium;
-    case 'Weak': return l10n.strength_weak;
-    default: return strength;
+    case 'Strong':
+      return l10n.strength_strong;
+    case 'Medium':
+      return l10n.strength_medium;
+    case 'Weak':
+      return l10n.strength_weak;
+    default:
+      return strength;
   }
 }
 
 /// Get localized strength level from percentage value
-String _getLocalizedStrengthLevelFromValue(double avgStrength, AppLocalizations l10n) {
+String _getLocalizedStrengthLevelFromValue(
+  double avgStrength,
+  AppLocalizations l10n,
+) {
   if (avgStrength >= 100) return l10n.strength_excellent;
   if (avgStrength >= 75) return l10n.strength_good;
   if (avgStrength >= 50) return l10n.strength_average;

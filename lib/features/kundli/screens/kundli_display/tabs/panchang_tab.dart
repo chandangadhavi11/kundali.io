@@ -318,7 +318,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
 
                     // Description
                     Text(
-                      'What This Means',
+                      AppLocalizations.of(context).panchang_whatThisMeans,
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -371,7 +371,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Significance',
+                                  AppLocalizations.of(context).panchang_significance,
                                   style: GoogleFonts.inter(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -399,7 +399,7 @@ class _InsightBottomSheetState extends State<_InsightBottomSheet>
                     if (insight.keyPoints.isNotEmpty) ...[
                       const SizedBox(height: 24),
                       Text(
-                        'Key Points',
+                        AppLocalizations.of(context).panchang_keyPoints,
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -1833,7 +1833,7 @@ class _MoonPhaseHeroCardState extends State<_MoonPhaseHeroCard>
                       _CompactMoonStat(
                         icon: Icons.nightlight_round,
                         label: l10n.panchang_moonSign,
-                        value: widget.moonPos?.sign ?? '?',
+                        value: _getLocalizedZodiacSign(widget.moonPos?.sign ?? '?', l10n),
                         color: _Colors.emerald,
                       ),
                       const SizedBox(width: 8),
@@ -1976,7 +1976,7 @@ class _PanchangElementsGrid extends StatelessWidget {
                   symbol: '☽',
                   label: l10n.panchang_tithi,
                   value: panchang.tithi,
-                  detail: tithiLord,
+                  detail: _getLocalizedPlanetName(tithiLord, l10n),
                   detailPrefix: l10n.panchang_lord,
                   position: _TilePosition.topLeft,
                   insight: _getTithiInsight(panchang, tithiLord, l10n),
@@ -2388,7 +2388,7 @@ class _HoraCardState extends State<_HoraCard>
                         ),
                       ),
                       Text(
-                        widget.l10n.panchang_hora_value(widget.hora),
+                        widget.l10n.panchang_hora_value(_getLocalizedPlanetName(widget.hora, widget.l10n)),
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
@@ -2590,7 +2590,7 @@ class _WeekdayCardState extends State<_WeekdayCard>
                         ),
                       ),
                       Text(
-                        widget.panchang.vara,
+                        _getLocalizedWeekday(widget.panchang.vara, widget.l10n),
                         style: GoogleFonts.inter(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
@@ -2618,7 +2618,7 @@ class _WeekdayCardState extends State<_WeekdayCard>
                   ),
                 ),
                 Text(
-                  varaLord,
+                  _getLocalizedPlanetName(varaLord, widget.l10n),
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -2756,7 +2756,7 @@ class _BirthWarningBanner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  l10n.panchang_birthDuring(period.name),
+                  l10n.panchang_birthDuring(_getLocalizedPeriodName(period.name, l10n)),
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -2765,7 +2765,7 @@ class _BirthWarningBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  period.description,
+                  _getLocalizedPeriodDescription(period.name, l10n),
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     color: _Colors.textTertiary,
@@ -2885,7 +2885,7 @@ class _InauspiciousPeriodRowState extends State<_InauspiciousPeriodRow>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.period.name,
+                    _getLocalizedPeriodName(widget.period.name, widget.l10n),
                     style: GoogleFonts.inter(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -2893,7 +2893,7 @@ class _InauspiciousPeriodRowState extends State<_InauspiciousPeriodRow>
                     ),
                   ),
                   Text(
-                    widget.period.description,
+                    _getLocalizedPeriodDescription(widget.period.name, widget.l10n),
                     style: GoogleFonts.inter(
                       fontSize: 9,
                       color: _Colors.textTertiary,
@@ -3035,11 +3035,11 @@ class _InauspiciousTimeline extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('6AM', style: GoogleFonts.jetBrainsMono(fontSize: 8, color: _Colors.textTertiary)),
-            Text('9AM', style: GoogleFonts.jetBrainsMono(fontSize: 8, color: _Colors.textTertiary)),
-            Text('12PM', style: GoogleFonts.jetBrainsMono(fontSize: 8, color: _Colors.textTertiary)),
-            Text('3PM', style: GoogleFonts.jetBrainsMono(fontSize: 8, color: _Colors.textTertiary)),
-            Text('6PM', style: GoogleFonts.jetBrainsMono(fontSize: 8, color: _Colors.textTertiary)),
+            Text(l10n.panchang_time_6am, style: GoogleFonts.jetBrainsMono(fontSize: 8, color: _Colors.textTertiary)),
+            Text(l10n.panchang_time_9am, style: GoogleFonts.jetBrainsMono(fontSize: 8, color: _Colors.textTertiary)),
+            Text(l10n.panchang_time_12pm, style: GoogleFonts.jetBrainsMono(fontSize: 8, color: _Colors.textTertiary)),
+            Text(l10n.panchang_time_3pm, style: GoogleFonts.jetBrainsMono(fontSize: 8, color: _Colors.textTertiary)),
+            Text(l10n.panchang_time_6pm, style: GoogleFonts.jetBrainsMono(fontSize: 8, color: _Colors.textTertiary)),
           ],
         ),
       ],
@@ -3317,7 +3317,7 @@ class _VarshphalCardState extends State<_VarshphalCard> {
                   child: _MinimalInfoTile(
                     symbol: _getSignSymbol(widget.varshphal.munthaSign),
                     label: widget.l10n.panchang_muntha,
-                    value: widget.varshphal.munthaSign,
+                    value: _getLocalizedZodiacSign(widget.varshphal.munthaSign, widget.l10n),
                     symbolColor: _Colors.violet,
                   ),
                 ),
@@ -3327,7 +3327,7 @@ class _VarshphalCardState extends State<_VarshphalCard> {
                   child: _MinimalInfoTile(
                     symbol: _getYearLordSymbol(widget.varshphal.yearLord),
                     label: widget.l10n.panchang_yearLord,
-                    value: widget.varshphal.yearLord,
+                    value: _getLocalizedPlanetName(widget.varshphal.yearLord, widget.l10n),
                     symbolColor: yearLordColor,
                   ),
                 ),
@@ -3398,5 +3398,74 @@ class _MinimalInfoTile extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LOCALIZATION HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+String _getLocalizedZodiacSign(String sign, AppLocalizations l10n) {
+  switch (sign) {
+    case 'Aries': return l10n.zodiac_aries;
+    case 'Taurus': return l10n.zodiac_taurus;
+    case 'Gemini': return l10n.zodiac_gemini;
+    case 'Cancer': return l10n.zodiac_cancer;
+    case 'Leo': return l10n.zodiac_leo;
+    case 'Virgo': return l10n.zodiac_virgo;
+    case 'Libra': return l10n.zodiac_libra;
+    case 'Scorpio': return l10n.zodiac_scorpio;
+    case 'Sagittarius': return l10n.zodiac_sagittarius;
+    case 'Capricorn': return l10n.zodiac_capricorn;
+    case 'Aquarius': return l10n.zodiac_aquarius;
+    case 'Pisces': return l10n.zodiac_pisces;
+    default: return sign;
+  }
+}
+
+String _getLocalizedPlanetName(String planet, AppLocalizations l10n) {
+  switch (planet) {
+    case 'Sun': return l10n.planet_sun;
+    case 'Moon': return l10n.planet_moon;
+    case 'Mars': return l10n.planet_mars;
+    case 'Mercury': return l10n.planet_mercury;
+    case 'Jupiter': return l10n.planet_jupiter;
+    case 'Venus': return l10n.planet_venus;
+    case 'Saturn': return l10n.planet_saturn;
+    case 'Rahu': return l10n.planet_rahu;
+    case 'Ketu': return l10n.planet_ketu;
+    default: return planet;
+  }
+}
+
+String _getLocalizedWeekday(String weekday, AppLocalizations l10n) {
+  switch (weekday) {
+    case 'Sunday': return l10n.weekday_sunday;
+    case 'Monday': return l10n.weekday_monday;
+    case 'Tuesday': return l10n.weekday_tuesday;
+    case 'Wednesday': return l10n.weekday_wednesday;
+    case 'Thursday': return l10n.weekday_thursday;
+    case 'Friday': return l10n.weekday_friday;
+    case 'Saturday': return l10n.weekday_saturday;
+    default: return weekday;
+  }
+}
+
+String _getLocalizedPeriodName(String periodName, AppLocalizations l10n) {
+  switch (periodName) {
+    case 'Rahukala': return l10n.panchang_period_rahukala;
+    case 'Rahu Kala': return l10n.panchang_period_rahukala;
+    case 'Yamaghanda': return l10n.panchang_period_yamaghanda;
+    case 'Gulika': return l10n.panchang_period_gulika;
+    default: return periodName;
+  }
+}
+
+String _getLocalizedPeriodDescription(String periodName, AppLocalizations l10n) {
+  switch (periodName) {
+    case 'Rahukala': return l10n.panchang_period_rahukala_short;
+    case 'Rahu Kala': return l10n.panchang_period_rahukala_short;
+    case 'Yamaghanda': return l10n.panchang_period_yamaghanda_short;
+    case 'Gulika': return l10n.panchang_period_gulika_short;
+    default: return '';
   }
 }

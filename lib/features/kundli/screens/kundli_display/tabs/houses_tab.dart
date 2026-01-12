@@ -1528,7 +1528,7 @@ class _HouseCardState extends State<_HouseCard>
                             ),
                             const SizedBox(height: _DesignTokens.space4),
                             Text(
-                              widget.l10n.houses_houseBhava(_getHouseName(widget.house.number, widget.l10n), widget.house.sign),
+                              widget.l10n.houses_houseBhava(_getHouseName(widget.house.number, widget.l10n), _getLocalizedSign(widget.house.sign, widget.l10n)),
                               style: _DesignTokens.labelSm,
                             ),
                             const SizedBox(height: _DesignTokens.space2),
@@ -1575,7 +1575,7 @@ class _HouseCardState extends State<_HouseCard>
                           const SizedBox(width: _DesignTokens.space6),
                           Expanded(
                             child: Text(
-                              _getHouseSignifications(widget.house.number),
+                              _getHouseSignifications(widget.house.number, widget.l10n),
                               style: _DesignTokens.labelXs.copyWith(
                                 color: _Colors.textTertiary.withOpacity(0.8),
                               ),
@@ -1655,6 +1655,7 @@ class _LordBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final lordColor = _getPlanetColor(lord);
 
     return Container(
@@ -1709,7 +1710,7 @@ class _LordBadge extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                lord,
+                _getLocalizedPlanetName(lord, l10n),
                 style: _DesignTokens.labelSm.copyWith(
                   color: lordColor,
                   fontWeight: FontWeight.w600,
@@ -1717,7 +1718,7 @@ class _LordBadge extends StatelessWidget {
               ),
               if (placement > 0)
                 Text(
-                  'in H$placement',
+                  l10n.houses_inHouse(placement),
                   style: _DesignTokens.mono.copyWith(
                     fontSize: 9,
                     color: _Colors.textTertiary,
@@ -1744,6 +1745,7 @@ class _PlanetChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final color = _getPlanetColor(planet);
 
     return Container(
@@ -1798,7 +1800,7 @@ class _PlanetChip extends StatelessWidget {
           ),
           const SizedBox(width: _DesignTokens.space6),
           Text(
-            planet,
+            _getLocalizedPlanetName(planet, l10n),
             style: _DesignTokens.labelSm.copyWith(
               color: color,
               fontWeight: FontWeight.w600,
@@ -1843,7 +1845,7 @@ class _PlanetChip extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════════════════════
 InsightData _getHouseInsight(House house, AppLocalizations l10n) {
   final houseName = _getHouseName(house.number, l10n);
-  final significations = _getHouseSignifications(house.number);
+  final significations = _getHouseSignifications(house.number, l10n);
   final zodiacColor = _getZodiacColor(house.sign);
 
   String _getDescription(int number) {
@@ -1864,14 +1866,17 @@ InsightData _getHouseInsight(House house, AppLocalizations l10n) {
     }
   }
 
+  final localizedSign = _getLocalizedSign(house.sign, l10n);
+  final localizedLord = _getLocalizedPlanetName(_getSignLord(house.sign), l10n);
+  
   return InsightData(
     title: l10n.houses_houseNumber(house.number),
     value: l10n.houses_bhava_label(houseName),
     description: _getDescription(house.number),
-    significance: l10n.houses_withSign(house.sign, _getSignLord(house.sign)),
+    significance: l10n.houses_withSign(localizedSign, localizedLord),
     keyPoints: [
-      l10n.houses_sign_key(house.sign, _getSignSymbol(house.sign)),
-      l10n.houses_lord_key(_getSignLord(house.sign)),
+      l10n.houses_sign_key(localizedSign, _getSignSymbol(house.sign)),
+      l10n.houses_lord_key(localizedLord),
       l10n.houses_cusp_key(house.cuspDegree.toStringAsFixed(2)),
       l10n.houses_karaka_key(_getHouseKaraka(house.number)),
       l10n.houses_significations_key(significations),
@@ -2070,22 +2075,35 @@ String _getHouseName(int n, AppLocalizations l10n) {
   return names[(n - 1) % 12];
 }
 
-String _getHouseSignifications(int n) {
-  const significations = {
-    1: 'Self, body, appearance, personality, health',
-    2: 'Family, wealth, speech, food, values',
-    3: 'Siblings, courage, communication, skills',
-    4: 'Mother, home, emotions, property, vehicles',
-    5: 'Children, creativity, romance, intelligence',
-    6: 'Enemies, debts, health issues, service',
-    7: 'Marriage, partnerships, business, relations',
-    8: 'Longevity, transformation, inheritance',
-    9: 'Fortune, father, higher learning, travel',
-    10: 'Career, status, authority, achievements',
-    11: 'Gains, income, friends, aspirations',
-    12: 'Losses, expenses, liberation, foreign',
-  };
-  return significations[n] ?? '';
+String _getHouseSignifications(int n, AppLocalizations l10n) {
+  switch (n) {
+    case 1:
+      return l10n.house_1_meaning;
+    case 2:
+      return l10n.house_2_meaning;
+    case 3:
+      return l10n.house_3_meaning;
+    case 4:
+      return l10n.house_4_meaning;
+    case 5:
+      return l10n.house_5_meaning;
+    case 6:
+      return l10n.house_6_meaning;
+    case 7:
+      return l10n.house_7_meaning;
+    case 8:
+      return l10n.house_8_meaning;
+    case 9:
+      return l10n.house_9_meaning;
+    case 10:
+      return l10n.house_10_meaning;
+    case 11:
+      return l10n.house_11_meaning;
+    case 12:
+      return l10n.house_12_meaning;
+    default:
+      return '';
+  }
 }
 
 String _getPlanetSymbol(String planet) {
@@ -2124,6 +2142,42 @@ String _getZodiacImagePath(String sign) {
 
 String _getPlanetImagePath(String planet) {
   return 'assets/images/planets/${planet.toLowerCase()}.png';
+}
+
+String _getLocalizedPlanetName(String planet, AppLocalizations l10n) {
+  switch (planet) {
+    case 'Sun': return l10n.planet_sun;
+    case 'Moon': return l10n.planet_moon;
+    case 'Mars': return l10n.planet_mars;
+    case 'Mercury': return l10n.planet_mercury;
+    case 'Jupiter': return l10n.planet_jupiter;
+    case 'Venus': return l10n.planet_venus;
+    case 'Saturn': return l10n.planet_saturn;
+    case 'Rahu': return l10n.planet_rahu;
+    case 'Ketu': return l10n.planet_ketu;
+    case 'Uranus': return l10n.planet_uranus;
+    case 'Neptune': return l10n.planet_neptune;
+    case 'Pluto': return l10n.planet_pluto;
+    default: return planet;
+  }
+}
+
+String _getLocalizedSign(String sign, AppLocalizations l10n) {
+  switch (sign) {
+    case 'Aries': return l10n.zodiac_aries;
+    case 'Taurus': return l10n.zodiac_taurus;
+    case 'Gemini': return l10n.zodiac_gemini;
+    case 'Cancer': return l10n.zodiac_cancer;
+    case 'Leo': return l10n.zodiac_leo;
+    case 'Virgo': return l10n.zodiac_virgo;
+    case 'Libra': return l10n.zodiac_libra;
+    case 'Scorpio': return l10n.zodiac_scorpio;
+    case 'Sagittarius': return l10n.zodiac_sagittarius;
+    case 'Capricorn': return l10n.zodiac_capricorn;
+    case 'Aquarius': return l10n.zodiac_aquarius;
+    case 'Pisces': return l10n.zodiac_pisces;
+    default: return sign;
+  }
 }
 
 Color _getZodiacColor(String sign) {
