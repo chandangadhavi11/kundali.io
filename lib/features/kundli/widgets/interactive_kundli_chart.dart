@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/services/kundali_calculation_service.dart';
 import '../../../shared/models/kundali_data_model.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 /// Interactive North Indian Kundli chart with tappable, glowing house compartments
 class InteractiveKundliChart extends StatefulWidget {
@@ -1074,6 +1075,7 @@ class _HouseDetailModal extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context, bool isAscendant) {
     final accentColor = isAscendant ? _accentPrimary : _accentSecondary;
+    final l10n = AppLocalizations.of(context);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -1110,7 +1112,7 @@ class _HouseDetailModal extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    'House ${houseIndex + 1}',
+                    l10n.chart_house_title(houseIndex + 1),
                     style: GoogleFonts.spaceGrotesk(
                       fontSize: 17,
                       fontWeight: FontWeight.w600,
@@ -1130,7 +1132,7 @@ class _HouseDetailModal extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        'ASC',
+                        l10n.chart_asc_badge,
                         style: GoogleFonts.jetBrainsMono(
                           fontSize: 9,
                           fontWeight: FontWeight.w600,
@@ -1142,7 +1144,7 @@ class _HouseDetailModal extends StatelessWidget {
                 ],
               ),
               Text(
-                _getHouseTheme(houseIndex),
+                _getHouseTheme(houseIndex, l10n),
                 style: GoogleFonts.inter(
                   fontSize: 11,
                   color: _textMuted,
@@ -1170,23 +1172,28 @@ class _HouseDetailModal extends StatelessWidget {
   }
 
   Widget _buildHouseInfo() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildCompactInfoTile(
-            label: 'Sign',
-            value: house.sign,
-            valueColor: _accentPrimary,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _buildCompactInfoTile(
-            label: 'Cusp',
-            value: '${house.cuspDegree.toStringAsFixed(1)}°',
-          ),
-        ),
-      ],
+    return Builder(
+      builder: (context) {
+        final l10n = AppLocalizations.of(context);
+        return Row(
+          children: [
+            Expanded(
+              child: _buildCompactInfoTile(
+                label: l10n.chart_sign_label,
+                value: _getLocalizedSign(house.sign, l10n),
+                valueColor: _accentPrimary,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _buildCompactInfoTile(
+                label: l10n.chart_cusp_label,
+                value: '${house.cuspDegree.toStringAsFixed(1)}°',
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1229,27 +1236,32 @@ class _HouseDetailModal extends StatelessWidget {
   }
 
   Widget _buildPlanetsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 2, bottom: 8),
-          child: Text(
-            'PLANETS',
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: _textMuted,
-              letterSpacing: 1.2,
+    return Builder(
+      builder: (context) {
+        final l10n = AppLocalizations.of(context);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 2, bottom: 8),
+              child: Text(
+                l10n.chart_planets_label,
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: _textMuted,
+                  letterSpacing: 1.2,
+                ),
+              ),
             ),
-          ),
-        ),
-        ...house.planets.map((planet) => _buildPlanetRow(planet)),
-      ],
+            ...house.planets.map((planet) => _buildPlanetRow(planet, l10n)),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildPlanetRow(String planetName) {
+  Widget _buildPlanetRow(String planetName, AppLocalizations l10n) {
     final position = planetPositions[planetName];
     final color = _getPlanetColor(planetName);
     final symbol = _getPlanetSymbol(planetName);
@@ -1317,10 +1329,10 @@ class _HouseDetailModal extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 10),
-          // Planet name
+          // Planet name - localized
           Expanded(
             child: Text(
-              planetName,
+              _getLocalizedPlanetName(planetName, l10n),
               style: GoogleFonts.inter(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -1328,10 +1340,10 @@ class _HouseDetailModal extends StatelessWidget {
               ),
             ),
           ),
-          // Position info - inline
+          // Position info - inline with localized sign
           if (position != null) ...[
             Text(
-              '${position.sign} ${position.signDegree.toStringAsFixed(1)}°',
+              '${_getLocalizedSign(position.sign, l10n)} ${position.signDegree.toStringAsFixed(1)}°',
               style: GoogleFonts.jetBrainsMono(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
@@ -1358,57 +1370,62 @@ class _HouseDetailModal extends StatelessWidget {
   }
 
   Widget _buildSignificanceSection() {
-    final significance = _getHouseSignificance(houseIndex);
+    return Builder(
+      builder: (context) {
+        final l10n = AppLocalizations.of(context);
+        final significance = _getHouseSignificance(houseIndex, l10n);
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            _accentPrimary.withOpacity(0.06),
-            _accentPrimary.withOpacity(0.02),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: _accentPrimary.withOpacity(0.08)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.auto_awesome_rounded,
-            size: 14,
-            color: _accentPrimary.withOpacity(0.7),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  significance['title']!,
-                  style: GoogleFonts.spaceGrotesk(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: _accentPrimary,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  significance['description']!,
-                  style: GoogleFonts.inter(
-                    fontSize: 11,
-                    height: 1.4,
-                    color: _textSecondary,
-                  ),
-                ),
+        return Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                _accentPrimary.withOpacity(0.06),
+                _accentPrimary.withOpacity(0.02),
               ],
             ),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: _accentPrimary.withOpacity(0.08)),
           ),
-        ],
-      ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.auto_awesome_rounded,
+                size: 14,
+                color: _accentPrimary.withOpacity(0.7),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      significance['title']!,
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: _accentPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      significance['description']!,
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        height: 1.4,
+                        color: _textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -1439,80 +1456,165 @@ class _HouseDetailModal extends StatelessWidget {
     return colors[planet] ?? const Color(0xFF9CA3AF);
   }
 
-  String _getHouseTheme(int index) {
-    const themes = [
-      'Self & Identity',
-      'Wealth & Values',
-      'Communication',
-      'Home & Roots',
-      'Creativity & Romance',
-      'Health & Service',
-      'Partnerships',
-      'Transformation',
-      'Philosophy & Fortune',
-      'Career & Status',
-      'Aspirations & Gains',
-      'Spirituality & Endings',
-    ];
-    return index < themes.length ? themes[index] : '';
+  String _getHouseTheme(int index, AppLocalizations l10n) {
+    switch (index) {
+      case 0:
+        return l10n.chart_theme_1;
+      case 1:
+        return l10n.chart_theme_2;
+      case 2:
+        return l10n.chart_theme_3;
+      case 3:
+        return l10n.chart_theme_4;
+      case 4:
+        return l10n.chart_theme_5;
+      case 5:
+        return l10n.chart_theme_6;
+      case 6:
+        return l10n.chart_theme_7;
+      case 7:
+        return l10n.chart_theme_8;
+      case 8:
+        return l10n.chart_theme_9;
+      case 9:
+        return l10n.chart_theme_10;
+      case 10:
+        return l10n.chart_theme_11;
+      case 11:
+        return l10n.chart_theme_12;
+      default:
+        return '';
+    }
   }
 
-  Map<String, String> _getHouseSignificance(int index) {
-    const significances = [
-      {
-        'title': 'Lagna Bhava',
-        'description':
-            'Physical body, personality, vitality, and overall life path.',
-      },
-      {
-        'title': 'Dhana Bhava',
-        'description':
-            'Accumulated wealth, family, speech, and early childhood.',
-      },
-      {
-        'title': 'Sahaja Bhava',
-        'description':
-            'Siblings, courage, short journeys, and communication skills.',
-      },
-      {
-        'title': 'Sukha Bhava',
-        'description': 'Mother, home, emotional peace, and domestic happiness.',
-      },
-      {
-        'title': 'Putra Bhava',
-        'description': 'Children, creativity, intelligence, and romance.',
-      },
-      {
-        'title': 'Shatru Bhava',
-        'description': 'Enemies, health issues, debts, and daily work.',
-      },
-      {
-        'title': 'Kalatra Bhava',
-        'description': 'Marriage, partnerships, and business relationships.',
-      },
-      {
-        'title': 'Randhra Bhava',
-        'description': 'Longevity, inheritance, occult, and transformation.',
-      },
-      {
-        'title': 'Dharma Bhava',
-        'description': 'Fortune, higher learning, spirituality, and father.',
-      },
-      {
-        'title': 'Karma Bhava',
-        'description': 'Career, reputation, authority, and public image.',
-      },
-      {
-        'title': 'Labha Bhava',
-        'description': 'Gains, income, elder siblings, and social networks.',
-      },
-      {
-        'title': 'Vyaya Bhava',
-        'description': 'Losses, expenses, foreign lands, and liberation.',
-      },
-    ];
-    return index < significances.length
-        ? significances[index]
-        : {'title': 'House ${index + 1}', 'description': ''};
+  Map<String, String> _getHouseSignificance(int index, AppLocalizations l10n) {
+    switch (index) {
+      case 0:
+        return {
+          'title': l10n.chart_bhava_1_title,
+          'description': l10n.chart_bhava_1_desc,
+        };
+      case 1:
+        return {
+          'title': l10n.chart_bhava_2_title,
+          'description': l10n.chart_bhava_2_desc,
+        };
+      case 2:
+        return {
+          'title': l10n.chart_bhava_3_title,
+          'description': l10n.chart_bhava_3_desc,
+        };
+      case 3:
+        return {
+          'title': l10n.chart_bhava_4_title,
+          'description': l10n.chart_bhava_4_desc,
+        };
+      case 4:
+        return {
+          'title': l10n.chart_bhava_5_title,
+          'description': l10n.chart_bhava_5_desc,
+        };
+      case 5:
+        return {
+          'title': l10n.chart_bhava_6_title,
+          'description': l10n.chart_bhava_6_desc,
+        };
+      case 6:
+        return {
+          'title': l10n.chart_bhava_7_title,
+          'description': l10n.chart_bhava_7_desc,
+        };
+      case 7:
+        return {
+          'title': l10n.chart_bhava_8_title,
+          'description': l10n.chart_bhava_8_desc,
+        };
+      case 8:
+        return {
+          'title': l10n.chart_bhava_9_title,
+          'description': l10n.chart_bhava_9_desc,
+        };
+      case 9:
+        return {
+          'title': l10n.chart_bhava_10_title,
+          'description': l10n.chart_bhava_10_desc,
+        };
+      case 10:
+        return {
+          'title': l10n.chart_bhava_11_title,
+          'description': l10n.chart_bhava_11_desc,
+        };
+      case 11:
+        return {
+          'title': l10n.chart_bhava_12_title,
+          'description': l10n.chart_bhava_12_desc,
+        };
+      default:
+        return {'title': l10n.chart_house_title(index + 1), 'description': ''};
+    }
+  }
+
+  // Helper function to localize planet names
+  String _getLocalizedPlanetName(String planet, AppLocalizations l10n) {
+    switch (planet) {
+      case 'Sun':
+        return l10n.planet_sun;
+      case 'Moon':
+        return l10n.planet_moon;
+      case 'Mars':
+        return l10n.planet_mars;
+      case 'Mercury':
+        return l10n.planet_mercury;
+      case 'Jupiter':
+        return l10n.planet_jupiter;
+      case 'Venus':
+        return l10n.planet_venus;
+      case 'Saturn':
+        return l10n.planet_saturn;
+      case 'Rahu':
+        return l10n.planet_rahu;
+      case 'Ketu':
+        return l10n.planet_ketu;
+      case 'Uranus':
+        return l10n.planet_uranus;
+      case 'Neptune':
+        return l10n.planet_neptune;
+      case 'Pluto':
+        return l10n.planet_pluto;
+      default:
+        return planet;
+    }
+  }
+
+  // Helper function to localize zodiac signs
+  String _getLocalizedSign(String sign, AppLocalizations l10n) {
+    switch (sign) {
+      case 'Aries':
+        return l10n.zodiac_aries;
+      case 'Taurus':
+        return l10n.zodiac_taurus;
+      case 'Gemini':
+        return l10n.zodiac_gemini;
+      case 'Cancer':
+        return l10n.zodiac_cancer;
+      case 'Leo':
+        return l10n.zodiac_leo;
+      case 'Virgo':
+        return l10n.zodiac_virgo;
+      case 'Libra':
+        return l10n.zodiac_libra;
+      case 'Scorpio':
+        return l10n.zodiac_scorpio;
+      case 'Sagittarius':
+        return l10n.zodiac_sagittarius;
+      case 'Capricorn':
+        return l10n.zodiac_capricorn;
+      case 'Aquarius':
+        return l10n.zodiac_aquarius;
+      case 'Pisces':
+        return l10n.zodiac_pisces;
+      default:
+        return sign;
+    }
   }
 }

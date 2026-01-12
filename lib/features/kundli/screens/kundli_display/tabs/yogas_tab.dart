@@ -413,18 +413,10 @@ InsightData _getYogaOverviewInsight(
   int strongYogas,
   int severeDoshas,
   String ascendant,
+  AppLocalizations l10n,
 ) {
   final balance = yogaCount - severeDoshas;
-  final balanceStatus =
-      yogaCount > 0 && doshaCount == 0
-          ? 'Excellent'
-          : balance >= 3
-          ? 'Very Favorable'
-          : balance >= 1
-          ? 'Favorable'
-          : balance >= -1
-          ? 'Mixed'
-          : 'Challenging';
+  final balanceStatus = _getLocalizedBalanceStatus(balance, yogaCount, doshaCount, l10n);
 
   final color =
       balance >= 3
@@ -435,131 +427,117 @@ InsightData _getYogaOverviewInsight(
           ? _Colors.amber
           : _Colors.coral;
 
+  final localizedAscendant = _getLocalizedZodiacSign(ascendant, l10n);
+
   return InsightData(
-    title: 'Yoga & Dosha Overview',
+    title: l10n.yogas_overview_insight_title,
     value: balanceStatus,
-    description:
-        'Yogas are auspicious planetary combinations that bestow specific benefits, while Doshas are challenging combinations that may create obstacles. The balance between them shapes your life experiences and opportunities.',
-    significance:
-        'Your chart has $yogaCount yoga(s) and $doshaCount dosha(s). $strongYogas yoga(s) are strong, and $severeDoshas dosha(s) are severe. With $ascendant Lagna, the overall balance is $balanceStatus.',
+    description: l10n.yogas_overview_insight_desc,
+    significance: l10n.yogas_overview_insight_significance(
+      yogaCount,
+      doshaCount,
+      strongYogas,
+      severeDoshas,
+      localizedAscendant,
+      balanceStatus,
+    ),
     keyPoints: [
-      'Total Yogas: $yogaCount (Strong: $strongYogas)',
-      'Total Doshas: $doshaCount (Severe: $severeDoshas)',
-      'Ascendant: $ascendant',
-      'Overall Balance: $balanceStatus',
-      'Yogas manifest during their planetary Dasha periods',
-      'Most doshas can be mitigated through proper remedies',
+      l10n.yogas_overview_insight_keypoint1(yogaCount, strongYogas),
+      l10n.yogas_overview_insight_keypoint2(doshaCount, severeDoshas),
+      l10n.yogas_overview_insight_keypoint3(localizedAscendant),
+      l10n.yogas_overview_insight_keypoint4(balanceStatus),
+      l10n.yogas_overview_insight_keypoint5,
+      l10n.yogas_overview_insight_keypoint6,
     ],
     accentColor: color,
     icon: Icons.balance_rounded,
   );
 }
 
-InsightData _getYogaTypeInsight(String type, bool isYoga) {
-  final descriptions = {
-    'Raja Yoga': (
-      'Raja Yogas are the most powerful combinations that bestow kingship, authority, power, and success. They are formed by the association of lords of Kendra (1, 4, 7, 10) and Trikona (1, 5, 9) houses.',
-      'Success in career, rise to power, leadership, authority, fame',
-      _Colors.gold,
-    ),
-    'Dhana Yoga': (
-      'Dhana Yogas indicate wealth and prosperity. They are formed by the association of lords of wealth houses (2, 5, 9, 11) with each other or with benefics.',
-      'Financial prosperity, accumulation of wealth, material success',
-      _Colors.emerald,
-    ),
-    'Pancha Mahapurusha': (
-      'These are five great yogas formed when Mars, Mercury, Jupiter, Venus, or Saturn are in their own or exaltation sign in a Kendra house. They create exceptional individuals.',
-      'Outstanding personality, exceptional achievements, leadership in specific domains',
-      _Colors.violet,
-    ),
-    'Lunar Yoga': (
-      'Lunar Yogas are formed based on the Moon\'s relationship with other planets. They primarily affect the mind, emotions, and mental abilities.',
-      'Mental strength, emotional stability, intuition, memory',
-      _Colors.sky,
-    ),
-    'High': (
-      'Severe doshas require immediate attention and remedial measures. They can significantly impact the areas they govern.',
-      'May cause significant challenges in specific life areas',
-      _Colors.coral,
-    ),
-    'Moderate': (
-      'Moderate doshas have noticeable effects but are manageable with proper awareness and remedies.',
-      'Some challenges that can be overcome with effort',
-      _Colors.amber,
-    ),
-    'Low': (
-      'Low severity doshas have minimal impact and may not require intensive remedial measures.',
-      'Minor influences that are easily managed',
-      _Colors.sky,
-    ),
-  };
+String _getLocalizedBalanceStatus(int balance, int yogas, int doshas, AppLocalizations l10n) {
+  if (yogas > 0 && doshas == 0) return l10n.yogas_balance_excellent;
+  if (balance >= 3) return l10n.yogas_balance_veryFavorable;
+  if (balance >= 1) return l10n.yogas_balance_favorable;
+  if (balance >= -1) return l10n.yogas_balance_mixed;
+  return l10n.yogas_balance_challenging;
+}
 
-  final info =
-      descriptions[type] ??
-      (
-        isYoga
-            ? 'This is a beneficial planetary combination that enhances specific life areas.'
-            : 'This dosha creates certain challenges that can be addressed through remedies.',
-        'Effects vary based on the specific combination',
-        isYoga ? _Colors.gold : _Colors.coral,
-      );
+InsightData _getYogaTypeInsight(String type, bool isYoga, AppLocalizations l10n) {
+  final (String desc, String significance, Color color) = _getYogaTypeInfo(type, isYoga, l10n);
+  final localizedType = isYoga ? _getLocalizedYogaType(type, l10n) : _getLocalizedStrength(type, l10n);
 
   return InsightData(
-    title: isYoga ? 'Yoga Type' : 'Dosha Severity',
-    value: type,
-    description: info.$1,
-    significance: info.$2,
+    title: isYoga ? l10n.yogas_type_yoga : l10n.yogas_doshaRemedy,
+    value: localizedType,
+    description: desc,
+    significance: significance,
     keyPoints:
         isYoga
             ? [
-              'Type: $type',
-              'Nature: Benefic combination',
-              'Activation: During relevant Dasha periods',
-              'Strength depends on planet dignity and aspects',
+              l10n.yogas_typeInsight_yoga_type(localizedType),
+              l10n.yogas_typeInsight_yoga_nature,
+              l10n.yogas_typeInsight_yoga_activation,
+              l10n.yogas_typeInsight_yoga_strength,
             ]
             : [
-              'Severity: $type',
-              'Impact varies by chart context',
-              'Remedies can mitigate effects',
-              'Consult an astrologer for personalized guidance',
+              l10n.yogas_typeInsight_dosha_severity(localizedType),
+              l10n.yogas_typeInsight_dosha_impact,
+              l10n.yogas_typeInsight_dosha_remedies,
+              l10n.yogas_typeInsight_dosha_consult,
             ],
-    accentColor: info.$3,
+    accentColor: color,
     icon: isYoga ? Icons.auto_awesome_rounded : Icons.warning_amber_rounded,
   );
 }
 
-InsightData _getStrengthInsight(String strength, int count, String label) {
-  final descriptions = {
-    'Strong': (
-      'Strong yogas are fully activated and manifest their effects clearly in life. The planets involved are well-placed, dignified, and free from afflictions.',
-      _Colors.emerald,
-    ),
-    'Moderate': (
-      'Moderate strength indicates partial manifestation. The yoga is present but planets may have mixed dignity or receive both benefic and malefic influences.',
-      _Colors.amber,
-    ),
-    'Severe': (
-      'Severe doshas have strong impact and require attention. Remedial measures are recommended to mitigate their effects.',
-      _Colors.coral,
-    ),
-  };
+(String, String, Color) _getYogaTypeInfo(String type, bool isYoga, AppLocalizations l10n) {
+  switch (type) {
+    case 'Raja Yoga':
+    case 'Raja':
+      return (l10n.yogas_typeInsight_rajaYoga_desc, l10n.yogas_typeInsight_rajaYoga_significance, _Colors.gold);
+    case 'Dhana Yoga':
+    case 'Dhana':
+      return (l10n.yogas_typeInsight_dhanaYoga_desc, l10n.yogas_typeInsight_dhanaYoga_significance, _Colors.emerald);
+    case 'Pancha Mahapurusha':
+    case 'Mahapurusha':
+      return (l10n.yogas_typeInsight_mahapurusha_desc, l10n.yogas_typeInsight_mahapurusha_significance, _Colors.violet);
+    case 'Lunar Yoga':
+    case 'Lunar':
+      return (l10n.yogas_typeInsight_lunarYoga_desc, l10n.yogas_typeInsight_lunarYoga_significance, _Colors.sky);
+    case 'High':
+    case 'Severe':
+      return (l10n.yogas_typeInsight_severeDosha_desc, l10n.yogas_typeInsight_severeDosha_significance, _Colors.coral);
+    case 'Moderate':
+      return (l10n.yogas_typeInsight_moderateDosha_desc, l10n.yogas_typeInsight_moderateDosha_significance, _Colors.amber);
+    case 'Low':
+    case 'Mild':
+      return (l10n.yogas_typeInsight_mildDosha_desc, l10n.yogas_typeInsight_mildDosha_significance, _Colors.sky);
+    default:
+      if (isYoga) {
+        return (l10n.yogas_typeInsight_defaultYoga_desc, l10n.yogas_typeInsight_defaultYoga_significance, _Colors.gold);
+      } else {
+        return (l10n.yogas_typeInsight_defaultDosha_desc, l10n.yogas_typeInsight_defaultDosha_significance, _Colors.coral);
+      }
+  }
+}
 
-  final info = descriptions[label] ?? ('Standard strength level.', _Colors.sky);
+InsightData _getStrengthInsight(String strength, int count, String label, AppLocalizations l10n) {
+  final localizedLabel = _getLocalizedStrength(label, l10n);
+  final (String desc, Color color) = _getStrengthInfo(label, l10n);
 
   return InsightData(
-    title: '$label ${count > 1 ? "Items" : "Item"}',
-    value: '$count $label',
-    description: info.$1,
-    significance:
-        'You have $count ${label.toLowerCase()} ${count > 1 ? "combinations" : "combination"} in your chart.',
+    title: l10n.yogas_strengthInsight_title(count, localizedLabel),
+    value: l10n.yogas_strengthInsight_value(count, localizedLabel),
+    description: desc,
+    significance: l10n.yogas_strengthInsight_significance(count, localizedLabel),
     keyPoints: [
-      'Count: $count',
-      'Strength Level: $label',
-      if (label == 'Strong') 'Clear manifestation expected',
-      if (label == 'Moderate') 'Partial effects with room for improvement',
-      if (label == 'Severe') 'Remedies recommended',
+      l10n.yogas_strengthInsight_count(count),
+      l10n.yogas_strengthInsight_level(localizedLabel),
+      if (label == 'Strong') l10n.yogas_strengthInsight_strong_keypoint,
+      if (label == 'Moderate') l10n.yogas_strengthInsight_moderate_keypoint,
+      if (label == 'Severe') l10n.yogas_strengthInsight_severe_keypoint,
     ],
-    accentColor: info.$2,
+    accentColor: color,
     icon:
         label == 'Severe'
             ? Icons.warning_rounded
@@ -569,68 +547,34 @@ InsightData _getStrengthInsight(String strength, int count, String label) {
   );
 }
 
+(String, Color) _getStrengthInfo(String label, AppLocalizations l10n) {
+  switch (label) {
+    case 'Strong':
+      return (l10n.yogas_strengthInsight_strong_desc, _Colors.emerald);
+    case 'Moderate':
+      return (l10n.yogas_strengthInsight_moderate_desc, _Colors.amber);
+    case 'Severe':
+      return (l10n.yogas_strengthInsight_severe_desc, _Colors.coral);
+    default:
+      return (l10n.yogas_strengthInsight_default_desc, _Colors.sky);
+  }
+}
+
 InsightData _getInsightCardInsight(
   String title,
   String description,
   Color color,
+  AppLocalizations l10n,
 ) {
-  final detailedDescriptions = {
-    'Understanding': (
-      'Yogas are beneficial planetary combinations formed by specific relationships between planets and houses. They indicate areas of life where you have special potential or blessings.',
-      'Understanding your yogas helps you recognize your strengths and work with your natural talents.',
-      [
-        'Yogas enhance specific life areas',
-        'Formed by planetary positions and relationships',
-        'Each yoga has unique significations',
-        'Strength determines manifestation level',
-      ],
-    ),
-    'Activation': (
-      'Yogas don\'t always manifest constantly—they activate during the Dasha (planetary period) of the planets involved. The Dasha system in Vedic astrology determines when each yoga will give its results.',
-      'Knowing when your yogas activate helps in timing important life decisions.',
-      [
-        'Mahadasha of involved planets activates yoga',
-        'Antardasha brings sub-level activation',
-        'Transit support enhances effects',
-        'Check your Dasha periods for timing',
-      ],
-    ),
-    'Strength': (
-      'The strength of a yoga depends on the dignity of planets involved (own sign, exaltation, debilitation), aspects from benefics or malefics, and placement in houses.',
-      'Strong yogas manifest clearly while weak ones need strengthening through remedies.',
-      [
-        'Exalted/own sign planets = Strong yoga',
-        'Debilitated planets = Weak manifestation',
-        'Benefic aspects strengthen',
-        'Malefic aspects weaken',
-      ],
-    ),
-    'Remedies': (
-      'Doshas can be mitigated through various remedies including mantras, gemstones, charity, fasting, and pujas. The right remedy depends on the specific dosha and your chart.',
-      'Proper remedies performed with faith can significantly reduce dosha effects.',
-      [
-        'Mantra chanting for involved planets',
-        'Gemstones to strengthen weak planets',
-        'Charity on specific days',
-        'Fasting and pujas for afflicted planets',
-      ],
-    ),
-  };
-
-  final info =
-      detailedDescriptions[title] ??
-      (
-        description,
-        'Important aspect of chart analysis.',
-        ['General astrological principle'],
-      );
+  final (String desc, String significance, List<String> keyPoints) = _getInsightCardInfo(title, description, l10n);
+  final localizedTitle = _getLocalizedInsightTitle(title, l10n);
 
   return InsightData(
-    title: 'Astrological Insight',
-    value: title,
-    description: info.$1,
-    significance: info.$2,
-    keyPoints: info.$3,
+    title: l10n.yogas_astrologicalInsight,
+    value: localizedTitle,
+    description: desc,
+    significance: significance,
+    keyPoints: keyPoints,
     accentColor: color,
     icon:
         title == 'Understanding'
@@ -641,6 +585,71 @@ InsightData _getInsightCardInsight(
             ? Icons.fitness_center_rounded
             : Icons.healing_outlined,
   );
+}
+
+String _getLocalizedInsightTitle(String title, AppLocalizations l10n) {
+  switch (title) {
+    case 'Understanding': return l10n.yogas_insight_understanding;
+    case 'Activation': return l10n.yogas_insight_activation;
+    case 'Strength': return l10n.yogas_insight_strength;
+    case 'Remedies': return l10n.yogas_insight_remedies;
+    default: return title;
+  }
+}
+
+(String, String, List<String>) _getInsightCardInfo(String title, String description, AppLocalizations l10n) {
+  switch (title) {
+    case 'Understanding':
+      return (
+        l10n.yogas_insightCard_understanding_desc,
+        l10n.yogas_insightCard_understanding_significance,
+        [
+          l10n.yogas_insightCard_understanding_kp1,
+          l10n.yogas_insightCard_understanding_kp2,
+          l10n.yogas_insightCard_understanding_kp3,
+          l10n.yogas_insightCard_understanding_kp4,
+        ],
+      );
+    case 'Activation':
+      return (
+        l10n.yogas_insightCard_activation_desc,
+        l10n.yogas_insightCard_activation_significance,
+        [
+          l10n.yogas_insightCard_activation_kp1,
+          l10n.yogas_insightCard_activation_kp2,
+          l10n.yogas_insightCard_activation_kp3,
+          l10n.yogas_insightCard_activation_kp4,
+        ],
+      );
+    case 'Strength':
+      return (
+        l10n.yogas_insightCard_strength_desc,
+        l10n.yogas_insightCard_strength_significance,
+        [
+          l10n.yogas_insightCard_strength_kp1,
+          l10n.yogas_insightCard_strength_kp2,
+          l10n.yogas_insightCard_strength_kp3,
+          l10n.yogas_insightCard_strength_kp4,
+        ],
+      );
+    case 'Remedies':
+      return (
+        l10n.yogas_insightCard_remedies_desc,
+        l10n.yogas_insightCard_remedies_significance,
+        [
+          l10n.yogas_insightCard_remedies_kp1,
+          l10n.yogas_insightCard_remedies_kp2,
+          l10n.yogas_insightCard_remedies_kp3,
+          l10n.yogas_insightCard_remedies_kp4,
+        ],
+      );
+    default:
+      return (
+        description,
+        l10n.yogas_insightCard_default_significance,
+        [l10n.yogas_insightCard_default_kp],
+      );
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1624,6 +1633,7 @@ class _YogaHeroCardState extends State<_YogaHeroCard> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
+        final l10n = AppLocalizations.of(context);
         _showInsightSheet(
           context,
           _getYogaOverviewInsight(
@@ -1632,6 +1642,7 @@ class _YogaHeroCardState extends State<_YogaHeroCard> {
             widget.strongYogas,
             widget.severeDoshas,
             widget.ascendant,
+            l10n,
           ),
         );
       },
@@ -2017,6 +2028,7 @@ class _MinimalLegendItemState extends State<_MinimalLegendItem> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
@@ -2024,7 +2036,7 @@ class _MinimalLegendItemState extends State<_MinimalLegendItem> {
         HapticFeedback.lightImpact();
         _showInsightSheet(
           context,
-          _getYogaTypeInsight(widget.label, widget.isYoga),
+          _getYogaTypeInsight(widget.label, widget.isYoga, l10n),
         );
       },
       onTapCancel: () => setState(() => _isPressed = false),
@@ -2080,7 +2092,8 @@ class _EmptyStateCardState extends State<_EmptyStateCard> {
 
   @override
   Widget build(BuildContext context) {
-    final isNoYogas = widget.title.contains('No Yogas');
+    final l10n = AppLocalizations.of(context);
+    final isNoYogas = widget.title.contains(l10n.yogas_noYogasDetected) || widget.title.contains('No Yogas');
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -2090,28 +2103,25 @@ class _EmptyStateCardState extends State<_EmptyStateCard> {
         _showInsightSheet(
           context,
           InsightData(
-            title: isNoYogas ? 'No Special Yogas' : 'Dosha-Free Chart',
+            title: isNoYogas ? l10n.yogas_noSpecialYogas : l10n.yogas_doshaFreeChart,
             value: widget.title,
-            description:
-                isNoYogas
-                    ? 'Your chart does not have any of the commonly recognized special yogas. This is normal and doesn\'t mean anything negative—many successful people have charts without named yogas. The strength of your chart comes from other factors like planet dignity, house placements, and aspects.'
-                    : 'Congratulations! Your chart is free from major doshas like Manglik, Kaal Sarp, or other challenging combinations. This indicates fewer karmic obstacles in the areas typically affected by these doshas.',
+            description: isNoYogas ? l10n.yogas_emptyState_noYogas_desc : l10n.yogas_emptyState_noDoshas_desc,
             significance: widget.message,
             keyPoints:
                 isNoYogas
                     ? [
-                      'Standard chart configuration',
-                      'Success depends on overall chart strength',
-                      'Dasha periods still important for timing',
-                      'Individual planet strengths matter more',
-                      'Aspects and house placements are key factors',
+                      l10n.yogas_emptyState_noYogas_kp1,
+                      l10n.yogas_emptyState_noYogas_kp2,
+                      l10n.yogas_emptyState_noYogas_kp3,
+                      l10n.yogas_emptyState_noYogas_kp4,
+                      l10n.yogas_emptyState_noYogas_kp5,
                     ]
                     : [
-                      'No major doshas detected',
-                      'Fewer karmic obstacles expected',
-                      'Marriage and relationships less afflicted',
-                      'Still check for other challenging aspects',
-                      'Overall chart analysis recommended',
+                      l10n.yogas_emptyState_noDoshas_kp1,
+                      l10n.yogas_emptyState_noDoshas_kp2,
+                      l10n.yogas_emptyState_noDoshas_kp3,
+                      l10n.yogas_emptyState_noDoshas_kp4,
+                      l10n.yogas_emptyState_noDoshas_kp5,
                     ],
             accentColor: widget.color,
             icon: widget.icon,
@@ -2968,6 +2978,7 @@ class _InteractiveInsightCardState extends State<_InteractiveInsightCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
@@ -2979,6 +2990,7 @@ class _InteractiveInsightCardState extends State<_InteractiveInsightCard> {
             widget.title,
             widget.description,
             widget.color,
+            l10n,
           ),
         );
       },
@@ -3089,6 +3101,9 @@ class _InteractiveRemedyCardState extends State<_InteractiveRemedyCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final isKaalSarp = widget.doshaType == 'Kaal Sarp Dosha';
+    
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
@@ -3097,28 +3112,25 @@ class _InteractiveRemedyCardState extends State<_InteractiveRemedyCard> {
         _showInsightSheet(
           context,
           InsightData(
-            title: 'Dosha Remedy',
+            title: l10n.yogas_doshaRemedy,
             value: widget.doshaType,
-            description:
-                widget.doshaType == 'Kaal Sarp Dosha'
-                    ? 'Kaal Sarp Dosha occurs when all planets are hemmed between Rahu and Ketu. This can cause delays, obstacles, and sudden changes in life. However, with proper remedies, its effects can be significantly reduced.'
-                    : 'Manglik Dosha occurs when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. It primarily affects marriage and relationships but can be effectively remedied.',
+            description: isKaalSarp ? l10n.yogas_kaalSarpDosha_desc : l10n.yogas_manglikDosha_desc,
             significance: widget.description,
             keyPoints:
-                widget.doshaType == 'Kaal Sarp Dosha'
+                isKaalSarp
                     ? [
-                      'Visit Trimbakeshwar for Kaal Sarp Puja',
-                      'Chant Maha Mrityunjaya Mantra 108 times daily',
-                      'Offer milk to Shivling on Mondays',
-                      'Keep a snake made of silver in your home',
-                      'Donate to the needy on Saturdays',
+                      l10n.yogas_kaalSarp_kp1,
+                      l10n.yogas_kaalSarp_kp2,
+                      l10n.yogas_kaalSarp_kp3,
+                      l10n.yogas_kaalSarp_kp4,
+                      l10n.yogas_kaalSarp_kp5,
                     ]
                     : [
-                      'Perform Mangal Shanti Puja',
-                      'Recite Hanuman Chalisa on Tuesdays',
-                      'Fast on Tuesdays',
-                      'Wear Red Coral gemstone (after consultation)',
-                      'Donate red items on Tuesdays',
+                      l10n.yogas_manglik_kp1,
+                      l10n.yogas_manglik_kp2,
+                      l10n.yogas_manglik_kp3,
+                      l10n.yogas_manglik_kp4,
+                      l10n.yogas_manglik_kp5,
                     ],
             accentColor: widget.color,
             icon: widget.icon,

@@ -2152,17 +2152,20 @@ class _InteractiveStatChipState extends State<_InteractiveStatChip> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
+        final l10n = AppLocalizations.of(context);
         _showInsightSheet(
           context,
           InsightData(
-            title: '${widget.label} Planets',
+            title: l10n.strength_labelPlanets(widget.label),
             value: widget.value,
             description: widget.description,
-            significance:
-                'You have ${widget.value} ${widget.label.toLowerCase()} planets in your chart.',
+            significance: l10n.strength_haveCount(
+              widget.value,
+              widget.label.toLowerCase(),
+            ),
             keyPoints: [
-              'Count: ${widget.value} planets',
-              'Status: ${widget.label}',
+              l10n.strength_countPlanets(int.tryParse(widget.value) ?? 0),
+              l10n.strength_statusCategory(widget.label),
               widget.description,
             ],
             accentColor: widget.color,
@@ -3517,22 +3520,26 @@ class _VimshopakaSummaryState extends State<_VimshopakaSummary> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
+        final l10n = AppLocalizations.of(context);
         _showInsightSheet(
           context,
           InsightData(
-            title: 'Vimshopaka Bala',
-            value: 'Summary',
-            description:
-                'Vimshopaka Bala (20-point strength) evaluates how well planets are placed across all 16 divisional charts (Shodasavarga). Each planet receives dignity points based on its placement in each divisional chart.',
-            significance:
-                'Of ${widget.vimshopaka.length} planets: $strongCount are Strong (75-100%), $mediumCount are Medium (50-75%), and $weakCount are Weak (<50%).',
+            title: l10n.strength_vimshopaka_title,
+            value: l10n.strength_vimshopakaSummary,
+            description: l10n.strength_vimshopakaSummary_desc,
+            significance: l10n.strength_vimshopakaSummary_significance(
+              widget.vimshopaka.length,
+              strongCount,
+              mediumCount,
+              weakCount,
+            ),
             keyPoints: [
-              'Strong Planets: $strongCount (15-20 points)',
-              'Medium Planets: $mediumCount (10-15 points)',
-              'Weak Planets: $weakCount (0-10 points)',
-              'Based on 16 divisional charts (D1 to D60)',
-              'Max score: 20 points per planet',
-              'Strong Vimshopaka = Good dignity across all charts',
+              l10n.strength_strongPlanetsRange(strongCount),
+              l10n.strength_mediumPlanetsRange(mediumCount),
+              l10n.strength_weakPlanetsRange(weakCount),
+              l10n.strength_basedOn16Charts,
+              l10n.strength_maxScore20,
+              l10n.strength_strongVimshopakaExplain,
             ],
             accentColor: _Colors.sky,
             icon: Icons.grid_view_rounded,
@@ -3648,27 +3655,30 @@ class _InteractiveMiniCountState extends State<_InteractiveMiniCount> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
+        final l10n = AppLocalizations.of(context);
         _showInsightSheet(
           context,
           InsightData(
-            title: 'Vimshopaka Strength',
+            title: l10n.strength_vimshopakaStrength,
             value: '${widget.count} ${widget.label}',
             description:
                 widget.label == 'Strong'
-                    ? 'Planets with 15-20 Vimshopaka points (75-100%). These planets have excellent dignity across divisional charts and give strong results.'
+                    ? l10n.strength_vimshopakaStrength_strong_desc
                     : widget.label == 'Med'
-                    ? 'Planets with 10-15 Vimshopaka points (50-75%). These planets have moderate dignity and give balanced results.'
-                    : 'Planets with 0-10 Vimshopaka points (<50%). These planets may need strengthening through remedies.',
-            significance:
-                'You have ${widget.count} ${widget.label.toLowerCase()} planet(s) based on Vimshopaka Bala scoring.',
+                    ? l10n.strength_vimshopakaStrength_medium_desc
+                    : l10n.strength_vimshopakaStrength_weak_desc,
+            significance: l10n.strength_vimshopakaStrength_significance(
+              widget.count,
+              widget.label.toLowerCase(),
+            ),
             keyPoints: [
-              'Count: ${widget.count} planets',
-              'Category: ${widget.label}',
+              l10n.strength_countPlanets(widget.count),
+              l10n.strength_categoryLabel(widget.label),
               widget.label == 'Strong'
-                  ? 'Score Range: 15-20 points (75-100%)'
+                  ? l10n.strength_scoreRangeStrong
                   : widget.label == 'Med'
-                  ? 'Score Range: 10-15 points (50-75%)'
-                  : 'Score Range: 0-10 points (0-50%)',
+                  ? l10n.strength_scoreRangeMedium
+                  : l10n.strength_scoreRangeWeak,
             ],
             accentColor: widget.color,
             icon: Icons.grid_view_rounded,
@@ -3998,23 +4008,28 @@ class _AshtakavargaSummaryCardState extends State<_AshtakavargaSummaryCard> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
+        final l10n = AppLocalizations.of(context);
         _showInsightSheet(
           context,
           InsightData(
-            title: 'Ashtakavarga',
-            value: 'Transit Strength System',
-            description:
-                'Ashtakavarga is a unique Vedic system to evaluate sign strength for transit predictions. Each of the 7 planets contributes 0-8 benefic points (bindus) to each sign. The Sarvashtakavarga (SAV) is the combined score of all planets for each sign.',
-            significance:
-                'Your strongest sign for transits is ${_signs[maxIndex]} ($maxSav points) and weakest is ${_signs[minIndex]} ($minSav points). Total SAV across all signs is $totalSav.',
+            title: l10n.strength_ashtakavarga,
+            value: l10n.strength_ashtakavarga_transitSystem,
+            description: l10n.strength_ashtakavarga_desc,
+            significance: l10n.strength_ashtakavarga_significance(
+              _signs[maxIndex],
+              maxSav,
+              _signs[minIndex],
+              minSav,
+              totalSav,
+            ),
             keyPoints: [
-              'Strongest Sign: ${_signs[maxIndex]} ($maxSav pts)',
-              'Weakest Sign: ${_signs[minIndex]} ($minSav pts)',
-              'Total SAV: $totalSav points',
-              'Individual BAV: 0-8 points per planet-sign',
-              'SAV: 0-56 points per sign (combined)',
-              'Good BAV: ≥4 points',
-              'Strong SAV: ≥28 points',
+              l10n.strength_strongestSign(_signs[maxIndex], maxSav),
+              l10n.strength_weakestSign(_signs[minIndex], minSav),
+              l10n.strength_totalSav(totalSav),
+              l10n.strength_bavRange,
+              l10n.strength_savRange,
+              l10n.strength_goodBavThreshold,
+              l10n.strength_strongSavThreshold,
             ],
             accentColor: _Colors.emerald,
             icon: Icons.apps_rounded,
@@ -4292,24 +4307,24 @@ class _MinimalTotalSavState extends State<_MinimalTotalSav> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.lightImpact();
+        final l10n = AppLocalizations.of(context);
         _showInsightSheet(
           context,
           InsightData(
-            title: 'Total Sarvashtakavarga',
-            value: '${widget.totalSav} Points',
-            description:
-                'The Total SAV is the sum of all Sarvashtakavarga points across all 12 signs. Maximum possible is 337 points. A higher total indicates overall stronger chart for transits.',
+            title: l10n.strength_totalSarvashtakavarga,
+            value: l10n.strength_totalSav_points(widget.totalSav),
+            description: l10n.strength_totalSav_desc,
             significance:
-                'Your total SAV of ${widget.totalSav} points ${widget.totalSav >= 300
-                    ? "is excellent, indicating a strong overall chart"
+                widget.totalSav >= 300
+                    ? l10n.strength_totalSav_excellent(widget.totalSav)
                     : widget.totalSav >= 250
-                    ? "is good, showing balanced strength"
-                    : "suggests focusing on beneficial transit periods"}.',
+                    ? l10n.strength_totalSav_good(widget.totalSav)
+                    : l10n.strength_totalSav_focus(widget.totalSav),
             keyPoints: [
-              'Total SAV: ${widget.totalSav} points',
-              'Maximum possible: 337 points',
-              'Calculation: Sum of all 12 sign SAV values',
-              'Higher = Better overall transit strength',
+              l10n.strength_totalSav(widget.totalSav),
+              l10n.strength_maxPossible337,
+              l10n.strength_calculationSum12,
+              l10n.strength_higherBetter,
             ],
             accentColor: _Colors.sky,
             icon: Icons.functions_rounded,
@@ -4515,24 +4530,24 @@ class _InteractiveTotalSavState extends State<_InteractiveTotalSav> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
+        final l10n = AppLocalizations.of(context);
         _showInsightSheet(
           context,
           InsightData(
-            title: 'Total Sarvashtakavarga',
-            value: '${widget.totalSav} Points',
-            description:
-                'The Total SAV is the sum of all Sarvashtakavarga points across all 12 signs. Maximum possible is 337 points. A higher total indicates overall stronger chart for transits.',
+            title: l10n.strength_totalSarvashtakavarga,
+            value: l10n.strength_totalSav_points(widget.totalSav),
+            description: l10n.strength_totalSav_desc,
             significance:
-                'Your total SAV of ${widget.totalSav} points ${widget.totalSav >= 300
-                    ? "is excellent, indicating a strong overall chart"
+                widget.totalSav >= 300
+                    ? l10n.strength_totalSav_excellent(widget.totalSav)
                     : widget.totalSav >= 250
-                    ? "is good, showing balanced strength"
-                    : "suggests focusing on beneficial transit periods"}.',
+                    ? l10n.strength_totalSav_good(widget.totalSav)
+                    : l10n.strength_totalSav_focus(widget.totalSav),
             keyPoints: [
-              'Total SAV: ${widget.totalSav} points',
-              'Maximum possible: 337 points',
-              'Calculation: Sum of all 12 sign SAV values',
-              'Higher = Better overall transit strength',
+              l10n.strength_totalSav(widget.totalSav),
+              l10n.strength_maxPossible337,
+              l10n.strength_calculationSum12,
+              l10n.strength_higherBetter,
             ],
             accentColor: _Colors.violet,
             icon: Icons.functions_rounded,

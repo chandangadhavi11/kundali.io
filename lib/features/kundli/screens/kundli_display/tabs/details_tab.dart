@@ -580,19 +580,25 @@ class _TappableInsightState extends State<_TappableInsight>
 // ═══════════════════════════════════════════════════════════════════════════
 // INSIGHT DATA GENERATORS
 // ═══════════════════════════════════════════════════════════════════════════
-InsightData _getAscendantInsight(String sign, double degree) {
+InsightData _getAscendantInsight(
+  String sign,
+  double degree,
+  AppLocalizations l10n,
+) {
+  final localizedSign = getLocalizedZodiacSign(sign, l10n);
   return InsightData(
-    title: 'Rising Sign',
-    value: sign,
-    description:
-        'Your Ascendant (Lagna) is $sign at ${degree.toStringAsFixed(1)}°. The Ascendant represents the sign that was rising on the eastern horizon at the exact moment of your birth. It is considered the most important point in Vedic astrology.',
-    significance:
-        'The Ascendant shapes your physical appearance, personality, and how others perceive you. It acts as a lens through which all planetary energies are filtered in your chart.',
+    title: l10n.insight_risingSign,
+    value: localizedSign,
+    description: l10n.insight_ascendant_desc(
+      localizedSign,
+      degree.toStringAsFixed(1),
+    ),
+    significance: l10n.insight_ascendant_significance,
     keyPoints: [
-      'Determines your body constitution and health tendencies',
-      'Influences your natural approach to life and new situations',
-      'Sets the foundation for all 12 houses in your birth chart',
-      'Reveals your instinctive reactions and outer personality',
+      l10n.insight_ascendant_point1,
+      l10n.insight_ascendant_point2,
+      l10n.insight_ascendant_point3,
+      l10n.insight_ascendant_point4,
     ],
     accentColor: _getZodiacColor(sign),
     icon: Icons.wb_twilight_rounded,
@@ -600,19 +606,18 @@ InsightData _getAscendantInsight(String sign, double degree) {
   );
 }
 
-InsightData _getMoonSignInsight(String sign) {
+InsightData _getMoonSignInsight(String sign, AppLocalizations l10n) {
+  final localizedSign = getLocalizedZodiacSign(sign, l10n);
   return InsightData(
-    title: 'Moon Sign',
-    value: sign,
-    description:
-        'Your Moon is placed in $sign. In Vedic astrology, the Moon sign (Rashi) is considered more significant than the Sun sign as it represents your emotional nature and inner world.',
-    significance:
-        'The Moon governs your mind, emotions, and subconscious patterns. It reveals how you process feelings and what brings you emotional security.',
+    title: l10n.insight_moonSign,
+    value: localizedSign,
+    description: l10n.insight_moon_desc(localizedSign),
+    significance: l10n.insight_moon_significance,
     keyPoints: [
-      'Reflects your emotional responses and mental patterns',
-      'Determines your Nakshatra (birth star) placement',
-      'Influences your intuition and psychic sensitivity',
-      'Shapes your relationship with mother and nurturing figures',
+      l10n.insight_moon_point1,
+      l10n.insight_moon_point2,
+      l10n.insight_moon_point3,
+      l10n.insight_moon_point4,
     ],
     accentColor: _getZodiacColor(sign),
     icon: Icons.nightlight_round,
@@ -620,19 +625,18 @@ InsightData _getMoonSignInsight(String sign) {
   );
 }
 
-InsightData _getSunSignInsight(String sign) {
+InsightData _getSunSignInsight(String sign, AppLocalizations l10n) {
+  final localizedSign = getLocalizedZodiacSign(sign, l10n);
   return InsightData(
-    title: 'Sun Sign',
-    value: sign,
-    description:
-        'Your Sun is placed in $sign. The Sun represents your soul essence, vitality, and core identity. It shows your life purpose and the qualities you are meant to develop.',
-    significance:
-        'The Sun indicates your father, authority figures, and your relationship with power. It reveals your ego, pride, and how you express your individuality.',
+    title: l10n.insight_sunSign,
+    value: localizedSign,
+    description: l10n.insight_sun_desc(localizedSign),
+    significance: l10n.insight_sun_significance,
     keyPoints: [
-      'Represents your soul\'s purpose and true self',
-      'Governs vitality, health, and life force energy',
-      'Indicates career potential and leadership abilities',
-      'Influences relationship with father and authority',
+      l10n.insight_sun_point1,
+      l10n.insight_sun_point2,
+      l10n.insight_sun_point3,
+      l10n.insight_sun_point4,
     ],
     accentColor: _getZodiacColor(sign),
     icon: Icons.wb_sunny_rounded,
@@ -640,60 +644,73 @@ InsightData _getSunSignInsight(String sign) {
   );
 }
 
-InsightData _getElementInsight(String element, String sign) {
-  final descriptions = {
-    'Fire':
-        'Fire signs (Aries, Leo, Sagittarius) are dynamic, passionate, and action-oriented. They bring enthusiasm, courage, and creative inspiration.',
-    'Earth':
-        'Earth signs (Taurus, Virgo, Capricorn) are practical, grounded, and focused on material stability. They bring patience, reliability, and tangible results.',
-    'Air':
-        'Air signs (Gemini, Libra, Aquarius) are intellectual, communicative, and socially oriented. They bring ideas, connection, and mental agility.',
-    'Water':
-        'Water signs (Cancer, Scorpio, Pisces) are emotional, intuitive, and deeply feeling. They bring sensitivity, empathy, and spiritual depth.',
-  };
+InsightData _getElementInsight(
+  String element,
+  String sign,
+  AppLocalizations l10n,
+) {
+  final localizedElement = getLocalizedElement(element, l10n);
 
-  final traits = {
-    'Fire': [
-      'Courageous and bold',
-      'Natural leaders',
-      'Quick to act',
-      'Inspiring to others',
-    ],
-    'Earth': [
-      'Practical and reliable',
-      'Patient builders',
-      'Materially focused',
-      'Strong endurance',
-    ],
-    'Air': [
-      'Quick-minded',
-      'Excellent communicators',
-      'Socially adept',
-      'Idea generators',
-    ],
-    'Water': [
-      'Deeply intuitive',
-      'Emotionally intelligent',
-      'Nurturing nature',
-      'Spiritually inclined',
-    ],
-  };
+  String getDescription() {
+    switch (element) {
+      case 'Fire':
+        return l10n.insight_element_fire_desc;
+      case 'Earth':
+        return l10n.insight_element_earth_desc;
+      case 'Air':
+        return l10n.insight_element_air_desc;
+      case 'Water':
+        return l10n.insight_element_water_desc;
+      default:
+        return l10n.insight_element_default_desc(localizedElement);
+    }
+  }
+
+  List<String> getTraits() {
+    switch (element) {
+      case 'Fire':
+        return [
+          l10n.insight_element_fire_trait1,
+          l10n.insight_element_fire_trait2,
+          l10n.insight_element_fire_trait3,
+          l10n.insight_element_fire_trait4,
+        ];
+      case 'Earth':
+        return [
+          l10n.insight_element_earth_trait1,
+          l10n.insight_element_earth_trait2,
+          l10n.insight_element_earth_trait3,
+          l10n.insight_element_earth_trait4,
+        ];
+      case 'Air':
+        return [
+          l10n.insight_element_air_trait1,
+          l10n.insight_element_air_trait2,
+          l10n.insight_element_air_trait3,
+          l10n.insight_element_air_trait4,
+        ];
+      case 'Water':
+        return [
+          l10n.insight_element_water_trait1,
+          l10n.insight_element_water_trait2,
+          l10n.insight_element_water_trait3,
+          l10n.insight_element_water_trait4,
+        ];
+      default:
+        return [
+          l10n.insight_element_default_trait1,
+          l10n.insight_element_default_trait2,
+          l10n.insight_element_default_trait3,
+        ];
+    }
+  }
 
   return InsightData(
-    title: 'Element',
-    value: element,
-    description:
-        descriptions[element] ??
-        'Your rising sign belongs to the $element element, shaping your fundamental approach to life.',
-    significance:
-        'Elements represent the basic building blocks of personality. Your $element nature influences how you perceive and interact with the world around you.',
-    keyPoints:
-        traits[element] ??
-        [
-          'Influences your temperament',
-          'Shapes your reactions',
-          'Affects compatibility',
-        ],
+    title: l10n.insight_element,
+    value: localizedElement,
+    description: getDescription(),
+    significance: l10n.insight_element_significance(localizedElement),
+    keyPoints: getTraits(),
     accentColor: _getElementColorFromImage(element),
     icon: _getElementIcon(element),
     imagePath: _getElementImagePath(element),
@@ -715,19 +732,23 @@ IconData _getElementIcon(String element) {
   }
 }
 
-InsightData _getLagnaLordInsight(String planet, String sign) {
+InsightData _getLagnaLordInsight(
+  String planet,
+  String sign,
+  AppLocalizations l10n,
+) {
+  final localizedPlanet = getLocalizedPlanetName(planet, l10n);
+  final localizedSign = getLocalizedZodiacSign(sign, l10n);
   return InsightData(
-    title: 'Lagna Lord',
-    value: planet,
-    description:
-        '$planet is the ruler of your Ascendant sign $sign. As the chart ruler, its placement and condition significantly influence your entire life journey and personality expression.',
-    significance:
-        'The Lagna Lord acts as a guide for your soul\'s journey. Its house placement shows where you invest most of your energy, and its condition affects overall life success.',
+    title: l10n.insight_lagnaLord,
+    value: localizedPlanet,
+    description: l10n.insight_lagnaLord_desc(localizedPlanet, localizedSign),
+    significance: l10n.insight_lagnaLord_significance,
     keyPoints: [
-      'Most important planet for your chart interpretation',
-      'Its strength indicates overall life vitality',
-      'House placement shows primary life focus',
-      'Aspects to it affect personality and health',
+      l10n.insight_lagnaLord_point1,
+      l10n.insight_lagnaLord_point2,
+      l10n.insight_lagnaLord_point3,
+      l10n.insight_lagnaLord_point4,
     ],
     accentColor: _getPlanetColor(planet),
     icon: Icons.star_rounded,
@@ -735,19 +756,26 @@ InsightData _getLagnaLordInsight(String planet, String sign) {
   );
 }
 
-InsightData _getNakshatraLordInsight(String planet, String nakshatra) {
+InsightData _getNakshatraLordInsight(
+  String planet,
+  String nakshatra,
+  AppLocalizations l10n,
+) {
+  final localizedPlanet = getLocalizedPlanetName(planet, l10n);
+  final localizedNakshatra = getLocalizedNakshatra(nakshatra, l10n);
   return InsightData(
-    title: 'Nakshatra Lord',
-    value: planet,
-    description:
-        '$planet rules your birth Nakshatra $nakshatra. The Nakshatra lord operates at a subtle level, influencing your psychological patterns and karmic tendencies.',
-    significance:
-        'This planet governs the Vimshottari Dasha sequence of your life. Its condition and placement deeply affect your mental inclinations and spiritual path.',
+    title: l10n.insight_nakshatraLord,
+    value: localizedPlanet,
+    description: l10n.insight_nakshatraLord_desc(
+      localizedPlanet,
+      localizedNakshatra,
+    ),
+    significance: l10n.insight_nakshatraLord_significance,
     keyPoints: [
-      'Determines your Mahadasha sequence',
-      'Influences subconscious patterns',
-      'Affects intuitive and psychic abilities',
-      'Reveals karmic lessons from past lives',
+      l10n.insight_nakshatraLord_point1,
+      l10n.insight_nakshatraLord_point2,
+      l10n.insight_nakshatraLord_point3,
+      l10n.insight_nakshatraLord_point4,
     ],
     accentColor: _getPlanetColor(planet),
     icon: Icons.auto_awesome_rounded,
@@ -755,114 +783,129 @@ InsightData _getNakshatraLordInsight(String planet, String nakshatra) {
   );
 }
 
-InsightData _getNakshatraInsight(String nakshatra, int pada, String gana) {
+InsightData _getNakshatraInsight(
+  String nakshatra,
+  int pada,
+  String gana,
+  AppLocalizations l10n,
+) {
+  final localizedNakshatra = getLocalizedNakshatra(nakshatra, l10n);
+  final localizedGana = getLocalizedGana(gana, l10n);
   return InsightData(
-    title: 'Birth Star',
-    value: '$nakshatra (Pada $pada)',
-    description:
-        'You were born under $nakshatra Nakshatra in Pada $pada. Nakshatras are the 27 lunar mansions that the Moon travels through, providing deep insights into your psychological nature.',
-    significance:
-        'Your Nakshatra reveals your innate talents, emotional patterns, and destiny path. The Pada (quarter) adds further specificity to these qualities.',
+    title: l10n.insight_birthStar,
+    value: l10n.insight_nakshatraPada(localizedNakshatra, pada.toString()),
+    description: l10n.insight_nakshatra_desc(
+      localizedNakshatra,
+      pada.toString(),
+    ),
+    significance: l10n.insight_nakshatra_significance,
     keyPoints: [
-      'Reveals deep personality traits and tendencies',
-      'Indicates compatible Nakshatras for relationships',
-      'Determines your Gana (temperament): $gana',
-      'Provides insights into career and life path',
+      l10n.insight_nakshatra_point1,
+      l10n.insight_nakshatra_point2,
+      l10n.insight_nakshatra_point3(localizedGana),
+      l10n.insight_nakshatra_point4,
     ],
     accentColor: _Colors.rose,
     icon: Icons.auto_awesome,
   );
 }
 
-InsightData _getTithiInsight(String tithi, String paksha) {
+InsightData _getTithiInsight(
+  String tithi,
+  String paksha,
+  AppLocalizations l10n,
+) {
   return InsightData(
-    title: 'Tithi',
+    title: l10n.insight_tithi,
     value: tithi,
-    description:
-        'You were born on $tithi during $paksha Paksha. Tithi is the lunar day based on the angular relationship between Sun and Moon, one of the five elements of Panchang.',
-    significance:
-        'Each Tithi carries specific energies affecting your emotional nature and auspiciousness for different activities. It influences your relationship with lunar energy.',
+    description: l10n.insight_tithi_desc(tithi, paksha),
+    significance: l10n.insight_tithi_significance,
     keyPoints: [
-      'Indicates emotional temperament at birth',
-      'Affects personality and decision-making style',
-      '$paksha Paksha influences waxing/waning energy',
-      'Used for determining auspicious timings',
+      l10n.insight_tithi_point1,
+      l10n.insight_tithi_point2,
+      l10n.insight_tithi_point3(paksha),
+      l10n.insight_tithi_point4,
     ],
     accentColor: _Colors.emerald,
     icon: Icons.brightness_2_rounded,
   );
 }
 
-InsightData _getYogaInsight(String yoga) {
+InsightData _getYogaInsight(String yoga, AppLocalizations l10n) {
   return InsightData(
-    title: 'Yoga',
+    title: l10n.insight_yoga,
     value: yoga,
-    description:
-        'You were born under $yoga Yoga. This is calculated from the combined positions of Sun and Moon, representing the spiritual and psychological atmosphere of your birth moment.',
-    significance:
-        'Yoga influences your mental orientation and fortune. There are 27 Yogas, each bringing distinct qualities and tendencies to the native.',
+    description: l10n.insight_yoga_desc(yoga),
+    significance: l10n.insight_yoga_significance,
     keyPoints: [
-      'Affects mental and spiritual inclinations',
-      'Influences overall fortune and luck',
-      'Shapes approach to challenges',
-      'Indicates periods of opportunity',
+      l10n.insight_yoga_point1,
+      l10n.insight_yoga_point2,
+      l10n.insight_yoga_point3,
+      l10n.insight_yoga_point4,
     ],
     accentColor: _Colors.emerald,
     icon: Icons.self_improvement_rounded,
   );
 }
 
-InsightData _getKaranaInsight(String karana) {
+InsightData _getKaranaInsight(String karana, AppLocalizations l10n) {
   return InsightData(
-    title: 'Karana',
+    title: l10n.insight_karana,
     value: karana,
-    description:
-        'Your birth Karana is $karana. Karana is half of a Tithi and there are 11 Karanas that repeat in a cycle. It influences dynamic action and productivity.',
-    significance:
-        'Karana affects your capacity for action and completing tasks. It particularly influences work ethic and the nature of your activities.',
+    description: l10n.insight_karana_desc(karana),
+    significance: l10n.insight_karana_significance,
     keyPoints: [
-      'Governs action and productivity style',
-      'Influences work and completion ability',
-      'Affects day-to-day decision making',
-      'Important for selecting activity timing',
+      l10n.insight_karana_point1,
+      l10n.insight_karana_point2,
+      l10n.insight_karana_point3,
+      l10n.insight_karana_point4,
     ],
     accentColor: _Colors.emerald,
     icon: Icons.bolt_rounded,
   );
 }
 
-InsightData _getVaraInsight(String vara, String deity) {
+InsightData _getVaraInsight(
+  String vara,
+  String deity,
+  AppLocalizations l10n,
+) {
+  final localizedVara = getLocalizedDay(vara, l10n);
   return InsightData(
-    title: 'Vara (Day)',
-    value: vara,
-    description:
-        'You were born on $vara, ruled by $deity. The weekday of birth is significant in Vedic astrology, connecting you to specific planetary and deity energies.',
-    significance:
-        'Your birth day lord influences your character and brings blessings from its ruling deity. Each day carries unique qualities that shape personality.',
+    title: l10n.insight_vara,
+    value: localizedVara,
+    description: l10n.insight_vara_desc(localizedVara, deity),
+    significance: l10n.insight_vara_significance,
     keyPoints: [
-      'Connects you to ${vara}\'s planetary ruler',
-      '$deity is your birth day deity',
-      'Influences natural talents and interests',
-      'Auspicious for activities ruled by this day',
+      l10n.insight_vara_point1(localizedVara),
+      l10n.insight_vara_point2(deity),
+      l10n.insight_vara_point3,
+      l10n.insight_vara_point4,
     ],
     accentColor: _Colors.emerald,
     icon: Icons.calendar_today_rounded,
   );
 }
 
-InsightData _getMahadashaInsight(String planet, double remaining) {
+InsightData _getMahadashaInsight(
+  String planet,
+  double remaining,
+  AppLocalizations l10n,
+) {
+  final localizedPlanet = getLocalizedPlanetName(planet, l10n);
   return InsightData(
-    title: 'Mahadasha',
-    value: '$planet Mahadasha',
-    description:
-        'You are currently running the $planet Mahadasha with ${remaining.toStringAsFixed(1)} years remaining. Mahadasha is the major planetary period that colors all life experiences.',
-    significance:
-        'The Mahadasha planet becomes the primary influence during its period, activating its significations in your chart. Life themes shift with each new Mahadasha.',
+    title: l10n.insight_mahadasha,
+    value: l10n.insight_mahadasha_value(localizedPlanet),
+    description: l10n.insight_mahadasha_desc(
+      localizedPlanet,
+      remaining.toStringAsFixed(1),
+    ),
+    significance: l10n.insight_mahadasha_significance,
     keyPoints: [
-      'Primary influence for current life phase',
-      'Activates houses ruled by $planet',
-      'Check $planet\'s condition for period quality',
-      'Sub-periods (Antardasha) provide refinement',
+      l10n.insight_mahadasha_point1,
+      l10n.insight_mahadasha_point2(localizedPlanet),
+      l10n.insight_mahadasha_point3(localizedPlanet),
+      l10n.insight_mahadasha_point4,
     ],
     accentColor: _getPlanetColor(planet),
     icon: Icons.hourglass_bottom_rounded,
@@ -870,59 +913,68 @@ InsightData _getMahadashaInsight(String planet, double remaining) {
   );
 }
 
-InsightData _getGunaInsight(String gunaName, String value, Color color) {
-  final descriptions = {
-    'Varna':
-        'Varna represents the spiritual temperament and indicates the type of work one is naturally suited for. Your Varna is $value.',
-    'Vashya':
-        'Vashya indicates mutual attraction and control in relationships. Your category is $value, which affects compatibility dynamics.',
-    'Tara':
-        'Tara (Birth Star) compatibility assesses the health of relationship. Your Tara is $value, influencing relationship harmony.',
-    'Yoni':
-        'Yoni represents sexual compatibility and physical attraction. Your Yoni is $value, indicating instinctual compatibility patterns.',
-    'Graha Maitri':
-        'Graha Maitri checks friendship between Moon sign lords. Your Moon lord is $value, affecting mental compatibility.',
-    'Gana':
-        'Gana indicates temperament and nature. Your Gana is $value, representing your fundamental character type.',
-    'Bhakoot':
-        'Bhakoot checks relative position of Moon signs. Your Moon is in $value, affecting emotional and health compatibility.',
-    'Nadi':
-        'Nadi indicates physiological compatibility and genetic factors. Your Nadi is $value, crucial for progeny and health.',
-  };
+InsightData _getGunaInsight(
+  String gunaName,
+  String value,
+  Color color,
+  AppLocalizations l10n,
+) {
+  String getDescription() {
+    switch (gunaName) {
+      case 'Varna':
+        return l10n.insight_guna_varna_desc(value);
+      case 'Vashya':
+        return l10n.insight_guna_vashya_desc(value);
+      case 'Tara':
+        return l10n.insight_guna_tara_desc(value);
+      case 'Yoni':
+        return l10n.insight_guna_yoni_desc(value);
+      case 'Graha Maitri':
+        return l10n.insight_guna_grahamaitri_desc(value);
+      case 'Gana':
+        return l10n.insight_guna_gana_desc(value);
+      case 'Bhakoot':
+        return l10n.insight_guna_bhakoot_desc(value);
+      case 'Nadi':
+        return l10n.insight_guna_nadi_desc(value);
+      default:
+        return l10n.insight_guna_default_desc(gunaName, value);
+    }
+  }
 
-  final significances = {
-    'Varna':
-        'Varna matching carries 1 point in Ashtakoot. It shows social and spiritual compatibility between partners.',
-    'Vashya':
-        'Vashya carries 2 points and indicates the power dynamics and mutual influence in relationships.',
-    'Tara':
-        'Tara carries 3 points and indicates health, longevity, and overall wellbeing of the relationship.',
-    'Yoni':
-        'Yoni carries 4 points and is crucial for physical and instinctual compatibility between partners.',
-    'Graha Maitri':
-        'Graha Maitri carries 5 points and determines mental wavelength and friendship compatibility.',
-    'Gana':
-        'Gana carries 6 points and indicates behavioral and temperamental harmony between partners.',
-    'Bhakoot':
-        'Bhakoot carries 7 points and affects emotional bonding, prosperity, and health after marriage.',
-    'Nadi':
-        'Nadi carries 8 points (highest) and is essential for genetic compatibility and healthy progeny.',
-  };
+  String getSignificance() {
+    switch (gunaName) {
+      case 'Varna':
+        return l10n.insight_guna_varna_significance;
+      case 'Vashya':
+        return l10n.insight_guna_vashya_significance;
+      case 'Tara':
+        return l10n.insight_guna_tara_significance;
+      case 'Yoni':
+        return l10n.insight_guna_yoni_significance;
+      case 'Graha Maitri':
+        return l10n.insight_guna_grahamaitri_significance;
+      case 'Gana':
+        return l10n.insight_guna_gana_significance;
+      case 'Bhakoot':
+        return l10n.insight_guna_bhakoot_significance;
+      case 'Nadi':
+        return l10n.insight_guna_nadi_significance;
+      default:
+        return l10n.insight_guna_default_significance;
+    }
+  }
 
   return InsightData(
     title: gunaName,
     value: value,
-    description:
-        descriptions[gunaName] ??
-        'Your $gunaName factor is $value, used in Vedic compatibility matching.',
-    significance:
-        significances[gunaName] ??
-        'This factor contributes to overall compatibility score in marriage matching.',
+    description: getDescription(),
+    significance: getSignificance(),
     keyPoints: [
-      'Used in Ashtakoot (8-fold) matching system',
-      'Helps assess relationship compatibility',
-      'Based on Moon sign and Nakshatra',
-      'Important for marriage compatibility',
+      l10n.insight_guna_point1,
+      l10n.insight_guna_point2,
+      l10n.insight_guna_point3,
+      l10n.insight_guna_point4,
     ],
     accentColor: color,
     icon: Icons.favorite_rounded,
@@ -933,18 +985,21 @@ InsightData _getGemstoneInsight(
   String gemstone,
   String moonSign,
   String rulingPlanet,
+  AppLocalizations l10n,
 ) {
+  final localizedGemstone = getLocalizedGemstone(gemstone, l10n);
+  final localizedSign = getLocalizedZodiacSign(moonSign, l10n);
+  final localizedDay = getLocalizedDay(_getLuckyDay(moonSign), l10n);
   return InsightData(
-    title: 'Primary Gemstone',
-    value: gemstone,
-    description:
-        '$gemstone is recommended as your primary gemstone based on your Moon sign $moonSign. Gemstones channel planetary energies and can strengthen benefic influences.',
+    title: l10n.insight_primaryGemstone,
+    value: localizedGemstone,
+    description: l10n.insight_gemstone_desc(localizedGemstone, localizedSign),
     significance: rulingPlanet,
     keyPoints: [
-      'Wear on ${_getLuckyDay(moonSign)} for best results',
-      'Consult an astrologer before wearing',
-      'Use natural, untreated stones',
-      'Set in recommended metal for your sign',
+      l10n.insight_gemstone_point1(localizedDay),
+      l10n.insight_gemstone_point2,
+      l10n.insight_gemstone_point3,
+      l10n.insight_gemstone_point4,
     ],
     accentColor: _getGemstoneColor(gemstone),
     icon: Icons.diamond_rounded,
@@ -952,140 +1007,188 @@ InsightData _getGemstoneInsight(
   );
 }
 
-InsightData _getLuckyNumbersInsight(String numbers, String moonSign) {
+InsightData _getLuckyNumbersInsight(
+  String numbers,
+  String moonSign,
+  AppLocalizations l10n,
+) {
+  final localizedSign = getLocalizedZodiacSign(moonSign, l10n);
   return InsightData(
-    title: 'Lucky Numbers',
+    title: l10n.insight_luckyNumbers,
     value: numbers,
-    description:
-        'Based on your Moon sign $moonSign, the numbers $numbers carry positive vibrations for you. Numerology connects numbers to planetary energies.',
-    significance:
-        'Lucky numbers can be used for important decisions, choosing dates, addresses, and other significant selections in life.',
+    description: l10n.insight_luckyNumbers_desc(localizedSign, numbers),
+    significance: l10n.insight_luckyNumbers_significance,
     keyPoints: [
-      'Derived from Moon sign planetary rulership',
-      'Use for important dates and decisions',
-      'Can influence address and phone numbers',
-      'Combined with Nakshatra for precision',
+      l10n.insight_luckyNumbers_point1,
+      l10n.insight_luckyNumbers_point2,
+      l10n.insight_luckyNumbers_point3,
+      l10n.insight_luckyNumbers_point4,
     ],
     accentColor: _Colors.gold,
     icon: Icons.tag_rounded,
   );
 }
 
-InsightData _getLuckyDayInsight(String day, String moonSign) {
+InsightData _getLuckyDayInsight(
+  String day,
+  String moonSign,
+  AppLocalizations l10n,
+) {
+  final localizedDay = getLocalizedDay(day, l10n);
+  final localizedSign = getLocalizedZodiacSign(moonSign, l10n);
   return InsightData(
-    title: 'Lucky Day',
-    value: day,
-    description:
-        '$day is your most auspicious weekday based on your Moon sign $moonSign. This day is ruled by a planet that is harmonious with your chart.',
-    significance:
-        'Important activities, new beginnings, and significant decisions yield better results when initiated on your lucky day.',
+    title: l10n.insight_luckyDay,
+    value: localizedDay,
+    description: l10n.insight_luckyDay_desc(localizedDay, localizedSign),
+    significance: l10n.insight_luckyDay_significance,
     keyPoints: [
-      'Best day for new ventures',
-      'Wear your gemstone on this day',
-      'Good for important meetings',
-      'Enhanced intuition and luck',
+      l10n.insight_luckyDay_point1,
+      l10n.insight_luckyDay_point2,
+      l10n.insight_luckyDay_point3,
+      l10n.insight_luckyDay_point4,
     ],
     accentColor: _Colors.gold,
     icon: Icons.calendar_today_rounded,
   );
 }
 
-InsightData _getLuckyColorsInsight(String colors, String moonSign) {
+InsightData _getLuckyColorsInsight(
+  String colors,
+  String moonSign,
+  AppLocalizations l10n,
+) {
+  final localizedColors = getLocalizedColors(colors, l10n);
+  final localizedSign = getLocalizedZodiacSign(moonSign, l10n);
   return InsightData(
-    title: 'Lucky Colors',
-    value: colors,
-    description:
-        'The colors $colors are harmonious with your Moon sign $moonSign. Colors carry vibrational frequencies that can enhance or diminish planetary energies.',
-    significance:
-        'Incorporating lucky colors in clothing, surroundings, and accessories can subtly enhance positive planetary influences.',
+    title: l10n.insight_luckyColors,
+    value: localizedColors,
+    description: l10n.insight_luckyColors_desc(localizedColors, localizedSign),
+    significance: l10n.insight_luckyColors_significance,
     keyPoints: [
-      'Wear during important occasions',
-      'Use in home and workspace decor',
-      'Enhances positive planetary rays',
-      'Can improve mood and confidence',
+      l10n.insight_luckyColors_point1,
+      l10n.insight_luckyColors_point2,
+      l10n.insight_luckyColors_point3,
+      l10n.insight_luckyColors_point4,
     ],
     accentColor: _Colors.gold,
     icon: Icons.palette_outlined,
   );
 }
 
-InsightData _getLuckyMetalInsight(String metal, String moonSign) {
+InsightData _getLuckyMetalInsight(
+  String metal,
+  String moonSign,
+  AppLocalizations l10n,
+) {
+  final localizedMetal = getLocalizedMetal(metal, l10n);
+  final localizedSign = getLocalizedZodiacSign(moonSign, l10n);
   return InsightData(
-    title: 'Lucky Metal',
-    value: metal,
-    description:
-        '$metal is your recommended metal based on your Moon sign $moonSign. Metals conduct planetary energies and wearing them can strengthen beneficial influences.',
-    significance:
-        'The right metal amplifies gemstone effects and provides protection from negative planetary influences.',
+    title: l10n.insight_luckyMetal,
+    value: localizedMetal,
+    description: l10n.insight_luckyMetal_desc(localizedMetal, localizedSign),
+    significance: l10n.insight_luckyMetal_significance,
     keyPoints: [
-      'Use for setting gemstones',
-      'Wear as jewelry for benefits',
-      'Connects to ruling planet',
-      'Traditional Vedic remedy',
+      l10n.insight_luckyMetal_point1,
+      l10n.insight_luckyMetal_point2,
+      l10n.insight_luckyMetal_point3,
+      l10n.insight_luckyMetal_point4,
     ],
     accentColor: _Colors.gold,
     icon: Icons.hexagon_outlined,
   );
 }
 
-InsightData _getPlanetaryStatusInsight(String status, List<String> planets) {
-  final descriptions = {
-    'Exalted':
-        'Planets in exaltation are at their strongest and most beneficial. They deliver their best results and significations with full power.',
-    'Debilitated':
-        'Planets in debilitation are weakened and may struggle to deliver positive results. Remedies can help mitigate negative effects.',
-    'Retrograde':
-        'Retrograde planets appear to move backward and often bring karmic lessons. They work on internal and past-life matters.',
-    'Combust':
-        'Planets too close to the Sun become combust, their significations may be overshadowed or weakened by solar energy.',
-  };
+InsightData _getPlanetaryStatusInsight(
+  String status,
+  List<String> planets,
+  AppLocalizations l10n,
+) {
+  String getDescription() {
+    switch (status) {
+      case 'Exalted':
+        return l10n.insight_status_exalted_desc;
+      case 'Debilitated':
+        return l10n.insight_status_debilitated_desc;
+      case 'Retrograde':
+        return l10n.insight_status_retrograde_desc;
+      case 'Combust':
+        return l10n.insight_status_combust_desc;
+      default:
+        return l10n.insight_status_default_desc;
+    }
+  }
 
-  final tips = {
-    'Exalted': [
-      'Leverage this strength in life',
-      'Excellent for related activities',
-      'Natural talent area',
-      'Harness during its Dasha',
-    ],
-    'Debilitated': [
-      'Practice related remedies',
-      'Be patient with these areas',
-      'Cancellation may apply',
-      'Growth through challenges',
-    ],
-    'Retrograde': [
-      'Review and reflect themes',
-      'Past-life karmic work',
-      'Internal development focus',
-      'Delays may have purpose',
-    ],
-    'Combust': [
-      'Strengthen through mantras',
-      'May need more effort',
-      'Sun period affects these',
-      'Humility in these areas',
-    ],
-  };
+  List<String> getTips() {
+    switch (status) {
+      case 'Exalted':
+        return [
+          l10n.insight_status_exalted_tip1,
+          l10n.insight_status_exalted_tip2,
+          l10n.insight_status_exalted_tip3,
+          l10n.insight_status_exalted_tip4,
+        ];
+      case 'Debilitated':
+        return [
+          l10n.insight_status_debilitated_tip1,
+          l10n.insight_status_debilitated_tip2,
+          l10n.insight_status_debilitated_tip3,
+          l10n.insight_status_debilitated_tip4,
+        ];
+      case 'Retrograde':
+        return [
+          l10n.insight_status_retrograde_tip1,
+          l10n.insight_status_retrograde_tip2,
+          l10n.insight_status_retrograde_tip3,
+          l10n.insight_status_retrograde_tip4,
+        ];
+      case 'Combust':
+        return [
+          l10n.insight_status_combust_tip1,
+          l10n.insight_status_combust_tip2,
+          l10n.insight_status_combust_tip3,
+          l10n.insight_status_combust_tip4,
+        ];
+      default:
+        return [
+          l10n.insight_status_default_tip1,
+          l10n.insight_status_default_tip2,
+          l10n.insight_status_default_tip3,
+        ];
+    }
+  }
 
-  final planetStr = planets.isEmpty ? 'None' : planets.join(', ');
+  String getLocalizedStatus() {
+    switch (status) {
+      case 'Exalted':
+        return l10n.details_exalted;
+      case 'Debilitated':
+        return l10n.details_debilitated;
+      case 'Retrograde':
+        return l10n.details_retrograde;
+      case 'Combust':
+        return l10n.details_combust;
+      default:
+        return status;
+    }
+  }
+
+  final localizedPlanets =
+      planets.map((p) => getLocalizedPlanetName(p, l10n)).toList();
+  final planetStr =
+      localizedPlanets.isEmpty ? l10n.details_none : localizedPlanets.join(', ');
 
   return InsightData(
-    title: '$status Planets',
+    title: l10n.insight_statusPlanets(getLocalizedStatus()),
     value: planetStr,
-    description:
-        descriptions[status] ??
-        'Planets with special status require attention in chart interpretation.',
+    description: getDescription(),
     significance:
         planets.isEmpty
-            ? 'No planets in this condition in your chart.'
-            : 'These planets (${planets.join(", ")}) are $status in your chart, affecting their significations.',
-    keyPoints:
-        tips[status] ??
-        [
-          'Check individual planet effects',
-          'Consider house placement',
-          'Review Dasha periods',
-        ],
+            ? l10n.insight_status_noPlanets
+            : l10n.insight_status_significance(
+              planetStr,
+              getLocalizedStatus(),
+            ),
+    keyPoints: getTips(),
     accentColor:
         status == 'Exalted'
             ? _Colors.emerald
@@ -1823,6 +1926,7 @@ class _ProfileCard extends StatelessWidget {
                             _getAscendantInsight(
                               kundaliData.ascendant.sign,
                               kundaliData.ascendant.signDegree,
+                              l10n,
                             ),
                           ),
                     ),
@@ -1834,7 +1938,7 @@ class _ProfileCard extends StatelessWidget {
                       onTap:
                           () => _showInsightSheet(
                             context,
-                            _getMoonSignInsight(kundaliData.moonSign),
+                            _getMoonSignInsight(kundaliData.moonSign, l10n),
                           ),
                     ),
                     const SizedBox(width: _DesignTokens.space8),
@@ -1845,7 +1949,7 @@ class _ProfileCard extends StatelessWidget {
                       onTap:
                           () => _showInsightSheet(
                             context,
-                            _getSunSignInsight(kundaliData.sunSign),
+                            _getSunSignInsight(kundaliData.sunSign, l10n),
                           ),
                     ),
                   ],
@@ -2374,6 +2478,7 @@ class _CoreElementsGrid extends StatelessWidget {
                       _getAscendantInsight(
                         ascendant.sign,
                         ascendant.signDegree,
+                        l10n,
                       ),
                     ),
               ),
@@ -2390,7 +2495,7 @@ class _CoreElementsGrid extends StatelessWidget {
                 onTap:
                     () => _showInsightSheet(
                       context,
-                      _getElementInsight(element, ascendant.sign),
+                      _getElementInsight(element, ascendant.sign, l10n),
                     ),
               ),
             ),
@@ -2410,7 +2515,7 @@ class _CoreElementsGrid extends StatelessWidget {
                 onTap:
                     () => _showInsightSheet(
                       context,
-                      _getLagnaLordInsight(lagnaLord, ascendant.sign),
+                      _getLagnaLordInsight(lagnaLord, ascendant.sign, l10n),
                     ),
               ),
             ),
@@ -2429,6 +2534,7 @@ class _CoreElementsGrid extends StatelessWidget {
                       _getNakshatraLordInsight(
                         nakshatraLord,
                         kundaliData.birthNakshatra,
+                        l10n,
                       ),
                     ),
               ),
@@ -2704,10 +2810,14 @@ class _NakshatraCardState extends State<_NakshatraCard>
   void _onTapUp(TapUpDetails details) {
     setState(() => _isPressed = false);
     _controller.reverse();
+    final l10n = AppLocalizations.of(context)!;
     final nakshatra = widget.kundaliData.birthNakshatra;
     final pada = widget.kundaliData.birthNakshatraPada;
     final gana = _getNakshatraGana(nakshatra);
-    _showInsightSheet(context, _getNakshatraInsight(nakshatra, pada, gana));
+    _showInsightSheet(
+      context,
+      _getNakshatraInsight(nakshatra, pada, gana, l10n),
+    );
   }
 
   void _onTapCancel() {
@@ -3004,7 +3114,7 @@ class _PanchangCard extends StatelessWidget {
             onTap:
                 () => _showInsightSheet(
                   context,
-                  _getTithiInsight(panchang.tithi, panchang.paksha),
+                  _getTithiInsight(panchang.tithi, panchang.paksha, l10n),
                 ),
           ),
 
@@ -3028,7 +3138,7 @@ class _PanchangCard extends StatelessWidget {
                         onTap:
                             () => _showInsightSheet(
                               context,
-                              _getYogaInsight(panchang.yoga),
+                              _getYogaInsight(panchang.yoga, l10n),
                             ),
                       ),
                     ),
@@ -3039,7 +3149,7 @@ class _PanchangCard extends StatelessWidget {
                         onTap:
                             () => _showInsightSheet(
                               context,
-                              _getKaranaInsight(panchang.karana),
+                              _getKaranaInsight(panchang.karana, l10n),
                             ),
                       ),
                     ),
@@ -3058,6 +3168,7 @@ class _PanchangCard extends StatelessWidget {
                               _getVaraInsight(
                                 panchang.vara,
                                 panchang.varaDeity,
+                                l10n,
                               ),
                             ),
                       ),
@@ -3223,10 +3334,15 @@ class _DashaCardState extends State<_DashaCard>
   void _onTapUp(TapUpDetails details) {
     setState(() => _isPressed = false);
     _controller.reverse();
+    final l10n = AppLocalizations.of(context)!;
     final dasha = widget.kundaliData.dashaInfo;
     _showInsightSheet(
       context,
-      _getMahadashaInsight(dasha.currentMahadasha, dasha.remainingYears),
+      _getMahadashaInsight(
+        dasha.currentMahadasha,
+        dasha.remainingYears,
+        l10n,
+      ),
     );
   }
 
@@ -3660,9 +3776,10 @@ class _GunaCellState extends State<_GunaCell> {
   bool _isPressed = false;
 
   void _showGunaInsight() {
+    final l10n = AppLocalizations.of(context)!;
     _showInsightSheet(
       context,
-      _getGunaInsight(widget.label, widget.value, widget.color),
+      _getGunaInsight(widget.label, widget.value, widget.color, l10n),
     );
   }
 
@@ -3818,6 +3935,7 @@ class _LuckyElementsCard extends StatelessWidget {
                         _getLuckyNumbersInsight(
                           _getLuckyNumbers(moonSign),
                           moonSign,
+                          l10n,
                         ),
                       ),
                 ),
@@ -3831,7 +3949,11 @@ class _LuckyElementsCard extends StatelessWidget {
                   onTap:
                       () => _showInsightSheet(
                         context,
-                        _getLuckyDayInsight(_getLuckyDay(moonSign), moonSign),
+                        _getLuckyDayInsight(
+                          _getLuckyDay(moonSign),
+                          moonSign,
+                          l10n,
+                        ),
                       ),
                 ),
               ),
@@ -3851,6 +3973,7 @@ class _LuckyElementsCard extends StatelessWidget {
                         _getLuckyColorsInsight(
                           _getLuckyColors(moonSign),
                           moonSign,
+                          l10n,
                         ),
                       ),
                 ),
@@ -3867,6 +3990,7 @@ class _LuckyElementsCard extends StatelessWidget {
                         _getLuckyMetalInsight(
                           _getLuckyMetal(moonSign),
                           moonSign,
+                          l10n,
                         ),
                       ),
                 ),
@@ -3931,6 +4055,7 @@ class _InteractiveGemstoneRowState extends State<_InteractiveGemstoneRow>
             widget.gemstone,
             widget.moonSign,
             getLocalizedGemstoneRuler(widget.gemstone, l10n),
+            l10n,
           ),
         );
       },
@@ -4282,9 +4407,10 @@ class _StatusRowItemState extends State<_StatusRowItem> {
   bool _isPressed = false;
 
   void _showStatusInsight() {
+    final l10n = AppLocalizations.of(context)!;
     _showInsightSheet(
       context,
-      _getPlanetaryStatusInsight(widget.label, widget.planets),
+      _getPlanetaryStatusInsight(widget.label, widget.planets, l10n),
     );
   }
 

@@ -287,6 +287,222 @@ class AppLocalizationsHi extends AppLocalizations {
   String get chart_category_special_desc => 'अद्वितीय विश्लेषणात्मक विधियाँ';
 
   @override
+  String get chart_lagna_display => 'लग्न कुंडली';
+
+  @override
+  String get chart_lagna_subtitle => 'राशि चार्ट / D1 चार्ट';
+
+  @override
+  String get chart_chandra_display => 'चंद्र कुंडली';
+
+  @override
+  String get chart_chandra_subtitle => 'चंद्र कुंडली';
+
+  @override
+  String get chart_surya_display => 'सूर्य कुंडली';
+
+  @override
+  String get chart_surya_subtitle => 'सूर्य कुंडली';
+
+  @override
+  String get chart_bhava_chalit_display => 'चलित कुंडली';
+
+  @override
+  String get chart_bhava_chalit_subtitle => 'भाव चलित चार्ट';
+
+  @override
+  String get chart_hora_display => 'होरा चार्ट';
+
+  @override
+  String get chart_hora_subtitle => 'धन चार्ट';
+
+  @override
+  String get chart_drekkana_display => 'द्रेक्काण चार्ट';
+
+  @override
+  String get chart_drekkana_subtitle => 'भाई-बहन और साहस';
+
+  @override
+  String get chart_chaturthamsa_display => 'चतुर्थांश';
+
+  @override
+  String get chart_chaturthamsa_subtitle => 'संपत्ति और भाग्य';
+
+  @override
+  String get chart_saptamsa_display => 'सप्तांश';
+
+  @override
+  String get chart_saptamsa_subtitle => 'संतान';
+
+  @override
+  String get chart_navamsa_display => 'नवांश कुंडली';
+
+  @override
+  String get chart_navamsa_subtitle => 'D9 - विवाह और धर्म';
+
+  @override
+  String get chart_dasamsa_display => 'दशांश चार्ट';
+
+  @override
+  String get chart_dasamsa_subtitle => 'करियर और पेशा';
+
+  @override
+  String get chart_dwadasamsa_display => 'द्वादशांश';
+
+  @override
+  String get chart_dwadasamsa_subtitle => 'माता-पिता';
+
+  @override
+  String get chart_shodasamsa_display => 'षोडशांश';
+
+  @override
+  String get chart_shodasamsa_subtitle => 'वाहन और सुख';
+
+  @override
+  String get chart_vimsamsa_display => 'विंशांश';
+
+  @override
+  String get chart_vimsamsa_subtitle => 'आध्यात्मिक प्रगति';
+
+  @override
+  String get chart_chaturvimsamsa_display => 'चतुर्विंशांश';
+
+  @override
+  String get chart_chaturvimsamsa_subtitle => 'शिक्षा और ज्ञान';
+
+  @override
+  String get chart_bhamsa_display => 'भांश चार्ट';
+
+  @override
+  String get chart_bhamsa_subtitle => 'नक्षत्रांश';
+
+  @override
+  String get chart_trimshamsa_display => 'त्रिंशांश';
+
+  @override
+  String get chart_trimshamsa_subtitle => 'दुर्भाग्य';
+
+  @override
+  String get chart_khavedamsa_display => 'खवेदांश';
+
+  @override
+  String get chart_khavedamsa_subtitle => 'शुभ प्रभाव';
+
+  @override
+  String get chart_akshavedamsa_display => 'अक्षवेदांश';
+
+  @override
+  String get chart_akshavedamsa_subtitle => 'सामान्य संकेत';
+
+  @override
+  String get chart_shashtiamsa_display => 'षष्ट्यांश';
+
+  @override
+  String get chart_shashtiamsa_subtitle => 'पूर्व जन्म कर्म';
+
+  @override
+  String get chart_sudarshan_display => 'सुदर्शन चक्र';
+
+  @override
+  String get chart_sudarshan_subtitle => 'त्रिविध चार्ट दृश्य';
+
+  @override
+  String get chart_ashtakavarga_display => 'अष्टकवर्ग';
+
+  @override
+  String get chart_ashtakavarga_subtitle => 'बिंदु आधारित बल';
+
+  @override
+  String get chart_guide_title => 'चार्ट प्रकार मार्गदर्शिका';
+
+  @override
+  String get chart_guide_subtitle => 'वैदिक ज्योतिष चार्ट को समझना';
+
+  @override
+  String get chart_meaning_lagna =>
+      'वैदिक ज्योतिष की नींव। आपके समग्र जीवन पथ, व्यक्तित्व, शारीरिक शरीर और जन्म के समय उदय राशि के आधार पर सामान्य प्रवृत्तियों को दर्शाता है।';
+
+  @override
+  String get chart_meaning_chandra =>
+      'चंद्र कुंडली आपके भावनात्मक स्वभाव, मन, मानसिक पैटर्न और मनोवैज्ञानिक प्रवृत्तियों को प्रकट करती है। आंतरिक भावनाओं और प्रतिक्रियाओं को समझने के लिए आवश्यक।';
+
+  @override
+  String get chart_meaning_surya =>
+      'सूर्य कुंडली आपके आत्मा के उद्देश्य, अहंकार, जीवन शक्ति, पिता, अधिकारी व्यक्तियों और सरकारी या नेतृत्व भूमिकाओं में करियर को दर्शाती है।';
+
+  @override
+  String get chart_meaning_bhava_chalit =>
+      'यह दिखाने के लिए सटीक भाव कुस्पों का उपयोग करता है कि ग्रह वास्तव में कहां प्रभाव डालते हैं। प्रत्येक ग्रह किस भाव को प्रभावित करता है इसकी भविष्यवाणी के लिए अधिक सटीक।';
+
+  @override
+  String get chart_meaning_navamsa =>
+      'D9 - सबसे महत्वपूर्ण वर्ग चार्ट। विवाह गुणवत्ता, जीवनसाथी स्वभाव, धर्म और ग्रहों की शक्ति को प्रकट करता है।';
+
+  @override
+  String get chart_meaning_dasamsa =>
+      'D10 - करियर और पेशा चार्ट। पेशेवर सफलता, समाज में स्थिति, मान्यता और संतुष्टि देने वाले कार्य को दर्शाता है।';
+
+  @override
+  String get chart_meaning_saptamsa =>
+      'D7 - संतान चार्ट। प्रजनन क्षमता, बच्चों की संख्या, बच्चों के साथ संबंध और रचनात्मक उत्पादन को दर्शाता है।';
+
+  @override
+  String get chart_meaning_dwadasamsa =>
+      'D12 - माता-पिता चार्ट। माता-पिता के साथ संबंध, पैतृक कर्म और पारिवारिक वंश प्रभावों को दर्शाता है।';
+
+  @override
+  String get chart_meaning_trimshamsa =>
+      'D30 - दुर्भाग्य चार्ट। संभावित चुनौतियों, स्वास्थ्य समस्याओं, दुर्घटनाओं और सावधानी की आवश्यकता वाले क्षेत्रों को प्रकट करता है।';
+
+  @override
+  String get chart_meaning_hora =>
+      'D2 - धन चार्ट। वित्तीय क्षमता, कमाई की क्षमता और भौतिक संसाधनों के संचय को दर्शाता है।';
+
+  @override
+  String get chart_meaning_drekkana =>
+      'D3 - भाई-बहन और साहस चार्ट। भाई-बहनों के साथ संबंध, आंतरिक साहस और संचार क्षमताओं को दर्शाता है।';
+
+  @override
+  String get chart_meaning_chaturthamsa =>
+      'D4 - संपत्ति और भाग्य चार्ट। अचल संपत्ति, वाहनों और समग्र भौतिक सुख-सुविधाओं को दर्शाता है।';
+
+  @override
+  String get chart_meaning_shodasamsa =>
+      'D16 - वाहन और सुख चार्ट। विलासिता की वस्तुएं, वाहन और भौतिक सुख को दर्शाता है।';
+
+  @override
+  String get chart_meaning_vimsamsa =>
+      'D20 - आध्यात्मिक प्रगति चार्ट। आध्यात्मिक झुकाव, धार्मिक प्रथाओं और ध्यान की क्षमता को प्रकट करता है।';
+
+  @override
+  String get chart_meaning_chaturvimsamsa =>
+      'D24 - शिक्षा चार्ट। शैक्षणिक उपलब्धियों, सीखने की क्षमताओं और ज्ञान अर्जन को दर्शाता है।';
+
+  @override
+  String get chart_meaning_bhamsa =>
+      'D27 - शक्ति चार्ट। कुंडली में निहित शक्तियों और कमजोरियों को प्रकट करता है।';
+
+  @override
+  String get chart_meaning_khavedamsa =>
+      'D40 - शुभ प्रभाव चार्ट। सकारात्मक कार्मिक पैटर्न और आशीर्वाद दिखाता है।';
+
+  @override
+  String get chart_meaning_akshavedamsa =>
+      'D45 - सामान्य संकेत चार्ट। समग्र जीवन संकेत प्रदान करता है।';
+
+  @override
+  String get chart_meaning_shashtiamsa =>
+      'D60 - पूर्व जन्म कर्म चार्ट। पिछले जन्मों से कार्मिक पैटर्न दिखाने वाला सबसे विस्तृत चार्ट।';
+
+  @override
+  String get chart_meaning_sudarshan =>
+      'व्यापक विश्लेषण के लिए लग्न, चंद्र और सूर्य चार्ट को संयोजित करने वाला त्रिविध चार्ट दृश्य।';
+
+  @override
+  String get chart_meaning_ashtakavarga =>
+      'प्रत्येक भाव में ग्रहीय प्रभावों को संख्यात्मक रूप से दर्शाने वाला बिंदु-आधारित शक्ति विश्लेषण।';
+
+  @override
   String get display_shareComingSoon => 'शेयर जल्द आ रहा है';
 
   @override
@@ -2633,12 +2849,28 @@ class AppLocalizationsHi extends AppLocalizations {
   String get strength_maxPossible => 'Maximum possible: 337 points';
 
   @override
+  String get strength_maxPossible337 => 'Maximum possible: 337 points';
+
+  @override
   String get strength_calculationSum =>
+      'Calculation: Sum of all 12 sign SAV values';
+
+  @override
+  String get strength_calculationSum12 =>
       'Calculation: Sum of all 12 sign SAV values';
 
   @override
   String get strength_higherBetter =>
       'Higher = Better overall transit strength';
+
+  @override
+  String get strength_bavRange => 'Individual BAV: 0-8 points per planet-sign';
+
+  @override
+  String get strength_savRange => 'SAV: 0-56 points per sign (combined)';
+
+  @override
+  String get strength_goodBavThreshold => 'Good BAV: ≥4 points';
 
   @override
   String get strength_lagnaLord => 'Lagna Lord';
@@ -2759,16 +2991,6 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String strength_countPlanets(int count) {
-    return 'Count: $count planets';
-  }
-
-  @override
-  String strength_category(String category) {
-    return 'Category: $category';
-  }
-
-  @override
   String get strength_scoreRangeStrong => 'Score Range: 15-20 points (75-100%)';
 
   @override
@@ -2778,13 +3000,60 @@ class AppLocalizationsHi extends AppLocalizations {
   String get strength_scoreRangeWeak => 'Score Range: 0-10 points (0-50%)';
 
   @override
-  String strength_planetsPlanets(String label) {
+  String strength_categoryLabel(String category) {
+    return 'Category: $category';
+  }
+
+  @override
+  String strength_countPlanets(int count) {
+    return 'Count: $count planets';
+  }
+
+  @override
+  String strength_labelPlanets(String label) {
     return '$label Planets';
   }
 
   @override
   String strength_haveCount(String value, String label) {
     return 'You have $value $label planets in your chart.';
+  }
+
+  @override
+  String strength_statusCategory(String status) {
+    return 'Status: $status';
+  }
+
+  @override
+  String strength_strongPlanetsRange(int count) {
+    return 'Strong Planets: $count (15-20 points)';
+  }
+
+  @override
+  String strength_mediumPlanetsRange(int count) {
+    return 'Medium Planets: $count (10-15 points)';
+  }
+
+  @override
+  String strength_weakPlanetsRange(int count) {
+    return 'Weak Planets: $count (0-10 points)';
+  }
+
+  @override
+  String get strength_maxScore20 => 'Max score: 20 points per planet';
+
+  @override
+  String get strength_strongVimshopakaExplain =>
+      'Strong Vimshopaka = Good dignity across all charts';
+
+  @override
+  String strength_category(String category) {
+    return 'Category: $category';
+  }
+
+  @override
+  String strength_planetsPlanets(String label) {
+    return '$label Planets';
   }
 
   @override
@@ -5455,96 +5724,95 @@ class AppLocalizationsHi extends AppLocalizations {
   String get transit_degree_label => 'Degree';
 
   @override
-  String get yogas_nav_overview => 'Overview';
+  String get yogas_nav_overview => 'अवलोकन';
 
   @override
-  String get yogas_nav_yogas => 'Yogas';
+  String get yogas_nav_yogas => 'योग';
 
   @override
-  String get yogas_nav_doshas => 'Doshas';
+  String get yogas_nav_doshas => 'दोष';
 
   @override
-  String get yogas_nav_insights => 'Insights';
+  String get yogas_nav_insights => 'अंतर्दृष्टि';
 
   @override
-  String get yogas_balance_excellent => 'Excellent';
+  String get yogas_balance_excellent => 'उत्कृष्ट';
 
   @override
-  String get yogas_balance_veryFavorable => 'Very Favorable';
+  String get yogas_balance_veryFavorable => 'अति शुभ';
 
   @override
-  String get yogas_balance_favorable => 'Favorable';
+  String get yogas_balance_favorable => 'शुभ';
 
   @override
-  String get yogas_balance_mixed => 'Mixed';
+  String get yogas_balance_mixed => 'मिश्रित';
 
   @override
-  String get yogas_balance_challenging => 'Challenging';
+  String get yogas_balance_challenging => 'चुनौतीपूर्ण';
 
   @override
-  String get yogas_balance_veryGood => 'Very Good';
+  String get yogas_balance_veryGood => 'बहुत अच्छा';
 
   @override
-  String get yogas_balance_good => 'Good';
+  String get yogas_balance_good => 'अच्छा';
 
   @override
-  String get yogas_balance_needsAttention => 'Needs Attention';
+  String get yogas_balance_needsAttention => 'ध्यान आवश्यक';
 
   @override
-  String get yogas_overview_title => 'Yoga Overview';
+  String get yogas_overview_title => 'योग अवलोकन';
 
   @override
-  String get yogas_auspiciousYogas => 'Auspicious Yogas';
+  String get yogas_auspiciousYogas => 'शुभ योग';
 
   @override
   String yogas_beneficialCombinations(Object count) {
-    return '$count beneficial combinations';
+    return '$count शुभ संयोग';
   }
 
   @override
-  String get yogas_doshasPresent => 'Doshas Present';
+  String get yogas_doshasPresent => 'दोष उपस्थित';
 
   @override
   String yogas_detected(Object count) {
-    return '$count detected';
+    return '$count पाए गए';
   }
 
   @override
-  String get yogas_astrologicalInsights => 'Astrological Insights';
+  String get yogas_astrologicalInsights => 'ज्योतिषीय अंतर्दृष्टि';
 
   @override
-  String get yogas_understandingYourChart => 'Understanding your chart';
+  String get yogas_understandingYourChart => 'आपकी कुंडली को समझना';
 
   @override
-  String get yogas_noYogasDetected => 'No Yogas Detected';
+  String get yogas_noYogasDetected => 'कोई योग नहीं मिला';
 
   @override
-  String get yogas_noYogasMessage =>
-      'Standard chart configuration without special combinations.';
+  String get yogas_noYogasMessage => 'विशेष संयोग के बिना मानक कुंडली विन्यास।';
 
   @override
-  String get yogas_noDoshasFound => 'No Doshas Found';
+  String get yogas_noDoshasFound => 'कोई दोष नहीं मिला';
 
   @override
-  String get yogas_noDoshasMessage => 'Your chart is free from major doshas.';
+  String get yogas_noDoshasMessage => 'आपकी कुंडली प्रमुख दोषों से मुक्त है।';
 
   @override
-  String get yogas_yogas => 'Yogas';
+  String get yogas_yogas => 'योग';
 
   @override
-  String get yogas_doshas => 'Doshas';
+  String get yogas_doshas => 'दोष';
 
   @override
-  String get yogas_strong => 'Strong';
+  String get yogas_strong => 'बलवान';
 
   @override
-  String get yogas_moderate => 'Moderate';
+  String get yogas_moderate => 'मध्यम';
 
   @override
-  String get yogas_severe => 'Severe';
+  String get yogas_severe => 'गंभीर';
 
   @override
-  String get yogas_mild => 'Mild';
+  String get yogas_mild => 'हल्का';
 
   @override
   String get yogas_low => 'Low';
@@ -5553,52 +5821,52 @@ class AppLocalizationsHi extends AppLocalizations {
   String get yogas_high => 'High';
 
   @override
-  String get yogas_type_raja => 'Raja';
+  String get yogas_type_raja => 'राज';
 
   @override
-  String get yogas_type_dhana => 'Dhana';
+  String get yogas_type_dhana => 'धन';
 
   @override
-  String get yogas_type_mahapurusha => 'Mahapurusha';
+  String get yogas_type_mahapurusha => 'महापुरुष';
 
   @override
-  String get yogas_type_lunar => 'Lunar';
+  String get yogas_type_lunar => 'चंद्र';
 
   @override
-  String get yogas_type_rajaYoga => 'Raja Yoga';
+  String get yogas_type_rajaYoga => 'राज योग';
 
   @override
-  String get yogas_type_dhanaYoga => 'Dhana Yoga';
+  String get yogas_type_dhanaYoga => 'धन योग';
 
   @override
-  String get yogas_type_lunarYoga => 'Lunar Yoga';
+  String get yogas_type_lunarYoga => 'चंद्र योग';
 
   @override
-  String get yogas_type_panchaMahapurusha => 'Pancha Mahapurusha';
+  String get yogas_type_panchaMahapurusha => 'पंच महापुरुष';
 
   @override
-  String get yogas_type_beneficYoga => 'Benefic Yoga';
+  String get yogas_type_beneficYoga => 'शुभ योग';
 
   @override
-  String get yogas_type_majorDosha => 'Major Dosha';
+  String get yogas_type_majorDosha => 'प्रमुख दोष';
 
   @override
-  String get yogas_type_ancestral => 'Ancestral';
+  String get yogas_type_ancestral => 'पैतृक';
 
   @override
-  String get yogas_type_conjunctionDosha => 'Conjunction Dosha';
+  String get yogas_type_conjunctionDosha => 'युति दोष';
 
   @override
-  String get yogas_strength_strong => 'Strong';
+  String get yogas_strength_strong => 'बलवान';
 
   @override
-  String get yogas_strength_moderate => 'Moderate';
+  String get yogas_strength_moderate => 'मध्यम';
 
   @override
-  String get yogas_strength_high => 'High';
+  String get yogas_strength_high => 'उच्च';
 
   @override
-  String get yogas_strength_low => 'Low';
+  String get yogas_strength_low => 'निम्न';
 
   @override
   String yogas_inHouse(String house) {
@@ -5632,91 +5900,91 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get yogas_type_yoga => 'Yoga';
+  String get yogas_type_yoga => 'योग';
 
   @override
-  String get yogas_type_dosha => 'Dosha';
+  String get yogas_type_dosha => 'दोष';
 
   @override
-  String get yogas_formation => 'Formation';
+  String get yogas_formation => 'निर्माण';
 
   @override
-  String get yogas_planetsInvolved => 'Planets Involved';
+  String get yogas_planetsInvolved => 'संबंधित ग्रह';
 
   @override
   String yogas_whatIs(Object name) {
-    return 'What is $name?';
+    return '$name क्या है?';
   }
 
   @override
-  String get yogas_potentialEffects => 'Potential Effects';
+  String get yogas_potentialEffects => 'संभावित प्रभाव';
 
   @override
-  String get yogas_benefits => 'Benefits';
+  String get yogas_benefits => 'लाभ';
 
   @override
-  String get yogas_remedies => 'Remedies';
+  String get yogas_remedies => 'उपाय';
 
   @override
-  String get yogas_howToStrengthen => 'How to Strengthen';
+  String get yogas_howToStrengthen => 'कैसे मजबूत करें';
 
   @override
-  String get yogas_insight_understanding => 'Understanding';
+  String get yogas_insight_understanding => 'समझ';
 
   @override
-  String get yogas_insight_activation => 'Activation';
+  String get yogas_insight_activation => 'सक्रियण';
 
   @override
-  String get yogas_insight_strength => 'Strength';
+  String get yogas_insight_strength => 'बल';
 
   @override
-  String get yogas_insight_remedies => 'Remedies';
+  String get yogas_insight_remedies => 'उपाय';
 
   @override
   String get yogas_insight_understanding_desc =>
-      'Yogas are beneficial combinations that enhance life areas.';
+      'योग शुभ संयोग हैं जो जीवन के क्षेत्रों को बढ़ाते हैं।';
 
   @override
   String get yogas_insight_activation_desc =>
-      'Yogas manifest during their planetary Dasha periods.';
+      'योग अपने ग्रहों की दशा अवधि में प्रकट होते हैं।';
 
   @override
   String get yogas_insight_strength_desc =>
-      'Planet placement determines yoga manifestation level.';
+      'ग्रह स्थिति योग की अभिव्यक्ति स्तर निर्धारित करती है।';
 
   @override
   String get yogas_insight_remedies_desc =>
-      'Most doshas can be mitigated through proper remedies.';
+      'अधिकांश दोषों को उचित उपायों से कम किया जा सकता है।';
 
   @override
-  String get yogas_kaalSarpRemedy => 'Kaal Sarp Remedy';
+  String get yogas_kaalSarpRemedy => 'काल सर्प उपाय';
 
   @override
   String get yogas_kaalSarpRemedy_desc =>
-      'Trimbakeshwar Puja recommended. Chant Maha Mrityunjaya Mantra 108 times daily.';
+      'त्र्यंबकेश्वर पूजा की सिफारिश। महामृत्युंजय मंत्र 108 बार रोज जाप करें।';
 
   @override
-  String get yogas_manglikRemedy => 'Manglik Remedy';
+  String get yogas_manglikRemedy => 'मांगलिक उपाय';
 
   @override
   String get yogas_manglikRemedy_desc =>
-      'Perform Mangal Shanti Puja. Recite Hanuman Chalisa on Tuesdays.';
+      'मंगल शांति पूजा करें। मंगलवार को हनुमान चालीसा पढ़ें।';
 
   @override
-  String get yogas_doshaRemedy => 'Dosha Remedy';
+  String get yogas_doshaRemedy => 'दोष उपाय';
 
   @override
-  String get yogas_noSpecialYogas => 'No Special Yogas';
+  String get yogas_noSpecialYogas => 'कोई विशेष योग नहीं';
 
   @override
-  String get yogas_doshaFreeChart => 'Dosha-Free Chart';
+  String get yogas_doshaFreeChart => 'दोष-मुक्त कुंडली';
 
   @override
-  String get yogas_overview_insight_title => 'Yoga & Dosha Overview';
+  String get yogas_overview_insight_title => 'योग और दोष अवलोकन';
 
   @override
   String get yogas_overview_insight_desc =>
-      'Yogas are auspicious planetary combinations that bestow specific benefits, while Doshas are challenging combinations that may create obstacles. The balance between them shapes your life experiences and opportunities.';
+      'योग शुभ ग्रह संयोग हैं जो विशिष्ट लाभ देते हैं, जबकि दोष चुनौतीपूर्ण संयोग हैं जो बाधाएं उत्पन्न कर सकते हैं। इनका संतुलन आपके जीवन के अनुभवों को आकार देता है।';
 
   @override
   String yogas_overview_insight_significance(
@@ -5727,152 +5995,375 @@ class AppLocalizationsHi extends AppLocalizations {
     Object strongYogas,
     Object yogaCount,
   ) {
-    return 'Your chart has $yogaCount yoga(s) and $doshaCount dosha(s). $strongYogas yoga(s) are strong, and $severeDoshas dosha(s) are severe. With $ascendant Lagna, the overall balance is $balanceStatus.';
+    return 'आपकी कुंडली में $yogaCount योग और $doshaCount दोष हैं। $strongYogas योग बलवान हैं, और $severeDoshas दोष गंभीर हैं। $ascendant लग्न के साथ, समग्र संतुलन $balanceStatus है।';
   }
 
   @override
   String yogas_overview_insight_keypoint1(Object count, Object strong) {
-    return 'Total Yogas: $count (Strong: $strong)';
+    return 'कुल योग: $count (बलवान: $strong)';
   }
 
   @override
   String yogas_overview_insight_keypoint2(Object count, Object severe) {
-    return 'Total Doshas: $count (Severe: $severe)';
+    return 'कुल दोष: $count (गंभीर: $severe)';
   }
 
   @override
   String yogas_overview_insight_keypoint3(Object ascendant) {
-    return 'Ascendant: $ascendant';
+    return 'लग्न: $ascendant';
   }
 
   @override
   String yogas_overview_insight_keypoint4(Object balance) {
-    return 'Overall Balance: $balance';
+    return 'समग्र संतुलन: $balance';
   }
 
   @override
   String get yogas_overview_insight_keypoint5 =>
-      'Yogas manifest during their planetary Dasha periods';
+      'योग अपने ग्रहों की दशा अवधि में प्रकट होते हैं';
 
   @override
   String get yogas_overview_insight_keypoint6 =>
-      'Most doshas can be mitigated through proper remedies';
+      'अधिकांश दोषों को उचित उपायों से कम किया जा सकता है';
 
   @override
   String get yogas_typeInsight_rajaYoga_desc =>
-      'Raja Yogas are the most powerful combinations that bestow kingship, authority, power, and success. They are formed by the association of lords of Kendra (1, 4, 7, 10) and Trikona (1, 5, 9) houses.';
+      'राज योग सबसे शक्तिशाली संयोग हैं जो राजसत्ता, अधिकार, शक्ति और सफलता प्रदान करते हैं। ये केंद्र (1, 4, 7, 10) और त्रिकोण (1, 5, 9) भावों के स्वामियों के संबंध से बनते हैं।';
 
   @override
   String get yogas_typeInsight_rajaYoga_significance =>
-      'Success in career, rise to power, leadership, authority, fame';
+      'करियर में सफलता, शक्ति का उदय, नेतृत्व, अधिकार, प्रसिद्धि';
 
   @override
   String get yogas_typeInsight_dhanaYoga_desc =>
-      'Dhana Yogas indicate wealth and prosperity. They are formed by the association of lords of wealth houses (2, 5, 9, 11) with each other or with benefics.';
+      'धन योग संपत्ति और समृद्धि का संकेत देते हैं। ये धन भावों (2, 5, 9, 11) के स्वामियों के परस्पर या शुभ ग्रहों के साथ संबंध से बनते हैं।';
 
   @override
   String get yogas_typeInsight_dhanaYoga_significance =>
-      'Financial prosperity, accumulation of wealth, material success';
+      'आर्थिक समृद्धि, धन संचय, भौतिक सफलता';
 
   @override
   String get yogas_typeInsight_mahapurusha_desc =>
-      'These are five great yogas formed when Mars, Mercury, Jupiter, Venus, or Saturn are in their own or exaltation sign in a Kendra house. They create exceptional individuals.';
+      'ये पांच महान योग हैं जो मंगल, बुध, बृहस्पति, शुक्र या शनि अपने या उच्च राशि में केंद्र भाव में होने पर बनते हैं। ये असाधारण व्यक्ति बनाते हैं।';
 
   @override
   String get yogas_typeInsight_mahapurusha_significance =>
-      'Outstanding personality, exceptional achievements, leadership in specific domains';
+      'उत्कृष्ट व्यक्तित्व, असाधारण उपलब्धियां, विशिष्ट क्षेत्रों में नेतृत्व';
 
   @override
   String get yogas_typeInsight_lunarYoga_desc =>
-      'Lunar Yogas are formed based on the Moon\'s relationship with other planets. They primarily affect the mind, emotions, and mental abilities.';
+      'चंद्र योग चंद्रमा के अन्य ग्रहों के साथ संबंध पर आधारित होते हैं। ये मुख्य रूप से मन, भावनाओं और मानसिक क्षमताओं को प्रभावित करते हैं।';
 
   @override
   String get yogas_typeInsight_lunarYoga_significance =>
-      'Mental strength, emotional stability, intuition, memory';
+      'मानसिक शक्ति, भावनात्मक स्थिरता, अंतर्ज्ञान, स्मृति';
 
   @override
   String get yogas_typeInsight_severeDosha_desc =>
-      'Severe doshas require immediate attention and remedial measures. They can significantly impact the areas they govern.';
+      'गंभीर दोषों को तत्काल ध्यान और उपचारात्मक उपायों की आवश्यकता होती है। ये उन क्षेत्रों को महत्वपूर्ण रूप से प्रभावित कर सकते हैं जिन पर ये शासन करते हैं।';
 
   @override
   String get yogas_typeInsight_severeDosha_significance =>
-      'May cause significant challenges in specific life areas';
+      'विशिष्ट जीवन क्षेत्रों में महत्वपूर्ण चुनौतियां उत्पन्न कर सकते हैं';
 
   @override
   String get yogas_typeInsight_moderateDosha_desc =>
-      'Moderate doshas have noticeable effects but are manageable with proper awareness and remedies.';
+      'मध्यम दोषों के ध्यान देने योग्य प्रभाव होते हैं लेकिन उचित जागरूकता और उपायों से इन्हें प्रबंधित किया जा सकता है।';
 
   @override
   String get yogas_typeInsight_moderateDosha_significance =>
-      'Some challenges that can be overcome with effort';
+      'कुछ चुनौतियां जिन्हें प्रयास से दूर किया जा सकता है';
 
   @override
   String get yogas_typeInsight_mildDosha_desc =>
-      'Low severity doshas have minimal impact and may not require intensive remedial measures.';
+      'हल्के दोषों का न्यूनतम प्रभाव होता है और इन्हें गहन उपचारात्मक उपायों की आवश्यकता नहीं हो सकती।';
 
   @override
   String get yogas_typeInsight_mildDosha_significance =>
-      'Minor influences that are easily managed';
+      'मामूली प्रभाव जिन्हें आसानी से प्रबंधित किया जा सकता है';
 
   @override
   String get yogas_strengthInsight_strong_desc =>
-      'Strong yogas are fully activated and manifest their effects clearly in life. The planets involved are well-placed, dignified, and free from afflictions.';
+      'बलवान योग पूर्ण रूप से सक्रिय होते हैं और जीवन में अपने प्रभाव स्पष्ट रूप से प्रकट करते हैं। संबंधित ग्रह अच्छी स्थिति में, मर्यादित और पीड़ा से मुक्त होते हैं।';
 
   @override
   String get yogas_strengthInsight_moderate_desc =>
-      'Moderate strength indicates partial manifestation. The yoga is present but planets may have mixed dignity or receive both benefic and malefic influences.';
+      'मध्यम बल आंशिक अभिव्यक्ति को इंगित करता है। योग मौजूद है लेकिन ग्रहों की मिश्रित मर्यादा हो सकती है या वे शुभ और अशुभ दोनों प्रभाव प्राप्त कर सकते हैं।';
 
   @override
   String get yogas_strengthInsight_severe_desc =>
-      'Severe doshas have strong impact and require attention. Remedial measures are recommended to mitigate their effects.';
+      'गंभीर दोषों का मजबूत प्रभाव होता है और इन्हें ध्यान देने की आवश्यकता होती है। उनके प्रभावों को कम करने के लिए उपचारात्मक उपायों की सिफारिश की जाती है।';
 
   @override
   String get yogas_insightCard_understanding_desc =>
-      'Yogas are beneficial planetary combinations formed by specific relationships between planets and houses. They indicate areas of life where you have special potential or blessings.';
+      'योग ग्रहों और भावों के बीच विशिष्ट संबंधों द्वारा बनने वाले शुभ ग्रह संयोग हैं। ये जीवन के उन क्षेत्रों को इंगित करते हैं जहां आपके पास विशेष क्षमता या आशीर्वाद है।';
 
   @override
   String get yogas_insightCard_understanding_significance =>
-      'Understanding your yogas helps you recognize your strengths and work with your natural talents.';
+      'अपने योगों को समझने से आपको अपनी शक्तियों को पहचानने और अपनी प्राकृतिक प्रतिभाओं के साथ काम करने में मदद मिलती है।';
 
   @override
   String get yogas_insightCard_activation_desc =>
-      'Yogas don\'t always manifest constantly—they activate during the Dasha (planetary period) of the planets involved. The Dasha system in Vedic astrology determines when each yoga will give its results.';
+      'योग हमेशा लगातार प्रकट नहीं होते—वे संबंधित ग्रहों की दशा (ग्रह अवधि) के दौरान सक्रिय होते हैं। वैदिक ज्योतिष में दशा प्रणाली यह निर्धारित करती है कि प्रत्येक योग कब अपने परिणाम देगा।';
 
   @override
   String get yogas_insightCard_activation_significance =>
-      'Knowing when your yogas activate helps in timing important life decisions.';
+      'यह जानना कि आपके योग कब सक्रिय होते हैं, महत्वपूर्ण जीवन निर्णयों के समय में मदद करता है।';
 
   @override
   String get yogas_insightCard_strength_desc =>
-      'The strength of a yoga depends on the dignity of planets involved (own sign, exaltation, debilitation), aspects from benefics or malefics, and placement in houses.';
+      'योग की शक्ति संबंधित ग्रहों की मर्यादा (स्व राशि, उच्च, नीच), शुभ या अशुभ ग्रहों की दृष्टि, और भावों में स्थिति पर निर्भर करती है।';
 
   @override
   String get yogas_insightCard_strength_significance =>
-      'Strong yogas manifest clearly while weak ones need strengthening through remedies.';
+      'बलवान योग स्पष्ट रूप से प्रकट होते हैं जबकि कमजोर योगों को उपायों के माध्यम से मजबूत करने की आवश्यकता होती है।';
 
   @override
   String get yogas_insightCard_remedies_desc =>
-      'Doshas can be mitigated through various remedies including mantras, gemstones, charity, fasting, and pujas. The right remedy depends on the specific dosha and your chart.';
+      'दोषों को मंत्र, रत्न, दान, उपवास और पूजा सहित विभिन्न उपायों के माध्यम से कम किया जा सकता है। सही उपाय विशिष्ट दोष और आपकी कुंडली पर निर्भर करता है।';
 
   @override
   String get yogas_insightCard_remedies_significance =>
-      'Proper remedies performed with faith can significantly reduce dosha effects.';
+      'श्रद्धा के साथ किए गए उचित उपाय दोष प्रभावों को काफी कम कर सकते हैं।';
 
   @override
   String get yogas_emptyState_noYogas_desc =>
-      'Your chart does not have any of the commonly recognized special yogas. This is normal and doesn\'t mean anything negative—many successful people have charts without named yogas. The strength of your chart comes from other factors like planet dignity, house placements, and aspects.';
+      'आपकी कुंडली में आमतौर पर मान्यता प्राप्त विशेष योग नहीं हैं। यह सामान्य है और इसका कोई नकारात्मक अर्थ नहीं है—कई सफल लोगों की कुंडली में नामित योग नहीं होते। आपकी कुंडली की शक्ति अन्य कारकों जैसे ग्रह मर्यादा, भाव स्थिति और दृष्टियों से आती है।';
 
   @override
   String get yogas_emptyState_noDoshas_desc =>
-      'Congratulations! Your chart is free from major doshas like Manglik, Kaal Sarp, or other challenging combinations. This indicates fewer karmic obstacles in the areas typically affected by these doshas.';
+      'बधाई! आपकी कुंडली मांगलिक, काल सर्प जैसे प्रमुख दोषों से मुक्त है। यह इन दोषों से प्रभावित क्षेत्रों में कम कार्मिक बाधाओं को इंगित करता है।';
 
   @override
   String get yogas_kaalSarpDosha_desc =>
-      'Kaal Sarp Dosha occurs when all planets are hemmed between Rahu and Ketu. This can cause delays, obstacles, and sudden changes in life. However, with proper remedies, its effects can be significantly reduced.';
+      'काल सर्प दोष तब होता है जब सभी ग्रह राहु और केतु के बीच घिरे होते हैं। इससे देरी, बाधाएं और जीवन में अचानक परिवर्तन हो सकते हैं। हालांकि, उचित उपायों से इसके प्रभावों को काफी कम किया जा सकता है।';
 
   @override
   String get yogas_manglikDosha_desc =>
-      'Manglik Dosha occurs when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. It primarily affects marriage and relationships but can be effectively remedied.';
+      'मांगलिक दोष तब होता है जब मंगल लग्न से 1, 4, 7, 8 या 12वें भाव में स्थित होता है। यह मुख्य रूप से विवाह और संबंधों को प्रभावित करता है लेकिन प्रभावी ढंग से इसका उपाय किया जा सकता है।';
+
+  @override
+  String get yogas_astrologicalInsight => 'ज्योतिषीय अंतर्दृष्टि';
+
+  @override
+  String yogas_typeInsight_yoga_type(String type) {
+    return 'प्रकार: $type';
+  }
+
+  @override
+  String get yogas_typeInsight_yoga_nature => 'प्रकृति: शुभ संयोग';
+
+  @override
+  String get yogas_typeInsight_yoga_activation =>
+      'सक्रियण: संबंधित दशा अवधि में';
+
+  @override
+  String get yogas_typeInsight_yoga_strength =>
+      'बल ग्रह मर्यादा और दृष्टि पर निर्भर करता है';
+
+  @override
+  String yogas_typeInsight_dosha_severity(String severity) {
+    return 'गंभीरता: $severity';
+  }
+
+  @override
+  String get yogas_typeInsight_dosha_impact =>
+      'प्रभाव कुंडली संदर्भ के अनुसार भिन्न होता है';
+
+  @override
+  String get yogas_typeInsight_dosha_remedies =>
+      'उपाय प्रभावों को कम कर सकते हैं';
+
+  @override
+  String get yogas_typeInsight_dosha_consult =>
+      'व्यक्तिगत मार्गदर्शन के लिए ज्योतिषी से परामर्श करें';
+
+  @override
+  String get yogas_typeInsight_defaultYoga_desc =>
+      'यह एक शुभ ग्रह संयोग है जो विशिष्ट जीवन क्षेत्रों को बढ़ाता है।';
+
+  @override
+  String get yogas_typeInsight_defaultYoga_significance =>
+      'प्रभाव विशिष्ट संयोग के आधार पर भिन्न होते हैं';
+
+  @override
+  String get yogas_typeInsight_defaultDosha_desc =>
+      'यह दोष कुछ चुनौतियां उत्पन्न करता है जिन्हें उपायों से दूर किया जा सकता है।';
+
+  @override
+  String get yogas_typeInsight_defaultDosha_significance =>
+      'प्रभाव विशिष्ट संयोग के आधार पर भिन्न होते हैं';
+
+  @override
+  String yogas_strengthInsight_title(int count, String label) {
+    return '$count $label';
+  }
+
+  @override
+  String yogas_strengthInsight_value(int count, String label) {
+    return '$count $label';
+  }
+
+  @override
+  String yogas_strengthInsight_significance(int count, String label) {
+    return 'आपकी कुंडली में $count $label संयोग हैं।';
+  }
+
+  @override
+  String yogas_strengthInsight_count(int count) {
+    return 'गणना: $count';
+  }
+
+  @override
+  String yogas_strengthInsight_level(String level) {
+    return 'बल स्तर: $level';
+  }
+
+  @override
+  String get yogas_strengthInsight_strong_keypoint =>
+      'स्पष्ट अभिव्यक्ति अपेक्षित';
+
+  @override
+  String get yogas_strengthInsight_moderate_keypoint =>
+      'सुधार की गुंजाइश के साथ आंशिक प्रभाव';
+
+  @override
+  String get yogas_strengthInsight_severe_keypoint => 'उपाय अनुशंसित';
+
+  @override
+  String get yogas_strengthInsight_default_desc => 'मानक बल स्तर।';
+
+  @override
+  String get yogas_insightCard_understanding_kp1 =>
+      'योग विशिष्ट जीवन क्षेत्रों को बढ़ाते हैं';
+
+  @override
+  String get yogas_insightCard_understanding_kp2 =>
+      'ग्रह स्थितियों और संबंधों द्वारा निर्मित';
+
+  @override
+  String get yogas_insightCard_understanding_kp3 =>
+      'प्रत्येक योग का अनूठा महत्व है';
+
+  @override
+  String get yogas_insightCard_understanding_kp4 =>
+      'बल अभिव्यक्ति स्तर निर्धारित करता है';
+
+  @override
+  String get yogas_insightCard_activation_kp1 =>
+      'संबंधित ग्रहों की महादशा योग को सक्रिय करती है';
+
+  @override
+  String get yogas_insightCard_activation_kp2 =>
+      'अंतर्दशा उप-स्तर सक्रियण लाती है';
+
+  @override
+  String get yogas_insightCard_activation_kp3 =>
+      'गोचर समर्थन प्रभावों को बढ़ाता है';
+
+  @override
+  String get yogas_insightCard_activation_kp4 =>
+      'समय के लिए अपनी दशा अवधि जांचें';
+
+  @override
+  String get yogas_insightCard_strength_kp1 => 'उच्च/स्व राशि ग्रह = बलवान योग';
+
+  @override
+  String get yogas_insightCard_strength_kp2 => 'नीच ग्रह = कमजोर अभिव्यक्ति';
+
+  @override
+  String get yogas_insightCard_strength_kp3 => 'शुभ दृष्टियां मजबूत करती हैं';
+
+  @override
+  String get yogas_insightCard_strength_kp4 => 'अशुभ दृष्टियां कमजोर करती हैं';
+
+  @override
+  String get yogas_insightCard_remedies_kp1 =>
+      'संबंधित ग्रहों के लिए मंत्र जाप';
+
+  @override
+  String get yogas_insightCard_remedies_kp2 =>
+      'कमजोर ग्रहों को मजबूत करने के लिए रत्न';
+
+  @override
+  String get yogas_insightCard_remedies_kp3 => 'विशिष्ट दिनों पर दान';
+
+  @override
+  String get yogas_insightCard_remedies_kp4 =>
+      'पीड़ित ग्रहों के लिए उपवास और पूजा';
+
+  @override
+  String get yogas_insightCard_default_significance =>
+      'कुंडली विश्लेषण का महत्वपूर्ण पहलू।';
+
+  @override
+  String get yogas_insightCard_default_kp => 'सामान्य ज्योतिषीय सिद्धांत';
+
+  @override
+  String get yogas_emptyState_noYogas_kp1 => 'मानक कुंडली विन्यास';
+
+  @override
+  String get yogas_emptyState_noYogas_kp2 =>
+      'सफलता समग्र कुंडली बल पर निर्भर करती है';
+
+  @override
+  String get yogas_emptyState_noYogas_kp3 =>
+      'समय के लिए दशा अवधि अभी भी महत्वपूर्ण है';
+
+  @override
+  String get yogas_emptyState_noYogas_kp4 =>
+      'व्यक्तिगत ग्रह बल अधिक मायने रखते हैं';
+
+  @override
+  String get yogas_emptyState_noYogas_kp5 =>
+      'दृष्टियां और भाव स्थितियां मुख्य कारक हैं';
+
+  @override
+  String get yogas_emptyState_noDoshas_kp1 => 'कोई प्रमुख दोष नहीं पाए गए';
+
+  @override
+  String get yogas_emptyState_noDoshas_kp2 => 'कम कार्मिक बाधाएं अपेक्षित';
+
+  @override
+  String get yogas_emptyState_noDoshas_kp3 => 'विवाह और संबंध कम पीड़ित';
+
+  @override
+  String get yogas_emptyState_noDoshas_kp4 =>
+      'अन्य चुनौतीपूर्ण दृष्टियों की जांच करें';
+
+  @override
+  String get yogas_emptyState_noDoshas_kp5 => 'समग्र कुंडली विश्लेषण अनुशंसित';
+
+  @override
+  String get yogas_kaalSarp_kp1 => 'काल सर्प पूजा के लिए त्र्यंबकेश्वर जाएं';
+
+  @override
+  String get yogas_kaalSarp_kp2 =>
+      'प्रतिदिन 108 बार महामृत्युंजय मंत्र का जाप करें';
+
+  @override
+  String get yogas_kaalSarp_kp3 => 'सोमवार को शिवलिंग पर दूध चढ़ाएं';
+
+  @override
+  String get yogas_kaalSarp_kp4 => 'अपने घर में चांदी का सांप रखें';
+
+  @override
+  String get yogas_kaalSarp_kp5 => 'शनिवार को जरूरतमंदों को दान करें';
+
+  @override
+  String get yogas_manglik_kp1 => 'मंगल शांति पूजा करें';
+
+  @override
+  String get yogas_manglik_kp2 => 'मंगलवार को हनुमान चालीसा पढ़ें';
+
+  @override
+  String get yogas_manglik_kp3 => 'मंगलवार को उपवास करें';
+
+  @override
+  String get yogas_manglik_kp4 => 'मूंगा रत्न पहनें (परामर्श के बाद)';
+
+  @override
+  String get yogas_manglik_kp5 => 'मंगलवार को लाल वस्तुएं दान करें';
 
   @override
   String get charDasha_nav_current => 'Current';
@@ -6064,4 +6555,859 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get charDasha_signDesc_default => 'Cosmic influence';
+
+  @override
+  String chart_house_title(int number) {
+    return 'भाव $number';
+  }
+
+  @override
+  String get chart_asc_badge => 'लग्न';
+
+  @override
+  String get chart_sign_label => 'राशि';
+
+  @override
+  String get chart_cusp_label => 'भावारंभ';
+
+  @override
+  String get chart_planets_label => 'ग्रह';
+
+  @override
+  String get chart_theme_1 => 'स्व और पहचान';
+
+  @override
+  String get chart_theme_2 => 'धन और मूल्य';
+
+  @override
+  String get chart_theme_3 => 'संचार';
+
+  @override
+  String get chart_theme_4 => 'घर और जड़ें';
+
+  @override
+  String get chart_theme_5 => 'रचनात्मकता और प्रेम';
+
+  @override
+  String get chart_theme_6 => 'स्वास्थ्य और सेवा';
+
+  @override
+  String get chart_theme_7 => 'साझेदारी';
+
+  @override
+  String get chart_theme_8 => 'परिवर्तन';
+
+  @override
+  String get chart_theme_9 => 'दर्शन और भाग्य';
+
+  @override
+  String get chart_theme_10 => 'करियर और स्थिति';
+
+  @override
+  String get chart_theme_11 => 'आकांक्षाएँ और लाभ';
+
+  @override
+  String get chart_theme_12 => 'आध्यात्मिकता और समाप्ति';
+
+  @override
+  String get chart_bhava_1_title => 'लग्न भाव';
+
+  @override
+  String get chart_bhava_1_desc =>
+      'शारीरिक शरीर, व्यक्तित्व, जीवन शक्ति और समग्र जीवन पथ।';
+
+  @override
+  String get chart_bhava_2_title => 'धन भाव';
+
+  @override
+  String get chart_bhava_2_desc => 'संचित धन, परिवार, वाणी और प्रारंभिक बचपन।';
+
+  @override
+  String get chart_bhava_3_title => 'सहज भाव';
+
+  @override
+  String get chart_bhava_3_desc =>
+      'भाई-बहन, साहस, छोटी यात्राएँ और संचार कौशल।';
+
+  @override
+  String get chart_bhava_4_title => 'सुख भाव';
+
+  @override
+  String get chart_bhava_4_desc => 'माता, घर, भावनात्मक शांति और गृहस्थ सुख।';
+
+  @override
+  String get chart_bhava_5_title => 'पुत्र भाव';
+
+  @override
+  String get chart_bhava_5_desc => 'संतान, रचनात्मकता, बुद्धि और प्रेम।';
+
+  @override
+  String get chart_bhava_6_title => 'शत्रु भाव';
+
+  @override
+  String get chart_bhava_6_desc =>
+      'शत्रु, स्वास्थ्य समस्याएँ, ऋण और दैनिक कार्य।';
+
+  @override
+  String get chart_bhava_7_title => 'कलत्र भाव';
+
+  @override
+  String get chart_bhava_7_desc => 'विवाह, साझेदारी और व्यापारिक संबंध।';
+
+  @override
+  String get chart_bhava_8_title => 'रंध्र भाव';
+
+  @override
+  String get chart_bhava_8_desc => 'आयु, विरासत, गूढ़ विद्या और परिवर्तन।';
+
+  @override
+  String get chart_bhava_9_title => 'धर्म भाव';
+
+  @override
+  String get chart_bhava_9_desc => 'भाग्य, उच्च शिक्षा, आध्यात्मिकता और पिता।';
+
+  @override
+  String get chart_bhava_10_title => 'कर्म भाव';
+
+  @override
+  String get chart_bhava_10_desc =>
+      'करियर, प्रतिष्ठा, अधिकार और सार्वजनिक छवि।';
+
+  @override
+  String get chart_bhava_11_title => 'लाभ भाव';
+
+  @override
+  String get chart_bhava_11_desc => 'लाभ, आय, बड़े भाई-बहन और सामाजिक नेटवर्क।';
+
+  @override
+  String get chart_bhava_12_title => 'व्यय भाव';
+
+  @override
+  String get chart_bhava_12_desc => 'हानि, खर्च, विदेश और मोक्ष।';
+
+  @override
+  String get insight_risingSign => 'उदय राशि';
+
+  @override
+  String insight_ascendant_desc(String sign, String degree) {
+    return 'आपका लग्न $sign है $degree° पर। लग्न उस राशि को दर्शाता है जो आपके जन्म के सही समय पर पूर्वी क्षितिज पर उदय हो रही थी। इसे वैदिक ज्योतिष में सबसे महत्वपूर्ण बिंदु माना जाता है।';
+  }
+
+  @override
+  String get insight_ascendant_significance =>
+      'लग्न आपके शारीरिक रूप, व्यक्तित्व और दूसरे आपको कैसे देखते हैं, इसे आकार देता है। यह एक लेंस की तरह काम करता है जिसके माध्यम से सभी ग्रहों की ऊर्जा आपकी कुंडली में फ़िल्टर होती है।';
+
+  @override
+  String get insight_ascendant_point1 =>
+      'आपके शरीर की संरचना और स्वास्थ्य प्रवृत्तियों को निर्धारित करता है';
+
+  @override
+  String get insight_ascendant_point2 =>
+      'जीवन और नई परिस्थितियों के प्रति आपके स्वाभाविक दृष्टिकोण को प्रभावित करता है';
+
+  @override
+  String get insight_ascendant_point3 =>
+      'आपकी जन्म कुंडली के सभी 12 भावों की नींव रखता है';
+
+  @override
+  String get insight_ascendant_point4 =>
+      'आपकी सहज प्रतिक्रियाओं और बाहरी व्यक्तित्व को प्रकट करता है';
+
+  @override
+  String get insight_moonSign => 'चंद्र राशि';
+
+  @override
+  String insight_moon_desc(String sign) {
+    return 'आपका चंद्रमा $sign में स्थित है। वैदिक ज्योतिष में, चंद्र राशि (राशि) को सूर्य राशि से अधिक महत्वपूर्ण माना जाता है क्योंकि यह आपकी भावनात्मक प्रकृति और आंतरिक दुनिया का प्रतिनिधित्व करती है।';
+  }
+
+  @override
+  String get insight_moon_significance =>
+      'चंद्रमा आपके मन, भावनाओं और अवचेतन पैटर्न को नियंत्रित करता है। यह प्रकट करता है कि आप भावनाओं को कैसे संसाधित करते हैं और क्या आपको भावनात्मक सुरक्षा प्रदान करता है।';
+
+  @override
+  String get insight_moon_point1 =>
+      'आपकी भावनात्मक प्रतिक्रियाओं और मानसिक पैटर्न को दर्शाता है';
+
+  @override
+  String get insight_moon_point2 =>
+      'आपके नक्षत्र (जन्म तारा) स्थान को निर्धारित करता है';
+
+  @override
+  String get insight_moon_point3 =>
+      'आपकी अंतर्ज्ञान और मानसिक संवेदनशीलता को प्रभावित करता है';
+
+  @override
+  String get insight_moon_point4 =>
+      'माता और पोषण करने वाले व्यक्तियों के साथ आपके संबंध को आकार देता है';
+
+  @override
+  String get insight_sunSign => 'सूर्य राशि';
+
+  @override
+  String insight_sun_desc(String sign) {
+    return 'आपका सूर्य $sign में स्थित है। सूर्य आपकी आत्मा के सार, जीवन शक्ति और मूल पहचान का प्रतिनिधित्व करता है। यह आपके जीवन के उद्देश्य और उन गुणों को दर्शाता है जिन्हें आपको विकसित करना है।';
+  }
+
+  @override
+  String get insight_sun_significance =>
+      'सूर्य आपके पिता, अधिकार के आंकड़े और शक्ति के साथ आपके संबंध को इंगित करता है। यह आपके अहंकार, गर्व और आप अपनी व्यक्तित्व को कैसे व्यक्त करते हैं, प्रकट करता है।';
+
+  @override
+  String get insight_sun_point1 =>
+      'आपकी आत्मा के उद्देश्य और सच्चे स्वरूप का प्रतिनिधित्व करता है';
+
+  @override
+  String get insight_sun_point2 =>
+      'जीवन शक्ति, स्वास्थ्य और जीवन ऊर्जा को नियंत्रित करता है';
+
+  @override
+  String get insight_sun_point3 =>
+      'करियर क्षमता और नेतृत्व क्षमताओं को इंगित करता है';
+
+  @override
+  String get insight_sun_point4 =>
+      'पिता और अधिकार के साथ संबंध को प्रभावित करता है';
+
+  @override
+  String get insight_element => 'तत्व';
+
+  @override
+  String get insight_element_fire_desc =>
+      'अग्नि राशियाँ (मेष, सिंह, धनु) गतिशील, जोशीली और कार्य-उन्मुख होती हैं। ये उत्साह, साहस और रचनात्मक प्रेरणा लाती हैं।';
+
+  @override
+  String get insight_element_earth_desc =>
+      'पृथ्वी राशियाँ (वृषभ, कन्या, मकर) व्यावहारिक, स्थिर और भौतिक स्थिरता पर केंद्रित होती हैं। ये धैर्य, विश्वसनीयता और ठोस परिणाम लाती हैं।';
+
+  @override
+  String get insight_element_air_desc =>
+      'वायु राशियाँ (मिथुन, तुला, कुंभ) बौद्धिक, संचारी और सामाजिक रूप से उन्मुख होती हैं। ये विचार, संपर्क और मानसिक चपलता लाती हैं।';
+
+  @override
+  String get insight_element_water_desc =>
+      'जल राशियाँ (कर्क, वृश्चिक, मीन) भावनात्मक, सहज और गहरी अनुभूति वाली होती हैं। ये संवेदनशीलता, सहानुभूति और आध्यात्मिक गहराई लाती हैं।';
+
+  @override
+  String insight_element_default_desc(String element) {
+    return 'आपकी उदय राशि $element तत्व से संबंधित है, जो जीवन के प्रति आपके मौलिक दृष्टिकोण को आकार देती है।';
+  }
+
+  @override
+  String insight_element_significance(String element) {
+    return 'तत्व व्यक्तित्व के मूल निर्माण खंडों का प्रतिनिधित्व करते हैं। आपका $element स्वभाव प्रभावित करता है कि आप दुनिया को कैसे देखते हैं और उससे कैसे बातचीत करते हैं।';
+  }
+
+  @override
+  String get insight_element_fire_trait1 => 'साहसी और निडर';
+
+  @override
+  String get insight_element_fire_trait2 => 'स्वाभाविक नेता';
+
+  @override
+  String get insight_element_fire_trait3 => 'शीघ्र कार्यवाही करने वाले';
+
+  @override
+  String get insight_element_fire_trait4 => 'दूसरों को प्रेरित करने वाले';
+
+  @override
+  String get insight_element_earth_trait1 => 'व्यावहारिक और विश्वसनीय';
+
+  @override
+  String get insight_element_earth_trait2 => 'धैर्यवान निर्माता';
+
+  @override
+  String get insight_element_earth_trait3 => 'भौतिक रूप से केंद्रित';
+
+  @override
+  String get insight_element_earth_trait4 => 'मजबूत सहनशक्ति';
+
+  @override
+  String get insight_element_air_trait1 => 'तेज दिमाग वाले';
+
+  @override
+  String get insight_element_air_trait2 => 'उत्कृष्ट संचारक';
+
+  @override
+  String get insight_element_air_trait3 => 'सामाजिक रूप से निपुण';
+
+  @override
+  String get insight_element_air_trait4 => 'विचार उत्पन्न करने वाले';
+
+  @override
+  String get insight_element_water_trait1 => 'गहन अंतर्ज्ञानी';
+
+  @override
+  String get insight_element_water_trait2 => 'भावनात्मक रूप से बुद्धिमान';
+
+  @override
+  String get insight_element_water_trait3 => 'पोषण करने वाला स्वभाव';
+
+  @override
+  String get insight_element_water_trait4 => 'आध्यात्मिक रूप से झुकाव';
+
+  @override
+  String get insight_element_default_trait1 =>
+      'आपके स्वभाव को प्रभावित करता है';
+
+  @override
+  String get insight_element_default_trait2 =>
+      'आपकी प्रतिक्रियाओं को आकार देता है';
+
+  @override
+  String get insight_element_default_trait3 => 'अनुकूलता को प्रभावित करता है';
+
+  @override
+  String get insight_lagnaLord => 'लग्नेश';
+
+  @override
+  String insight_lagnaLord_desc(String planet, String sign) {
+    return '$planet आपकी लग्न राशि $sign का स्वामी है। कुंडली के शासक के रूप में, इसकी स्थिति और स्थिति आपकी पूरी जीवन यात्रा और व्यक्तित्व अभिव्यक्ति को महत्वपूर्ण रूप से प्रभावित करती है।';
+  }
+
+  @override
+  String get insight_lagnaLord_significance =>
+      'लग्नेश आपकी आत्मा की यात्रा के लिए मार्गदर्शक के रूप में कार्य करता है। इसकी भाव स्थिति दर्शाती है कि आप अपनी अधिकांश ऊर्जा कहाँ निवेश करते हैं, और इसकी स्थिति समग्र जीवन सफलता को प्रभावित करती है।';
+
+  @override
+  String get insight_lagnaLord_point1 =>
+      'आपकी कुंडली व्याख्या के लिए सबसे महत्वपूर्ण ग्रह';
+
+  @override
+  String get insight_lagnaLord_point2 =>
+      'इसकी शक्ति समग्र जीवन शक्ति को इंगित करती है';
+
+  @override
+  String get insight_lagnaLord_point3 =>
+      'भाव स्थिति प्राथमिक जीवन फोकस दर्शाती है';
+
+  @override
+  String get insight_lagnaLord_point4 =>
+      'इस पर दृष्टि व्यक्तित्व और स्वास्थ्य को प्रभावित करती है';
+
+  @override
+  String get insight_nakshatraLord => 'नक्षत्र स्वामी';
+
+  @override
+  String insight_nakshatraLord_desc(String planet, String nakshatra) {
+    return '$planet आपके जन्म नक्षत्र $nakshatra का स्वामी है। नक्षत्र स्वामी सूक्ष्म स्तर पर कार्य करता है, आपके मनोवैज्ञानिक पैटर्न और कर्म प्रवृत्तियों को प्रभावित करता है।';
+  }
+
+  @override
+  String get insight_nakshatraLord_significance =>
+      'यह ग्रह आपके जीवन के विंशोत्तरी दशा क्रम को नियंत्रित करता है। इसकी स्थिति और स्थान आपकी मानसिक झुकाव और आध्यात्मिक मार्ग को गहराई से प्रभावित करते हैं।';
+
+  @override
+  String get insight_nakshatraLord_point1 =>
+      'आपके महादशा क्रम को निर्धारित करता है';
+
+  @override
+  String get insight_nakshatraLord_point2 =>
+      'अवचेतन पैटर्न को प्रभावित करता है';
+
+  @override
+  String get insight_nakshatraLord_point3 =>
+      'सहज और मानसिक क्षमताओं को प्रभावित करता है';
+
+  @override
+  String get insight_nakshatraLord_point4 =>
+      'पिछले जन्मों के कर्म पाठों को प्रकट करता है';
+
+  @override
+  String get insight_birthStar => 'जन्म नक्षत्र';
+
+  @override
+  String insight_nakshatraPada(String nakshatra, String pada) {
+    return '$nakshatra (पाद $pada)';
+  }
+
+  @override
+  String insight_nakshatra_desc(String nakshatra, String pada) {
+    return 'आपका जन्म $nakshatra नक्षत्र में पाद $pada में हुआ था। नक्षत्र 27 चंद्र मंडल हैं जिनसे चंद्रमा गुजरता है, जो आपकी मनोवैज्ञानिक प्रकृति में गहरी अंतर्दृष्टि प्रदान करते हैं।';
+  }
+
+  @override
+  String get insight_nakshatra_significance =>
+      'आपका नक्षत्र आपकी जन्मजात प्रतिभाओं, भावनात्मक पैटर्न और भाग्य मार्ग को प्रकट करता है। पाद (चतुर्थांश) इन गुणों में और विशिष्टता जोड़ता है।';
+
+  @override
+  String get insight_nakshatra_point1 =>
+      'गहरे व्यक्तित्व लक्षणों और प्रवृत्तियों को प्रकट करता है';
+
+  @override
+  String get insight_nakshatra_point2 =>
+      'संबंधों के लिए अनुकूल नक्षत्रों को इंगित करता है';
+
+  @override
+  String insight_nakshatra_point3(String gana) {
+    return 'आपका गण (स्वभाव) निर्धारित करता है: $gana';
+  }
+
+  @override
+  String get insight_nakshatra_point4 =>
+      'करियर और जीवन पथ में अंतर्दृष्टि प्रदान करता है';
+
+  @override
+  String get insight_tithi => 'तिथि';
+
+  @override
+  String insight_tithi_desc(String tithi, String paksha) {
+    return 'आपका जन्म $tithi तिथि को $paksha पक्ष के दौरान हुआ था। तिथि सूर्य और चंद्रमा के बीच कोणीय संबंध पर आधारित चंद्र दिवस है, जो पंचांग के पांच तत्वों में से एक है।';
+  }
+
+  @override
+  String get insight_tithi_significance =>
+      'प्रत्येक तिथि विशिष्ट ऊर्जाएं वहन करती है जो आपकी भावनात्मक प्रकृति और विभिन्न गतिविधियों के लिए शुभता को प्रभावित करती है। यह चंद्र ऊर्जा के साथ आपके संबंध को प्रभावित करती है।';
+
+  @override
+  String get insight_tithi_point1 =>
+      'जन्म के समय भावनात्मक स्वभाव को इंगित करता है';
+
+  @override
+  String get insight_tithi_point2 =>
+      'व्यक्तित्व और निर्णय लेने की शैली को प्रभावित करता है';
+
+  @override
+  String insight_tithi_point3(String paksha) {
+    return '$paksha पक्ष बढ़ती/घटती ऊर्जा को प्रभावित करता है';
+  }
+
+  @override
+  String get insight_tithi_point4 =>
+      'शुभ समय निर्धारित करने के लिए उपयोग किया जाता है';
+
+  @override
+  String get insight_yoga => 'योग';
+
+  @override
+  String insight_yoga_desc(String yoga) {
+    return 'आपका जन्म $yoga योग के अंतर्गत हुआ था। इसकी गणना सूर्य और चंद्रमा की संयुक्त स्थितियों से की जाती है, जो आपके जन्म के क्षण के आध्यात्मिक और मनोवैज्ञानिक वातावरण का प्रतिनिधित्व करता है।';
+  }
+
+  @override
+  String get insight_yoga_significance =>
+      'योग आपकी मानसिक अभिविन्यास और भाग्य को प्रभावित करता है। 27 योग हैं, प्रत्येक जातक को विशिष्ट गुण और प्रवृत्तियाँ प्रदान करता है।';
+
+  @override
+  String get insight_yoga_point1 =>
+      'मानसिक और आध्यात्मिक झुकाव को प्रभावित करता है';
+
+  @override
+  String get insight_yoga_point2 => 'समग्र भाग्य और किस्मत को प्रभावित करता है';
+
+  @override
+  String get insight_yoga_point3 =>
+      'चुनौतियों के प्रति दृष्टिकोण को आकार देता है';
+
+  @override
+  String get insight_yoga_point4 => 'अवसर की अवधि को इंगित करता है';
+
+  @override
+  String get insight_karana => 'करण';
+
+  @override
+  String insight_karana_desc(String karana) {
+    return 'आपका जन्म करण $karana है। करण तिथि का आधा है और 11 करण हैं जो एक चक्र में दोहराते हैं। यह गतिशील कार्रवाई और उत्पादकता को प्रभावित करता है।';
+  }
+
+  @override
+  String get insight_karana_significance =>
+      'करण कार्रवाई और कार्यों को पूरा करने की आपकी क्षमता को प्रभावित करता है। यह विशेष रूप से कार्य नैतिकता और आपकी गतिविधियों की प्रकृति को प्रभावित करता है।';
+
+  @override
+  String get insight_karana_point1 =>
+      'कार्रवाई और उत्पादकता शैली को नियंत्रित करता है';
+
+  @override
+  String get insight_karana_point2 =>
+      'कार्य और समापन क्षमता को प्रभावित करता है';
+
+  @override
+  String get insight_karana_point3 =>
+      'दिन-प्रतिदिन के निर्णय लेने को प्रभावित करता है';
+
+  @override
+  String get insight_karana_point4 => 'गतिविधि समय चुनने के लिए महत्वपूर्ण';
+
+  @override
+  String get insight_vara => 'वार (दिन)';
+
+  @override
+  String insight_vara_desc(String vara, String deity) {
+    return 'आपका जन्म $vara को हुआ था, जो $deity द्वारा शासित है। जन्म का सप्ताह का दिन वैदिक ज्योतिष में महत्वपूर्ण है, जो आपको विशिष्ट ग्रह और देवता ऊर्जाओं से जोड़ता है।';
+  }
+
+  @override
+  String get insight_vara_significance =>
+      'आपके जन्म दिवस स्वामी आपके चरित्र को प्रभावित करता है और अपने शासक देवता से आशीर्वाद लाता है। प्रत्येक दिन अद्वितीय गुण वहन करता है जो व्यक्तित्व को आकार देते हैं।';
+
+  @override
+  String insight_vara_point1(String vara) {
+    return 'आपको $vara के ग्रह शासक से जोड़ता है';
+  }
+
+  @override
+  String insight_vara_point2(String deity) {
+    return '$deity आपके जन्म दिवस के देवता हैं';
+  }
+
+  @override
+  String get insight_vara_point3 =>
+      'प्राकृतिक प्रतिभाओं और रुचियों को प्रभावित करता है';
+
+  @override
+  String get insight_vara_point4 => 'इस दिन द्वारा शासित गतिविधियों के लिए शुभ';
+
+  @override
+  String get insight_mahadasha => 'महादशा';
+
+  @override
+  String insight_mahadasha_value(String planet) {
+    return '$planet महादशा';
+  }
+
+  @override
+  String insight_mahadasha_desc(String planet, String years) {
+    return 'आप वर्तमान में $planet महादशा चला रहे हैं जिसमें $years वर्ष शेष हैं। महादशा प्रमुख ग्रह अवधि है जो सभी जीवन अनुभवों को रंगती है।';
+  }
+
+  @override
+  String get insight_mahadasha_significance =>
+      'महादशा ग्रह अपनी अवधि के दौरान प्राथमिक प्रभाव बन जाता है, आपकी कुंडली में अपने संकेतों को सक्रिय करता है। प्रत्येक नई महादशा के साथ जीवन की थीम बदलती है।';
+
+  @override
+  String get insight_mahadasha_point1 =>
+      'वर्तमान जीवन चरण के लिए प्राथमिक प्रभाव';
+
+  @override
+  String insight_mahadasha_point2(String planet) {
+    return '$planet द्वारा शासित भावों को सक्रिय करता है';
+  }
+
+  @override
+  String insight_mahadasha_point3(String planet) {
+    return 'अवधि गुणवत्ता के लिए $planet की स्थिति जांचें';
+  }
+
+  @override
+  String get insight_mahadasha_point4 =>
+      'उप-अवधि (अंतर्दशा) परिशोधन प्रदान करती है';
+
+  @override
+  String insight_guna_varna_desc(String value) {
+    return 'वर्ण आध्यात्मिक स्वभाव का प्रतिनिधित्व करता है और उस प्रकार के कार्य को इंगित करता है जिसके लिए व्यक्ति स्वाभाविक रूप से उपयुक्त है। आपका वर्ण $value है।';
+  }
+
+  @override
+  String insight_guna_vashya_desc(String value) {
+    return 'वश्य संबंधों में पारस्परिक आकर्षण और नियंत्रण को इंगित करता है। आपकी श्रेणी $value है, जो अनुकूलता गतिशीलता को प्रभावित करती है।';
+  }
+
+  @override
+  String insight_guna_tara_desc(String value) {
+    return 'तारा (जन्म तारा) अनुकूलता संबंध के स्वास्थ्य का आकलन करती है। आपका तारा $value है, जो संबंध सामंजस्य को प्रभावित करता है।';
+  }
+
+  @override
+  String insight_guna_yoni_desc(String value) {
+    return 'योनि यौन अनुकूलता और शारीरिक आकर्षण का प्रतिनिधित्व करती है। आपकी योनि $value है, जो सहज अनुकूलता पैटर्न को इंगित करती है।';
+  }
+
+  @override
+  String insight_guna_grahamaitri_desc(String value) {
+    return 'ग्रह मैत्री चंद्र राशि स्वामियों के बीच मित्रता की जांच करती है। आपका चंद्र स्वामी $value है, जो मानसिक अनुकूलता को प्रभावित करता है।';
+  }
+
+  @override
+  String insight_guna_gana_desc(String value) {
+    return 'गण स्वभाव और प्रकृति को इंगित करता है। आपका गण $value है, जो आपके मूल चरित्र प्रकार का प्रतिनिधित्व करता है।';
+  }
+
+  @override
+  String insight_guna_bhakoot_desc(String value) {
+    return 'भकूट चंद्र राशियों की सापेक्ष स्थिति की जांच करता है। आपका चंद्र $value में है, जो भावनात्मक और स्वास्थ्य अनुकूलता को प्रभावित करता है।';
+  }
+
+  @override
+  String insight_guna_nadi_desc(String value) {
+    return 'नाड़ी शारीरिक अनुकूलता और आनुवंशिक कारकों को इंगित करती है। आपकी नाड़ी $value है, जो संतान और स्वास्थ्य के लिए महत्वपूर्ण है।';
+  }
+
+  @override
+  String insight_guna_default_desc(String name, String value) {
+    return 'आपका $name कारक $value है, जो वैदिक अनुकूलता मिलान में उपयोग किया जाता है।';
+  }
+
+  @override
+  String get insight_guna_varna_significance =>
+      'अष्टकूट में वर्ण मिलान 1 अंक वहन करता है। यह साझेदारों के बीच सामाजिक और आध्यात्मिक अनुकूलता दर्शाता है।';
+
+  @override
+  String get insight_guna_vashya_significance =>
+      'वश्य 2 अंक वहन करता है और संबंधों में शक्ति गतिशीलता और पारस्परिक प्रभाव को इंगित करता है।';
+
+  @override
+  String get insight_guna_tara_significance =>
+      'तारा 3 अंक वहन करता है और संबंध के स्वास्थ्य, दीर्घायु और समग्र कल्याण को इंगित करता है।';
+
+  @override
+  String get insight_guna_yoni_significance =>
+      'योनि 4 अंक वहन करती है और साझेदारों के बीच शारीरिक और सहज अनुकूलता के लिए महत्वपूर्ण है।';
+
+  @override
+  String get insight_guna_grahamaitri_significance =>
+      'ग्रह मैत्री 5 अंक वहन करती है और मानसिक तरंगदैर्ध्य और मित्रता अनुकूलता निर्धारित करती है।';
+
+  @override
+  String get insight_guna_gana_significance =>
+      'गण 6 अंक वहन करता है और साझेदारों के बीच व्यवहारिक और स्वभाव सामंजस्य को इंगित करता है।';
+
+  @override
+  String get insight_guna_bhakoot_significance =>
+      'भकूट 7 अंक वहन करता है और विवाह के बाद भावनात्मक बंधन, समृद्धि और स्वास्थ्य को प्रभावित करता है।';
+
+  @override
+  String get insight_guna_nadi_significance =>
+      'नाड़ी 8 अंक (उच्चतम) वहन करती है और आनुवंशिक अनुकूलता और स्वस्थ संतान के लिए आवश्यक है।';
+
+  @override
+  String get insight_guna_default_significance =>
+      'यह कारक विवाह मिलान में समग्र अनुकूलता स्कोर में योगदान करता है।';
+
+  @override
+  String get insight_guna_point1 =>
+      'अष्टकूट (8-गुना) मिलान प्रणाली में उपयोग किया जाता है';
+
+  @override
+  String get insight_guna_point2 =>
+      'संबंध अनुकूलता का आकलन करने में मदद करता है';
+
+  @override
+  String get insight_guna_point3 => 'चंद्र राशि और नक्षत्र पर आधारित';
+
+  @override
+  String get insight_guna_point4 => 'विवाह अनुकूलता के लिए महत्वपूर्ण';
+
+  @override
+  String get insight_primaryGemstone => 'प्राथमिक रत्न';
+
+  @override
+  String insight_gemstone_desc(String gemstone, String sign) {
+    return '$gemstone आपकी चंद्र राशि $sign के आधार पर आपके प्राथमिक रत्न के रूप में अनुशंसित है। रत्न ग्रह ऊर्जाओं को चैनल करते हैं और शुभ प्रभावों को मजबूत कर सकते हैं।';
+  }
+
+  @override
+  String insight_gemstone_point1(String day) {
+    return 'सर्वोत्तम परिणामों के लिए $day को पहनें';
+  }
+
+  @override
+  String get insight_gemstone_point2 =>
+      'पहनने से पहले ज्योतिषी से परामर्श करें';
+
+  @override
+  String get insight_gemstone_point3 =>
+      'प्राकृतिक, अनुपचारित पत्थरों का उपयोग करें';
+
+  @override
+  String get insight_gemstone_point4 =>
+      'अपनी राशि के लिए अनुशंसित धातु में जड़ें';
+
+  @override
+  String get insight_luckyNumbers => 'भाग्यशाली अंक';
+
+  @override
+  String insight_luckyNumbers_desc(String sign, String numbers) {
+    return 'आपकी चंद्र राशि $sign के आधार पर, अंक $numbers आपके लिए सकारात्मक कंपन वहन करते हैं। अंकशास्त्र अंकों को ग्रह ऊर्जाओं से जोड़ता है।';
+  }
+
+  @override
+  String get insight_luckyNumbers_significance =>
+      'भाग्यशाली अंक महत्वपूर्ण निर्णयों, तिथियों, पतों और जीवन में अन्य महत्वपूर्ण चयनों के लिए उपयोग किए जा सकते हैं।';
+
+  @override
+  String get insight_luckyNumbers_point1 =>
+      'चंद्र राशि ग्रह शासन से व्युत्पन्न';
+
+  @override
+  String get insight_luckyNumbers_point2 =>
+      'महत्वपूर्ण तिथियों और निर्णयों के लिए उपयोग करें';
+
+  @override
+  String get insight_luckyNumbers_point3 =>
+      'पते और फोन नंबरों को प्रभावित कर सकते हैं';
+
+  @override
+  String get insight_luckyNumbers_point4 =>
+      'सटीकता के लिए नक्षत्र के साथ संयुक्त';
+
+  @override
+  String get insight_luckyDay => 'भाग्यशाली दिन';
+
+  @override
+  String insight_luckyDay_desc(String day, String sign) {
+    return '$day आपकी चंद्र राशि $sign के आधार पर आपका सबसे शुभ सप्ताह का दिन है। यह दिन एक ऐसे ग्रह द्वारा शासित है जो आपकी कुंडली के साथ सामंजस्यपूर्ण है।';
+  }
+
+  @override
+  String get insight_luckyDay_significance =>
+      'महत्वपूर्ण गतिविधियाँ, नई शुरुआत और महत्वपूर्ण निर्णय आपके भाग्यशाली दिन पर शुरू होने पर बेहतर परिणाम देते हैं।';
+
+  @override
+  String get insight_luckyDay_point1 => 'नए उद्यमों के लिए सर्वोत्तम दिन';
+
+  @override
+  String get insight_luckyDay_point2 => 'इस दिन अपना रत्न पहनें';
+
+  @override
+  String get insight_luckyDay_point3 => 'महत्वपूर्ण बैठकों के लिए अच्छा';
+
+  @override
+  String get insight_luckyDay_point4 => 'बढ़ी हुई अंतर्ज्ञान और भाग्य';
+
+  @override
+  String get insight_luckyColors => 'भाग्यशाली रंग';
+
+  @override
+  String insight_luckyColors_desc(String colors, String sign) {
+    return 'रंग $colors आपकी चंद्र राशि $sign के साथ सामंजस्यपूर्ण हैं। रंग कंपन आवृत्तियाँ वहन करते हैं जो ग्रह ऊर्जाओं को बढ़ा या घटा सकती हैं।';
+  }
+
+  @override
+  String get insight_luckyColors_significance =>
+      'कपड़ों, परिवेश और सहायक उपकरणों में भाग्यशाली रंगों को शामिल करने से सकारात्मक ग्रह प्रभावों को सूक्ष्म रूप से बढ़ाया जा सकता है।';
+
+  @override
+  String get insight_luckyColors_point1 => 'महत्वपूर्ण अवसरों पर पहनें';
+
+  @override
+  String get insight_luckyColors_point2 =>
+      'घर और कार्यक्षेत्र की सजावट में उपयोग करें';
+
+  @override
+  String get insight_luckyColors_point3 => 'सकारात्मक ग्रह किरणों को बढ़ाता है';
+
+  @override
+  String get insight_luckyColors_point4 =>
+      'मनोदशा और आत्मविश्वास में सुधार कर सकता है';
+
+  @override
+  String get insight_luckyMetal => 'भाग्यशाली धातु';
+
+  @override
+  String insight_luckyMetal_desc(String metal, String sign) {
+    return '$metal आपकी चंद्र राशि $sign के आधार पर आपकी अनुशंसित धातु है। धातुएं ग्रह ऊर्जाओं का संचालन करती हैं और उन्हें पहनने से लाभकारी प्रभाव मजबूत हो सकते हैं।';
+  }
+
+  @override
+  String get insight_luckyMetal_significance =>
+      'सही धातु रत्न प्रभावों को बढ़ाती है और नकारात्मक ग्रह प्रभावों से सुरक्षा प्रदान करती है।';
+
+  @override
+  String get insight_luckyMetal_point1 => 'रत्न जड़ने के लिए उपयोग करें';
+
+  @override
+  String get insight_luckyMetal_point2 => 'लाभ के लिए आभूषण के रूप में पहनें';
+
+  @override
+  String get insight_luckyMetal_point3 => 'शासक ग्रह से जुड़ता है';
+
+  @override
+  String get insight_luckyMetal_point4 => 'पारंपरिक वैदिक उपाय';
+
+  @override
+  String insight_statusPlanets(String status) {
+    return '$status ग्रह';
+  }
+
+  @override
+  String get insight_status_exalted_desc =>
+      'उच्च स्थिति में ग्रह अपनी सबसे मजबूत और सबसे लाभकारी स्थिति में होते हैं। वे पूर्ण शक्ति के साथ अपने सर्वोत्तम परिणाम और संकेत प्रदान करते हैं।';
+
+  @override
+  String get insight_status_debilitated_desc =>
+      'नीच स्थिति में ग्रह कमजोर होते हैं और सकारात्मक परिणाम देने में संघर्ष कर सकते हैं। उपाय नकारात्मक प्रभावों को कम करने में मदद कर सकते हैं।';
+
+  @override
+  String get insight_status_retrograde_desc =>
+      'वक्री ग्रह पीछे की ओर चलते हुए दिखाई देते हैं और अक्सर कार्मिक पाठ लाते हैं। वे आंतरिक और पूर्व जन्म के मामलों पर काम करते हैं।';
+
+  @override
+  String get insight_status_combust_desc =>
+      'सूर्य के बहुत निकट के ग्रह अस्त हो जाते हैं, उनके संकेत सौर ऊर्जा द्वारा छाया या कमजोर हो सकते हैं।';
+
+  @override
+  String get insight_status_default_desc =>
+      'विशेष स्थिति वाले ग्रहों को कुंडली व्याख्या में ध्यान देने की आवश्यकता होती है।';
+
+  @override
+  String get insight_status_noPlanets =>
+      'आपकी कुंडली में इस स्थिति में कोई ग्रह नहीं है।';
+
+  @override
+  String insight_status_significance(String planets, String status) {
+    return 'ये ग्रह ($planets) आपकी कुंडली में $status हैं, जो उनके संकेतों को प्रभावित करते हैं।';
+  }
+
+  @override
+  String get insight_status_exalted_tip1 => 'जीवन में इस ताकत का लाभ उठाएं';
+
+  @override
+  String get insight_status_exalted_tip2 =>
+      'संबंधित गतिविधियों के लिए उत्कृष्ट';
+
+  @override
+  String get insight_status_exalted_tip3 => 'प्राकृतिक प्रतिभा क्षेत्र';
+
+  @override
+  String get insight_status_exalted_tip4 => 'इसकी दशा के दौरान उपयोग करें';
+
+  @override
+  String get insight_status_debilitated_tip1 => 'संबंधित उपायों का अभ्यास करें';
+
+  @override
+  String get insight_status_debilitated_tip2 => 'इन क्षेत्रों में धैर्य रखें';
+
+  @override
+  String get insight_status_debilitated_tip3 => 'रद्दीकरण लागू हो सकता है';
+
+  @override
+  String get insight_status_debilitated_tip4 => 'चुनौतियों के माध्यम से विकास';
+
+  @override
+  String get insight_status_retrograde_tip1 =>
+      'थीम की समीक्षा और प्रतिबिंबित करें';
+
+  @override
+  String get insight_status_retrograde_tip2 => 'पूर्व जन्म का कार्मिक कार्य';
+
+  @override
+  String get insight_status_retrograde_tip3 => 'आंतरिक विकास पर ध्यान दें';
+
+  @override
+  String get insight_status_retrograde_tip4 => 'देरी का उद्देश्य हो सकता है';
+
+  @override
+  String get insight_status_combust_tip1 => 'मंत्रों के माध्यम से मजबूत करें';
+
+  @override
+  String get insight_status_combust_tip2 =>
+      'अधिक प्रयास की आवश्यकता हो सकती है';
+
+  @override
+  String get insight_status_combust_tip3 =>
+      'सूर्य की अवधि इन्हें प्रभावित करती है';
+
+  @override
+  String get insight_status_combust_tip4 => 'इन क्षेत्रों में विनम्रता';
+
+  @override
+  String get insight_status_default_tip1 =>
+      'व्यक्तिगत ग्रह प्रभावों की जांच करें';
+
+  @override
+  String get insight_status_default_tip2 => 'भाव स्थान पर विचार करें';
+
+  @override
+  String get insight_status_default_tip3 => 'दशा अवधियों की समीक्षा करें';
 }

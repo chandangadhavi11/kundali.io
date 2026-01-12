@@ -1,4 +1,5 @@
 import '../../core/services/kundali_calculation_service.dart';
+import '../../l10n/generated/app_localizations.dart';
 
 /// Complete Kundali data model
 class KundaliData {
@@ -1033,6 +1034,102 @@ extension KundaliTypeExtension on KundaliType {
         return 60;
       default:
         return null;
+    }
+  }
+
+  /// Returns the localized display name for this chart type
+  String localizedDisplayName(AppLocalizations l10n) {
+    switch (this) {
+      case KundaliType.lagna:
+        return l10n.chart_lagna_display;
+      case KundaliType.chandra:
+        return l10n.chart_chandra_display;
+      case KundaliType.surya:
+        return l10n.chart_surya_display;
+      case KundaliType.bhavaChalit:
+        return l10n.chart_bhava_chalit_display;
+      case KundaliType.hora:
+        return l10n.chart_hora_display;
+      case KundaliType.drekkana:
+        return l10n.chart_drekkana_display;
+      case KundaliType.chaturthamsa:
+        return l10n.chart_chaturthamsa_display;
+      case KundaliType.saptamsa:
+        return l10n.chart_saptamsa_display;
+      case KundaliType.navamsa:
+        return l10n.chart_navamsa_display;
+      case KundaliType.dasamsa:
+        return l10n.chart_dasamsa_display;
+      case KundaliType.dwadasamsa:
+        return l10n.chart_dwadasamsa_display;
+      case KundaliType.shodasamsa:
+        return l10n.chart_shodasamsa_display;
+      case KundaliType.vimsamsa:
+        return l10n.chart_vimsamsa_display;
+      case KundaliType.chaturvimsamsa:
+        return l10n.chart_chaturvimsamsa_display;
+      case KundaliType.bhamsa:
+        return l10n.chart_bhamsa_display;
+      case KundaliType.trimshamsa:
+        return l10n.chart_trimshamsa_display;
+      case KundaliType.khavedamsa:
+        return l10n.chart_khavedamsa_display;
+      case KundaliType.akshavedamsa:
+        return l10n.chart_akshavedamsa_display;
+      case KundaliType.shashtiamsa:
+        return l10n.chart_shashtiamsa_display;
+      case KundaliType.sudarshan:
+        return l10n.chart_sudarshan_display;
+      case KundaliType.ashtakavarga:
+        return l10n.chart_ashtakavarga_display;
+    }
+  }
+
+  /// Returns the localized subtitle for this chart type
+  String localizedSubtitle(AppLocalizations l10n) {
+    switch (this) {
+      case KundaliType.lagna:
+        return l10n.chart_lagna_subtitle;
+      case KundaliType.chandra:
+        return l10n.chart_chandra_subtitle;
+      case KundaliType.surya:
+        return l10n.chart_surya_subtitle;
+      case KundaliType.bhavaChalit:
+        return l10n.chart_bhava_chalit_subtitle;
+      case KundaliType.hora:
+        return l10n.chart_hora_subtitle;
+      case KundaliType.drekkana:
+        return l10n.chart_drekkana_subtitle;
+      case KundaliType.chaturthamsa:
+        return l10n.chart_chaturthamsa_subtitle;
+      case KundaliType.saptamsa:
+        return l10n.chart_saptamsa_subtitle;
+      case KundaliType.navamsa:
+        return l10n.chart_navamsa_subtitle;
+      case KundaliType.dasamsa:
+        return l10n.chart_dasamsa_subtitle;
+      case KundaliType.dwadasamsa:
+        return l10n.chart_dwadasamsa_subtitle;
+      case KundaliType.shodasamsa:
+        return l10n.chart_shodasamsa_subtitle;
+      case KundaliType.vimsamsa:
+        return l10n.chart_vimsamsa_subtitle;
+      case KundaliType.chaturvimsamsa:
+        return l10n.chart_chaturvimsamsa_subtitle;
+      case KundaliType.bhamsa:
+        return l10n.chart_bhamsa_subtitle;
+      case KundaliType.trimshamsa:
+        return l10n.chart_trimshamsa_subtitle;
+      case KundaliType.khavedamsa:
+        return l10n.chart_khavedamsa_subtitle;
+      case KundaliType.akshavedamsa:
+        return l10n.chart_akshavedamsa_subtitle;
+      case KundaliType.shashtiamsa:
+        return l10n.chart_shashtiamsa_subtitle;
+      case KundaliType.sudarshan:
+        return l10n.chart_sudarshan_subtitle;
+      case KundaliType.ashtakavarga:
+        return l10n.chart_ashtakavarga_subtitle;
     }
   }
 }

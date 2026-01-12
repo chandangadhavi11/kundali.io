@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/models/kundali_data_model.dart';
+import '../../../l10n/generated/app_localizations.dart';
 
 /// A horizontally scrollable chart type selector for switching between
 /// different Kundali types (Lagna, Chandra, Navamsa, etc.)
@@ -215,17 +216,22 @@ class _ChartTypeCardState extends State<_ChartTypeCard> {
                 ],
               ),
               const SizedBox(height: 6),
-              // Name
-              Text(
-                widget.type.displayName,
-                style: GoogleFonts.dmSans(
-                  fontSize: 10,
-                  fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: widget.isSelected ? _textPrimary : _textMuted,
-                  letterSpacing: 0.1,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              // Name - localized
+              Builder(
+                builder: (context) {
+                  final l10n = AppLocalizations.of(context);
+                  return Text(
+                    widget.type.localizedDisplayName(l10n),
+                    style: GoogleFonts.dmSans(
+                      fontSize: 10,
+                      fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500,
+                      color: widget.isSelected ? _textPrimary : _textMuted,
+                      letterSpacing: 0.1,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  );
+                },
               ),
             ],
           ),
@@ -285,13 +291,18 @@ class ChartTypeDropdown extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              currentType.displayName,
-              style: GoogleFonts.dmSans(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: _textPrimary,
-              ),
+            Builder(
+              builder: (context) {
+                final l10n = AppLocalizations.of(context);
+                return Text(
+                  currentType.localizedDisplayName(l10n),
+                  style: GoogleFonts.dmSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: _textPrimary,
+                  ),
+                );
+              },
             ),
             const SizedBox(width: 6),
             Icon(
@@ -476,28 +487,33 @@ class _ChartTypeBottomSheet extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 2),
-                        Text(
-                          type.displayName,
-                          style: GoogleFonts.dmSans(
-                            fontSize: 9,
-                            fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.w500,
-                            color: isSelected ? _textPrimary : _textMuted,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        Builder(
+                          builder: (context) {
+                            final l10n = AppLocalizations.of(context);
+                            return Text(
+                              type.localizedDisplayName(l10n),
+                              style: GoogleFonts.dmSans(
+                                fontSize: 9,
+                                fontWeight: isSelected
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                                color: isSelected ? _textPrimary : _textMuted,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            );
+                          },
                         ),
                       ],
                     ),
                   ),
                 );
-              },
-            ),
-          ],
-        ),
+            },
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
 

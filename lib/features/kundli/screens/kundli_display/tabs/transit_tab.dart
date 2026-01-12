@@ -412,16 +412,18 @@ InsightData _getTransitOverviewInsight(
   int favorableCount,
   int challengingCount,
   String moonSign,
+  AppLocalizations l10n,
 ) {
   final balance = favorableCount - challengingCount;
+  final localizedMoonSign = _getLocalizedZodiacSign(moonSign, l10n);
   final balanceStatus =
       balance >= 3
-          ? 'Very Favorable'
+          ? l10n.transit_veryFavorable
           : balance >= 1
-          ? 'Favorable'
+          ? l10n.transit_favorable
           : balance >= -1
-          ? 'Mixed'
-          : 'Challenging';
+          ? l10n.transit_balance_mixed
+          : l10n.transit_challenging;
   final color =
       balance >= 3
           ? _Colors.emerald
@@ -432,40 +434,41 @@ InsightData _getTransitOverviewInsight(
           : _Colors.coral;
 
   return InsightData(
-    title: 'Transit Overview',
+    title: l10n.transit_insight_overview_title,
     value: balanceStatus,
-    description:
-        'Planetary transits (Gochar) are the current positions of planets in the sky relative to your birth chart. They trigger events and influence your life based on their relationship with your natal planets, especially the Moon sign (Janma Rashi).',
-    significance:
-        'Currently, $favorableCount planets are in favorable positions and $challengingCount are challenging. Your Janma Rashi is $moonSign, which is the reference point for all transit calculations in Vedic astrology.',
+    description: l10n.transit_insight_overview_desc,
+    significance: l10n.transit_insight_overview_significance(
+      favorableCount.toString(),
+      challengingCount.toString(),
+      localizedMoonSign,
+    ),
     keyPoints: [
-      'Favorable Transits: $favorableCount planets',
-      'Challenging Transits: $challengingCount planets',
-      'Overall Balance: $balanceStatus',
-      'Janma Rashi (Moon Sign): $moonSign',
-      'Favorable houses from Moon: 3, 6, 10, 11',
-      'Transits are temporary influences that trigger natal potential',
+      l10n.transit_insight_overview_keypoint1(favorableCount.toString()),
+      l10n.transit_insight_overview_keypoint2(challengingCount.toString()),
+      l10n.transit_insight_overview_keypoint3(balanceStatus),
+      l10n.transit_insight_overview_keypoint4(localizedMoonSign),
+      l10n.transit_insight_overview_keypoint5,
+      l10n.transit_insight_overview_keypoint6,
     ],
     accentColor: color,
     icon: Icons.sync_alt_rounded,
   );
 }
 
-InsightData _getGocharInsight(String moonSign) {
+InsightData _getGocharInsight(String moonSign, AppLocalizations l10n) {
+  final localizedMoonSign = _getLocalizedZodiacSign(moonSign, l10n);
   return InsightData(
-    title: 'Gochar (गोचर)',
-    value: 'Transit System',
-    description:
-        'Gochar is the Vedic system of planetary transits calculated from the Moon sign. Unlike Western astrology which uses the Sun sign, Vedic astrology emphasizes the Moon as the seat of the mind and emotions, making it the primary reference for transit predictions.',
-    significance:
-        'Your transits are calculated from $moonSign, your Janma Rashi. Planets transiting the 3rd, 6th, 10th, and 11th houses from Moon are generally favorable, while the 1st, 2nd, 4th, 5th, 7th, 8th, 9th, and 12th require careful attention.',
+    title: l10n.transit_insight_gochar_title,
+    value: l10n.transit_insight_gochar_value,
+    description: l10n.transit_insight_gochar_desc,
+    significance: l10n.transit_insight_gochar_significance(localizedMoonSign),
     keyPoints: [
-      'Reference Point: $moonSign (Janma Rashi)',
-      'Favorable Houses: 3, 6, 10, 11',
-      'Challenging Houses: 1, 4, 5, 7, 8, 12',
-      'Neutral Houses: 2, 9',
-      'Each planet has specific favorable/unfavorable houses',
-      'Slow planets (Saturn, Jupiter, Rahu/Ketu) have longer effects',
+      l10n.transit_insight_gochar_keypoint1(localizedMoonSign),
+      l10n.transit_insight_gochar_keypoint2,
+      l10n.transit_insight_gochar_keypoint3,
+      l10n.transit_insight_gochar_keypoint4,
+      l10n.transit_insight_gochar_keypoint5,
+      l10n.transit_insight_gochar_keypoint6,
     ],
     accentColor: _Colors.rose,
     icon: Icons.radar_rounded,
@@ -513,22 +516,29 @@ InsightData _getGocharHouseInsight(
   List<String> planets,
   bool isFavorable,
   bool isMoonHouse,
+  AppLocalizations l10n,
 ) {
-  final houseDescriptions = {
-    1: 'Self, personality, health, new beginnings',
-    2: 'Wealth, family, speech, accumulated resources',
-    3: 'Courage, siblings, communication, short journeys',
-    4: 'Home, mother, comfort, emotional well-being, property',
-    5: 'Intelligence, children, creativity, romance, speculation',
-    6: 'Enemies, diseases, debts, daily work, service',
-    7: 'Marriage, partnerships, business relationships',
-    8: 'Longevity, transformation, inheritance, hidden matters',
-    9: 'Fortune, higher learning, spirituality, father, long journeys',
-    10: 'Career, reputation, authority, public standing',
-    11: 'Gains, income, friends, fulfillment of desires',
-    12: 'Losses, expenses, foreign lands, liberation, isolation',
-  };
+  String _getHouseSignifications(int h) {
+    switch (h) {
+      case 1: return l10n.transit_house_1_significations;
+      case 2: return l10n.transit_house_2_significations;
+      case 3: return l10n.transit_house_3_significations;
+      case 4: return l10n.transit_house_4_significations;
+      case 5: return l10n.transit_house_5_significations;
+      case 6: return l10n.transit_house_6_significations;
+      case 7: return l10n.transit_house_7_significations;
+      case 8: return l10n.transit_house_8_significations;
+      case 9: return l10n.transit_house_9_significations;
+      case 10: return l10n.transit_house_10_significations;
+      case 11: return l10n.transit_house_11_significations;
+      case 12: return l10n.transit_house_12_significations;
+      default: return '';
+    }
+  }
 
+  final significations = _getHouseSignifications(house);
+  final localizedPlanets = planets.map((p) => _getLocalizedPlanetName(p, l10n)).toList();
+  
   final color =
       isMoonHouse
           ? _Colors.violet
@@ -536,57 +546,82 @@ InsightData _getGocharHouseInsight(
           ? _Colors.emerald
           : _Colors.amber;
 
+  final description = isMoonHouse
+      ? l10n.transit_insight_house_desc_moonHouse(house.toString(), significations)
+      : isFavorable
+      ? l10n.transit_insight_house_desc_favorable(house.toString(), significations)
+      : l10n.transit_insight_house_desc_challenging(house.toString(), significations);
+
+  final significance = planets.isEmpty
+      ? l10n.transit_insight_house_significance_empty
+      : l10n.transit_insight_house_significance_planets(
+          localizedPlanets.join(", "),
+          planets.length == 1 ? l10n.transit_is : l10n.transit_are,
+          isFavorable ? l10n.transit_supporting : l10n.transit_influencing,
+          significations.split(",").first,
+        );
+
   return InsightData(
-    title: 'Gochar House',
-    value: 'House ${house}${isMoonHouse ? " (Moon)" : ""}',
-    description:
-        'House $house represents ${houseDescriptions[house] ?? "various life matters"}. ${isMoonHouse
-            ? "This is your Janma Rashi house where the Moon was at birth."
-            : isFavorable
-            ? "This is generally a favorable house for transits."
-            : "Transits through this house require attention."}',
-    significance:
-        planets.isEmpty
-            ? 'No planets are currently transiting this house.'
-            : 'Currently ${planets.join(", ")} ${planets.length == 1 ? "is" : "are"} transiting this house, ${isFavorable ? "supporting" : "influencing"} matters related to ${houseDescriptions[house]?.split(",").first ?? "this house"}.',
+    title: l10n.transit_insight_house_title,
+    value: isMoonHouse
+        ? l10n.transit_insight_house_value_moon(house.toString())
+        : l10n.transit_insight_house_value(house.toString()),
+    description: description,
+    significance: significance,
     keyPoints: [
-      'House Number: $house',
-      'Significations: ${houseDescriptions[house] ?? "Various life matters"}',
-      if (isMoonHouse) 'Type: Janma Rashi (Moon Sign House)',
-      'Transit Quality: ${isFavorable ? "Favorable ★" : "Requires Attention"}',
-      'Current Planets: ${planets.isEmpty ? "None" : planets.join(", ")}',
+      l10n.transit_insight_house_keypoint1(house.toString()),
+      l10n.transit_insight_house_keypoint2(significations),
+      if (isMoonHouse) l10n.transit_insight_house_keypoint3,
+      isFavorable
+          ? l10n.transit_insight_house_keypoint4_favorable
+          : l10n.transit_insight_house_keypoint4_challenging,
+      l10n.transit_insight_house_keypoint5(
+          localizedPlanets.isEmpty ? l10n.transit_none : localizedPlanets.join(", ")),
     ],
     accentColor: color,
     icon: Icons.home_work_rounded,
   );
 }
 
-InsightData _getSadeSatiInsight(Map<String, dynamic> info) {
+InsightData _getSadeSatiInsight(Map<String, dynamic> info, AppLocalizations l10n) {
   final phase = info['phaseNumber'] ?? 0;
-  final phaseNames = [
-    '',
-    'Rising (1st Phase)',
-    'Peak (2nd Phase)',
-    'Setting (3rd Phase)',
-  ];
+  
+  String _getPhaseName(int p) {
+    switch (p) {
+      case 1: return l10n.transit_phase_rising;
+      case 2: return l10n.transit_phase_peak;
+      case 3: return l10n.transit_phase_setting;
+      default: return '';
+    }
+  }
+  
+  final phaseName = _getPhaseName(phase);
+  final localizedSaturnSign = info['saturnSign'] != null 
+      ? _getLocalizedZodiacSign(info['saturnSign'], l10n) 
+      : '';
+  final localizedMoonSign = info['moonSign'] != null 
+      ? _getLocalizedZodiacSign(info['moonSign'], l10n) 
+      : '';
 
   return InsightData(
-    title: 'Sade Sati (साढ़े साती)',
-    value: phase > 0 ? phaseNames[phase] : 'Not Active',
-    description:
-        'Sade Sati is Saturn\'s 7.5-year transit cycle over three signs: the 12th, 1st, and 2nd from your Moon sign. Each sign takes approximately 2.5 years. This period is often associated with challenges, delays, and karmic lessons, but also brings maturity and spiritual growth.',
-    significance:
-        phase > 0
-            ? '${info['description'] ?? "You are currently in the ${phaseNames[phase]} of Sade Sati."} Saturn is transiting ${info['saturnSign']} at ${(info['saturnDegree'] as double?)?.toStringAsFixed(1) ?? ""}°.'
-            : 'Saturn is not currently transiting the 12th, 1st, or 2nd house from your Moon sign (${info['moonSign']}). Sade Sati is not active.',
+    title: l10n.transit_insight_sadesati_title,
+    value: phase > 0 ? l10n.transit_insight_sadesati_value_active(phaseName) : l10n.transit_insight_sadesati_value_inactive,
+    description: l10n.transit_insight_sadesati_desc,
+    significance: phase > 0
+        ? l10n.transit_insight_sadesati_significance_active(
+            info['description'] ?? '',
+            localizedSaturnSign,
+            (info['saturnDegree'] as double?)?.toStringAsFixed(1) ?? '',
+          )
+        : l10n.transit_insight_sadesati_significance_inactive(localizedMoonSign),
     keyPoints: [
-      'Duration: 7.5 years total (~2.5 years per phase)',
-      'Phase 1 (Rising): Saturn in 12th from Moon - expenses, travel, mental stress',
-      'Phase 2 (Peak): Saturn over Moon - most intense, health/emotional challenges',
-      'Phase 3 (Setting): Saturn in 2nd from Moon - family, finances, speech',
-      if (phase > 0) 'Current Phase: ${phaseNames[phase]}',
-      if (phase > 0) 'Saturn in: ${info['saturnSign']}',
-      'Remedies: Saturn mantras, charity on Saturdays, patience',
+      l10n.transit_insight_sadesati_keypoint1,
+      l10n.transit_insight_sadesati_keypoint2,
+      l10n.transit_insight_sadesati_keypoint3,
+      l10n.transit_insight_sadesati_keypoint4,
+      if (phase > 0) l10n.transit_insight_sadesati_keypoint5(phaseName),
+      if (phase > 0) l10n.transit_insight_sadesati_keypoint6(localizedSaturnSign),
+      l10n.transit_insight_sadesati_keypoint7,
     ],
     accentColor: _Colors.coral,
     icon: Icons.hourglass_bottom_rounded,
@@ -1480,12 +1515,14 @@ class _TransitHeroCardState extends State<_TransitHeroCard> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
+        final l10n = AppLocalizations.of(context);
         _showInsightSheet(
           context,
           _getTransitOverviewInsight(
             widget.favorableCount,
             widget.challengingCount,
             widget.moonSign,
+            l10n,
           ),
         );
       },
@@ -1776,7 +1813,8 @@ class _MinimalSadeSatiBannerState extends State<_MinimalSadeSatiBanner> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
-        _showInsightSheet(context, _getSadeSatiInsight(widget.sadeSatiInfo));
+        final l10n = AppLocalizations.of(context);
+        _showInsightSheet(context, _getSadeSatiInsight(widget.sadeSatiInfo, l10n));
       },
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedContainer(
@@ -1874,7 +1912,8 @@ class _InteractiveSadeSatiBannerState
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
-        _showInsightSheet(context, _getSadeSatiInsight(widget.sadeSatiInfo));
+        final l10n = AppLocalizations.of(context);
+        _showInsightSheet(context, _getSadeSatiInsight(widget.sadeSatiInfo, l10n));
       },
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedContainer(
@@ -2249,29 +2288,32 @@ class _InteractiveStatBadgeState extends State<_InteractiveStatBadge> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
+        final isFavorable = widget.label == l10n.transit_favorable || widget.label == 'Favorable';
         _showInsightSheet(
           context,
           InsightData(
-            title: '${widget.label} Transits',
-            value: '${widget.value} Planets',
-            description:
-                widget.label == 'Favorable'
-                    ? 'These planets are currently transiting houses that are generally supportive from your Moon sign. Favorable transits bring opportunities, success, and positive energy.'
-                    : 'These planets are currently in positions that may bring challenges or require extra attention. Challenging transits offer growth opportunities through overcoming obstacles.',
-            significance:
-                'You have ${widget.value} ${widget.label.toLowerCase()} planetary transits currently active.',
+            title: l10n.transit_insight_transitCount_title(widget.label),
+            value: l10n.transit_insight_transitCount_value(widget.value.toString()),
+            description: isFavorable
+                ? l10n.transit_insight_transitCount_desc_favorable
+                : l10n.transit_insight_transitCount_desc_challenging,
+            significance: l10n.transit_insight_transitCount_significance(
+              widget.value.toString(),
+              widget.label.toLowerCase(),
+            ),
             keyPoints: [
-              'Count: ${widget.value} planets',
-              'Type: ${widget.label}',
-              widget.label == 'Favorable'
-                  ? 'Houses 3, 6, 10, 11 are generally favorable'
-                  : 'Other houses require more attention',
-              'Transits are calculated from your Moon sign (Janma Rashi)',
+              l10n.transit_insight_transitCount_keypoint1(widget.value.toString()),
+              l10n.transit_insight_transitCount_keypoint2(widget.label),
+              isFavorable
+                  ? l10n.transit_insight_transitCount_keypoint3_favorable
+                  : l10n.transit_insight_transitCount_keypoint3_challenging,
+              l10n.transit_insight_transitCount_keypoint4,
             ],
             accentColor: widget.color,
             icon: widget.icon,
@@ -2581,30 +2623,56 @@ class _InteractiveSkyPlanetRowState extends State<_InteractiveSkyPlanetRow> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
+        
+        final retroText = widget.currentPos.isRetrograde ? l10n.transit_insight_currentPosition_retro : '';
+        final natalInfo = widget.natalPos != null 
+            ? l10n.transit_insight_currentPosition_natalInfo(
+                localizedPlanetName,
+                widget.natalPos!.signDegree.toStringAsFixed(1),
+                localizedSignNatal,
+              )
+            : '';
+        
+        String significance;
+        if (signChanged) {
+          significance = l10n.transit_insight_currentPosition_significance_changed(localizedPlanetName);
+        } else if (widget.currentPos.sign == widget.natalPos?.sign) {
+          significance = l10n.transit_insight_currentPosition_significance_same(localizedPlanetName);
+        } else {
+          significance = l10n.transit_insight_currentPosition_significance_transiting(localizedPlanetName);
+        }
+        if (isSlow) {
+          significance += l10n.transit_insight_currentPosition_significance_slow;
+        }
+        
+        final transitDuration = widget.planet == "Saturn"
+            ? "~2.5 ${l10n.transit_years}"
+            : widget.planet == "Jupiter"
+            ? "~1 ${l10n.transit_year}"
+            : "~1.5 ${l10n.transit_years}";
+        
         _showInsightSheet(
           context,
           InsightData(
-            title: l10n.transit_currentPosition,
+            title: l10n.transit_insight_currentPosition_title,
             value: localizedPlanetName,
-            description:
-                '${widget.planet} is currently at ${widget.currentPos.signDegree.toStringAsFixed(1)}° in ${widget.currentPos.sign}${widget.currentPos.isRetrograde ? " (Retrograde)" : ""}. ${widget.natalPos != null ? "At your birth, ${widget.planet} was at ${widget.natalPos!.signDegree.toStringAsFixed(1)}° in ${widget.natalPos!.sign}." : ""}',
-            significance:
-                signChanged
-                    ? '${widget.planet} has moved to a different sign since your birth. ${signChanged ? "This indicates the planet is in a new area of your chart." : ""}'
-                    : '${widget.planet} is ${widget.currentPos.sign == widget.natalPos?.sign ? "in the same sign as at birth" : "currently transiting"}.${isSlow ? " As a slow-moving planet, its transits have longer-lasting effects." : ""}',
+            description: l10n.transit_insight_currentPosition_desc(
+              localizedPlanetName,
+              widget.currentPos.signDegree.toStringAsFixed(1),
+              localizedSignCurrent,
+              retroText,
+              natalInfo,
+            ),
+            significance: significance,
             keyPoints: [
-              'Planet: ${widget.planet}',
-              'Current: ${widget.currentPos.sign} ${widget.currentPos.signDegree.toStringAsFixed(1)}°',
+              l10n.transit_insight_currentPosition_keypoint1(localizedPlanetName),
+              l10n.transit_insight_currentPosition_keypoint2(localizedSignCurrent, widget.currentPos.signDegree.toStringAsFixed(1)),
               if (widget.natalPos != null)
-                'Natal: ${widget.natalPos!.sign} ${widget.natalPos!.signDegree.toStringAsFixed(1)}°',
-              if (widget.currentPos.isRetrograde) 'Status: Retrograde ℞',
-              if (signChanged) 'Sign Changed: Yes',
+                l10n.transit_insight_currentPosition_keypoint3(localizedSignNatal, widget.natalPos!.signDegree.toStringAsFixed(1)),
+              if (widget.currentPos.isRetrograde) l10n.transit_insight_currentPosition_keypoint4,
+              if (signChanged) l10n.transit_insight_currentPosition_keypoint5,
               if (isSlow)
-                'Transit Speed: Slow (${widget.planet == "Saturn"
-                    ? "~2.5 yrs"
-                    : widget.planet == "Jupiter"
-                    ? "~1 yr"
-                    : "~1.5 yrs"}/sign)',
+                l10n.transit_insight_currentPosition_keypoint6(transitDuration),
             ],
             accentColor: planetColor,
             icon: Icons.public_rounded,
@@ -2850,7 +2918,8 @@ class _GocharLegendState extends State<_GocharLegend> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
-        _showInsightSheet(context, _getGocharInsight(widget.moonSign));
+        final l10n = AppLocalizations.of(context);
+        _showInsightSheet(context, _getGocharInsight(widget.moonSign, l10n));
       },
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedContainer(
@@ -3071,6 +3140,7 @@ class _InteractiveGocharCellState extends State<_InteractiveGocharCell> {
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
+        final l10n = AppLocalizations.of(context);
         _showInsightSheet(
           context,
           _getGocharHouseInsight(
@@ -3078,6 +3148,7 @@ class _InteractiveGocharCellState extends State<_InteractiveGocharCell> {
             widget.planets,
             widget.isFavorable,
             widget.isMoonHouse,
+            l10n,
           ),
         );
       },
@@ -3677,7 +3748,8 @@ class _SadeSatiCardState extends State<_SadeSatiCard>
       onTapUp: (_) {
         setState(() => _isPressed = false);
         HapticFeedback.selectionClick();
-        _showInsightSheet(context, _getSadeSatiInsight(widget.sadeSatiInfo));
+        final l10n = AppLocalizations.of(context);
+        _showInsightSheet(context, _getSadeSatiInsight(widget.sadeSatiInfo, l10n));
       },
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedContainer(
@@ -4162,7 +4234,7 @@ class _SadeSatiInactiveCardState extends State<_SadeSatiInactiveCard>
         HapticFeedback.selectionClick();
         _showInsightSheet(
           context,
-          _getSadeSatiInsight({'isActive': false, 'moonSign': widget.moonSign}),
+          _getSadeSatiInsight({'isActive': false, 'moonSign': widget.moonSign}, l10n),
         );
       },
       onTapCancel: () => setState(() => _isPressed = false),

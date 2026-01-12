@@ -287,6 +287,222 @@ class AppLocalizationsMl extends AppLocalizations {
   String get chart_category_special_desc => 'അദ്വിതീയ വിശകലന രീതികൾ';
 
   @override
+  String get chart_lagna_display => 'Lagna Kundali';
+
+  @override
+  String get chart_lagna_subtitle => 'Rasi Chart / D1 Chart';
+
+  @override
+  String get chart_chandra_display => 'Moon Chart';
+
+  @override
+  String get chart_chandra_subtitle => 'Chandra Kundali';
+
+  @override
+  String get chart_surya_display => 'Sun Chart';
+
+  @override
+  String get chart_surya_subtitle => 'Surya Kundali';
+
+  @override
+  String get chart_bhava_chalit_display => 'Chalit Kundali';
+
+  @override
+  String get chart_bhava_chalit_subtitle => 'Bhava Chalit Chart';
+
+  @override
+  String get chart_hora_display => 'Hora Chart';
+
+  @override
+  String get chart_hora_subtitle => 'Wealth Chart';
+
+  @override
+  String get chart_drekkana_display => 'Drekkana Chart';
+
+  @override
+  String get chart_drekkana_subtitle => 'Siblings & Courage';
+
+  @override
+  String get chart_chaturthamsa_display => 'Chaturthamsha';
+
+  @override
+  String get chart_chaturthamsa_subtitle => 'Property & Fortune';
+
+  @override
+  String get chart_saptamsa_display => 'Saptamsha';
+
+  @override
+  String get chart_saptamsa_subtitle => 'Children & Progeny';
+
+  @override
+  String get chart_navamsa_display => 'Navamsha Kundali';
+
+  @override
+  String get chart_navamsa_subtitle => 'D9 - Marriage & Dharma';
+
+  @override
+  String get chart_dasamsa_display => 'Dasamsha Chart';
+
+  @override
+  String get chart_dasamsa_subtitle => 'Career & Profession';
+
+  @override
+  String get chart_dwadasamsa_display => 'Dwadashamsha';
+
+  @override
+  String get chart_dwadasamsa_subtitle => 'Parents';
+
+  @override
+  String get chart_shodasamsa_display => 'Shodashamsha';
+
+  @override
+  String get chart_shodasamsa_subtitle => 'Vehicles & Comforts';
+
+  @override
+  String get chart_vimsamsa_display => 'Vimshamsha';
+
+  @override
+  String get chart_vimsamsa_subtitle => 'Spiritual Progress';
+
+  @override
+  String get chart_chaturvimsamsa_display => 'Chaturvimshamsha';
+
+  @override
+  String get chart_chaturvimsamsa_subtitle => 'Education & Learning';
+
+  @override
+  String get chart_bhamsa_display => 'Bhamsha Chart';
+
+  @override
+  String get chart_bhamsa_subtitle => 'Nakshatramsa';
+
+  @override
+  String get chart_trimshamsa_display => 'Trimshamsha';
+
+  @override
+  String get chart_trimshamsa_subtitle => 'Misfortunes';
+
+  @override
+  String get chart_khavedamsa_display => 'Khavedamsha';
+
+  @override
+  String get chart_khavedamsa_subtitle => 'Auspicious Effects';
+
+  @override
+  String get chart_akshavedamsa_display => 'Akshavedamsha';
+
+  @override
+  String get chart_akshavedamsa_subtitle => 'General Indications';
+
+  @override
+  String get chart_shashtiamsa_display => 'Shashtiamsha';
+
+  @override
+  String get chart_shashtiamsa_subtitle => 'Past Life Karma';
+
+  @override
+  String get chart_sudarshan_display => 'Sudarshan Chakra';
+
+  @override
+  String get chart_sudarshan_subtitle => 'Triple Chart View';
+
+  @override
+  String get chart_ashtakavarga_display => 'Ashtakavarga';
+
+  @override
+  String get chart_ashtakavarga_subtitle => 'Point-based Strength';
+
+  @override
+  String get chart_guide_title => 'Chart Types Guide';
+
+  @override
+  String get chart_guide_subtitle => 'Understanding Vedic astrology charts';
+
+  @override
+  String get chart_meaning_lagna =>
+      'The foundation of Vedic astrology. Shows your overall life path, personality, physical body, and general tendencies based on the rising sign at birth.';
+
+  @override
+  String get chart_meaning_chandra =>
+      'Moon chart reveals your emotional nature, mind, mental patterns, and psychological tendencies. Essential for understanding inner feelings and reactions.';
+
+  @override
+  String get chart_meaning_surya =>
+      'Sun chart shows your soul purpose, ego, vitality, father, authority figures, and career in government or leadership roles.';
+
+  @override
+  String get chart_meaning_bhava_chalit =>
+      'Uses exact house cusps to show where planets actually influence. More accurate for predicting which house matters each planet truly affects.';
+
+  @override
+  String get chart_meaning_navamsa =>
+      'D9 - The most important divisional chart. Reveals marriage quality, spouse nature, dharma (life purpose), and the strength of planets.';
+
+  @override
+  String get chart_meaning_dasamsa =>
+      'D10 - Career and profession chart. Shows professional success, status in society, recognition, and the type of work that brings fulfillment.';
+
+  @override
+  String get chart_meaning_saptamsa =>
+      'D7 - Children and progeny chart. Indicates fertility, number of children, relationship with children, and creative output.';
+
+  @override
+  String get chart_meaning_dwadasamsa =>
+      'D12 - Parents chart. Shows relationship with parents, ancestral karma, and family lineage influences.';
+
+  @override
+  String get chart_meaning_trimshamsa =>
+      'D30 - Misfortunes chart. Reveals potential challenges, health issues, accidents, and areas requiring caution.';
+
+  @override
+  String get chart_meaning_hora =>
+      'D2 - Wealth chart. Shows financial potential, earning capacity, and accumulation of material resources.';
+
+  @override
+  String get chart_meaning_drekkana =>
+      'D3 - Siblings and courage chart. Shows relationship with siblings, inner courage, and communication abilities.';
+
+  @override
+  String get chart_meaning_chaturthamsa =>
+      'D4 - Property and fortune chart. Indicates real estate, vehicles, and overall material comforts.';
+
+  @override
+  String get chart_meaning_shodasamsa =>
+      'D16 - Vehicles and comforts chart. Shows luxury items, vehicles, and material happiness.';
+
+  @override
+  String get chart_meaning_vimsamsa =>
+      'D20 - Spiritual progress chart. Reveals spiritual inclinations, religious practices, and meditation potential.';
+
+  @override
+  String get chart_meaning_chaturvimsamsa =>
+      'D24 - Education chart. Shows academic achievements, learning abilities, and knowledge acquisition.';
+
+  @override
+  String get chart_meaning_bhamsa =>
+      'D27 - Strength chart. Reveals inherent strengths and weaknesses in the horoscope.';
+
+  @override
+  String get chart_meaning_khavedamsa =>
+      'D40 - Auspicious effects chart. Shows positive karmic patterns and blessings.';
+
+  @override
+  String get chart_meaning_akshavedamsa =>
+      'D45 - General indications chart. Provides overall life indications.';
+
+  @override
+  String get chart_meaning_shashtiamsa =>
+      'D60 - Past life karma chart. The most detailed chart showing karmic patterns from previous lives.';
+
+  @override
+  String get chart_meaning_sudarshan =>
+      'Triple chart view combining Lagna, Moon, and Sun charts for comprehensive analysis.';
+
+  @override
+  String get chart_meaning_ashtakavarga =>
+      'Point-based strength analysis showing planetary influences in each house numerically.';
+
+  @override
   String get display_shareComingSoon => 'ഷെയർ ഉടൻ വരുന്നു';
 
   @override
@@ -2646,12 +2862,28 @@ class AppLocalizationsMl extends AppLocalizations {
   String get strength_maxPossible => 'Maximum possible: 337 points';
 
   @override
+  String get strength_maxPossible337 => 'Maximum possible: 337 points';
+
+  @override
   String get strength_calculationSum =>
+      'Calculation: Sum of all 12 sign SAV values';
+
+  @override
+  String get strength_calculationSum12 =>
       'Calculation: Sum of all 12 sign SAV values';
 
   @override
   String get strength_higherBetter =>
       'Higher = Better overall transit strength';
+
+  @override
+  String get strength_bavRange => 'Individual BAV: 0-8 points per planet-sign';
+
+  @override
+  String get strength_savRange => 'SAV: 0-56 points per sign (combined)';
+
+  @override
+  String get strength_goodBavThreshold => 'Good BAV: ≥4 points';
 
   @override
   String get strength_lagnaLord => 'Lagna Lord';
@@ -2772,16 +3004,6 @@ class AppLocalizationsMl extends AppLocalizations {
   }
 
   @override
-  String strength_countPlanets(int count) {
-    return 'Count: $count planets';
-  }
-
-  @override
-  String strength_category(String category) {
-    return 'Category: $category';
-  }
-
-  @override
   String get strength_scoreRangeStrong => 'Score Range: 15-20 points (75-100%)';
 
   @override
@@ -2791,13 +3013,60 @@ class AppLocalizationsMl extends AppLocalizations {
   String get strength_scoreRangeWeak => 'Score Range: 0-10 points (0-50%)';
 
   @override
-  String strength_planetsPlanets(String label) {
+  String strength_categoryLabel(String category) {
+    return 'Category: $category';
+  }
+
+  @override
+  String strength_countPlanets(int count) {
+    return 'Count: $count planets';
+  }
+
+  @override
+  String strength_labelPlanets(String label) {
     return '$label Planets';
   }
 
   @override
   String strength_haveCount(String value, String label) {
     return 'You have $value $label planets in your chart.';
+  }
+
+  @override
+  String strength_statusCategory(String status) {
+    return 'Status: $status';
+  }
+
+  @override
+  String strength_strongPlanetsRange(int count) {
+    return 'Strong Planets: $count (15-20 points)';
+  }
+
+  @override
+  String strength_mediumPlanetsRange(int count) {
+    return 'Medium Planets: $count (10-15 points)';
+  }
+
+  @override
+  String strength_weakPlanetsRange(int count) {
+    return 'Weak Planets: $count (0-10 points)';
+  }
+
+  @override
+  String get strength_maxScore20 => 'Max score: 20 points per planet';
+
+  @override
+  String get strength_strongVimshopakaExplain =>
+      'Strong Vimshopaka = Good dignity across all charts';
+
+  @override
+  String strength_category(String category) {
+    return 'Category: $category';
+  }
+
+  @override
+  String strength_planetsPlanets(String label) {
+    return '$label Planets';
   }
 
   @override
@@ -5885,6 +6154,233 @@ class AppLocalizationsMl extends AppLocalizations {
       'Manglik Dosha occurs when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. It primarily affects marriage and relationships but can be effectively remedied.';
 
   @override
+  String get yogas_astrologicalInsight => 'Astrological Insight';
+
+  @override
+  String yogas_typeInsight_yoga_type(String type) {
+    return 'Type: $type';
+  }
+
+  @override
+  String get yogas_typeInsight_yoga_nature => 'Nature: Benefic combination';
+
+  @override
+  String get yogas_typeInsight_yoga_activation =>
+      'Activation: During relevant Dasha periods';
+
+  @override
+  String get yogas_typeInsight_yoga_strength =>
+      'Strength depends on planet dignity and aspects';
+
+  @override
+  String yogas_typeInsight_dosha_severity(String severity) {
+    return 'Severity: $severity';
+  }
+
+  @override
+  String get yogas_typeInsight_dosha_impact => 'Impact varies by chart context';
+
+  @override
+  String get yogas_typeInsight_dosha_remedies =>
+      'Remedies can mitigate effects';
+
+  @override
+  String get yogas_typeInsight_dosha_consult =>
+      'Consult an astrologer for personalized guidance';
+
+  @override
+  String get yogas_typeInsight_defaultYoga_desc =>
+      'This is a beneficial planetary combination that enhances specific life areas.';
+
+  @override
+  String get yogas_typeInsight_defaultYoga_significance =>
+      'Effects vary based on the specific combination';
+
+  @override
+  String get yogas_typeInsight_defaultDosha_desc =>
+      'This dosha creates certain challenges that can be addressed through remedies.';
+
+  @override
+  String get yogas_typeInsight_defaultDosha_significance =>
+      'Effects vary based on the specific combination';
+
+  @override
+  String yogas_strengthInsight_title(int count, String label) {
+    return '$count $label';
+  }
+
+  @override
+  String yogas_strengthInsight_value(int count, String label) {
+    return '$count $label';
+  }
+
+  @override
+  String yogas_strengthInsight_significance(int count, String label) {
+    return 'You have $count $label combination(s) in your chart.';
+  }
+
+  @override
+  String yogas_strengthInsight_count(int count) {
+    return 'Count: $count';
+  }
+
+  @override
+  String yogas_strengthInsight_level(String level) {
+    return 'Strength Level: $level';
+  }
+
+  @override
+  String get yogas_strengthInsight_strong_keypoint =>
+      'Clear manifestation expected';
+
+  @override
+  String get yogas_strengthInsight_moderate_keypoint =>
+      'Partial effects with room for improvement';
+
+  @override
+  String get yogas_strengthInsight_severe_keypoint => 'Remedies recommended';
+
+  @override
+  String get yogas_strengthInsight_default_desc => 'Standard strength level.';
+
+  @override
+  String get yogas_insightCard_understanding_kp1 =>
+      'Yogas enhance specific life areas';
+
+  @override
+  String get yogas_insightCard_understanding_kp2 =>
+      'Formed by planetary positions and relationships';
+
+  @override
+  String get yogas_insightCard_understanding_kp3 =>
+      'Each yoga has unique significations';
+
+  @override
+  String get yogas_insightCard_understanding_kp4 =>
+      'Strength determines manifestation level';
+
+  @override
+  String get yogas_insightCard_activation_kp1 =>
+      'Mahadasha of involved planets activates yoga';
+
+  @override
+  String get yogas_insightCard_activation_kp2 =>
+      'Antardasha brings sub-level activation';
+
+  @override
+  String get yogas_insightCard_activation_kp3 =>
+      'Transit support enhances effects';
+
+  @override
+  String get yogas_insightCard_activation_kp4 =>
+      'Check your Dasha periods for timing';
+
+  @override
+  String get yogas_insightCard_strength_kp1 =>
+      'Exalted/own sign planets = Strong yoga';
+
+  @override
+  String get yogas_insightCard_strength_kp2 =>
+      'Debilitated planets = Weak manifestation';
+
+  @override
+  String get yogas_insightCard_strength_kp3 => 'Benefic aspects strengthen';
+
+  @override
+  String get yogas_insightCard_strength_kp4 => 'Malefic aspects weaken';
+
+  @override
+  String get yogas_insightCard_remedies_kp1 =>
+      'Mantra chanting for involved planets';
+
+  @override
+  String get yogas_insightCard_remedies_kp2 =>
+      'Gemstones to strengthen weak planets';
+
+  @override
+  String get yogas_insightCard_remedies_kp3 => 'Charity on specific days';
+
+  @override
+  String get yogas_insightCard_remedies_kp4 =>
+      'Fasting and pujas for afflicted planets';
+
+  @override
+  String get yogas_insightCard_default_significance =>
+      'Important aspect of chart analysis.';
+
+  @override
+  String get yogas_insightCard_default_kp => 'General astrological principle';
+
+  @override
+  String get yogas_emptyState_noYogas_kp1 => 'Standard chart configuration';
+
+  @override
+  String get yogas_emptyState_noYogas_kp2 =>
+      'Success depends on overall chart strength';
+
+  @override
+  String get yogas_emptyState_noYogas_kp3 =>
+      'Dasha periods still important for timing';
+
+  @override
+  String get yogas_emptyState_noYogas_kp4 =>
+      'Individual planet strengths matter more';
+
+  @override
+  String get yogas_emptyState_noYogas_kp5 =>
+      'Aspects and house placements are key factors';
+
+  @override
+  String get yogas_emptyState_noDoshas_kp1 => 'No major doshas detected';
+
+  @override
+  String get yogas_emptyState_noDoshas_kp2 => 'Fewer karmic obstacles expected';
+
+  @override
+  String get yogas_emptyState_noDoshas_kp3 =>
+      'Marriage and relationships less afflicted';
+
+  @override
+  String get yogas_emptyState_noDoshas_kp4 =>
+      'Still check for other challenging aspects';
+
+  @override
+  String get yogas_emptyState_noDoshas_kp5 =>
+      'Overall chart analysis recommended';
+
+  @override
+  String get yogas_kaalSarp_kp1 => 'Visit Trimbakeshwar for Kaal Sarp Puja';
+
+  @override
+  String get yogas_kaalSarp_kp2 =>
+      'Chant Maha Mrityunjaya Mantra 108 times daily';
+
+  @override
+  String get yogas_kaalSarp_kp3 => 'Offer milk to Shivling on Mondays';
+
+  @override
+  String get yogas_kaalSarp_kp4 => 'Keep a snake made of silver in your home';
+
+  @override
+  String get yogas_kaalSarp_kp5 => 'Donate to the needy on Saturdays';
+
+  @override
+  String get yogas_manglik_kp1 => 'Perform Mangal Shanti Puja';
+
+  @override
+  String get yogas_manglik_kp2 => 'Recite Hanuman Chalisa on Tuesdays';
+
+  @override
+  String get yogas_manglik_kp3 => 'Fast on Tuesdays';
+
+  @override
+  String get yogas_manglik_kp4 =>
+      'Wear Red Coral gemstone (after consultation)';
+
+  @override
+  String get yogas_manglik_kp5 => 'Donate red items on Tuesdays';
+
+  @override
   String get charDasha_nav_current => 'Current';
 
   @override
@@ -6074,4 +6570,847 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get charDasha_signDesc_default => 'Cosmic influence';
+
+  @override
+  String chart_house_title(int number) {
+    return 'House $number';
+  }
+
+  @override
+  String get chart_asc_badge => 'ASC';
+
+  @override
+  String get chart_sign_label => 'Sign';
+
+  @override
+  String get chart_cusp_label => 'Cusp';
+
+  @override
+  String get chart_planets_label => 'PLANETS';
+
+  @override
+  String get chart_theme_1 => 'Self & Identity';
+
+  @override
+  String get chart_theme_2 => 'Wealth & Values';
+
+  @override
+  String get chart_theme_3 => 'Communication';
+
+  @override
+  String get chart_theme_4 => 'Home & Roots';
+
+  @override
+  String get chart_theme_5 => 'Creativity & Romance';
+
+  @override
+  String get chart_theme_6 => 'Health & Service';
+
+  @override
+  String get chart_theme_7 => 'Partnerships';
+
+  @override
+  String get chart_theme_8 => 'Transformation';
+
+  @override
+  String get chart_theme_9 => 'Philosophy & Fortune';
+
+  @override
+  String get chart_theme_10 => 'Career & Status';
+
+  @override
+  String get chart_theme_11 => 'Aspirations & Gains';
+
+  @override
+  String get chart_theme_12 => 'Spirituality & Endings';
+
+  @override
+  String get chart_bhava_1_title => 'Lagna Bhava';
+
+  @override
+  String get chart_bhava_1_desc =>
+      'Physical body, personality, vitality, and overall life path.';
+
+  @override
+  String get chart_bhava_2_title => 'Dhana Bhava';
+
+  @override
+  String get chart_bhava_2_desc =>
+      'Accumulated wealth, family, speech, and early childhood.';
+
+  @override
+  String get chart_bhava_3_title => 'Sahaja Bhava';
+
+  @override
+  String get chart_bhava_3_desc =>
+      'Siblings, courage, short journeys, and communication skills.';
+
+  @override
+  String get chart_bhava_4_title => 'Sukha Bhava';
+
+  @override
+  String get chart_bhava_4_desc =>
+      'Mother, home, emotional peace, and domestic happiness.';
+
+  @override
+  String get chart_bhava_5_title => 'Putra Bhava';
+
+  @override
+  String get chart_bhava_5_desc =>
+      'Children, creativity, intelligence, and romance.';
+
+  @override
+  String get chart_bhava_6_title => 'Shatru Bhava';
+
+  @override
+  String get chart_bhava_6_desc =>
+      'Enemies, health issues, debts, and daily work.';
+
+  @override
+  String get chart_bhava_7_title => 'Kalatra Bhava';
+
+  @override
+  String get chart_bhava_7_desc =>
+      'Marriage, partnerships, and business relationships.';
+
+  @override
+  String get chart_bhava_8_title => 'Randhra Bhava';
+
+  @override
+  String get chart_bhava_8_desc =>
+      'Longevity, inheritance, occult, and transformation.';
+
+  @override
+  String get chart_bhava_9_title => 'Dharma Bhava';
+
+  @override
+  String get chart_bhava_9_desc =>
+      'Fortune, higher learning, spirituality, and father.';
+
+  @override
+  String get chart_bhava_10_title => 'Karma Bhava';
+
+  @override
+  String get chart_bhava_10_desc =>
+      'Career, reputation, authority, and public image.';
+
+  @override
+  String get chart_bhava_11_title => 'Labha Bhava';
+
+  @override
+  String get chart_bhava_11_desc =>
+      'Gains, income, elder siblings, and social networks.';
+
+  @override
+  String get chart_bhava_12_title => 'Vyaya Bhava';
+
+  @override
+  String get chart_bhava_12_desc =>
+      'Losses, expenses, foreign lands, and liberation.';
+
+  @override
+  String get insight_risingSign => 'Rising Sign';
+
+  @override
+  String insight_ascendant_desc(String sign, String degree) {
+    return 'Your Ascendant (Lagna) is $sign at $degree°. The Ascendant represents the sign that was rising on the eastern horizon at the exact moment of your birth. It is considered the most important point in Vedic astrology.';
+  }
+
+  @override
+  String get insight_ascendant_significance =>
+      'The Ascendant shapes your physical appearance, personality, and how others perceive you. It acts as a lens through which all planetary energies are filtered in your chart.';
+
+  @override
+  String get insight_ascendant_point1 =>
+      'Determines your body constitution and health tendencies';
+
+  @override
+  String get insight_ascendant_point2 =>
+      'Influences your natural approach to life and new situations';
+
+  @override
+  String get insight_ascendant_point3 =>
+      'Sets the foundation for all 12 houses in your birth chart';
+
+  @override
+  String get insight_ascendant_point4 =>
+      'Reveals your instinctive reactions and outer personality';
+
+  @override
+  String get insight_moonSign => 'Moon Sign';
+
+  @override
+  String insight_moon_desc(String sign) {
+    return 'Your Moon is placed in $sign. In Vedic astrology, the Moon sign (Rashi) is considered more significant than the Sun sign as it represents your emotional nature and inner world.';
+  }
+
+  @override
+  String get insight_moon_significance =>
+      'The Moon governs your mind, emotions, and subconscious patterns. It reveals how you process feelings and what brings you emotional security.';
+
+  @override
+  String get insight_moon_point1 =>
+      'Reflects your emotional responses and mental patterns';
+
+  @override
+  String get insight_moon_point2 =>
+      'Determines your Nakshatra (birth star) placement';
+
+  @override
+  String get insight_moon_point3 =>
+      'Influences your intuition and psychic sensitivity';
+
+  @override
+  String get insight_moon_point4 =>
+      'Shapes your relationship with mother and nurturing figures';
+
+  @override
+  String get insight_sunSign => 'Sun Sign';
+
+  @override
+  String insight_sun_desc(String sign) {
+    return 'Your Sun is placed in $sign. The Sun represents your soul essence, vitality, and core identity. It shows your life purpose and the qualities you are meant to develop.';
+  }
+
+  @override
+  String get insight_sun_significance =>
+      'The Sun indicates your father, authority figures, and your relationship with power. It reveals your ego, pride, and how you express your individuality.';
+
+  @override
+  String get insight_sun_point1 =>
+      'Represents your soul\'s purpose and true self';
+
+  @override
+  String get insight_sun_point2 =>
+      'Governs vitality, health, and life force energy';
+
+  @override
+  String get insight_sun_point3 =>
+      'Indicates career potential and leadership abilities';
+
+  @override
+  String get insight_sun_point4 =>
+      'Influences relationship with father and authority';
+
+  @override
+  String get insight_element => 'Element';
+
+  @override
+  String get insight_element_fire_desc =>
+      'Fire signs (Aries, Leo, Sagittarius) are dynamic, passionate, and action-oriented. They bring enthusiasm, courage, and creative inspiration.';
+
+  @override
+  String get insight_element_earth_desc =>
+      'Earth signs (Taurus, Virgo, Capricorn) are practical, grounded, and focused on material stability. They bring patience, reliability, and tangible results.';
+
+  @override
+  String get insight_element_air_desc =>
+      'Air signs (Gemini, Libra, Aquarius) are intellectual, communicative, and socially oriented. They bring ideas, connection, and mental agility.';
+
+  @override
+  String get insight_element_water_desc =>
+      'Water signs (Cancer, Scorpio, Pisces) are emotional, intuitive, and deeply feeling. They bring sensitivity, empathy, and spiritual depth.';
+
+  @override
+  String insight_element_default_desc(String element) {
+    return 'Your rising sign belongs to the $element element, shaping your fundamental approach to life.';
+  }
+
+  @override
+  String insight_element_significance(String element) {
+    return 'Elements represent the basic building blocks of personality. Your $element nature influences how you perceive and interact with the world around you.';
+  }
+
+  @override
+  String get insight_element_fire_trait1 => 'Courageous and bold';
+
+  @override
+  String get insight_element_fire_trait2 => 'Natural leaders';
+
+  @override
+  String get insight_element_fire_trait3 => 'Quick to act';
+
+  @override
+  String get insight_element_fire_trait4 => 'Inspiring to others';
+
+  @override
+  String get insight_element_earth_trait1 => 'Practical and reliable';
+
+  @override
+  String get insight_element_earth_trait2 => 'Patient builders';
+
+  @override
+  String get insight_element_earth_trait3 => 'Materially focused';
+
+  @override
+  String get insight_element_earth_trait4 => 'Strong endurance';
+
+  @override
+  String get insight_element_air_trait1 => 'Quick-minded';
+
+  @override
+  String get insight_element_air_trait2 => 'Excellent communicators';
+
+  @override
+  String get insight_element_air_trait3 => 'Socially adept';
+
+  @override
+  String get insight_element_air_trait4 => 'Idea generators';
+
+  @override
+  String get insight_element_water_trait1 => 'Deeply intuitive';
+
+  @override
+  String get insight_element_water_trait2 => 'Emotionally intelligent';
+
+  @override
+  String get insight_element_water_trait3 => 'Nurturing nature';
+
+  @override
+  String get insight_element_water_trait4 => 'Spiritually inclined';
+
+  @override
+  String get insight_element_default_trait1 => 'Influences your temperament';
+
+  @override
+  String get insight_element_default_trait2 => 'Shapes your reactions';
+
+  @override
+  String get insight_element_default_trait3 => 'Affects compatibility';
+
+  @override
+  String get insight_lagnaLord => 'Lagna Lord';
+
+  @override
+  String insight_lagnaLord_desc(String planet, String sign) {
+    return '$planet is the ruler of your Ascendant sign $sign. As the chart ruler, its placement and condition significantly influence your entire life journey and personality expression.';
+  }
+
+  @override
+  String get insight_lagnaLord_significance =>
+      'The Lagna Lord acts as a guide for your soul\'s journey. Its house placement shows where you invest most of your energy, and its condition affects overall life success.';
+
+  @override
+  String get insight_lagnaLord_point1 =>
+      'Most important planet for your chart interpretation';
+
+  @override
+  String get insight_lagnaLord_point2 =>
+      'Its strength indicates overall life vitality';
+
+  @override
+  String get insight_lagnaLord_point3 =>
+      'House placement shows primary life focus';
+
+  @override
+  String get insight_lagnaLord_point4 =>
+      'Aspects to it affect personality and health';
+
+  @override
+  String get insight_nakshatraLord => 'Nakshatra Lord';
+
+  @override
+  String insight_nakshatraLord_desc(String planet, String nakshatra) {
+    return '$planet rules your birth Nakshatra $nakshatra. The Nakshatra lord operates at a subtle level, influencing your psychological patterns and karmic tendencies.';
+  }
+
+  @override
+  String get insight_nakshatraLord_significance =>
+      'This planet governs the Vimshottari Dasha sequence of your life. Its condition and placement deeply affect your mental inclinations and spiritual path.';
+
+  @override
+  String get insight_nakshatraLord_point1 =>
+      'Determines your Mahadasha sequence';
+
+  @override
+  String get insight_nakshatraLord_point2 => 'Influences subconscious patterns';
+
+  @override
+  String get insight_nakshatraLord_point3 =>
+      'Affects intuitive and psychic abilities';
+
+  @override
+  String get insight_nakshatraLord_point4 =>
+      'Reveals karmic lessons from past lives';
+
+  @override
+  String get insight_birthStar => 'Birth Star';
+
+  @override
+  String insight_nakshatraPada(String nakshatra, String pada) {
+    return '$nakshatra (Pada $pada)';
+  }
+
+  @override
+  String insight_nakshatra_desc(String nakshatra, String pada) {
+    return 'You were born under $nakshatra Nakshatra in Pada $pada. Nakshatras are the 27 lunar mansions that the Moon travels through, providing deep insights into your psychological nature.';
+  }
+
+  @override
+  String get insight_nakshatra_significance =>
+      'Your Nakshatra reveals your innate talents, emotional patterns, and destiny path. The Pada (quarter) adds further specificity to these qualities.';
+
+  @override
+  String get insight_nakshatra_point1 =>
+      'Reveals deep personality traits and tendencies';
+
+  @override
+  String get insight_nakshatra_point2 =>
+      'Indicates compatible Nakshatras for relationships';
+
+  @override
+  String insight_nakshatra_point3(String gana) {
+    return 'Determines your Gana (temperament): $gana';
+  }
+
+  @override
+  String get insight_nakshatra_point4 =>
+      'Provides insights into career and life path';
+
+  @override
+  String get insight_tithi => 'Tithi';
+
+  @override
+  String insight_tithi_desc(String tithi, String paksha) {
+    return 'You were born on $tithi during $paksha Paksha. Tithi is the lunar day based on the angular relationship between Sun and Moon, one of the five elements of Panchang.';
+  }
+
+  @override
+  String get insight_tithi_significance =>
+      'Each Tithi carries specific energies affecting your emotional nature and auspiciousness for different activities. It influences your relationship with lunar energy.';
+
+  @override
+  String get insight_tithi_point1 => 'Indicates emotional temperament at birth';
+
+  @override
+  String get insight_tithi_point2 =>
+      'Affects personality and decision-making style';
+
+  @override
+  String insight_tithi_point3(String paksha) {
+    return '$paksha Paksha influences waxing/waning energy';
+  }
+
+  @override
+  String get insight_tithi_point4 => 'Used for determining auspicious timings';
+
+  @override
+  String get insight_yoga => 'Yoga';
+
+  @override
+  String insight_yoga_desc(String yoga) {
+    return 'You were born under $yoga Yoga. This is calculated from the combined positions of Sun and Moon, representing the spiritual and psychological atmosphere of your birth moment.';
+  }
+
+  @override
+  String get insight_yoga_significance =>
+      'Yoga influences your mental orientation and fortune. There are 27 Yogas, each bringing distinct qualities and tendencies to the native.';
+
+  @override
+  String get insight_yoga_point1 => 'Affects mental and spiritual inclinations';
+
+  @override
+  String get insight_yoga_point2 => 'Influences overall fortune and luck';
+
+  @override
+  String get insight_yoga_point3 => 'Shapes approach to challenges';
+
+  @override
+  String get insight_yoga_point4 => 'Indicates periods of opportunity';
+
+  @override
+  String get insight_karana => 'Karana';
+
+  @override
+  String insight_karana_desc(String karana) {
+    return 'Your birth Karana is $karana. Karana is half of a Tithi and there are 11 Karanas that repeat in a cycle. It influences dynamic action and productivity.';
+  }
+
+  @override
+  String get insight_karana_significance =>
+      'Karana affects your capacity for action and completing tasks. It particularly influences work ethic and the nature of your activities.';
+
+  @override
+  String get insight_karana_point1 => 'Governs action and productivity style';
+
+  @override
+  String get insight_karana_point2 => 'Influences work and completion ability';
+
+  @override
+  String get insight_karana_point3 => 'Affects day-to-day decision making';
+
+  @override
+  String get insight_karana_point4 => 'Important for selecting activity timing';
+
+  @override
+  String get insight_vara => 'Vara (Day)';
+
+  @override
+  String insight_vara_desc(String vara, String deity) {
+    return 'You were born on $vara, ruled by $deity. The weekday of birth is significant in Vedic astrology, connecting you to specific planetary and deity energies.';
+  }
+
+  @override
+  String get insight_vara_significance =>
+      'Your birth day lord influences your character and brings blessings from its ruling deity. Each day carries unique qualities that shape personality.';
+
+  @override
+  String insight_vara_point1(String vara) {
+    return 'Connects you to $vara\'s planetary ruler';
+  }
+
+  @override
+  String insight_vara_point2(String deity) {
+    return '$deity is your birth day deity';
+  }
+
+  @override
+  String get insight_vara_point3 => 'Influences natural talents and interests';
+
+  @override
+  String get insight_vara_point4 =>
+      'Auspicious for activities ruled by this day';
+
+  @override
+  String get insight_mahadasha => 'Mahadasha';
+
+  @override
+  String insight_mahadasha_value(String planet) {
+    return '$planet Mahadasha';
+  }
+
+  @override
+  String insight_mahadasha_desc(String planet, String years) {
+    return 'You are currently running the $planet Mahadasha with $years years remaining. Mahadasha is the major planetary period that colors all life experiences.';
+  }
+
+  @override
+  String get insight_mahadasha_significance =>
+      'The Mahadasha planet becomes the primary influence during its period, activating its significations in your chart. Life themes shift with each new Mahadasha.';
+
+  @override
+  String get insight_mahadasha_point1 =>
+      'Primary influence for current life phase';
+
+  @override
+  String insight_mahadasha_point2(String planet) {
+    return 'Activates houses ruled by $planet';
+  }
+
+  @override
+  String insight_mahadasha_point3(String planet) {
+    return 'Check $planet\'s condition for period quality';
+  }
+
+  @override
+  String get insight_mahadasha_point4 =>
+      'Sub-periods (Antardasha) provide refinement';
+
+  @override
+  String insight_guna_varna_desc(String value) {
+    return 'Varna represents the spiritual temperament and indicates the type of work one is naturally suited for. Your Varna is $value.';
+  }
+
+  @override
+  String insight_guna_vashya_desc(String value) {
+    return 'Vashya indicates mutual attraction and control in relationships. Your category is $value, which affects compatibility dynamics.';
+  }
+
+  @override
+  String insight_guna_tara_desc(String value) {
+    return 'Tara (Birth Star) compatibility assesses the health of relationship. Your Tara is $value, influencing relationship harmony.';
+  }
+
+  @override
+  String insight_guna_yoni_desc(String value) {
+    return 'Yoni represents sexual compatibility and physical attraction. Your Yoni is $value, indicating instinctual compatibility patterns.';
+  }
+
+  @override
+  String insight_guna_grahamaitri_desc(String value) {
+    return 'Graha Maitri checks friendship between Moon sign lords. Your Moon lord is $value, affecting mental compatibility.';
+  }
+
+  @override
+  String insight_guna_gana_desc(String value) {
+    return 'Gana indicates temperament and nature. Your Gana is $value, representing your fundamental character type.';
+  }
+
+  @override
+  String insight_guna_bhakoot_desc(String value) {
+    return 'Bhakoot checks relative position of Moon signs. Your Moon is in $value, affecting emotional and health compatibility.';
+  }
+
+  @override
+  String insight_guna_nadi_desc(String value) {
+    return 'Nadi indicates physiological compatibility and genetic factors. Your Nadi is $value, crucial for progeny and health.';
+  }
+
+  @override
+  String insight_guna_default_desc(String name, String value) {
+    return 'Your $name factor is $value, used in Vedic compatibility matching.';
+  }
+
+  @override
+  String get insight_guna_varna_significance =>
+      'Varna matching carries 1 point in Ashtakoot. It shows social and spiritual compatibility between partners.';
+
+  @override
+  String get insight_guna_vashya_significance =>
+      'Vashya carries 2 points and indicates the power dynamics and mutual influence in relationships.';
+
+  @override
+  String get insight_guna_tara_significance =>
+      'Tara carries 3 points and indicates health, longevity, and overall wellbeing of the relationship.';
+
+  @override
+  String get insight_guna_yoni_significance =>
+      'Yoni carries 4 points and is crucial for physical and instinctual compatibility between partners.';
+
+  @override
+  String get insight_guna_grahamaitri_significance =>
+      'Graha Maitri carries 5 points and determines mental wavelength and friendship compatibility.';
+
+  @override
+  String get insight_guna_gana_significance =>
+      'Gana carries 6 points and indicates behavioral and temperamental harmony between partners.';
+
+  @override
+  String get insight_guna_bhakoot_significance =>
+      'Bhakoot carries 7 points and affects emotional bonding, prosperity, and health after marriage.';
+
+  @override
+  String get insight_guna_nadi_significance =>
+      'Nadi carries 8 points (highest) and is essential for genetic compatibility and healthy progeny.';
+
+  @override
+  String get insight_guna_default_significance =>
+      'This factor contributes to overall compatibility score in marriage matching.';
+
+  @override
+  String get insight_guna_point1 =>
+      'Used in Ashtakoot (8-fold) matching system';
+
+  @override
+  String get insight_guna_point2 => 'Helps assess relationship compatibility';
+
+  @override
+  String get insight_guna_point3 => 'Based on Moon sign and Nakshatra';
+
+  @override
+  String get insight_guna_point4 => 'Important for marriage compatibility';
+
+  @override
+  String get insight_primaryGemstone => 'Primary Gemstone';
+
+  @override
+  String insight_gemstone_desc(String gemstone, String sign) {
+    return '$gemstone is recommended as your primary gemstone based on your Moon sign $sign. Gemstones channel planetary energies and can strengthen benefic influences.';
+  }
+
+  @override
+  String insight_gemstone_point1(String day) {
+    return 'Wear on $day for best results';
+  }
+
+  @override
+  String get insight_gemstone_point2 => 'Consult an astrologer before wearing';
+
+  @override
+  String get insight_gemstone_point3 => 'Use natural, untreated stones';
+
+  @override
+  String get insight_gemstone_point4 =>
+      'Set in recommended metal for your sign';
+
+  @override
+  String get insight_luckyNumbers => 'Lucky Numbers';
+
+  @override
+  String insight_luckyNumbers_desc(String sign, String numbers) {
+    return 'Based on your Moon sign $sign, the numbers $numbers carry positive vibrations for you. Numerology connects numbers to planetary energies.';
+  }
+
+  @override
+  String get insight_luckyNumbers_significance =>
+      'Lucky numbers can be used for important decisions, choosing dates, addresses, and other significant selections in life.';
+
+  @override
+  String get insight_luckyNumbers_point1 =>
+      'Derived from Moon sign planetary rulership';
+
+  @override
+  String get insight_luckyNumbers_point2 =>
+      'Use for important dates and decisions';
+
+  @override
+  String get insight_luckyNumbers_point3 =>
+      'Can influence address and phone numbers';
+
+  @override
+  String get insight_luckyNumbers_point4 =>
+      'Combined with Nakshatra for precision';
+
+  @override
+  String get insight_luckyDay => 'Lucky Day';
+
+  @override
+  String insight_luckyDay_desc(String day, String sign) {
+    return '$day is your most auspicious weekday based on your Moon sign $sign. This day is ruled by a planet that is harmonious with your chart.';
+  }
+
+  @override
+  String get insight_luckyDay_significance =>
+      'Important activities, new beginnings, and significant decisions yield better results when initiated on your lucky day.';
+
+  @override
+  String get insight_luckyDay_point1 => 'Best day for new ventures';
+
+  @override
+  String get insight_luckyDay_point2 => 'Wear your gemstone on this day';
+
+  @override
+  String get insight_luckyDay_point3 => 'Good for important meetings';
+
+  @override
+  String get insight_luckyDay_point4 => 'Enhanced intuition and luck';
+
+  @override
+  String get insight_luckyColors => 'Lucky Colors';
+
+  @override
+  String insight_luckyColors_desc(String colors, String sign) {
+    return 'The colors $colors are harmonious with your Moon sign $sign. Colors carry vibrational frequencies that can enhance or diminish planetary energies.';
+  }
+
+  @override
+  String get insight_luckyColors_significance =>
+      'Incorporating lucky colors in clothing, surroundings, and accessories can subtly enhance positive planetary influences.';
+
+  @override
+  String get insight_luckyColors_point1 => 'Wear during important occasions';
+
+  @override
+  String get insight_luckyColors_point2 => 'Use in home and workspace decor';
+
+  @override
+  String get insight_luckyColors_point3 => 'Enhances positive planetary rays';
+
+  @override
+  String get insight_luckyColors_point4 => 'Can improve mood and confidence';
+
+  @override
+  String get insight_luckyMetal => 'Lucky Metal';
+
+  @override
+  String insight_luckyMetal_desc(String metal, String sign) {
+    return '$metal is your recommended metal based on your Moon sign $sign. Metals conduct planetary energies and wearing them can strengthen beneficial influences.';
+  }
+
+  @override
+  String get insight_luckyMetal_significance =>
+      'The right metal amplifies gemstone effects and provides protection from negative planetary influences.';
+
+  @override
+  String get insight_luckyMetal_point1 => 'Use for setting gemstones';
+
+  @override
+  String get insight_luckyMetal_point2 => 'Wear as jewelry for benefits';
+
+  @override
+  String get insight_luckyMetal_point3 => 'Connects to ruling planet';
+
+  @override
+  String get insight_luckyMetal_point4 => 'Traditional Vedic remedy';
+
+  @override
+  String insight_statusPlanets(String status) {
+    return '$status Planets';
+  }
+
+  @override
+  String get insight_status_exalted_desc =>
+      'Planets in exaltation are at their strongest and most beneficial. They deliver their best results and significations with full power.';
+
+  @override
+  String get insight_status_debilitated_desc =>
+      'Planets in debilitation are weakened and may struggle to deliver positive results. Remedies can help mitigate negative effects.';
+
+  @override
+  String get insight_status_retrograde_desc =>
+      'Retrograde planets appear to move backward and often bring karmic lessons. They work on internal and past-life matters.';
+
+  @override
+  String get insight_status_combust_desc =>
+      'Planets too close to the Sun become combust, their significations may be overshadowed or weakened by solar energy.';
+
+  @override
+  String get insight_status_default_desc =>
+      'Planets with special status require attention in chart interpretation.';
+
+  @override
+  String get insight_status_noPlanets =>
+      'No planets in this condition in your chart.';
+
+  @override
+  String insight_status_significance(String planets, String status) {
+    return 'These planets ($planets) are $status in your chart, affecting their significations.';
+  }
+
+  @override
+  String get insight_status_exalted_tip1 => 'Leverage this strength in life';
+
+  @override
+  String get insight_status_exalted_tip2 => 'Excellent for related activities';
+
+  @override
+  String get insight_status_exalted_tip3 => 'Natural talent area';
+
+  @override
+  String get insight_status_exalted_tip4 => 'Harness during its Dasha';
+
+  @override
+  String get insight_status_debilitated_tip1 => 'Practice related remedies';
+
+  @override
+  String get insight_status_debilitated_tip2 => 'Be patient with these areas';
+
+  @override
+  String get insight_status_debilitated_tip3 => 'Cancellation may apply';
+
+  @override
+  String get insight_status_debilitated_tip4 => 'Growth through challenges';
+
+  @override
+  String get insight_status_retrograde_tip1 => 'Review and reflect themes';
+
+  @override
+  String get insight_status_retrograde_tip2 => 'Past-life karmic work';
+
+  @override
+  String get insight_status_retrograde_tip3 => 'Internal development focus';
+
+  @override
+  String get insight_status_retrograde_tip4 => 'Delays may have purpose';
+
+  @override
+  String get insight_status_combust_tip1 => 'Strengthen through mantras';
+
+  @override
+  String get insight_status_combust_tip2 => 'May need more effort';
+
+  @override
+  String get insight_status_combust_tip3 => 'Sun period affects these';
+
+  @override
+  String get insight_status_combust_tip4 => 'Humility in these areas';
+
+  @override
+  String get insight_status_default_tip1 => 'Check individual planet effects';
+
+  @override
+  String get insight_status_default_tip2 => 'Consider house placement';
+
+  @override
+  String get insight_status_default_tip3 => 'Review Dasha periods';
 }

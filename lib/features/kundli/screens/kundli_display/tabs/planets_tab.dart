@@ -631,168 +631,106 @@ InsightData _getDignityInsight(
   );
 }
 
-InsightData _getNakshatraInsight(String nakshatra, String lord, int pada) {
-  final nakshatraInfo = {
-    'Ashwini': {
-      'deity': 'Ashwini Kumaras',
-      'symbol': 'Horse head',
-      'nature': 'Swift, healing',
-    },
-    'Bharani': {
-      'deity': 'Yama',
-      'symbol': 'Yoni',
-      'nature': 'Restraint, transformation',
-    },
-    'Krittika': {
-      'deity': 'Agni',
-      'symbol': 'Razor/Flame',
-      'nature': 'Sharp, cutting',
-    },
-    'Rohini': {
-      'deity': 'Brahma',
-      'symbol': 'Ox cart',
-      'nature': 'Creative, growing',
-    },
-    'Mrigashira': {
-      'deity': 'Soma',
-      'symbol': 'Deer head',
-      'nature': 'Searching, gentle',
-    },
-    'Ardra': {
-      'deity': 'Rudra',
-      'symbol': 'Teardrop',
-      'nature': 'Stormy, transformative',
-    },
-    'Punarvasu': {
-      'deity': 'Aditi',
-      'symbol': 'Bow/Quiver',
-      'nature': 'Renewal, return',
-    },
-    'Pushya': {
-      'deity': 'Brihaspati',
-      'symbol': 'Flower/Circle',
-      'nature': 'Nourishing, auspicious',
-    },
-    'Ashlesha': {
-      'deity': 'Nagas',
-      'symbol': 'Serpent',
-      'nature': 'Clinging, mystical',
-    },
-    'Magha': {
-      'deity': 'Pitris',
-      'symbol': 'Throne',
-      'nature': 'Royal, ancestral',
-    },
-    'Purva Phalguni': {
-      'deity': 'Bhaga',
-      'symbol': 'Hammock',
-      'nature': 'Pleasure, relaxation',
-    },
-    'Uttara Phalguni': {
-      'deity': 'Aryaman',
-      'symbol': 'Bed',
-      'nature': 'Friendship, contracts',
-    },
-    'Hasta': {
-      'deity': 'Savitar',
-      'symbol': 'Hand',
-      'nature': 'Skillful, crafty',
-    },
-    'Chitra': {
-      'deity': 'Vishwakarma',
-      'symbol': 'Jewel',
-      'nature': 'Brilliant, creative',
-    },
-    'Swati': {
-      'deity': 'Vayu',
-      'symbol': 'Coral',
-      'nature': 'Independent, flexible',
-    },
-    'Vishakha': {
-      'deity': 'Indra-Agni',
-      'symbol': 'Archway',
-      'nature': 'Determined, goal-oriented',
-    },
-    'Anuradha': {
-      'deity': 'Mitra',
-      'symbol': 'Lotus',
-      'nature': 'Friendship, devotion',
-    },
-    'Jyeshtha': {
-      'deity': 'Indra',
-      'symbol': 'Earring',
-      'nature': 'Chief, protective',
-    },
-    'Mula': {
-      'deity': 'Nirriti',
-      'symbol': 'Roots',
-      'nature': 'Uprooting, foundational',
-    },
-    'Purva Ashadha': {
-      'deity': 'Apas',
-      'symbol': 'Fan',
-      'nature': 'Invincible, purifying',
-    },
-    'Uttara Ashadha': {
-      'deity': 'Vishve Devas',
-      'symbol': 'Tusk',
-      'nature': 'Universal, victorious',
-    },
-    'Shravana': {
-      'deity': 'Vishnu',
-      'symbol': 'Ear',
-      'nature': 'Listening, learning',
-    },
-    'Dhanishta': {
-      'deity': 'Vasus',
-      'symbol': 'Drum',
-      'nature': 'Wealthy, musical',
-    },
-    'Shatabhisha': {
-      'deity': 'Varuna',
-      'symbol': 'Empty circle',
-      'nature': 'Healing, mysterious',
-    },
-    'Purva Bhadrapada': {
-      'deity': 'Aja Ekapada',
-      'symbol': 'Sword',
-      'nature': 'Intense, fiery',
-    },
-    'Uttara Bhadrapada': {
-      'deity': 'Ahir Budhnya',
-      'symbol': 'Twin/Serpent',
-      'nature': 'Deep, wise',
-    },
-    'Revati': {
-      'deity': 'Pushan',
-      'symbol': 'Fish',
-      'nature': 'Nourishing, protective',
-    },
-  };
-
-  final info =
-      nakshatraInfo[nakshatra] ??
-      {'deity': 'Unknown', 'symbol': 'Unknown', 'nature': 'Unknown'};
+InsightData _getNakshatraInsight(String nakshatra, String lord, int pada, AppLocalizations l10n) {
+  final nakshatraInfo = _getNakshatraInfoData(nakshatra);
   final lordColor = _getPlanetColor(lord);
+  final localizedNakshatra = _getLocalizedNakshatra(nakshatra, l10n);
+  final localizedLord = _getLocalizedPlanetName(lord, l10n);
+  final padaSign = _getPadaSign(nakshatra, pada);
+  final localizedPadaSign = _getLocalizedSignName(padaSign, l10n);
 
   return InsightData(
-    title: 'Nakshatra',
-    value: '$nakshatra (Pada $pada)',
-    description:
-        '$nakshatra is one of the 27 lunar mansions in Vedic astrology. Its symbol is ${info['symbol']} and it embodies the quality of being ${info['nature']}. The presiding deity is ${info['deity']}.',
-    significance:
-        'This Nakshatra is ruled by $lord, which influences the Vimshottari Dasha sequence. Pada $pada of $nakshatra falls in the ${_getPadaSign(nakshatra, pada)} navamsa.',
+    title: l10n.planets_nakshatra_title,
+    value: l10n.planets_nakshatra_value(localizedNakshatra, pada),
+    description: l10n.planets_nakshatra_desc(
+      localizedNakshatra,
+      nakshatraInfo['symbol']!,
+      nakshatraInfo['nature']!,
+      nakshatraInfo['deity']!,
+    ),
+    significance: l10n.planets_nakshatra_significance(
+      localizedLord,
+      pada,
+      localizedNakshatra,
+      localizedPadaSign,
+    ),
     keyPoints: [
-      'Nakshatra: $nakshatra',
-      'Pada: $pada of 4',
-      'Lord: $lord',
-      'Deity: ${info['deity']}',
-      'Symbol: ${info['symbol']}',
-      'Nature: ${info['nature']}',
+      l10n.planets_insight_nakshatraLabel(localizedNakshatra, pada),
+      l10n.planets_nakshatra_padaLabel(pada),
+      l10n.planets_nakshatra_lordLabel(localizedLord),
+      l10n.planets_nakshatra_deityLabel(nakshatraInfo['deity']!),
+      l10n.planets_nakshatra_symbolLabel(nakshatraInfo['symbol']!),
+      l10n.planets_nakshatra_natureLabel(nakshatraInfo['nature']!),
     ],
     accentColor: lordColor,
     icon: Icons.star_rounded,
   );
+}
+
+Map<String, String> _getNakshatraInfoData(String nakshatra) {
+  const nakshatraInfo = {
+    'Ashwini': {'deity': 'Ashwini Kumaras', 'symbol': 'Horse head', 'nature': 'Swift, healing'},
+    'Bharani': {'deity': 'Yama', 'symbol': 'Yoni', 'nature': 'Restraint, transformation'},
+    'Krittika': {'deity': 'Agni', 'symbol': 'Razor/Flame', 'nature': 'Sharp, cutting'},
+    'Rohini': {'deity': 'Brahma', 'symbol': 'Ox cart', 'nature': 'Creative, growing'},
+    'Mrigashira': {'deity': 'Soma', 'symbol': 'Deer head', 'nature': 'Searching, gentle'},
+    'Ardra': {'deity': 'Rudra', 'symbol': 'Teardrop', 'nature': 'Stormy, transformative'},
+    'Punarvasu': {'deity': 'Aditi', 'symbol': 'Bow/Quiver', 'nature': 'Renewal, return'},
+    'Pushya': {'deity': 'Brihaspati', 'symbol': 'Flower/Circle', 'nature': 'Nourishing, auspicious'},
+    'Ashlesha': {'deity': 'Nagas', 'symbol': 'Serpent', 'nature': 'Clinging, mystical'},
+    'Magha': {'deity': 'Pitris', 'symbol': 'Throne', 'nature': 'Royal, ancestral'},
+    'Purva Phalguni': {'deity': 'Bhaga', 'symbol': 'Hammock', 'nature': 'Pleasure, relaxation'},
+    'Uttara Phalguni': {'deity': 'Aryaman', 'symbol': 'Bed', 'nature': 'Friendship, contracts'},
+    'Hasta': {'deity': 'Savitar', 'symbol': 'Hand', 'nature': 'Skillful, crafty'},
+    'Chitra': {'deity': 'Vishwakarma', 'symbol': 'Jewel', 'nature': 'Brilliant, creative'},
+    'Swati': {'deity': 'Vayu', 'symbol': 'Coral', 'nature': 'Independent, flexible'},
+    'Vishakha': {'deity': 'Indra-Agni', 'symbol': 'Archway', 'nature': 'Determined, goal-oriented'},
+    'Anuradha': {'deity': 'Mitra', 'symbol': 'Lotus', 'nature': 'Friendship, devotion'},
+    'Jyeshtha': {'deity': 'Indra', 'symbol': 'Earring', 'nature': 'Chief, protective'},
+    'Mula': {'deity': 'Nirriti', 'symbol': 'Roots', 'nature': 'Uprooting, foundational'},
+    'Purva Ashadha': {'deity': 'Apas', 'symbol': 'Fan', 'nature': 'Invincible, purifying'},
+    'Uttara Ashadha': {'deity': 'Vishve Devas', 'symbol': 'Tusk', 'nature': 'Universal, victorious'},
+    'Shravana': {'deity': 'Vishnu', 'symbol': 'Ear', 'nature': 'Listening, learning'},
+    'Dhanishta': {'deity': 'Vasus', 'symbol': 'Drum', 'nature': 'Wealthy, musical'},
+    'Shatabhisha': {'deity': 'Varuna', 'symbol': 'Empty circle', 'nature': 'Healing, mysterious'},
+    'Purva Bhadrapada': {'deity': 'Aja Ekapada', 'symbol': 'Sword', 'nature': 'Intense, fiery'},
+    'Uttara Bhadrapada': {'deity': 'Ahir Budhnya', 'symbol': 'Twin/Serpent', 'nature': 'Deep, wise'},
+    'Revati': {'deity': 'Pushan', 'symbol': 'Fish', 'nature': 'Nourishing, protective'},
+  };
+  return nakshatraInfo[nakshatra] ?? {'deity': 'Unknown', 'symbol': 'Unknown', 'nature': 'Unknown'};
+}
+
+String _getLocalizedNakshatra(String nakshatra, AppLocalizations l10n) {
+  switch (nakshatra) {
+    case 'Ashwini': return l10n.nakshatra_ashwini;
+    case 'Bharani': return l10n.nakshatra_bharani;
+    case 'Krittika': return l10n.nakshatra_krittika;
+    case 'Rohini': return l10n.nakshatra_rohini;
+    case 'Mrigashira': return l10n.nakshatra_mrigashira;
+    case 'Ardra': return l10n.nakshatra_ardra;
+    case 'Punarvasu': return l10n.nakshatra_punarvasu;
+    case 'Pushya': return l10n.nakshatra_pushya;
+    case 'Ashlesha': return l10n.nakshatra_ashlesha;
+    case 'Magha': return l10n.nakshatra_magha;
+    case 'Purva Phalguni': return l10n.nakshatra_purvaphalguni;
+    case 'Uttara Phalguni': return l10n.nakshatra_uttaraphalguni;
+    case 'Hasta': return l10n.nakshatra_hasta;
+    case 'Chitra': return l10n.nakshatra_chitra;
+    case 'Swati': return l10n.nakshatra_swati;
+    case 'Vishakha': return l10n.nakshatra_vishakha;
+    case 'Anuradha': return l10n.nakshatra_anuradha;
+    case 'Jyeshtha': return l10n.nakshatra_jyeshtha;
+    case 'Mula': return l10n.nakshatra_mula;
+    case 'Purva Ashadha': return l10n.nakshatra_purvashadha;
+    case 'Uttara Ashadha': return l10n.nakshatra_uttarashadha;
+    case 'Shravana': return l10n.nakshatra_shravana;
+    case 'Dhanishta': return l10n.nakshatra_dhanishta;
+    case 'Shatabhisha': return l10n.nakshatra_shatabhisha;
+    case 'Purva Bhadrapada': return l10n.nakshatra_purvabhadrapada;
+    case 'Uttara Bhadrapada': return l10n.nakshatra_uttarabhadrapada;
+    case 'Revati': return l10n.nakshatra_revati;
+    default: return nakshatra;
+  }
 }
 
 String _getPadaSign(String nakshatra, int pada) {
@@ -1820,34 +1758,26 @@ class _SummaryCardState extends State<_SummaryCard>
               children: [
                 _InteractiveStatChip(
                   value: widget.stats['exalted'] ?? 0,
-                  label: 'Exalt',
+                  labelKey: 'exalt',
                   color: _Colors.emerald,
-                  description:
-                      'Exalted planets are in their strongest position, giving maximum positive results.',
                 ),
                 const SizedBox(width: 6),
                 _InteractiveStatChip(
                   value: widget.stats['debilitated'] ?? 0,
-                  label: 'Debil',
+                  labelKey: 'debil',
                   color: _Colors.coral,
-                  description:
-                      'Debilitated planets are in their weakest position, requiring remedies for better results.',
                 ),
                 const SizedBox(width: 6),
                 _InteractiveStatChip(
                   value: widget.stats['retrograde'] ?? 0,
-                  label: 'Retro',
+                  labelKey: 'retro',
                   color: _Colors.amber,
-                  description:
-                      'Retrograde planets move backwards (apparent motion), intensifying internal effects.',
                 ),
                 const SizedBox(width: 6),
                 _InteractiveStatChip(
                   value: widget.stats['combust'] ?? 0,
-                  label: 'Comb',
+                  labelKey: 'comb',
                   color: _Colors.coral,
-                  description:
-                      'Combust planets are too close to Sun, their energy gets hidden or weakened.',
                 ),
               ],
             ),
@@ -1860,15 +1790,13 @@ class _SummaryCardState extends State<_SummaryCard>
 
 class _InteractiveStatChip extends StatefulWidget {
   final int value;
-  final String label;
+  final String labelKey;
   final Color color;
-  final String description;
 
   const _InteractiveStatChip({
     required this.value,
-    required this.label,
+    required this.labelKey,
     required this.color,
-    required this.description,
   });
 
   @override
@@ -1878,30 +1806,53 @@ class _InteractiveStatChip extends StatefulWidget {
 class _InteractiveStatChipState extends State<_InteractiveStatChip> {
   bool _isPressed = false;
 
+  String _getLabel(AppLocalizations l10n) {
+    switch (widget.labelKey) {
+      case 'exalt': return l10n.planets_stat_exalt;
+      case 'debil': return l10n.planets_stat_debil;
+      case 'retro': return l10n.planets_stat_retro;
+      case 'comb': return l10n.planets_stat_comb;
+      default: return widget.labelKey;
+    }
+  }
+
+  String _getDescription(AppLocalizations l10n) {
+    switch (widget.labelKey) {
+      case 'exalt': return l10n.planets_stat_exaltDesc;
+      case 'debil': return l10n.planets_stat_debilDesc;
+      case 'retro': return l10n.planets_stat_retroDesc;
+      case 'comb': return l10n.planets_stat_combDesc;
+      default: return '';
+    }
+  }
+
   void _showStatInsight() {
     if (widget.value == 0) return;
+
+    final l10n = AppLocalizations.of(context)!;
+    final label = _getLabel(l10n);
+    final description = _getDescription(l10n);
 
     HapticFeedback.selectionClick();
     _showInsightSheet(
       context,
       InsightData(
-        title: 'Planetary Status',
-        value: '${widget.value} ${widget.label}',
-        description: widget.description,
-        significance:
-            'You have ${widget.value} planet(s) with this status in your birth chart.',
+        title: l10n.planets_planetaryStatus,
+        value: '${widget.value} $label',
+        description: description,
+        significance: l10n.planets_statInsight(widget.value),
         keyPoints: [
-          'Count: ${widget.value} planets',
-          'Status: ${widget.label}',
-          widget.description,
+          l10n.planets_statusCount(widget.value),
+          l10n.planets_statusLabel(label),
+          description,
         ],
         accentColor: widget.color,
         icon:
-            widget.label == 'Exalt'
+            widget.labelKey == 'exalt'
                 ? Icons.arrow_upward_rounded
-                : widget.label == 'Debil'
+                : widget.labelKey == 'debil'
                 ? Icons.arrow_downward_rounded
-                : widget.label == 'Retro'
+                : widget.labelKey == 'retro'
                 ? Icons.replay_rounded
                 : Icons.whatshot_rounded,
       ),
@@ -1911,6 +1862,8 @@ class _InteractiveStatChipState extends State<_InteractiveStatChip> {
   @override
   Widget build(BuildContext context) {
     final isActive = widget.value > 0;
+    final l10n = AppLocalizations.of(context)!;
+    final label = _getLabel(l10n);
 
     return Expanded(
       child: GestureDetector(
@@ -1962,7 +1915,7 @@ class _InteractiveStatChipState extends State<_InteractiveStatChip> {
               ),
               const SizedBox(height: 2),
               Text(
-                widget.label,
+                label,
                 style: GoogleFonts.inter(
                   fontSize: 9,
                   fontWeight: FontWeight.w600,
@@ -2634,6 +2587,7 @@ class _PlanetCardState extends State<_PlanetCard>
                                         widget.planet.nakshatra,
                                         widget.nakshatraLord,
                                         widget.nakshatraPada,
+                                        AppLocalizations.of(context)!,
                                       ),
                                     );
                                   },
@@ -2717,7 +2671,7 @@ class _PlanetCardState extends State<_PlanetCard>
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Combust · Reduced planetary strength due to Sun proximity',
+                        AppLocalizations.of(context)!.planets_combustWarning,
                         style: GoogleFonts.inter(
                           fontSize: 10,
                           color: _Colors.coral.withOpacity(0.9),

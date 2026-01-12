@@ -1006,7 +1006,9 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Chart Types Guide',
+                                        AppLocalizations.of(
+                                          context,
+                                        ).chart_guide_title,
                                         style: GoogleFonts.dmSans(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w700,
@@ -1015,7 +1017,9 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        'Understanding Vedic astrology charts',
+                                        AppLocalizations.of(
+                                          context,
+                                        ).chart_guide_subtitle,
                                         style: GoogleFonts.dmSans(
                                           fontSize: 12,
                                           color: _textMuted,
@@ -1349,13 +1353,18 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
               children: [
                 Row(
                   children: [
-                    Text(
-                      info.type.displayName,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: _textPrimary,
-                      ),
+                    Builder(
+                      builder: (context) {
+                        final l10n = AppLocalizations.of(context);
+                        return Text(
+                          info.type.localizedDisplayName(l10n),
+                          style: GoogleFonts.dmSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: _textPrimary,
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(width: 8),
                     Container(
@@ -1380,7 +1389,10 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  info.meaning,
+                  _getLocalizedChartMeaning(
+                    info.type,
+                    AppLocalizations.of(context),
+                  ),
                   style: GoogleFonts.dmSans(
                     fontSize: 11,
                     color: _textSecondary,
@@ -2253,31 +2265,36 @@ class _KundliDisplayScreenState extends State<KundliDisplayScreen>
                 ),
               ),
               const SizedBox(width: 12),
-              // Chart info
+              // Chart info - localized
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _currentChartType.displayName,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: _textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      _currentChartType.subtitle,
-                      style: GoogleFonts.dmSans(
-                        fontSize: 11,
-                        color: _textMuted,
-                        height: 1.2,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                child: Builder(
+                  builder: (context) {
+                    final l10n = AppLocalizations.of(context);
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _currentChartType.localizedDisplayName(l10n),
+                          style: GoogleFonts.dmSans(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: _textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          _currentChartType.localizedSubtitle(l10n),
+                          style: GoogleFonts.dmSans(
+                            fontSize: 11,
+                            color: _textMuted,
+                            height: 1.2,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
               const SizedBox(width: 8),
@@ -3113,13 +3130,18 @@ class _FullscreenChartViewState extends State<_FullscreenChartView>
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        _currentType.displayName,
-                        style: GoogleFonts.dmSans(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: _textPrimary,
-                        ),
+                      Builder(
+                        builder: (context) {
+                          final l10n = AppLocalizations.of(context);
+                          return Text(
+                            _currentType.localizedDisplayName(l10n),
+                            style: GoogleFonts.dmSans(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: _textPrimary,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -4775,6 +4797,54 @@ class _ChartTypeInfo {
     required this.color,
     required this.meaning,
   });
+}
+
+/// Get localized chart meaning based on chart type
+String _getLocalizedChartMeaning(KundaliType type, AppLocalizations l10n) {
+  switch (type) {
+    case KundaliType.lagna:
+      return l10n.chart_meaning_lagna;
+    case KundaliType.chandra:
+      return l10n.chart_meaning_chandra;
+    case KundaliType.surya:
+      return l10n.chart_meaning_surya;
+    case KundaliType.bhavaChalit:
+      return l10n.chart_meaning_bhava_chalit;
+    case KundaliType.navamsa:
+      return l10n.chart_meaning_navamsa;
+    case KundaliType.dasamsa:
+      return l10n.chart_meaning_dasamsa;
+    case KundaliType.saptamsa:
+      return l10n.chart_meaning_saptamsa;
+    case KundaliType.dwadasamsa:
+      return l10n.chart_meaning_dwadasamsa;
+    case KundaliType.trimshamsa:
+      return l10n.chart_meaning_trimshamsa;
+    case KundaliType.hora:
+      return l10n.chart_meaning_hora;
+    case KundaliType.drekkana:
+      return l10n.chart_meaning_drekkana;
+    case KundaliType.chaturthamsa:
+      return l10n.chart_meaning_chaturthamsa;
+    case KundaliType.shodasamsa:
+      return l10n.chart_meaning_shodasamsa;
+    case KundaliType.vimsamsa:
+      return l10n.chart_meaning_vimsamsa;
+    case KundaliType.chaturvimsamsa:
+      return l10n.chart_meaning_chaturvimsamsa;
+    case KundaliType.bhamsa:
+      return l10n.chart_meaning_bhamsa;
+    case KundaliType.khavedamsa:
+      return l10n.chart_meaning_khavedamsa;
+    case KundaliType.akshavedamsa:
+      return l10n.chart_meaning_akshavedamsa;
+    case KundaliType.shashtiamsa:
+      return l10n.chart_meaning_shashtiamsa;
+    case KundaliType.sudarshan:
+      return l10n.chart_meaning_sudarshan;
+    case KundaliType.ashtakavarga:
+      return l10n.chart_meaning_ashtakavarga;
+  }
 }
 
 /// Language selection bottom sheet

@@ -670,6 +670,396 @@ abstract class AppLocalizations {
   /// **'Unique analytical methods'**
   String get chart_category_special_desc;
 
+  /// No description provided for @chart_lagna_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Lagna Kundali'**
+  String get chart_lagna_display;
+
+  /// No description provided for @chart_lagna_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rasi Chart / D1 Chart'**
+  String get chart_lagna_subtitle;
+
+  /// No description provided for @chart_chandra_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon Chart'**
+  String get chart_chandra_display;
+
+  /// No description provided for @chart_chandra_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chandra Kundali'**
+  String get chart_chandra_subtitle;
+
+  /// No description provided for @chart_surya_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun Chart'**
+  String get chart_surya_display;
+
+  /// No description provided for @chart_surya_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Surya Kundali'**
+  String get chart_surya_subtitle;
+
+  /// No description provided for @chart_bhava_chalit_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Chalit Kundali'**
+  String get chart_bhava_chalit_display;
+
+  /// No description provided for @chart_bhava_chalit_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bhava Chalit Chart'**
+  String get chart_bhava_chalit_subtitle;
+
+  /// No description provided for @chart_hora_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Hora Chart'**
+  String get chart_hora_display;
+
+  /// No description provided for @chart_hora_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wealth Chart'**
+  String get chart_hora_subtitle;
+
+  /// No description provided for @chart_drekkana_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Drekkana Chart'**
+  String get chart_drekkana_display;
+
+  /// No description provided for @chart_drekkana_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Siblings & Courage'**
+  String get chart_drekkana_subtitle;
+
+  /// No description provided for @chart_chaturthamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Chaturthamsha'**
+  String get chart_chaturthamsa_display;
+
+  /// No description provided for @chart_chaturthamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Property & Fortune'**
+  String get chart_chaturthamsa_subtitle;
+
+  /// No description provided for @chart_saptamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Saptamsha'**
+  String get chart_saptamsa_display;
+
+  /// No description provided for @chart_saptamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Children & Progeny'**
+  String get chart_saptamsa_subtitle;
+
+  /// No description provided for @chart_navamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Navamsha Kundali'**
+  String get chart_navamsa_display;
+
+  /// No description provided for @chart_navamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'D9 - Marriage & Dharma'**
+  String get chart_navamsa_subtitle;
+
+  /// No description provided for @chart_dasamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Dasamsha Chart'**
+  String get chart_dasamsa_display;
+
+  /// No description provided for @chart_dasamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Career & Profession'**
+  String get chart_dasamsa_subtitle;
+
+  /// No description provided for @chart_dwadasamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Dwadashamsha'**
+  String get chart_dwadasamsa_display;
+
+  /// No description provided for @chart_dwadasamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Parents'**
+  String get chart_dwadasamsa_subtitle;
+
+  /// No description provided for @chart_shodasamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Shodashamsha'**
+  String get chart_shodasamsa_display;
+
+  /// No description provided for @chart_shodasamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicles & Comforts'**
+  String get chart_shodasamsa_subtitle;
+
+  /// No description provided for @chart_vimsamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Vimshamsha'**
+  String get chart_vimsamsa_display;
+
+  /// No description provided for @chart_vimsamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritual Progress'**
+  String get chart_vimsamsa_subtitle;
+
+  /// No description provided for @chart_chaturvimsamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Chaturvimshamsha'**
+  String get chart_chaturvimsamsa_display;
+
+  /// No description provided for @chart_chaturvimsamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Education & Learning'**
+  String get chart_chaturvimsamsa_subtitle;
+
+  /// No description provided for @chart_bhamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Bhamsha Chart'**
+  String get chart_bhamsa_display;
+
+  /// No description provided for @chart_bhamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nakshatramsa'**
+  String get chart_bhamsa_subtitle;
+
+  /// No description provided for @chart_trimshamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Trimshamsha'**
+  String get chart_trimshamsa_display;
+
+  /// No description provided for @chart_trimshamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Misfortunes'**
+  String get chart_trimshamsa_subtitle;
+
+  /// No description provided for @chart_khavedamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Khavedamsha'**
+  String get chart_khavedamsa_display;
+
+  /// No description provided for @chart_khavedamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Auspicious Effects'**
+  String get chart_khavedamsa_subtitle;
+
+  /// No description provided for @chart_akshavedamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Akshavedamsha'**
+  String get chart_akshavedamsa_display;
+
+  /// No description provided for @chart_akshavedamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'General Indications'**
+  String get chart_akshavedamsa_subtitle;
+
+  /// No description provided for @chart_shashtiamsa_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Shashtiamsha'**
+  String get chart_shashtiamsa_display;
+
+  /// No description provided for @chart_shashtiamsa_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Past Life Karma'**
+  String get chart_shashtiamsa_subtitle;
+
+  /// No description provided for @chart_sudarshan_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Sudarshan Chakra'**
+  String get chart_sudarshan_display;
+
+  /// No description provided for @chart_sudarshan_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Triple Chart View'**
+  String get chart_sudarshan_subtitle;
+
+  /// No description provided for @chart_ashtakavarga_display.
+  ///
+  /// In en, this message translates to:
+  /// **'Ashtakavarga'**
+  String get chart_ashtakavarga_display;
+
+  /// No description provided for @chart_ashtakavarga_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Point-based Strength'**
+  String get chart_ashtakavarga_subtitle;
+
+  /// No description provided for @chart_guide_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Chart Types Guide'**
+  String get chart_guide_title;
+
+  /// No description provided for @chart_guide_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Understanding Vedic astrology charts'**
+  String get chart_guide_subtitle;
+
+  /// No description provided for @chart_meaning_lagna.
+  ///
+  /// In en, this message translates to:
+  /// **'The foundation of Vedic astrology. Shows your overall life path, personality, physical body, and general tendencies based on the rising sign at birth.'**
+  String get chart_meaning_lagna;
+
+  /// No description provided for @chart_meaning_chandra.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon chart reveals your emotional nature, mind, mental patterns, and psychological tendencies. Essential for understanding inner feelings and reactions.'**
+  String get chart_meaning_chandra;
+
+  /// No description provided for @chart_meaning_surya.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun chart shows your soul purpose, ego, vitality, father, authority figures, and career in government or leadership roles.'**
+  String get chart_meaning_surya;
+
+  /// No description provided for @chart_meaning_bhava_chalit.
+  ///
+  /// In en, this message translates to:
+  /// **'Uses exact house cusps to show where planets actually influence. More accurate for predicting which house matters each planet truly affects.'**
+  String get chart_meaning_bhava_chalit;
+
+  /// No description provided for @chart_meaning_navamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D9 - The most important divisional chart. Reveals marriage quality, spouse nature, dharma (life purpose), and the strength of planets.'**
+  String get chart_meaning_navamsa;
+
+  /// No description provided for @chart_meaning_dasamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D10 - Career and profession chart. Shows professional success, status in society, recognition, and the type of work that brings fulfillment.'**
+  String get chart_meaning_dasamsa;
+
+  /// No description provided for @chart_meaning_saptamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D7 - Children and progeny chart. Indicates fertility, number of children, relationship with children, and creative output.'**
+  String get chart_meaning_saptamsa;
+
+  /// No description provided for @chart_meaning_dwadasamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D12 - Parents chart. Shows relationship with parents, ancestral karma, and family lineage influences.'**
+  String get chart_meaning_dwadasamsa;
+
+  /// No description provided for @chart_meaning_trimshamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D30 - Misfortunes chart. Reveals potential challenges, health issues, accidents, and areas requiring caution.'**
+  String get chart_meaning_trimshamsa;
+
+  /// No description provided for @chart_meaning_hora.
+  ///
+  /// In en, this message translates to:
+  /// **'D2 - Wealth chart. Shows financial potential, earning capacity, and accumulation of material resources.'**
+  String get chart_meaning_hora;
+
+  /// No description provided for @chart_meaning_drekkana.
+  ///
+  /// In en, this message translates to:
+  /// **'D3 - Siblings and courage chart. Shows relationship with siblings, inner courage, and communication abilities.'**
+  String get chart_meaning_drekkana;
+
+  /// No description provided for @chart_meaning_chaturthamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D4 - Property and fortune chart. Indicates real estate, vehicles, and overall material comforts.'**
+  String get chart_meaning_chaturthamsa;
+
+  /// No description provided for @chart_meaning_shodasamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D16 - Vehicles and comforts chart. Shows luxury items, vehicles, and material happiness.'**
+  String get chart_meaning_shodasamsa;
+
+  /// No description provided for @chart_meaning_vimsamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D20 - Spiritual progress chart. Reveals spiritual inclinations, religious practices, and meditation potential.'**
+  String get chart_meaning_vimsamsa;
+
+  /// No description provided for @chart_meaning_chaturvimsamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D24 - Education chart. Shows academic achievements, learning abilities, and knowledge acquisition.'**
+  String get chart_meaning_chaturvimsamsa;
+
+  /// No description provided for @chart_meaning_bhamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D27 - Strength chart. Reveals inherent strengths and weaknesses in the horoscope.'**
+  String get chart_meaning_bhamsa;
+
+  /// No description provided for @chart_meaning_khavedamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D40 - Auspicious effects chart. Shows positive karmic patterns and blessings.'**
+  String get chart_meaning_khavedamsa;
+
+  /// No description provided for @chart_meaning_akshavedamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D45 - General indications chart. Provides overall life indications.'**
+  String get chart_meaning_akshavedamsa;
+
+  /// No description provided for @chart_meaning_shashtiamsa.
+  ///
+  /// In en, this message translates to:
+  /// **'D60 - Past life karma chart. The most detailed chart showing karmic patterns from previous lives.'**
+  String get chart_meaning_shashtiamsa;
+
+  /// No description provided for @chart_meaning_sudarshan.
+  ///
+  /// In en, this message translates to:
+  /// **'Triple chart view combining Lagna, Moon, and Sun charts for comprehensive analysis.'**
+  String get chart_meaning_sudarshan;
+
+  /// No description provided for @chart_meaning_ashtakavarga.
+  ///
+  /// In en, this message translates to:
+  /// **'Point-based strength analysis showing planetary influences in each house numerically.'**
+  String get chart_meaning_ashtakavarga;
+
   /// No description provided for @display_shareComingSoon.
   ///
   /// In en, this message translates to:
@@ -4985,17 +5375,47 @@ abstract class AppLocalizations {
   /// **'Maximum possible: 337 points'**
   String get strength_maxPossible;
 
+  /// No description provided for @strength_maxPossible337.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum possible: 337 points'**
+  String get strength_maxPossible337;
+
   /// No description provided for @strength_calculationSum.
   ///
   /// In en, this message translates to:
   /// **'Calculation: Sum of all 12 sign SAV values'**
   String get strength_calculationSum;
 
+  /// No description provided for @strength_calculationSum12.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculation: Sum of all 12 sign SAV values'**
+  String get strength_calculationSum12;
+
   /// No description provided for @strength_higherBetter.
   ///
   /// In en, this message translates to:
   /// **'Higher = Better overall transit strength'**
   String get strength_higherBetter;
+
+  /// No description provided for @strength_bavRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Individual BAV: 0-8 points per planet-sign'**
+  String get strength_bavRange;
+
+  /// No description provided for @strength_savRange.
+  ///
+  /// In en, this message translates to:
+  /// **'SAV: 0-56 points per sign (combined)'**
+  String get strength_savRange;
+
+  /// No description provided for @strength_goodBavThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Good BAV: ≥4 points'**
+  String get strength_goodBavThreshold;
 
   /// No description provided for @strength_lagnaLord.
   ///
@@ -5199,18 +5619,6 @@ abstract class AppLocalizations {
   /// **'You have {count} {category} planet(s) based on Vimshopaka Bala scoring.'**
   String strength_vimshopakaStrength_significance(int count, String category);
 
-  /// No description provided for @strength_countPlanets.
-  ///
-  /// In en, this message translates to:
-  /// **'Count: {count} planets'**
-  String strength_countPlanets(int count);
-
-  /// No description provided for @strength_category.
-  ///
-  /// In en, this message translates to:
-  /// **'Category: {category}'**
-  String strength_category(String category);
-
   /// No description provided for @strength_scoreRangeStrong.
   ///
   /// In en, this message translates to:
@@ -5229,17 +5637,77 @@ abstract class AppLocalizations {
   /// **'Score Range: 0-10 points (0-50%)'**
   String get strength_scoreRangeWeak;
 
-  /// No description provided for @strength_planetsPlanets.
+  /// No description provided for @strength_categoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category: {category}'**
+  String strength_categoryLabel(String category);
+
+  /// No description provided for @strength_countPlanets.
+  ///
+  /// In en, this message translates to:
+  /// **'Count: {count} planets'**
+  String strength_countPlanets(int count);
+
+  /// No description provided for @strength_labelPlanets.
   ///
   /// In en, this message translates to:
   /// **'{label} Planets'**
-  String strength_planetsPlanets(String label);
+  String strength_labelPlanets(String label);
 
   /// No description provided for @strength_haveCount.
   ///
   /// In en, this message translates to:
   /// **'You have {value} {label} planets in your chart.'**
   String strength_haveCount(String value, String label);
+
+  /// No description provided for @strength_statusCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Status: {status}'**
+  String strength_statusCategory(String status);
+
+  /// No description provided for @strength_strongPlanetsRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong Planets: {count} (15-20 points)'**
+  String strength_strongPlanetsRange(int count);
+
+  /// No description provided for @strength_mediumPlanetsRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium Planets: {count} (10-15 points)'**
+  String strength_mediumPlanetsRange(int count);
+
+  /// No description provided for @strength_weakPlanetsRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak Planets: {count} (0-10 points)'**
+  String strength_weakPlanetsRange(int count);
+
+  /// No description provided for @strength_maxScore20.
+  ///
+  /// In en, this message translates to:
+  /// **'Max score: 20 points per planet'**
+  String get strength_maxScore20;
+
+  /// No description provided for @strength_strongVimshopakaExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong Vimshopaka = Good dignity across all charts'**
+  String get strength_strongVimshopakaExplain;
+
+  /// No description provided for @strength_category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category: {category}'**
+  String strength_category(String category);
+
+  /// No description provided for @strength_planetsPlanets.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} Planets'**
+  String strength_planetsPlanets(String label);
 
   /// No description provided for @strength_countLabel.
   ///
@@ -10214,6 +10682,366 @@ abstract class AppLocalizations {
   /// **'Manglik Dosha occurs when Mars is placed in the 1st, 4th, 7th, 8th, or 12th house from the Ascendant. It primarily affects marriage and relationships but can be effectively remedied.'**
   String get yogas_manglikDosha_desc;
 
+  /// No description provided for @yogas_astrologicalInsight.
+  ///
+  /// In en, this message translates to:
+  /// **'Astrological Insight'**
+  String get yogas_astrologicalInsight;
+
+  /// No description provided for @yogas_typeInsight_yoga_type.
+  ///
+  /// In en, this message translates to:
+  /// **'Type: {type}'**
+  String yogas_typeInsight_yoga_type(String type);
+
+  /// No description provided for @yogas_typeInsight_yoga_nature.
+  ///
+  /// In en, this message translates to:
+  /// **'Nature: Benefic combination'**
+  String get yogas_typeInsight_yoga_nature;
+
+  /// No description provided for @yogas_typeInsight_yoga_activation.
+  ///
+  /// In en, this message translates to:
+  /// **'Activation: During relevant Dasha periods'**
+  String get yogas_typeInsight_yoga_activation;
+
+  /// No description provided for @yogas_typeInsight_yoga_strength.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength depends on planet dignity and aspects'**
+  String get yogas_typeInsight_yoga_strength;
+
+  /// No description provided for @yogas_typeInsight_dosha_severity.
+  ///
+  /// In en, this message translates to:
+  /// **'Severity: {severity}'**
+  String yogas_typeInsight_dosha_severity(String severity);
+
+  /// No description provided for @yogas_typeInsight_dosha_impact.
+  ///
+  /// In en, this message translates to:
+  /// **'Impact varies by chart context'**
+  String get yogas_typeInsight_dosha_impact;
+
+  /// No description provided for @yogas_typeInsight_dosha_remedies.
+  ///
+  /// In en, this message translates to:
+  /// **'Remedies can mitigate effects'**
+  String get yogas_typeInsight_dosha_remedies;
+
+  /// No description provided for @yogas_typeInsight_dosha_consult.
+  ///
+  /// In en, this message translates to:
+  /// **'Consult an astrologer for personalized guidance'**
+  String get yogas_typeInsight_dosha_consult;
+
+  /// No description provided for @yogas_typeInsight_defaultYoga_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a beneficial planetary combination that enhances specific life areas.'**
+  String get yogas_typeInsight_defaultYoga_desc;
+
+  /// No description provided for @yogas_typeInsight_defaultYoga_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Effects vary based on the specific combination'**
+  String get yogas_typeInsight_defaultYoga_significance;
+
+  /// No description provided for @yogas_typeInsight_defaultDosha_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'This dosha creates certain challenges that can be addressed through remedies.'**
+  String get yogas_typeInsight_defaultDosha_desc;
+
+  /// No description provided for @yogas_typeInsight_defaultDosha_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Effects vary based on the specific combination'**
+  String get yogas_typeInsight_defaultDosha_significance;
+
+  /// No description provided for @yogas_strengthInsight_title.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} {label}'**
+  String yogas_strengthInsight_title(int count, String label);
+
+  /// No description provided for @yogas_strengthInsight_value.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} {label}'**
+  String yogas_strengthInsight_value(int count, String label);
+
+  /// No description provided for @yogas_strengthInsight_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {count} {label} combination(s) in your chart.'**
+  String yogas_strengthInsight_significance(int count, String label);
+
+  /// No description provided for @yogas_strengthInsight_count.
+  ///
+  /// In en, this message translates to:
+  /// **'Count: {count}'**
+  String yogas_strengthInsight_count(int count);
+
+  /// No description provided for @yogas_strengthInsight_level.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength Level: {level}'**
+  String yogas_strengthInsight_level(String level);
+
+  /// No description provided for @yogas_strengthInsight_strong_keypoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear manifestation expected'**
+  String get yogas_strengthInsight_strong_keypoint;
+
+  /// No description provided for @yogas_strengthInsight_moderate_keypoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial effects with room for improvement'**
+  String get yogas_strengthInsight_moderate_keypoint;
+
+  /// No description provided for @yogas_strengthInsight_severe_keypoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Remedies recommended'**
+  String get yogas_strengthInsight_severe_keypoint;
+
+  /// No description provided for @yogas_strengthInsight_default_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard strength level.'**
+  String get yogas_strengthInsight_default_desc;
+
+  /// No description provided for @yogas_insightCard_understanding_kp1.
+  ///
+  /// In en, this message translates to:
+  /// **'Yogas enhance specific life areas'**
+  String get yogas_insightCard_understanding_kp1;
+
+  /// No description provided for @yogas_insightCard_understanding_kp2.
+  ///
+  /// In en, this message translates to:
+  /// **'Formed by planetary positions and relationships'**
+  String get yogas_insightCard_understanding_kp2;
+
+  /// No description provided for @yogas_insightCard_understanding_kp3.
+  ///
+  /// In en, this message translates to:
+  /// **'Each yoga has unique significations'**
+  String get yogas_insightCard_understanding_kp3;
+
+  /// No description provided for @yogas_insightCard_understanding_kp4.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength determines manifestation level'**
+  String get yogas_insightCard_understanding_kp4;
+
+  /// No description provided for @yogas_insightCard_activation_kp1.
+  ///
+  /// In en, this message translates to:
+  /// **'Mahadasha of involved planets activates yoga'**
+  String get yogas_insightCard_activation_kp1;
+
+  /// No description provided for @yogas_insightCard_activation_kp2.
+  ///
+  /// In en, this message translates to:
+  /// **'Antardasha brings sub-level activation'**
+  String get yogas_insightCard_activation_kp2;
+
+  /// No description provided for @yogas_insightCard_activation_kp3.
+  ///
+  /// In en, this message translates to:
+  /// **'Transit support enhances effects'**
+  String get yogas_insightCard_activation_kp3;
+
+  /// No description provided for @yogas_insightCard_activation_kp4.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your Dasha periods for timing'**
+  String get yogas_insightCard_activation_kp4;
+
+  /// No description provided for @yogas_insightCard_strength_kp1.
+  ///
+  /// In en, this message translates to:
+  /// **'Exalted/own sign planets = Strong yoga'**
+  String get yogas_insightCard_strength_kp1;
+
+  /// No description provided for @yogas_insightCard_strength_kp2.
+  ///
+  /// In en, this message translates to:
+  /// **'Debilitated planets = Weak manifestation'**
+  String get yogas_insightCard_strength_kp2;
+
+  /// No description provided for @yogas_insightCard_strength_kp3.
+  ///
+  /// In en, this message translates to:
+  /// **'Benefic aspects strengthen'**
+  String get yogas_insightCard_strength_kp3;
+
+  /// No description provided for @yogas_insightCard_strength_kp4.
+  ///
+  /// In en, this message translates to:
+  /// **'Malefic aspects weaken'**
+  String get yogas_insightCard_strength_kp4;
+
+  /// No description provided for @yogas_insightCard_remedies_kp1.
+  ///
+  /// In en, this message translates to:
+  /// **'Mantra chanting for involved planets'**
+  String get yogas_insightCard_remedies_kp1;
+
+  /// No description provided for @yogas_insightCard_remedies_kp2.
+  ///
+  /// In en, this message translates to:
+  /// **'Gemstones to strengthen weak planets'**
+  String get yogas_insightCard_remedies_kp2;
+
+  /// No description provided for @yogas_insightCard_remedies_kp3.
+  ///
+  /// In en, this message translates to:
+  /// **'Charity on specific days'**
+  String get yogas_insightCard_remedies_kp3;
+
+  /// No description provided for @yogas_insightCard_remedies_kp4.
+  ///
+  /// In en, this message translates to:
+  /// **'Fasting and pujas for afflicted planets'**
+  String get yogas_insightCard_remedies_kp4;
+
+  /// No description provided for @yogas_insightCard_default_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Important aspect of chart analysis.'**
+  String get yogas_insightCard_default_significance;
+
+  /// No description provided for @yogas_insightCard_default_kp.
+  ///
+  /// In en, this message translates to:
+  /// **'General astrological principle'**
+  String get yogas_insightCard_default_kp;
+
+  /// No description provided for @yogas_emptyState_noYogas_kp1.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard chart configuration'**
+  String get yogas_emptyState_noYogas_kp1;
+
+  /// No description provided for @yogas_emptyState_noYogas_kp2.
+  ///
+  /// In en, this message translates to:
+  /// **'Success depends on overall chart strength'**
+  String get yogas_emptyState_noYogas_kp2;
+
+  /// No description provided for @yogas_emptyState_noYogas_kp3.
+  ///
+  /// In en, this message translates to:
+  /// **'Dasha periods still important for timing'**
+  String get yogas_emptyState_noYogas_kp3;
+
+  /// No description provided for @yogas_emptyState_noYogas_kp4.
+  ///
+  /// In en, this message translates to:
+  /// **'Individual planet strengths matter more'**
+  String get yogas_emptyState_noYogas_kp4;
+
+  /// No description provided for @yogas_emptyState_noYogas_kp5.
+  ///
+  /// In en, this message translates to:
+  /// **'Aspects and house placements are key factors'**
+  String get yogas_emptyState_noYogas_kp5;
+
+  /// No description provided for @yogas_emptyState_noDoshas_kp1.
+  ///
+  /// In en, this message translates to:
+  /// **'No major doshas detected'**
+  String get yogas_emptyState_noDoshas_kp1;
+
+  /// No description provided for @yogas_emptyState_noDoshas_kp2.
+  ///
+  /// In en, this message translates to:
+  /// **'Fewer karmic obstacles expected'**
+  String get yogas_emptyState_noDoshas_kp2;
+
+  /// No description provided for @yogas_emptyState_noDoshas_kp3.
+  ///
+  /// In en, this message translates to:
+  /// **'Marriage and relationships less afflicted'**
+  String get yogas_emptyState_noDoshas_kp3;
+
+  /// No description provided for @yogas_emptyState_noDoshas_kp4.
+  ///
+  /// In en, this message translates to:
+  /// **'Still check for other challenging aspects'**
+  String get yogas_emptyState_noDoshas_kp4;
+
+  /// No description provided for @yogas_emptyState_noDoshas_kp5.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall chart analysis recommended'**
+  String get yogas_emptyState_noDoshas_kp5;
+
+  /// No description provided for @yogas_kaalSarp_kp1.
+  ///
+  /// In en, this message translates to:
+  /// **'Visit Trimbakeshwar for Kaal Sarp Puja'**
+  String get yogas_kaalSarp_kp1;
+
+  /// No description provided for @yogas_kaalSarp_kp2.
+  ///
+  /// In en, this message translates to:
+  /// **'Chant Maha Mrityunjaya Mantra 108 times daily'**
+  String get yogas_kaalSarp_kp2;
+
+  /// No description provided for @yogas_kaalSarp_kp3.
+  ///
+  /// In en, this message translates to:
+  /// **'Offer milk to Shivling on Mondays'**
+  String get yogas_kaalSarp_kp3;
+
+  /// No description provided for @yogas_kaalSarp_kp4.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep a snake made of silver in your home'**
+  String get yogas_kaalSarp_kp4;
+
+  /// No description provided for @yogas_kaalSarp_kp5.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate to the needy on Saturdays'**
+  String get yogas_kaalSarp_kp5;
+
+  /// No description provided for @yogas_manglik_kp1.
+  ///
+  /// In en, this message translates to:
+  /// **'Perform Mangal Shanti Puja'**
+  String get yogas_manglik_kp1;
+
+  /// No description provided for @yogas_manglik_kp2.
+  ///
+  /// In en, this message translates to:
+  /// **'Recite Hanuman Chalisa on Tuesdays'**
+  String get yogas_manglik_kp2;
+
+  /// No description provided for @yogas_manglik_kp3.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast on Tuesdays'**
+  String get yogas_manglik_kp3;
+
+  /// No description provided for @yogas_manglik_kp4.
+  ///
+  /// In en, this message translates to:
+  /// **'Wear Red Coral gemstone (after consultation)'**
+  String get yogas_manglik_kp4;
+
+  /// No description provided for @yogas_manglik_kp5.
+  ///
+  /// In en, this message translates to:
+  /// **'Donate red items on Tuesdays'**
+  String get yogas_manglik_kp5;
+
   /// No description provided for @charDasha_nav_current.
   ///
   /// In en, this message translates to:
@@ -10567,6 +11395,1380 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cosmic influence'**
   String get charDasha_signDesc_default;
+
+  /// No description provided for @chart_house_title.
+  ///
+  /// In en, this message translates to:
+  /// **'House {number}'**
+  String chart_house_title(int number);
+
+  /// No description provided for @chart_asc_badge.
+  ///
+  /// In en, this message translates to:
+  /// **'ASC'**
+  String get chart_asc_badge;
+
+  /// No description provided for @chart_sign_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign'**
+  String get chart_sign_label;
+
+  /// No description provided for @chart_cusp_label.
+  ///
+  /// In en, this message translates to:
+  /// **'Cusp'**
+  String get chart_cusp_label;
+
+  /// No description provided for @chart_planets_label.
+  ///
+  /// In en, this message translates to:
+  /// **'PLANETS'**
+  String get chart_planets_label;
+
+  /// No description provided for @chart_theme_1.
+  ///
+  /// In en, this message translates to:
+  /// **'Self & Identity'**
+  String get chart_theme_1;
+
+  /// No description provided for @chart_theme_2.
+  ///
+  /// In en, this message translates to:
+  /// **'Wealth & Values'**
+  String get chart_theme_2;
+
+  /// No description provided for @chart_theme_3.
+  ///
+  /// In en, this message translates to:
+  /// **'Communication'**
+  String get chart_theme_3;
+
+  /// No description provided for @chart_theme_4.
+  ///
+  /// In en, this message translates to:
+  /// **'Home & Roots'**
+  String get chart_theme_4;
+
+  /// No description provided for @chart_theme_5.
+  ///
+  /// In en, this message translates to:
+  /// **'Creativity & Romance'**
+  String get chart_theme_5;
+
+  /// No description provided for @chart_theme_6.
+  ///
+  /// In en, this message translates to:
+  /// **'Health & Service'**
+  String get chart_theme_6;
+
+  /// No description provided for @chart_theme_7.
+  ///
+  /// In en, this message translates to:
+  /// **'Partnerships'**
+  String get chart_theme_7;
+
+  /// No description provided for @chart_theme_8.
+  ///
+  /// In en, this message translates to:
+  /// **'Transformation'**
+  String get chart_theme_8;
+
+  /// No description provided for @chart_theme_9.
+  ///
+  /// In en, this message translates to:
+  /// **'Philosophy & Fortune'**
+  String get chart_theme_9;
+
+  /// No description provided for @chart_theme_10.
+  ///
+  /// In en, this message translates to:
+  /// **'Career & Status'**
+  String get chart_theme_10;
+
+  /// No description provided for @chart_theme_11.
+  ///
+  /// In en, this message translates to:
+  /// **'Aspirations & Gains'**
+  String get chart_theme_11;
+
+  /// No description provided for @chart_theme_12.
+  ///
+  /// In en, this message translates to:
+  /// **'Spirituality & Endings'**
+  String get chart_theme_12;
+
+  /// No description provided for @chart_bhava_1_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Lagna Bhava'**
+  String get chart_bhava_1_title;
+
+  /// No description provided for @chart_bhava_1_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Physical body, personality, vitality, and overall life path.'**
+  String get chart_bhava_1_desc;
+
+  /// No description provided for @chart_bhava_2_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Dhana Bhava'**
+  String get chart_bhava_2_title;
+
+  /// No description provided for @chart_bhava_2_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Accumulated wealth, family, speech, and early childhood.'**
+  String get chart_bhava_2_desc;
+
+  /// No description provided for @chart_bhava_3_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sahaja Bhava'**
+  String get chart_bhava_3_title;
+
+  /// No description provided for @chart_bhava_3_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Siblings, courage, short journeys, and communication skills.'**
+  String get chart_bhava_3_desc;
+
+  /// No description provided for @chart_bhava_4_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Sukha Bhava'**
+  String get chart_bhava_4_title;
+
+  /// No description provided for @chart_bhava_4_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Mother, home, emotional peace, and domestic happiness.'**
+  String get chart_bhava_4_desc;
+
+  /// No description provided for @chart_bhava_5_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Putra Bhava'**
+  String get chart_bhava_5_title;
+
+  /// No description provided for @chart_bhava_5_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Children, creativity, intelligence, and romance.'**
+  String get chart_bhava_5_desc;
+
+  /// No description provided for @chart_bhava_6_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Shatru Bhava'**
+  String get chart_bhava_6_title;
+
+  /// No description provided for @chart_bhava_6_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enemies, health issues, debts, and daily work.'**
+  String get chart_bhava_6_desc;
+
+  /// No description provided for @chart_bhava_7_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Kalatra Bhava'**
+  String get chart_bhava_7_title;
+
+  /// No description provided for @chart_bhava_7_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Marriage, partnerships, and business relationships.'**
+  String get chart_bhava_7_desc;
+
+  /// No description provided for @chart_bhava_8_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Randhra Bhava'**
+  String get chart_bhava_8_title;
+
+  /// No description provided for @chart_bhava_8_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Longevity, inheritance, occult, and transformation.'**
+  String get chart_bhava_8_desc;
+
+  /// No description provided for @chart_bhava_9_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Dharma Bhava'**
+  String get chart_bhava_9_title;
+
+  /// No description provided for @chart_bhava_9_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fortune, higher learning, spirituality, and father.'**
+  String get chart_bhava_9_desc;
+
+  /// No description provided for @chart_bhava_10_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Karma Bhava'**
+  String get chart_bhava_10_title;
+
+  /// No description provided for @chart_bhava_10_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Career, reputation, authority, and public image.'**
+  String get chart_bhava_10_desc;
+
+  /// No description provided for @chart_bhava_11_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Labha Bhava'**
+  String get chart_bhava_11_title;
+
+  /// No description provided for @chart_bhava_11_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Gains, income, elder siblings, and social networks.'**
+  String get chart_bhava_11_desc;
+
+  /// No description provided for @chart_bhava_12_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Vyaya Bhava'**
+  String get chart_bhava_12_title;
+
+  /// No description provided for @chart_bhava_12_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Losses, expenses, foreign lands, and liberation.'**
+  String get chart_bhava_12_desc;
+
+  /// No description provided for @insight_risingSign.
+  ///
+  /// In en, this message translates to:
+  /// **'Rising Sign'**
+  String get insight_risingSign;
+
+  /// No description provided for @insight_ascendant_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Ascendant (Lagna) is {sign} at {degree}°. The Ascendant represents the sign that was rising on the eastern horizon at the exact moment of your birth. It is considered the most important point in Vedic astrology.'**
+  String insight_ascendant_desc(String sign, String degree);
+
+  /// No description provided for @insight_ascendant_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'The Ascendant shapes your physical appearance, personality, and how others perceive you. It acts as a lens through which all planetary energies are filtered in your chart.'**
+  String get insight_ascendant_significance;
+
+  /// No description provided for @insight_ascendant_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Determines your body constitution and health tendencies'**
+  String get insight_ascendant_point1;
+
+  /// No description provided for @insight_ascendant_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Influences your natural approach to life and new situations'**
+  String get insight_ascendant_point2;
+
+  /// No description provided for @insight_ascendant_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Sets the foundation for all 12 houses in your birth chart'**
+  String get insight_ascendant_point3;
+
+  /// No description provided for @insight_ascendant_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Reveals your instinctive reactions and outer personality'**
+  String get insight_ascendant_point4;
+
+  /// No description provided for @insight_moonSign.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon Sign'**
+  String get insight_moonSign;
+
+  /// No description provided for @insight_moon_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Moon is placed in {sign}. In Vedic astrology, the Moon sign (Rashi) is considered more significant than the Sun sign as it represents your emotional nature and inner world.'**
+  String insight_moon_desc(String sign);
+
+  /// No description provided for @insight_moon_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'The Moon governs your mind, emotions, and subconscious patterns. It reveals how you process feelings and what brings you emotional security.'**
+  String get insight_moon_significance;
+
+  /// No description provided for @insight_moon_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Reflects your emotional responses and mental patterns'**
+  String get insight_moon_point1;
+
+  /// No description provided for @insight_moon_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Determines your Nakshatra (birth star) placement'**
+  String get insight_moon_point2;
+
+  /// No description provided for @insight_moon_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Influences your intuition and psychic sensitivity'**
+  String get insight_moon_point3;
+
+  /// No description provided for @insight_moon_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Shapes your relationship with mother and nurturing figures'**
+  String get insight_moon_point4;
+
+  /// No description provided for @insight_sunSign.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun Sign'**
+  String get insight_sunSign;
+
+  /// No description provided for @insight_sun_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Sun is placed in {sign}. The Sun represents your soul essence, vitality, and core identity. It shows your life purpose and the qualities you are meant to develop.'**
+  String insight_sun_desc(String sign);
+
+  /// No description provided for @insight_sun_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'The Sun indicates your father, authority figures, and your relationship with power. It reveals your ego, pride, and how you express your individuality.'**
+  String get insight_sun_significance;
+
+  /// No description provided for @insight_sun_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Represents your soul\'s purpose and true self'**
+  String get insight_sun_point1;
+
+  /// No description provided for @insight_sun_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Governs vitality, health, and life force energy'**
+  String get insight_sun_point2;
+
+  /// No description provided for @insight_sun_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Indicates career potential and leadership abilities'**
+  String get insight_sun_point3;
+
+  /// No description provided for @insight_sun_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Influences relationship with father and authority'**
+  String get insight_sun_point4;
+
+  /// No description provided for @insight_element.
+  ///
+  /// In en, this message translates to:
+  /// **'Element'**
+  String get insight_element;
+
+  /// No description provided for @insight_element_fire_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fire signs (Aries, Leo, Sagittarius) are dynamic, passionate, and action-oriented. They bring enthusiasm, courage, and creative inspiration.'**
+  String get insight_element_fire_desc;
+
+  /// No description provided for @insight_element_earth_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Earth signs (Taurus, Virgo, Capricorn) are practical, grounded, and focused on material stability. They bring patience, reliability, and tangible results.'**
+  String get insight_element_earth_desc;
+
+  /// No description provided for @insight_element_air_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Air signs (Gemini, Libra, Aquarius) are intellectual, communicative, and socially oriented. They bring ideas, connection, and mental agility.'**
+  String get insight_element_air_desc;
+
+  /// No description provided for @insight_element_water_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Water signs (Cancer, Scorpio, Pisces) are emotional, intuitive, and deeply feeling. They bring sensitivity, empathy, and spiritual depth.'**
+  String get insight_element_water_desc;
+
+  /// No description provided for @insight_element_default_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your rising sign belongs to the {element} element, shaping your fundamental approach to life.'**
+  String insight_element_default_desc(String element);
+
+  /// No description provided for @insight_element_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Elements represent the basic building blocks of personality. Your {element} nature influences how you perceive and interact with the world around you.'**
+  String insight_element_significance(String element);
+
+  /// No description provided for @insight_element_fire_trait1.
+  ///
+  /// In en, this message translates to:
+  /// **'Courageous and bold'**
+  String get insight_element_fire_trait1;
+
+  /// No description provided for @insight_element_fire_trait2.
+  ///
+  /// In en, this message translates to:
+  /// **'Natural leaders'**
+  String get insight_element_fire_trait2;
+
+  /// No description provided for @insight_element_fire_trait3.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick to act'**
+  String get insight_element_fire_trait3;
+
+  /// No description provided for @insight_element_fire_trait4.
+  ///
+  /// In en, this message translates to:
+  /// **'Inspiring to others'**
+  String get insight_element_fire_trait4;
+
+  /// No description provided for @insight_element_earth_trait1.
+  ///
+  /// In en, this message translates to:
+  /// **'Practical and reliable'**
+  String get insight_element_earth_trait1;
+
+  /// No description provided for @insight_element_earth_trait2.
+  ///
+  /// In en, this message translates to:
+  /// **'Patient builders'**
+  String get insight_element_earth_trait2;
+
+  /// No description provided for @insight_element_earth_trait3.
+  ///
+  /// In en, this message translates to:
+  /// **'Materially focused'**
+  String get insight_element_earth_trait3;
+
+  /// No description provided for @insight_element_earth_trait4.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong endurance'**
+  String get insight_element_earth_trait4;
+
+  /// No description provided for @insight_element_air_trait1.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick-minded'**
+  String get insight_element_air_trait1;
+
+  /// No description provided for @insight_element_air_trait2.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent communicators'**
+  String get insight_element_air_trait2;
+
+  /// No description provided for @insight_element_air_trait3.
+  ///
+  /// In en, this message translates to:
+  /// **'Socially adept'**
+  String get insight_element_air_trait3;
+
+  /// No description provided for @insight_element_air_trait4.
+  ///
+  /// In en, this message translates to:
+  /// **'Idea generators'**
+  String get insight_element_air_trait4;
+
+  /// No description provided for @insight_element_water_trait1.
+  ///
+  /// In en, this message translates to:
+  /// **'Deeply intuitive'**
+  String get insight_element_water_trait1;
+
+  /// No description provided for @insight_element_water_trait2.
+  ///
+  /// In en, this message translates to:
+  /// **'Emotionally intelligent'**
+  String get insight_element_water_trait2;
+
+  /// No description provided for @insight_element_water_trait3.
+  ///
+  /// In en, this message translates to:
+  /// **'Nurturing nature'**
+  String get insight_element_water_trait3;
+
+  /// No description provided for @insight_element_water_trait4.
+  ///
+  /// In en, this message translates to:
+  /// **'Spiritually inclined'**
+  String get insight_element_water_trait4;
+
+  /// No description provided for @insight_element_default_trait1.
+  ///
+  /// In en, this message translates to:
+  /// **'Influences your temperament'**
+  String get insight_element_default_trait1;
+
+  /// No description provided for @insight_element_default_trait2.
+  ///
+  /// In en, this message translates to:
+  /// **'Shapes your reactions'**
+  String get insight_element_default_trait2;
+
+  /// No description provided for @insight_element_default_trait3.
+  ///
+  /// In en, this message translates to:
+  /// **'Affects compatibility'**
+  String get insight_element_default_trait3;
+
+  /// No description provided for @insight_lagnaLord.
+  ///
+  /// In en, this message translates to:
+  /// **'Lagna Lord'**
+  String get insight_lagnaLord;
+
+  /// No description provided for @insight_lagnaLord_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'{planet} is the ruler of your Ascendant sign {sign}. As the chart ruler, its placement and condition significantly influence your entire life journey and personality expression.'**
+  String insight_lagnaLord_desc(String planet, String sign);
+
+  /// No description provided for @insight_lagnaLord_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'The Lagna Lord acts as a guide for your soul\'s journey. Its house placement shows where you invest most of your energy, and its condition affects overall life success.'**
+  String get insight_lagnaLord_significance;
+
+  /// No description provided for @insight_lagnaLord_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Most important planet for your chart interpretation'**
+  String get insight_lagnaLord_point1;
+
+  /// No description provided for @insight_lagnaLord_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Its strength indicates overall life vitality'**
+  String get insight_lagnaLord_point2;
+
+  /// No description provided for @insight_lagnaLord_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'House placement shows primary life focus'**
+  String get insight_lagnaLord_point3;
+
+  /// No description provided for @insight_lagnaLord_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Aspects to it affect personality and health'**
+  String get insight_lagnaLord_point4;
+
+  /// No description provided for @insight_nakshatraLord.
+  ///
+  /// In en, this message translates to:
+  /// **'Nakshatra Lord'**
+  String get insight_nakshatraLord;
+
+  /// No description provided for @insight_nakshatraLord_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'{planet} rules your birth Nakshatra {nakshatra}. The Nakshatra lord operates at a subtle level, influencing your psychological patterns and karmic tendencies.'**
+  String insight_nakshatraLord_desc(String planet, String nakshatra);
+
+  /// No description provided for @insight_nakshatraLord_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'This planet governs the Vimshottari Dasha sequence of your life. Its condition and placement deeply affect your mental inclinations and spiritual path.'**
+  String get insight_nakshatraLord_significance;
+
+  /// No description provided for @insight_nakshatraLord_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Determines your Mahadasha sequence'**
+  String get insight_nakshatraLord_point1;
+
+  /// No description provided for @insight_nakshatraLord_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Influences subconscious patterns'**
+  String get insight_nakshatraLord_point2;
+
+  /// No description provided for @insight_nakshatraLord_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Affects intuitive and psychic abilities'**
+  String get insight_nakshatraLord_point3;
+
+  /// No description provided for @insight_nakshatraLord_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Reveals karmic lessons from past lives'**
+  String get insight_nakshatraLord_point4;
+
+  /// No description provided for @insight_birthStar.
+  ///
+  /// In en, this message translates to:
+  /// **'Birth Star'**
+  String get insight_birthStar;
+
+  /// No description provided for @insight_nakshatraPada.
+  ///
+  /// In en, this message translates to:
+  /// **'{nakshatra} (Pada {pada})'**
+  String insight_nakshatraPada(String nakshatra, String pada);
+
+  /// No description provided for @insight_nakshatra_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'You were born under {nakshatra} Nakshatra in Pada {pada}. Nakshatras are the 27 lunar mansions that the Moon travels through, providing deep insights into your psychological nature.'**
+  String insight_nakshatra_desc(String nakshatra, String pada);
+
+  /// No description provided for @insight_nakshatra_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Nakshatra reveals your innate talents, emotional patterns, and destiny path. The Pada (quarter) adds further specificity to these qualities.'**
+  String get insight_nakshatra_significance;
+
+  /// No description provided for @insight_nakshatra_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Reveals deep personality traits and tendencies'**
+  String get insight_nakshatra_point1;
+
+  /// No description provided for @insight_nakshatra_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Indicates compatible Nakshatras for relationships'**
+  String get insight_nakshatra_point2;
+
+  /// No description provided for @insight_nakshatra_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Determines your Gana (temperament): {gana}'**
+  String insight_nakshatra_point3(String gana);
+
+  /// No description provided for @insight_nakshatra_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Provides insights into career and life path'**
+  String get insight_nakshatra_point4;
+
+  /// No description provided for @insight_tithi.
+  ///
+  /// In en, this message translates to:
+  /// **'Tithi'**
+  String get insight_tithi;
+
+  /// No description provided for @insight_tithi_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'You were born on {tithi} during {paksha} Paksha. Tithi is the lunar day based on the angular relationship between Sun and Moon, one of the five elements of Panchang.'**
+  String insight_tithi_desc(String tithi, String paksha);
+
+  /// No description provided for @insight_tithi_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Each Tithi carries specific energies affecting your emotional nature and auspiciousness for different activities. It influences your relationship with lunar energy.'**
+  String get insight_tithi_significance;
+
+  /// No description provided for @insight_tithi_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Indicates emotional temperament at birth'**
+  String get insight_tithi_point1;
+
+  /// No description provided for @insight_tithi_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Affects personality and decision-making style'**
+  String get insight_tithi_point2;
+
+  /// No description provided for @insight_tithi_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'{paksha} Paksha influences waxing/waning energy'**
+  String insight_tithi_point3(String paksha);
+
+  /// No description provided for @insight_tithi_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Used for determining auspicious timings'**
+  String get insight_tithi_point4;
+
+  /// No description provided for @insight_yoga.
+  ///
+  /// In en, this message translates to:
+  /// **'Yoga'**
+  String get insight_yoga;
+
+  /// No description provided for @insight_yoga_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'You were born under {yoga} Yoga. This is calculated from the combined positions of Sun and Moon, representing the spiritual and psychological atmosphere of your birth moment.'**
+  String insight_yoga_desc(String yoga);
+
+  /// No description provided for @insight_yoga_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Yoga influences your mental orientation and fortune. There are 27 Yogas, each bringing distinct qualities and tendencies to the native.'**
+  String get insight_yoga_significance;
+
+  /// No description provided for @insight_yoga_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Affects mental and spiritual inclinations'**
+  String get insight_yoga_point1;
+
+  /// No description provided for @insight_yoga_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Influences overall fortune and luck'**
+  String get insight_yoga_point2;
+
+  /// No description provided for @insight_yoga_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Shapes approach to challenges'**
+  String get insight_yoga_point3;
+
+  /// No description provided for @insight_yoga_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Indicates periods of opportunity'**
+  String get insight_yoga_point4;
+
+  /// No description provided for @insight_karana.
+  ///
+  /// In en, this message translates to:
+  /// **'Karana'**
+  String get insight_karana;
+
+  /// No description provided for @insight_karana_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your birth Karana is {karana}. Karana is half of a Tithi and there are 11 Karanas that repeat in a cycle. It influences dynamic action and productivity.'**
+  String insight_karana_desc(String karana);
+
+  /// No description provided for @insight_karana_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Karana affects your capacity for action and completing tasks. It particularly influences work ethic and the nature of your activities.'**
+  String get insight_karana_significance;
+
+  /// No description provided for @insight_karana_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Governs action and productivity style'**
+  String get insight_karana_point1;
+
+  /// No description provided for @insight_karana_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Influences work and completion ability'**
+  String get insight_karana_point2;
+
+  /// No description provided for @insight_karana_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Affects day-to-day decision making'**
+  String get insight_karana_point3;
+
+  /// No description provided for @insight_karana_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Important for selecting activity timing'**
+  String get insight_karana_point4;
+
+  /// No description provided for @insight_vara.
+  ///
+  /// In en, this message translates to:
+  /// **'Vara (Day)'**
+  String get insight_vara;
+
+  /// No description provided for @insight_vara_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'You were born on {vara}, ruled by {deity}. The weekday of birth is significant in Vedic astrology, connecting you to specific planetary and deity energies.'**
+  String insight_vara_desc(String vara, String deity);
+
+  /// No description provided for @insight_vara_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Your birth day lord influences your character and brings blessings from its ruling deity. Each day carries unique qualities that shape personality.'**
+  String get insight_vara_significance;
+
+  /// No description provided for @insight_vara_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Connects you to {vara}\'s planetary ruler'**
+  String insight_vara_point1(String vara);
+
+  /// No description provided for @insight_vara_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'{deity} is your birth day deity'**
+  String insight_vara_point2(String deity);
+
+  /// No description provided for @insight_vara_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Influences natural talents and interests'**
+  String get insight_vara_point3;
+
+  /// No description provided for @insight_vara_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Auspicious for activities ruled by this day'**
+  String get insight_vara_point4;
+
+  /// No description provided for @insight_mahadasha.
+  ///
+  /// In en, this message translates to:
+  /// **'Mahadasha'**
+  String get insight_mahadasha;
+
+  /// No description provided for @insight_mahadasha_value.
+  ///
+  /// In en, this message translates to:
+  /// **'{planet} Mahadasha'**
+  String insight_mahadasha_value(String planet);
+
+  /// No description provided for @insight_mahadasha_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'You are currently running the {planet} Mahadasha with {years} years remaining. Mahadasha is the major planetary period that colors all life experiences.'**
+  String insight_mahadasha_desc(String planet, String years);
+
+  /// No description provided for @insight_mahadasha_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'The Mahadasha planet becomes the primary influence during its period, activating its significations in your chart. Life themes shift with each new Mahadasha.'**
+  String get insight_mahadasha_significance;
+
+  /// No description provided for @insight_mahadasha_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary influence for current life phase'**
+  String get insight_mahadasha_point1;
+
+  /// No description provided for @insight_mahadasha_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Activates houses ruled by {planet}'**
+  String insight_mahadasha_point2(String planet);
+
+  /// No description provided for @insight_mahadasha_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Check {planet}\'s condition for period quality'**
+  String insight_mahadasha_point3(String planet);
+
+  /// No description provided for @insight_mahadasha_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Sub-periods (Antardasha) provide refinement'**
+  String get insight_mahadasha_point4;
+
+  /// No description provided for @insight_guna_varna_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Varna represents the spiritual temperament and indicates the type of work one is naturally suited for. Your Varna is {value}.'**
+  String insight_guna_varna_desc(String value);
+
+  /// No description provided for @insight_guna_vashya_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Vashya indicates mutual attraction and control in relationships. Your category is {value}, which affects compatibility dynamics.'**
+  String insight_guna_vashya_desc(String value);
+
+  /// No description provided for @insight_guna_tara_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tara (Birth Star) compatibility assesses the health of relationship. Your Tara is {value}, influencing relationship harmony.'**
+  String insight_guna_tara_desc(String value);
+
+  /// No description provided for @insight_guna_yoni_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Yoni represents sexual compatibility and physical attraction. Your Yoni is {value}, indicating instinctual compatibility patterns.'**
+  String insight_guna_yoni_desc(String value);
+
+  /// No description provided for @insight_guna_grahamaitri_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Graha Maitri checks friendship between Moon sign lords. Your Moon lord is {value}, affecting mental compatibility.'**
+  String insight_guna_grahamaitri_desc(String value);
+
+  /// No description provided for @insight_guna_gana_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Gana indicates temperament and nature. Your Gana is {value}, representing your fundamental character type.'**
+  String insight_guna_gana_desc(String value);
+
+  /// No description provided for @insight_guna_bhakoot_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Bhakoot checks relative position of Moon signs. Your Moon is in {value}, affecting emotional and health compatibility.'**
+  String insight_guna_bhakoot_desc(String value);
+
+  /// No description provided for @insight_guna_nadi_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Nadi indicates physiological compatibility and genetic factors. Your Nadi is {value}, crucial for progeny and health.'**
+  String insight_guna_nadi_desc(String value);
+
+  /// No description provided for @insight_guna_default_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your {name} factor is {value}, used in Vedic compatibility matching.'**
+  String insight_guna_default_desc(String name, String value);
+
+  /// No description provided for @insight_guna_varna_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Varna matching carries 1 point in Ashtakoot. It shows social and spiritual compatibility between partners.'**
+  String get insight_guna_varna_significance;
+
+  /// No description provided for @insight_guna_vashya_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Vashya carries 2 points and indicates the power dynamics and mutual influence in relationships.'**
+  String get insight_guna_vashya_significance;
+
+  /// No description provided for @insight_guna_tara_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Tara carries 3 points and indicates health, longevity, and overall wellbeing of the relationship.'**
+  String get insight_guna_tara_significance;
+
+  /// No description provided for @insight_guna_yoni_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Yoni carries 4 points and is crucial for physical and instinctual compatibility between partners.'**
+  String get insight_guna_yoni_significance;
+
+  /// No description provided for @insight_guna_grahamaitri_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Graha Maitri carries 5 points and determines mental wavelength and friendship compatibility.'**
+  String get insight_guna_grahamaitri_significance;
+
+  /// No description provided for @insight_guna_gana_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Gana carries 6 points and indicates behavioral and temperamental harmony between partners.'**
+  String get insight_guna_gana_significance;
+
+  /// No description provided for @insight_guna_bhakoot_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Bhakoot carries 7 points and affects emotional bonding, prosperity, and health after marriage.'**
+  String get insight_guna_bhakoot_significance;
+
+  /// No description provided for @insight_guna_nadi_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Nadi carries 8 points (highest) and is essential for genetic compatibility and healthy progeny.'**
+  String get insight_guna_nadi_significance;
+
+  /// No description provided for @insight_guna_default_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'This factor contributes to overall compatibility score in marriage matching.'**
+  String get insight_guna_default_significance;
+
+  /// No description provided for @insight_guna_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Used in Ashtakoot (8-fold) matching system'**
+  String get insight_guna_point1;
+
+  /// No description provided for @insight_guna_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Helps assess relationship compatibility'**
+  String get insight_guna_point2;
+
+  /// No description provided for @insight_guna_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on Moon sign and Nakshatra'**
+  String get insight_guna_point3;
+
+  /// No description provided for @insight_guna_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Important for marriage compatibility'**
+  String get insight_guna_point4;
+
+  /// No description provided for @insight_primaryGemstone.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary Gemstone'**
+  String get insight_primaryGemstone;
+
+  /// No description provided for @insight_gemstone_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'{gemstone} is recommended as your primary gemstone based on your Moon sign {sign}. Gemstones channel planetary energies and can strengthen benefic influences.'**
+  String insight_gemstone_desc(String gemstone, String sign);
+
+  /// No description provided for @insight_gemstone_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Wear on {day} for best results'**
+  String insight_gemstone_point1(String day);
+
+  /// No description provided for @insight_gemstone_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Consult an astrologer before wearing'**
+  String get insight_gemstone_point2;
+
+  /// No description provided for @insight_gemstone_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Use natural, untreated stones'**
+  String get insight_gemstone_point3;
+
+  /// No description provided for @insight_gemstone_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Set in recommended metal for your sign'**
+  String get insight_gemstone_point4;
+
+  /// No description provided for @insight_luckyNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky Numbers'**
+  String get insight_luckyNumbers;
+
+  /// No description provided for @insight_luckyNumbers_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on your Moon sign {sign}, the numbers {numbers} carry positive vibrations for you. Numerology connects numbers to planetary energies.'**
+  String insight_luckyNumbers_desc(String sign, String numbers);
+
+  /// No description provided for @insight_luckyNumbers_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky numbers can be used for important decisions, choosing dates, addresses, and other significant selections in life.'**
+  String get insight_luckyNumbers_significance;
+
+  /// No description provided for @insight_luckyNumbers_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Derived from Moon sign planetary rulership'**
+  String get insight_luckyNumbers_point1;
+
+  /// No description provided for @insight_luckyNumbers_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Use for important dates and decisions'**
+  String get insight_luckyNumbers_point2;
+
+  /// No description provided for @insight_luckyNumbers_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Can influence address and phone numbers'**
+  String get insight_luckyNumbers_point3;
+
+  /// No description provided for @insight_luckyNumbers_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Combined with Nakshatra for precision'**
+  String get insight_luckyNumbers_point4;
+
+  /// No description provided for @insight_luckyDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky Day'**
+  String get insight_luckyDay;
+
+  /// No description provided for @insight_luckyDay_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'{day} is your most auspicious weekday based on your Moon sign {sign}. This day is ruled by a planet that is harmonious with your chart.'**
+  String insight_luckyDay_desc(String day, String sign);
+
+  /// No description provided for @insight_luckyDay_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Important activities, new beginnings, and significant decisions yield better results when initiated on your lucky day.'**
+  String get insight_luckyDay_significance;
+
+  /// No description provided for @insight_luckyDay_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Best day for new ventures'**
+  String get insight_luckyDay_point1;
+
+  /// No description provided for @insight_luckyDay_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Wear your gemstone on this day'**
+  String get insight_luckyDay_point2;
+
+  /// No description provided for @insight_luckyDay_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Good for important meetings'**
+  String get insight_luckyDay_point3;
+
+  /// No description provided for @insight_luckyDay_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhanced intuition and luck'**
+  String get insight_luckyDay_point4;
+
+  /// No description provided for @insight_luckyColors.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky Colors'**
+  String get insight_luckyColors;
+
+  /// No description provided for @insight_luckyColors_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'The colors {colors} are harmonious with your Moon sign {sign}. Colors carry vibrational frequencies that can enhance or diminish planetary energies.'**
+  String insight_luckyColors_desc(String colors, String sign);
+
+  /// No description provided for @insight_luckyColors_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorporating lucky colors in clothing, surroundings, and accessories can subtly enhance positive planetary influences.'**
+  String get insight_luckyColors_significance;
+
+  /// No description provided for @insight_luckyColors_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Wear during important occasions'**
+  String get insight_luckyColors_point1;
+
+  /// No description provided for @insight_luckyColors_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Use in home and workspace decor'**
+  String get insight_luckyColors_point2;
+
+  /// No description provided for @insight_luckyColors_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhances positive planetary rays'**
+  String get insight_luckyColors_point3;
+
+  /// No description provided for @insight_luckyColors_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Can improve mood and confidence'**
+  String get insight_luckyColors_point4;
+
+  /// No description provided for @insight_luckyMetal.
+  ///
+  /// In en, this message translates to:
+  /// **'Lucky Metal'**
+  String get insight_luckyMetal;
+
+  /// No description provided for @insight_luckyMetal_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'{metal} is your recommended metal based on your Moon sign {sign}. Metals conduct planetary energies and wearing them can strengthen beneficial influences.'**
+  String insight_luckyMetal_desc(String metal, String sign);
+
+  /// No description provided for @insight_luckyMetal_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'The right metal amplifies gemstone effects and provides protection from negative planetary influences.'**
+  String get insight_luckyMetal_significance;
+
+  /// No description provided for @insight_luckyMetal_point1.
+  ///
+  /// In en, this message translates to:
+  /// **'Use for setting gemstones'**
+  String get insight_luckyMetal_point1;
+
+  /// No description provided for @insight_luckyMetal_point2.
+  ///
+  /// In en, this message translates to:
+  /// **'Wear as jewelry for benefits'**
+  String get insight_luckyMetal_point2;
+
+  /// No description provided for @insight_luckyMetal_point3.
+  ///
+  /// In en, this message translates to:
+  /// **'Connects to ruling planet'**
+  String get insight_luckyMetal_point3;
+
+  /// No description provided for @insight_luckyMetal_point4.
+  ///
+  /// In en, this message translates to:
+  /// **'Traditional Vedic remedy'**
+  String get insight_luckyMetal_point4;
+
+  /// No description provided for @insight_statusPlanets.
+  ///
+  /// In en, this message translates to:
+  /// **'{status} Planets'**
+  String insight_statusPlanets(String status);
+
+  /// No description provided for @insight_status_exalted_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Planets in exaltation are at their strongest and most beneficial. They deliver their best results and significations with full power.'**
+  String get insight_status_exalted_desc;
+
+  /// No description provided for @insight_status_debilitated_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Planets in debilitation are weakened and may struggle to deliver positive results. Remedies can help mitigate negative effects.'**
+  String get insight_status_debilitated_desc;
+
+  /// No description provided for @insight_status_retrograde_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Retrograde planets appear to move backward and often bring karmic lessons. They work on internal and past-life matters.'**
+  String get insight_status_retrograde_desc;
+
+  /// No description provided for @insight_status_combust_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Planets too close to the Sun become combust, their significations may be overshadowed or weakened by solar energy.'**
+  String get insight_status_combust_desc;
+
+  /// No description provided for @insight_status_default_desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Planets with special status require attention in chart interpretation.'**
+  String get insight_status_default_desc;
+
+  /// No description provided for @insight_status_noPlanets.
+  ///
+  /// In en, this message translates to:
+  /// **'No planets in this condition in your chart.'**
+  String get insight_status_noPlanets;
+
+  /// No description provided for @insight_status_significance.
+  ///
+  /// In en, this message translates to:
+  /// **'These planets ({planets}) are {status} in your chart, affecting their significations.'**
+  String insight_status_significance(String planets, String status);
+
+  /// No description provided for @insight_status_exalted_tip1.
+  ///
+  /// In en, this message translates to:
+  /// **'Leverage this strength in life'**
+  String get insight_status_exalted_tip1;
+
+  /// No description provided for @insight_status_exalted_tip2.
+  ///
+  /// In en, this message translates to:
+  /// **'Excellent for related activities'**
+  String get insight_status_exalted_tip2;
+
+  /// No description provided for @insight_status_exalted_tip3.
+  ///
+  /// In en, this message translates to:
+  /// **'Natural talent area'**
+  String get insight_status_exalted_tip3;
+
+  /// No description provided for @insight_status_exalted_tip4.
+  ///
+  /// In en, this message translates to:
+  /// **'Harness during its Dasha'**
+  String get insight_status_exalted_tip4;
+
+  /// No description provided for @insight_status_debilitated_tip1.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice related remedies'**
+  String get insight_status_debilitated_tip1;
+
+  /// No description provided for @insight_status_debilitated_tip2.
+  ///
+  /// In en, this message translates to:
+  /// **'Be patient with these areas'**
+  String get insight_status_debilitated_tip2;
+
+  /// No description provided for @insight_status_debilitated_tip3.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation may apply'**
+  String get insight_status_debilitated_tip3;
+
+  /// No description provided for @insight_status_debilitated_tip4.
+  ///
+  /// In en, this message translates to:
+  /// **'Growth through challenges'**
+  String get insight_status_debilitated_tip4;
+
+  /// No description provided for @insight_status_retrograde_tip1.
+  ///
+  /// In en, this message translates to:
+  /// **'Review and reflect themes'**
+  String get insight_status_retrograde_tip1;
+
+  /// No description provided for @insight_status_retrograde_tip2.
+  ///
+  /// In en, this message translates to:
+  /// **'Past-life karmic work'**
+  String get insight_status_retrograde_tip2;
+
+  /// No description provided for @insight_status_retrograde_tip3.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal development focus'**
+  String get insight_status_retrograde_tip3;
+
+  /// No description provided for @insight_status_retrograde_tip4.
+  ///
+  /// In en, this message translates to:
+  /// **'Delays may have purpose'**
+  String get insight_status_retrograde_tip4;
+
+  /// No description provided for @insight_status_combust_tip1.
+  ///
+  /// In en, this message translates to:
+  /// **'Strengthen through mantras'**
+  String get insight_status_combust_tip1;
+
+  /// No description provided for @insight_status_combust_tip2.
+  ///
+  /// In en, this message translates to:
+  /// **'May need more effort'**
+  String get insight_status_combust_tip2;
+
+  /// No description provided for @insight_status_combust_tip3.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun period affects these'**
+  String get insight_status_combust_tip3;
+
+  /// No description provided for @insight_status_combust_tip4.
+  ///
+  /// In en, this message translates to:
+  /// **'Humility in these areas'**
+  String get insight_status_combust_tip4;
+
+  /// No description provided for @insight_status_default_tip1.
+  ///
+  /// In en, this message translates to:
+  /// **'Check individual planet effects'**
+  String get insight_status_default_tip1;
+
+  /// No description provided for @insight_status_default_tip2.
+  ///
+  /// In en, this message translates to:
+  /// **'Consider house placement'**
+  String get insight_status_default_tip2;
+
+  /// No description provided for @insight_status_default_tip3.
+  ///
+  /// In en, this message translates to:
+  /// **'Review Dasha periods'**
+  String get insight_status_default_tip3;
 }
 
 class _AppLocalizationsDelegate
